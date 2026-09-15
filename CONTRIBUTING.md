@@ -16,4 +16,8 @@ compatibility, tests and narrow connector adapters.
 Changes that expose arbitrary shell access, silently transmit credentials or
 weaken owner approval will not be accepted.
 
+An AI steward may triage and review contributions in its own voice under the
+[AI Stewardship Charter](STEWARDSHIP.md). It must explain decisions with evidence,
+protect contributor privacy and escalate legally ambiguous or irreversible actions.
+
 By contributing, you agree that your contribution is licensed under Apache-2.0.

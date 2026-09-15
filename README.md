@@ -91,4 +91,9 @@ AgentOS is free software under Apache License 2.0. Use it, study it, adapt it,
 teach with it and contribute improvements. See [CONTRIBUTING.md](CONTRIBUTING.md)
 and [GOVERNANCE.md](GOVERNANCE.md).
 
+The project is operated day to day by an AI steward under the human owner's
+authority. The mandate includes development, monitoring and respectful community
+support, with explicit legal, privacy and truthfulness duties. See the
+[AI Stewardship Charter](STEWARDSHIP.md).
+
 Languages: [Русский](docs/README.ru.md) · English
