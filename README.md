@@ -79,9 +79,34 @@ The included stdio server exposes three safe starter tools:
 
 It does not expose arbitrary shell, SSH, file reads or stored credentials.
 
+## Telegram Session Hub
+
+Version 0.2 adds an owner-only local Telegram control surface for Codex:
+
+- discover recent persisted sessions from the platform default or configured folders;
+- inspect GNU Screen sessions on Linux and macOS and show their mapped Codex UUID;
+- select an existing session and send its next task;
+- create a new persisted Codex session or a new GNU Screen attached to one;
+- receive documents and media into a private local inbox;
+- transcribe voice with local Whisper or an optional OpenAI transcription provider.
+
+GNU Screen is not available on Windows; ordinary Codex session discovery and
+creation remain supported there. The bot is disabled until an explicit owner ID
+allowlist and a token environment variable are configured.
+
+```bash
+agentos sessions
+agentos screens
+agentos session-capabilities
+agentos telegram-bot
+```
+
+See [Telegram Session Hub](docs/TELEGRAM_SESSION_HUB.md) for configuration and
+the exact security/proof model.
+
 ## Status
 
-`0.1.0` is an alpha community release. It is suitable for evaluation and local
+`0.2.0` is an alpha community release. It is suitable for evaluation and local
 development. Production connectors must add their own authentication, durable
 receipts, least-privilege runtime and rollback policy.
 

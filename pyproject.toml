@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "crystal-agent-os"
-version = "0.1.0"
+version = "0.2.0"
 description = "A local-first control plane for personal AI agents, Telegram Business and MCP clients."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -23,6 +23,7 @@ dependencies = []
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.9"]
+speech = ["openai>=2.0"]
 
 [project.scripts]
 agentos = "agent_os.cli:main"

@@ -15,6 +15,24 @@ private local configuration and connector adapters
 The public core never assumes access to a maintainer's infrastructure. Private
 deployments belong in overlays that are not committed to this repository.
 
+## Telegram Session Hub boundary
+
+```text
+allowlisted Telegram owner
+        ↓
+local Bot API adapter (no arbitrary shell)
+        ↓
+Codex metadata index / GNU Screen index / speech capability probe
+        ↓
+Codex exec resume or proof-checked Screen input
+        ↓
+durable Codex session journal
+```
+
+The community hub is deliberately host-local. Multi-host routing belongs in an
+authenticated deployment adapter and must not be approximated by exposing SSH
+hostnames or shell commands through Telegram.
+
 ## Invariants
 
 - No credential values in ordinary MCP responses.
@@ -24,6 +42,10 @@ deployments belong in overlays that are not committed to this repository.
 - Production mutations require a deployment-specific authority and rollback path.
 - Telegram QR is the primary MTProto onboarding method.
 - A credential bundle is an explicit, owner-approved output and is handled like a password.
+- Telegram control requires an explicit numeric owner allowlist.
+- Session discovery returns metadata, not transcript content.
+- Screen delivery requires a matching durable user event followed by a non-user event.
+- Speech capability is explicit: local, API-backed, or unavailable with setup guidance.
 
 ## Public versus private
 
