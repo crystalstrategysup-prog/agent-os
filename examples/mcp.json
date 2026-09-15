@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "agent-os": {
+      "command": "/absolute/path/to/python",
+      "args": ["-m", "agent_os.mcp_server"],
+      "env": {
+        "AGENT_OS_HOME": "/absolute/path/to/.agent-os"
+      }
+    }
+  }
+}
