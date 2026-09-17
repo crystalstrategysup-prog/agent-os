@@ -22,6 +22,33 @@ An AI model can reason, but a dependable agent also needs boundaries:
 
 AgentOS provides that control layer without taking ownership of your data.
 
+## Governed model routing
+
+Version 0.3 adds a deterministic routing plan for Codex tasks:
+
+- Sol/high coordinates the root task and difficult reviews;
+- Terra/medium handles bounded implementation and investigation;
+- Luna/low handles narrow classification, extraction and routing;
+- Astra/high is reserved for explicitly critical root work.
+
+```bash
+agentos route-task --mode implementation --role root
+agentos route-task --mode classification --role worker --complexity low
+```
+
+The command returns an exact model and reasoning effort. It does **not** claim
+that a model ran. Codex delegates in supported clients after a direct request or
+an applicable project/skill instruction; runtime activity still needs separate
+proof. The default is `delegate_by_default=false`.
+
+## Truthful completion gate
+
+A completed thread or successful command is not sufficient evidence that a
+product outcome works. `agentos assess-result --file evidence.json` requires
+current PASS evidence for every acceptance criterion. Missing, stale,
+future-dated, failed or historically bound evidence blocks `COMPLETE`, and a
+newer failure supersedes an older PASS. See [Result evidence](docs/RESULT_EVIDENCE.md).
+
 ## Install
 
 Requires Python 3.11 or newer.
@@ -106,7 +133,7 @@ the exact security/proof model.
 
 ## Status
 
-`0.2.0` is an alpha community release. It is suitable for evaluation and local
+`0.3.0` is an alpha community release. It is suitable for evaluation and local
 development. Production connectors must add their own authentication, durable
 receipts, least-privilege runtime and rollback policy.
 

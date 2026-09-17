@@ -7,10 +7,12 @@ import json
 from pathlib import Path
 
 from . import __version__
-from .config import AgentOSPaths
+from .config import AgentOSPaths, load_config
 from .doctor import run as doctor_run
 from .mcp import client_config
+from .model_routing import route_task
 from .onboarding import public_plan
+from .result_gate import evaluate_result
 from .session_hub import CodexRunner, discover_screens, discover_sessions
 from .tasks import normalize_task
 
@@ -32,6 +34,12 @@ def parser() -> argparse.ArgumentParser:
     commands.add_parser("screens", help="List local GNU Screen sessions and Codex bindings")
     commands.add_parser("session-capabilities", help="Show Telegram Session Hub readiness")
     commands.add_parser("telegram-bot", help="Run the owner-only Telegram Session Hub")
+    route = commands.add_parser("route-task", help="Plan an exact model and reasoning effort")
+    route.add_argument("--mode", default="implementation")
+    route.add_argument("--complexity", choices=("low", "medium", "high", "critical"), default="medium")
+    route.add_argument("--role", choices=("root", "worker", "verifier"), default="root")
+    gate = commands.add_parser("assess-result", help="Check current evidence before reporting COMPLETE")
+    gate.add_argument("--file", type=Path, required=True)
     task = commands.add_parser("task", help="Normalize a bounded task brief")
     task.add_argument("objective")
     task.add_argument("--target", default="local")
@@ -52,8 +60,6 @@ def main(argv: list[str] | None = None) -> int:
     elif args.command == "mcp-config":
         _print(client_config())
     elif args.command in {"sessions", "screens", "session-capabilities", "telegram-bot"}:
-        from .config import load_config
-
         config = load_config(paths)
         if args.command == "sessions":
             _print({"sessions": [item.as_dict() for item in discover_sessions(config)]})
@@ -73,6 +79,19 @@ def main(argv: list[str] | None = None) -> int:
             from .telegram_bot import run
 
             run(paths, config)
+    elif args.command == "route-task":
+        _print(route_task(load_config(paths), mode=args.mode, complexity=args.complexity, role=args.role))
+    elif args.command == "assess-result":
+        payload = json.loads(args.file.read_text(encoding="utf-8"))
+        result = evaluate_result(
+            payload["acceptance"],
+            payload.get("evidence", []),
+            now=payload["now"],
+            max_age_seconds=payload.get("max_age_seconds"),
+        )
+        _print(result)
+        if result["status"] != "PASS":
+            return 2
     elif args.command == "task":
         _print(normalize_task(args.objective, args.target, args.risk).as_dict())
     return 0

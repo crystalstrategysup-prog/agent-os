@@ -37,10 +37,21 @@ class AgentOSPaths:
 
 def default_config() -> dict[str, object]:
     return {
-        "schema": "agent-os.community-config/v2",
+        "schema": "agent-os.community-config/v3",
         "name": "My AgentOS",
         "telegram_business": {"enabled": False, "onboarding": "telegram_qr"},
         "mcp": {"transport": "stdio", "allow_arbitrary_shell": False},
+        "model_routing": {
+            "enabled": True,
+            "delegate_by_default": False,
+            "profiles": {
+                "coordinator": {"model": "gpt-5.6-sol", "reasoning_effort": "high"},
+                "worker": {"model": "gpt-5.6-terra", "reasoning_effort": "medium"},
+                "fast": {"model": "gpt-5.6-luna", "reasoning_effort": "low"},
+                "reviewer": {"model": "gpt-5.6-sol", "reasoning_effort": "high"},
+                "critical": {"model": "gpt-6-astra", "reasoning_effort": "high"},
+            },
+        },
         "codex": {
             "executable": "codex",
             "home": "",
@@ -71,11 +82,19 @@ def load_config(paths: AgentOSPaths) -> dict[str, object]:
     if raw.get("schema") not in {
         "agent-os.community-config/v1",
         "agent-os.community-config/v2",
+        "agent-os.community-config/v3",
     }:
         raise ValueError("unsupported_config_schema")
-    if raw.get("schema") == "agent-os.community-config/v1":
-        upgraded = default_config()
-        upgraded.update(raw)
-        upgraded["schema"] = "agent-os.community-config/v2"
-        return upgraded
-    return raw
+    upgraded = _merge(default_config(), raw)
+    upgraded["schema"] = "agent-os.community-config/v3"
+    return upgraded
+
+
+def _merge(defaults: dict[str, object], supplied: dict[str, object]) -> dict[str, object]:
+    result = dict(defaults)
+    for key, value in supplied.items():
+        if isinstance(value, dict) and isinstance(result.get(key), dict):
+            result[key] = _merge(result[key], value)  # type: ignore[arg-type]
+        else:
+            result[key] = value
+    return result
