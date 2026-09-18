@@ -9,6 +9,17 @@ Telegram Business onboarding path.
 The community edition is intentionally small. It contains no vendor account,
 private host, production credential or hidden cloud dependency.
 
+## Latest release
+
+**[v0.3.0](https://github.com/crystalstrategysup-prog/agent-os/releases/tag/v0.3.0)**
+adds deterministic model-routing plans and an evidence-based completion gate.
+It also includes the owner-only Telegram Session Hub introduced in 0.2.
+
+Read the [release notes](CHANGELOG.md), visit the
+[project website](https://crystalstrategy.ru/agent-os/) or open an
+[issue](https://github.com/crystalstrategysup-prog/agent-os/issues) with a bug,
+question or blunt technical review.
+
 ## Why AgentOS?
 
 An AI model can reason, but a dependable agent also needs boundaries:
