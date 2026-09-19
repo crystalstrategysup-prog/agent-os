@@ -15,7 +15,7 @@ from agent_os.tasks import normalize_task
 def test_init_creates_private_tree(tmp_path):
     paths = AgentOSPaths.discover(tmp_path / "agent-os")
     paths.initialize()
-    assert load_config(paths)["schema"] == "agent-os.community-config/v3"
+    assert load_config(paths)["schema"] == "agent-os.community-config/v4"
     assert stat.S_IMODE(paths.secrets.stat().st_mode) == 0o700
     assert run(paths)["status"] == "PASS"
 

@@ -11,9 +11,10 @@ private host, production credential or hidden cloud dependency.
 
 ## Latest release
 
-**[v0.3.0](https://github.com/crystalstrategysup-prog/agent-os/releases/tag/v0.3.0)**
-adds deterministic model-routing plans and an evidence-based completion gate.
-It also includes the owner-only Telegram Session Hub introduced in 0.2.
+**[v0.4.0](https://github.com/crystalstrategysup-prog/agent-os/tree/v0.4.0)**
+adds Full Inventory and an AgentOS-native two-day public update advisory. It
+also includes deterministic model routing, evidence-based completion and the
+owner-only Telegram Session Hub.
 
 Read the [release notes](CHANGELOG.md), visit the
 [project website](https://crystalstrategy.ru/agent-os/) or open an
@@ -59,6 +60,36 @@ product outcome works. `agentos assess-result --file evidence.json` requires
 current PASS evidence for every acceptance criterion. Missing, stale,
 future-dated, failed or historically bound evidence blocks `COMPLETE`, and a
 newer failure supersedes an older PASS. See [Result evidence](docs/RESULT_EVIDENCE.md).
+
+## Full Inventory
+
+Register the project roots you want AgentOS to know. The collector emits only
+paths, knowledge classes, sizes and SHA-256 identities; it never copies file
+contents and never auto-loads history.
+
+```bash
+agentos inventory collect --catalog /absolute/path/projects.json --output ~/.agent-os/state/inventory.json
+agentos inventory select --input ~/.agent-os/state/inventory.json --project-id my-project
+```
+
+The six classes are `project`, `roadmap`, `skill`, `problem`, `host` and
+`history`. See [Full Inventory](docs/FULL_INVENTORY.md).
+
+## Update advisory
+
+Every AgentOS command checks the local advisory state. If 48 hours have elapsed,
+AgentOS reads the official public GitHub tags and records whether a newer
+Community Edition exists. It stays quiet while current, retries an unavailable
+check after six hours and never installs anything automatically.
+
+```bash
+agentos update-check
+agentos update-check --force
+```
+
+This is activity-driven, not a background daemon: if AgentOS is idle, the check
+runs on the next command. Public tag metadata is informational and cannot
+authorize software or host mutation. See [Update checks](docs/UPDATE_CHECK.md).
 
 ## Install
 
@@ -144,7 +175,7 @@ the exact security/proof model.
 
 ## Status
 
-`0.3.0` is an alpha community release. It is suitable for evaluation and local
+`0.4.0` is an alpha community release. It is suitable for evaluation and local
 development. Production connectors must add their own authentication, durable
 receipts, least-privilege runtime and rollback policy.
 

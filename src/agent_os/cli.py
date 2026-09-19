@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
-from . import __version__
+from . import __version__, full_inventory
 from .config import AgentOSPaths, load_config
 from .doctor import run as doctor_run
 from .mcp import client_config
@@ -15,6 +16,7 @@ from .onboarding import public_plan
 from .result_gate import evaluate_result
 from .session_hub import CodexRunner, discover_screens, discover_sessions
 from .tasks import normalize_task
+from .update_advisory import check as update_advisory_check
 
 
 def _print(value: object) -> None:
@@ -34,6 +36,25 @@ def parser() -> argparse.ArgumentParser:
     commands.add_parser("screens", help="List local GNU Screen sessions and Codex bindings")
     commands.add_parser("session-capabilities", help="Show Telegram Session Hub readiness")
     commands.add_parser("telegram-bot", help="Run the owner-only Telegram Session Hub")
+    update = commands.add_parser("update-check", help="Check the official public tag when due")
+    update.add_argument("--force", action="store_true")
+    inventory = commands.add_parser("inventory", help="Collect or select maintained project knowledge")
+    inventory_commands = inventory.add_subparsers(dest="inventory_action", required=True)
+    collect = inventory_commands.add_parser("collect")
+    collect.add_argument("--catalog", type=Path, required=True)
+    collect.add_argument("--output", type=Path)
+    collect.add_argument("--max-files", type=int, default=full_inventory.DEFAULT_MAX_FILES)
+    collect.add_argument("--max-bytes", type=int, default=full_inventory.DEFAULT_MAX_BYTES)
+    select = inventory_commands.add_parser("select")
+    select.add_argument("--input", type=Path, required=True)
+    select.add_argument("--project-id", required=True)
+    select.add_argument(
+        "--class",
+        dest="knowledge_classes",
+        action="append",
+        choices=full_inventory.CLASSES[:-1],
+    )
+    select.add_argument("--output", type=Path)
     route = commands.add_parser("route-task", help="Plan an exact model and reasoning effort")
     route.add_argument("--mode", default="implementation")
     route.add_argument("--complexity", choices=("low", "medium", "high", "critical"), default="medium")
@@ -50,17 +71,33 @@ def parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
     paths = AgentOSPaths.discover(args.home)
+    config: dict[str, object] | None = None
+    advisory: dict[str, object] | None = None
+    if args.command != "init":
+        config = load_config(paths)
+        advisory = update_advisory_check(
+            paths.state,
+            config,
+            __version__,
+            force=args.command == "update-check" and args.force,
+        )
+        if args.command != "update-check" and advisory.get("status") == "UPDATE_AVAILABLE":
+            print(
+                f"AgentOS {advisory['latest_version']} is available: "
+                f"{advisory['latest_tag_url']}",
+                file=sys.stderr,
+            )
     if args.command == "init":
         paths.initialize()
         _print({"status": "PASS", "home": str(paths.home)})
     elif args.command == "doctor":
-        _print(doctor_run(paths))
+        _print(doctor_run(paths, update_advisory=advisory))
     elif args.command == "telegram-plan":
         _print(public_plan())
     elif args.command == "mcp-config":
         _print(client_config())
     elif args.command in {"sessions", "screens", "session-capabilities", "telegram-bot"}:
-        config = load_config(paths)
+        assert config is not None
         if args.command == "sessions":
             _print({"sessions": [item.as_dict() for item in discover_sessions(config)]})
         elif args.command == "screens":
@@ -80,7 +117,8 @@ def main(argv: list[str] | None = None) -> int:
 
             run(paths, config)
     elif args.command == "route-task":
-        _print(route_task(load_config(paths), mode=args.mode, complexity=args.complexity, role=args.role))
+        assert config is not None
+        _print(route_task(config, mode=args.mode, complexity=args.complexity, role=args.role))
     elif args.command == "assess-result":
         payload = json.loads(args.file.read_text(encoding="utf-8"))
         result = evaluate_result(
@@ -94,6 +132,33 @@ def main(argv: list[str] | None = None) -> int:
             return 2
     elif args.command == "task":
         _print(normalize_task(args.objective, args.target, args.risk).as_dict())
+    elif args.command == "update-check":
+        _print(advisory)
+    elif args.command == "inventory":
+        try:
+            if args.inventory_action == "collect":
+                result = full_inventory.collect(
+                    args.catalog,
+                    max_files=args.max_files,
+                    max_bytes=args.max_bytes,
+                )
+            else:
+                result = full_inventory.select(
+                    args.input,
+                    project_id=args.project_id,
+                    classes=args.knowledge_classes,
+                )
+        except full_inventory.FullInventoryError as exc:
+            result = {
+                "schema": "agent-os.full-inventory-error/v1",
+                "status": "BLOCKED",
+                "reason_code": str(exc),
+            }
+        if args.output and result.get("status") in {"PASS", "PARTIAL"}:
+            full_inventory.write_result(args.output, result)
+        _print(result)
+        if result.get("status") not in {"PASS", "PARTIAL"}:
+            return 2
     return 0
 
 

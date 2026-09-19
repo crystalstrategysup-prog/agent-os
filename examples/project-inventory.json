@@ -1,0 +1,14 @@
+{
+  "schema": "agent-os.full-inventory-catalog/v1",
+  "catalog_id": "my-agentos-projects",
+  "projects": [
+    {
+      "project_id": "my-project",
+      "host_id": "local",
+      "root": "/absolute/path/to/my-project",
+      "policy_paths": ["AGENTS.md"],
+      "roadmap_paths": ["ROADMAP.json"],
+      "enabled": false
+    }
+  ]
+}

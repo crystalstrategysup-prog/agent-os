@@ -30,3 +30,13 @@ def test_cli_routes_model_and_blocks_incomplete_result(tmp_path, capsys):
     assert main(["--home", str(home), "assess-result", "--file", str(payload)]) == 2
     result = json.loads(capsys.readouterr().out)
     assert result["status"] == "BLOCKED"
+
+
+def test_cli_update_check_is_advisory_only(tmp_path, capsys):
+    home = tmp_path / "home"
+    assert main(["--home", str(home), "init"]) == 0
+    capsys.readouterr()
+    assert main(["--home", str(home), "update-check", "--force"]) == 0
+    output = json.loads(capsys.readouterr().out)
+    assert output["status"] == "CURRENT"
+    assert output["automatic_install"] is False

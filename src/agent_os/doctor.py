@@ -11,7 +11,11 @@ from .session_hub import CodexRunner
 from .speech import capabilities as speech_capabilities
 
 
-def run(paths: AgentOSPaths) -> dict[str, object]:
+def run(
+    paths: AgentOSPaths,
+    *,
+    update_advisory: dict[str, object] | None = None,
+) -> dict[str, object]:
     checks: list[dict[str, object]] = []
     checks.append({"id": "home_exists", "ok": paths.home.is_dir()})
     checks.append({"id": "config_valid", "ok": _config_valid(paths)})
@@ -44,6 +48,18 @@ def run(paths: AgentOSPaths) -> dict[str, object]:
                 ),
             }
         )
+        if update_advisory is not None:
+            checks.append(
+                {
+                    "id": "update_advisory",
+                    # Public metadata is advisory. An offline host remains healthy.
+                    "ok": True,
+                    "available": update_advisory.get("status") != "UNAVAILABLE",
+                    "status": update_advisory.get("status"),
+                    "latest_version": update_advisory.get("latest_version"),
+                    "automatic_install": False,
+                }
+            )
     except (OSError, ValueError):
         checks.append({"id": "codex_executable", "ok": False})
     return {

@@ -37,10 +37,16 @@ class AgentOSPaths:
 
 def default_config() -> dict[str, object]:
     return {
-        "schema": "agent-os.community-config/v3",
+        "schema": "agent-os.community-config/v4",
         "name": "My AgentOS",
         "telegram_business": {"enabled": False, "onboarding": "telegram_qr"},
         "mcp": {"transport": "stdio", "allow_arbitrary_shell": False},
+        "update_advisory": {
+            "enabled": True,
+            "interval_seconds": 172800,
+            "failure_retry_seconds": 21600,
+            "automatic_install": False,
+        },
         "model_routing": {
             "enabled": True,
             "delegate_by_default": False,
@@ -83,10 +89,11 @@ def load_config(paths: AgentOSPaths) -> dict[str, object]:
         "agent-os.community-config/v1",
         "agent-os.community-config/v2",
         "agent-os.community-config/v3",
+        "agent-os.community-config/v4",
     }:
         raise ValueError("unsupported_config_schema")
     upgraded = _merge(default_config(), raw)
-    upgraded["schema"] = "agent-os.community-config/v3"
+    upgraded["schema"] = "agent-os.community-config/v4"
     return upgraded
 
 

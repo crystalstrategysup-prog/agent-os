@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.0 — 2026-09-19
+
+- Add Full Inventory: a bounded, content-free map of registered project policy,
+  roadmap, skill, problem, host and historical knowledge surfaces.
+- Add an AgentOS-native public update advisory. On AgentOS activity it checks
+  the official GitHub tags when the previous successful check is at least 48
+  hours old; failures retry after six hours.
+- Keep update metadata strictly advisory: no automatic download, installation
+  or mutation is permitted.
+
 ## 0.3.0 — 2026-09-18
 
 - Add deterministic Sol/Terra/Luna/Astra model-routing plans with exact
