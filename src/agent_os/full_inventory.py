@@ -52,8 +52,8 @@ def write_result(path: Path, payload: dict[str, Any]) -> Path:
     parent = target.parent
     parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     try:
-        if parent.resolve(strict=True) != parent:
-            raise FullInventoryError("inventory output parent must be canonical")
+        parent = parent.resolve(strict=True)
+        target = parent / target.name
         if target.exists() or target.is_symlink():
             current = target.lstat()
             if not stat.S_ISREG(current.st_mode) or stat.S_ISLNK(current.st_mode):

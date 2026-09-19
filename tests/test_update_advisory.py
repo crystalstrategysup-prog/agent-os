@@ -133,3 +133,20 @@ def test_symlinked_state_target_is_not_followed(tmp_path):
     assert result["status"] == "CURRENT"
     assert result["state_persisted"] is False
     assert outside.read_text(encoding="utf-8") == "untouched"
+
+
+def test_state_directory_alias_is_canonicalized(tmp_path):
+    real = tmp_path / "real"
+    real.mkdir()
+    alias = tmp_path / "alias"
+    alias.symlink_to(real, target_is_directory=True)
+    state = alias / "state"
+    result = check(
+        state,
+        default_config(),
+        "0.4.0",
+        opener=opener_for([("v0.4.0", "1" * 40)]),
+        now=NOW,
+    )
+    assert result["state_persisted"] is True
+    assert (real / "state" / "update-advisory.json").is_file()

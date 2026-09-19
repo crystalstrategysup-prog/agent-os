@@ -224,7 +224,13 @@ def check(
 
     enabled, interval, retry = _settings(config)
     moment = (now or _now()).astimezone(dt.UTC)
-    state_path = Path(state_dir) / "update-advisory.json"
+    state_root = Path(state_dir).expanduser()
+    state_root.mkdir(mode=0o700, parents=True, exist_ok=True)
+    state_path = (
+        state_root / "update-advisory.json"
+        if state_root.is_symlink()
+        else state_root.resolve(strict=True) / "update-advisory.json"
+    )
     cached = _load_cached(state_path)
     if not enabled:
         return {
