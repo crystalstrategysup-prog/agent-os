@@ -163,6 +163,13 @@ GNU Screen is not available on Windows; ordinary Codex session discovery and
 creation remain supported there. The bot is disabled until an explicit owner ID
 allowlist and a token environment variable are configured.
 
+The Session Hub bot is bound to the local AgentOS instance. It can receive
+files and voice for that host after owner authorization; it does not create a
+second “personal” or “report” bot automatically. Telegram Business uses its
+own business bot and authorization path. If you operate separate bots or hosts,
+give each listener its own bot identity, credential and explicit routing; this
+Community Edition does not provide a multi-host bot broker.
+
 ```bash
 agentos sessions
 agentos screens

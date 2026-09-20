@@ -74,3 +74,5 @@ video require a configured transcription provider before their speech becomes a 
 
 This community adapter controls the local host only. A multi-host deployment must
 add an authenticated host broker rather than expose SSH or arbitrary routes to Telegram.
+The Session Hub bot is not an automatically provisioned report bot, and its
+credential must not be reused by a Telegram Business bot or another listener.
