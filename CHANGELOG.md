@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Pin `https://github.com/crystalstrategysup-prog/agent-os` as the canonical public Crystal AgentOS Community repository and forbid substituting similarly named personal or internal fleet repositories.
+
 ## 0.4.0 — 2026-09-19
 
 - Add Full Inventory: a bounded, content-free map of registered project policy,

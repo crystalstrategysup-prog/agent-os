@@ -6,6 +6,13 @@ Crystal AgentOS helps you turn an AI client into a governed working environment:
 local configuration, bounded task briefs, MCP tools, health checks and a clear
 Telegram Business onboarding path.
 
+The canonical public repository is
+**[crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os)**,
+published through the Crystal Strategy GitHub account and linked from the
+[AgentOS Community page](https://crystalstrategy.ru/agent-os/community/).
+Similarly named personal or internal fleet repositories are separate operating
+contours and are not public AgentOS distribution endpoints.
+
 The community edition is intentionally small. It contains no vendor account,
 private host, production credential or hidden cloud dependency.
 

@@ -1,6 +1,7 @@
 # Project contract
 
-- This repository is the public, host-neutral Crystal AgentOS Community Edition.
+- This repository is the canonical public, host-neutral Crystal AgentOS Community Edition: `https://github.com/crystalstrategysup-prog/agent-os`.
+- The public project is owned and published through the Crystal Strategy GitHub account. Never substitute a similarly named personal or internal fleet repository when publishing, linking, reporting visibility, or preparing a community release.
 - Never commit credentials, Telegram identifiers, private hostnames, Codex auth files, session contents, or production routes.
 - Session discovery may read only bounded Codex metadata required to identify a session; ordinary output must never expose transcript contents.
 - Telegram control is owner-allowlisted and disabled until explicitly configured.
