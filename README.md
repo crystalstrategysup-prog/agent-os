@@ -36,6 +36,7 @@ An AI model can reason, but a dependable agent also needs boundaries:
 - which actions are allowed;
 - how a task is classified before execution;
 - how tools are exposed to ChatGPT and other MCP clients;
+- how browser work stays bound to the intended in-app or Chrome surface;
 - how a personal Telegram account becomes an authorized business interface;
 - how a result can be checked and rolled back.
 
@@ -154,6 +155,13 @@ The included stdio server exposes three safe starter tools:
 - `agentos_doctor`
 
 It does not expose arbitrary shell, SSH, file reads or stored credentials.
+
+## Browser surfaces
+
+AgentOS keeps the Codex in-app Browser and Chrome with the supported Playwright
+Extension as separate first-class surfaces. Explicit user or workstream binding
+wins; otherwise the required capability selects the surface. See
+[Browser surfaces](docs/BROWSER_SURFACES.md).
 
 ## Telegram Session Hub
 

@@ -3,6 +3,9 @@
 ## Unreleased
 
 - Pin `https://github.com/crystalstrategysup-prog/agent-os` as the canonical public Crystal AgentOS Community repository and forbid substituting similarly named personal or internal fleet repositories.
+- Document deterministic browser-surface selection for the in-app Browser and
+  Chrome with the supported Playwright Extension without publishing private
+  profile data or creating a universal fallback ladder.
 
 ## 0.4.0 — 2026-09-19
 

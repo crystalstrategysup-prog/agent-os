@@ -8,6 +8,7 @@
 - Commands are built as argument arrays from validated identifiers and configured paths. Do not expose an arbitrary shell surface.
 - Public update metadata is advisory only: it may report an official tag but must never authorize download, installation or mutation.
 - Full Inventory reads only explicitly registered canonical project roots, emits hashes and metadata instead of contents, and never auto-loads history.
+- Browser routing follows `docs/BROWSER_SURFACES.md`: explicit user/workstream binding wins; otherwise select the in-app Browser or Chrome with the supported Playwright Extension by required capability.
 - A queued Screen keystroke is not proof that Codex accepted a message; require a durable user event followed by a non-user event.
 - Keep Windows behavior explicit: Codex session folders are supported, GNU Screen is not.
 - Run local tests and review the diff before direct Git delivery. GitHub Actions are not used.
