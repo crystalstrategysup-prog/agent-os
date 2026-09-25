@@ -276,6 +276,32 @@ def test_F_check_runner_stops_late_descendant_writes(tmp_path, parent_sleep, exp
 
 
 @pytest.mark.skipif(os.name != "posix", reason="process-group checks require POSIX")
+@pytest.mark.parametrize("failure", ["set_blocking", "selector"])
+def test_F_check_runner_setup_failure_kills_owned_processes(tmp_path, monkeypatch, failure):
+    late = tmp_path / "late-after-setup-failure.txt"
+    child = (
+        "import pathlib,time; time.sleep(1.1); "
+        + f"pathlib.Path({str(late)!r}).write_text('late')"
+    )
+    parent = (
+        "import subprocess,sys,time; "
+        + f"subprocess.Popen([sys.executable,'-c',{child!r}]); "
+        + "time.sleep(3)"
+    )
+    def fail(*_args, **_kwargs):
+        raise OSError(24, "fixture failure")
+
+    if failure == "set_blocking":
+        monkeypatch.setattr(p.os, "set_blocking", fail)
+    else:
+        monkeypatch.setattr(p.selectors, "DefaultSelector", fail)
+    with pytest.raises(OSError, match="fixture failure"):
+        p._bounded_check_process([sys.executable, "-c", parent], tmp_path, os.environ.copy(), 3)
+    time.sleep(1.4)
+    assert not late.exists()
+
+
+@pytest.mark.skipif(os.name != "posix", reason="process-group checks require POSIX")
 def test_F_check_runner_bounds_output_and_launch_failure(tmp_path):
     code, output = p._bounded_check_process(
         [sys.executable, "-c", "print('x' * 5000000)"],
@@ -464,6 +490,91 @@ def test_F_integration_interrupted_journal_recovers_without_overwriting_owner_ed
     agent_row = next(row for row in journal["files"] if row["path"] == str(agents))
     assert agent_row["before"] == safeio.sha(b"Original owner rules.\n")
     # The conflict is intentionally left for a human reconciliation.
+
+
+def test_F_integration_replans_if_owner_agents_changes_during_planning(tmp_path, monkeypatch):
+    codex, skills, home = tmp_path / "codex", tmp_path / "skills", tmp_path / "user"
+    codex.mkdir()
+    agents = codex / "AGENTS.md"
+    agents.write_bytes(b"Original owner rule.\n")
+    changed = b"New owner rule: do not send.\r\n"
+    original = integration._current_bytes
+    seen = False
+
+    def edit_before_plan_read(path):
+        nonlocal seen
+        if path == agents and not seen:
+            seen = True
+            agents.write_bytes(changed)
+        return original(path)
+
+    monkeypatch.setattr(integration, "_current_bytes", edit_before_plan_read)
+    result = integration.install(codex, skills, home, apply=True)
+    assert result["status"] == "INSTALLED_MANUAL_WORKFLOW"
+    assert agents.read_bytes().startswith(changed)
+
+    # An edit after the selected snapshot and before the locked precondition
+    # must refuse the stale plan while preserving the new owner bytes.
+    fresh = b"Another owner rule.\n"
+    agents.write_bytes(fresh)
+    calls = 0
+
+    def edit_after_snapshot(path):
+        nonlocal calls
+        if path == agents:
+            calls += 1
+            if calls == 2:
+                agents.write_bytes(changed)
+        return original(path)
+
+    monkeypatch.setattr(integration, "_current_bytes", edit_after_snapshot)
+    with pytest.raises(GateError, match="integration_target_changed_replan"):
+        integration.install(codex, skills, home, apply=True)
+    assert agents.read_bytes() == changed
+
+
+def test_F_integration_recovery_rejects_lexical_escape(tmp_path):
+    codex, skills, home = tmp_path / "codex", tmp_path / "skills", tmp_path / "user"
+    for directory in (codex, skills, home / "state"):
+        directory.mkdir(parents=True)
+    outside = tmp_path / "outside"
+    outside.write_bytes(b"owner data")
+    crafted = skills / "dummy" / ".." / ".." / "outside"
+    journal = home / "state/integration-transaction.json"
+    atomic_json(journal, {
+        "schema": "agentos.integration-transaction/v1",
+        "codex_home": str(codex), "skills_home": str(skills),
+        "files": [{"path": str(crafted), "before": None,
+                   "after": safeio.sha(b"owner data"), "backup": None}],
+    })
+    with pytest.raises(GateError):
+        integration._recover_transaction(journal, codex, skills, home)
+    assert outside.read_bytes() == b"owner data"
+
+
+def test_B_pending_entry_blocks_lifecycle_but_not_questions(setup):
+    root, home, answers = setup
+    result = p.enter(root, answers, session_id="pending", turn_id="t", user_home=home)
+    task_id = result["task_id"]
+    journal = root / ".agentos/entry-transaction.json"
+    journal.write_text("pending fixture")
+    assert p.questionnaire(root)["schema"] == "agentos.questionnaire/v1"
+    with pytest.raises(GateError, match="entry_recovery_required"):
+        p.ready(root, task_id, "reviewer")
+    with pytest.raises(GateError, match="entry_recovery_required"):
+        p.check_ready(root, task_id)
+    with pytest.raises(GateError, match="entry_recovery_required"):
+        p.run_check(root, task_id, answers["checks"][0]["id"])
+    with pytest.raises(GateError, match="entry_recovery_required"):
+        p.register_document(root, "stage", "docs/agentos/STAGE.md", "owner", "source", "summary", task_id)
+    with pytest.raises(GateError, match="entry_recovery_required"):
+        p.assess(root, task_id)
+    with pytest.raises(GateError, match="entry_recovery_required"):
+        p.close(root, task_id, {})
+    with pytest.raises(GateError, match="entry_recovery_required"):
+        p.checkpoint(root, task_id, "pending", "recover")
+    with pytest.raises(GateError, match="entry_recovery_required"):
+        p.next_turn(root, home, session_id="pending", previous_turn="t", turn_id="t2", task_id=task_id)
 
 
 def test_F_integration_interrupted_journal_can_restore_and_retry(tmp_path, monkeypatch):

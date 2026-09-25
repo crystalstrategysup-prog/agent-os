@@ -80,6 +80,11 @@ agentos project enter --root P --session S --turn T --resume-task TASK \
 prompt/observation receipts не мешают явному входу; связанные записи сохраняются,
 пока реальная задача не закрыта или не checkpoint. Нативная provenance не является
 правом исполнения; explicit next-turn не доказывает native enforcement.
+Если `enter` оставил `.agentos/entry-transaction.json`, зависимые lifecycle
+операции (регистрация документов, READY, check, close/checkpoint, next-turn)
+возвращают `entry_recovery_required` до восстановления. Вопросы и read-only
+диагностика продолжаются без project intake. После проверки точного stale lock
+повторный `enter` выполняет recovery и требует повторить вход.
 
 ## 4. Документы до реализации
 
@@ -103,6 +108,9 @@ agentos project ready --root P --task TASK --reviewer Reviewer
 
 Только approved write_paths. `project check --root P --task TASK --check-id NAME`
 исполняет exact argv, timeout, собирает ограниченный лог и source-bound receipt.
+Runner останавливает собственную process group при таймауте, превышении вывода,
+живом потомке и ошибке настройки selector/pipe; PASS не выдаётся при оставшемся
+потомке.
 Ненулевой rc/timeout/изменение source во время check → FAIL. Shell-интерполяции нет,
 но `shell=False` **не sandbox**: программа может обращаться к сети/хосту. До запуска
 нужны проверенные полномочия на её реальные эффекты. В локальной приёмке — tmpdir,

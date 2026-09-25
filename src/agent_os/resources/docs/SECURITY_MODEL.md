@@ -16,6 +16,9 @@ Native hooks исключены; это **не** отключение клиен
 |Большой AGENTS обрезан и скрывает важные правила|Короткий индекс, адресные ссылки, fresh-session readback|Размер и Markdown не доказывают, что клиент прочитал все адресные документы|
 |Профиль навязал authority|Exact IDs/hashes/host/conflicts, profile_authority=false|Prompt injection в тексте остаётся риском|
 |Секреты или подмена релиза|Separate public tree, manifests, exact-current compare|Hash не подпись; scanning эвристический|
+|Непроверенный installed bytecode или launcher|Сверка wheel/source, обязательные script hashes v2, удаление package caches перед apply/probe|Same-UID hostile race не исключена|
+|Незавершённый enter принят за READY|Pending entry journal блокирует зависимый lifecycle до recovery|Read-only вопросы не блокируются|
+|Проверка оставила потомка|Собственная process group и cleanup с момента Popen|Не sandbox для проверяемой программы|
 
 До READY разрешены read-only inspection и нужная bootstrap/docs подготовка, не продуктовые
 изменения. write_paths контролируются на assessment, не ACL. check запускает reviewed exact

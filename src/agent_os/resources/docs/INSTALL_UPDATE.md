@@ -28,6 +28,13 @@ Wheel копируется с повторной проверкой SHA, venv с
 --isolated --no-index --no-deps. До запуска installed module сравниваются байты
 `agent_os`, wheel metadata и entrypoint scripts с проверенным wheel; затем smoke
 проверяет реальную installed version/resources/MCP tools.
+Новые установки используют manifest `agentos.install/v2` с обязательными SHA-256
+всех entrypoints. Для rollback существующего public beta.5 manifest v1 допускается
+только его проверенный canonical launcher. До probe при apply удаляются лишь
+производные `__pycache__/*.pyc` внутри установленного `agent_os`: проверенные
+исходники не должны исполняться через непроверенный bytecode. Plan cache не меняет.
+Пути с пробелами и длинные пути допускают точный pip shell trampoline; произвольный
+shell launcher не допускается.
 Only after PASS меняется current symlink. Installer не изменяет пользовательскую папку,
 но читает `overlay.json` и `config.json` для проверки совместимости схем перед планом и
 перед переключением версии. Неизвестная схема, повреждённый JSON или symlink блокируют
@@ -67,6 +74,9 @@ Import создаёт файл только после полной записи
 Перепутанные маркеры блокируют запись. Навыки имеют namespaced directories;
 чужие modifications вызывают CONFLICT. AGENTS, skills и receipt обновляются через
 журнал с откатом или явным recovery; конкурентная правка не перезаписывается.
+Выбранный AGENTS/override, результат и backup строятся из одного снимка; смена
+owner-файла до применения требует нового плана. Recovery принимает только пути
+в разрешённом каталоге skills или точные файлы интеграции.
 Existing hooks иных владельцев сохраняются. Backup предыдущих файлов —
 user/backups/integration. Config/auth/model/trust store не редактируются.
 

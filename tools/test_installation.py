@@ -62,7 +62,9 @@ def verify(wheel: Path, overlay: Path | None = None) -> dict:
             raise RuntimeError(r.stdout + "\n" + r.stderr)
         return json.loads(r.stdout) if r.stdout.strip().startswith("{") else r.stdout
 
-    with tempfile.TemporaryDirectory(prefix="agentos-install-check-") as td:
+    # The actual installer must handle pip's shell trampoline for venv paths
+    # containing spaces; every update and rollback in this fixture exercises it.
+    with tempfile.TemporaryDirectory(prefix="agentos install check ") as td:
         t = Path(td)
         fixture = t / "prior-fixture-source"
         shutil.copytree(
@@ -225,6 +227,32 @@ def verify(wheel: Path, overlay: Path | None = None) -> dict:
         entrypoint.write_bytes(original_entrypoint + b"\n# fixture drift\n")
         blocked_reactivation("installed_entrypoint_hash_mismatch")
         entrypoint.write_bytes(original_entrypoint)
+        manifest_without_hashes = json.loads(original_manifest)
+        manifest_without_hashes.pop("script_sha256")
+        manifest_path.write_text(json.dumps(manifest_without_hashes))
+        entrypoint.write_bytes(original_entrypoint + b"\n# fixture drift\n")
+        blocked_reactivation("installed_entrypoint_hash_contract_missing")
+        entrypoint.write_bytes(original_entrypoint)
+        manifest_path.write_bytes(original_manifest)
+        marker = t / "unverified-cache-executed.txt"
+        cache_script = """import importlib.util, importlib._bootstrap_external as be, sys
+from pathlib import Path
+module, marker = map(Path, sys.argv[1:])
+source = module.read_bytes()
+stat = module.stat()
+payload = source.decode() + "\\nfrom pathlib import Path as _Path\\n_Path(" + repr(str(marker)) + ").write_text('bad')\\n"
+cache = Path(importlib.util.cache_from_source(str(module)))
+cache.parent.mkdir(exist_ok=True)
+cache.write_bytes(be._code_to_timestamp_pyc(compile(payload, str(module), 'exec'), int(stat.st_mtime), len(source)))
+"""
+        run([release_dir / ".venv/bin/python", "-I", "-c", cache_script,
+             site / "agent_os/__init__.py", marker])
+        # Find the interpreter's actual cache tag rather than assuming Python 3.11.
+        cache = next((site / "agent_os/__pycache__").glob("__init__.*.pyc"))
+        assert run(reactivate[:-3])["status"] == "PLANNED"
+        assert cache.exists(), "plan must not modify installed cache"
+        run(reactivate)
+        assert not marker.exists(), "unverified bytecode executed during activation"
         workflow_file.write_bytes(original_workflow + b"\n# damaged current fixture\n")
         run(
             [
@@ -321,6 +349,16 @@ def verify(wheel: Path, overlay: Path | None = None) -> dict:
             "skills/agentos-project-entry/SKILL.md" in resources["files"]
             and "docs/PROCESS.md" in resources["files"]
         )
+        long_core = t / ("long-" + "x" * 65) / ("y" * 70) / ("z" * 70) / "core"
+        long_user = t / "long-user"
+        long_user.mkdir()
+        long_install = run([
+            sys.executable, installer, "install", "--wheel", wheel,
+            "--sha256", digest(wheel), "--version", __version__,
+            "--core-home", long_core, "--user-home", long_user,
+            "--apply", "--expected-current", "none",
+        ])
+        assert long_install["status"] == "INSTALLED"
         return {
             "schema": "agentos.local-install-verification/v1",
             "status": "PASS",
@@ -343,6 +381,7 @@ def verify(wheel: Path, overlay: Path | None = None) -> dict:
                 "integration_preserves_native_trust": True,
                 "corrupt_installed_payload_refused": True,
                 "damaged_current_can_switch_to_verified_release": True,
+                "space_and_long_paths": True,
             },
             "target_mac_verified": False,
             "native_hooks_activated": False,

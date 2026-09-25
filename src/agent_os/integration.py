@@ -46,12 +46,17 @@ def _recover_transaction(journal: Path, codex_home: Path, skills_home: Path, use
     for row in record["files"]:
         if not isinstance(row, dict) or set(row) != {"path", "before", "after", "backup"}:
             raise GateError("integration_recovery_journal_invalid")
+        if not isinstance(row["path"], str):
+            raise GateError("integration_recovery_path_invalid")
         path = Path(row["path"])
         if not path.is_absolute() or not (
             path == codex_home / "AGENTS.md"
             or path == codex_home / "AGENTS.override.md"
             or path == codex_home / "agentos-integration.json"
-            or skills_home in path.parents
+            or (
+                skills_home in path.parents
+                and within(skills_home, path.relative_to(skills_home).as_posix()) == path
+            )
         ):
             raise GateError("integration_recovery_path_invalid")
         current = _current_bytes(path)
@@ -118,16 +123,14 @@ def install(
     resources = Path(__file__).parent / "resources"
     # Do not manufacture an override that shadows existing owner instructions.
     override = codex_home / "AGENTS.override.md"
-    if override.is_symlink():
-        raise GateError("integration_symlink_refused")
+    override_bytes = _current_bytes(override)
     agents = (
         override
-        if override.is_file() and override.read_bytes().strip()
+        if override_bytes is not None and override_bytes.strip()
         else codex_home / "AGENTS.md"
     )
-    if agents.is_symlink():
-        raise GateError("integration_symlink_refused")
-    old = agents.read_bytes() if agents.exists() else b""
+    agents_before = override_bytes if agents == override else _current_bytes(agents)
+    old = agents_before or b""
     start, end = START.encode(), END.encode()
     if (
         old.count(start) != old.count(end)
@@ -184,7 +187,7 @@ def install(
     observed = {}
     for name, data in paths.items():
         path = Path(name)
-        original = _current_bytes(path)
+        original = agents_before if path == agents else _current_bytes(path)
         observed[name] = original
         if path == agents:
             continue
@@ -224,6 +227,8 @@ def install(
     with lock(within(user_home, "state/integration.lock")):
         if journal.exists():
             raise GateError("integration_recovery_required_replan")
+        if _current_bytes(override) != override_bytes:
+            raise GateError("integration_target_changed_replan:" + str(override))
         for path, _, original in to_write:
             if _current_bytes(path) != original:
                 raise GateError("integration_target_changed_replan:" + str(path))

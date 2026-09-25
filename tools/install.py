@@ -72,23 +72,58 @@ def release(root: Path, identifier: str) -> Path:
     return path
 
 
-def read_manifest(path: Path, *, verify_payload: bool = True) -> dict:
+def read_manifest(
+    path: Path, *, verify_payload: bool = True, normalize_caches: bool = False
+) -> dict:
     marker = path / "INSTALL.json"
     if marker.is_symlink() or not marker.is_file() or (path / "INCOMPLETE").exists():
         raise InstallError("release_not_complete:" + path.name)
     data = json.loads(marker.read_text())
-    if data.get("schema") != "agentos.install/v1" or data.get("overlay_schema") != 1:
+    if not isinstance(data, dict):
+        raise InstallError("release_manifest_invalid")
+    schema = data.get("schema")
+    if schema not in {"agentos.install/v1", "agentos.install/v2"} or data.get("overlay_schema") != 1:
         raise InstallError("release_schema_incompatible")
-    wheel = path / data["wheel_name"]
+    version, wheel_name, wheel_hash = (
+        data.get("version"), data.get("wheel_name"), data.get("wheel_sha256")
+    )
+    if (
+        not isinstance(version, str)
+        or not isinstance(wheel_name, str)
+        or not re.fullmatch(r"[A-Za-z0-9_.-]+\.whl", wheel_name)
+        or not isinstance(wheel_hash, str)
+        or not re.fullmatch(r"[0-9a-f]{64}", wheel_hash)
+    ):
+        raise InstallError("release_manifest_invalid")
+    wheel = path / wheel_name
     if (
         wheel.parent != path
         or wheel.is_symlink()
         or not wheel.is_file()
-        or digest(wheel) != data["wheel_sha256"]
+        or digest(wheel) != wheel_hash
     ):
         raise InstallError("installed_wheel_hash_mismatch")
+    if path.name != version + "-" + wheel_hash[:12]:
+        raise InstallError("release_identity_mismatch")
+    if schema == "agentos.install/v2":
+        hashes = data.get("script_sha256")
+        if not isinstance(hashes, dict) or not hashes or any(
+            not isinstance(name, str)
+            or not isinstance(value, str)
+            or not re.fullmatch(r"[0-9a-f]{64}", value)
+            for name, value in hashes.items()
+        ):
+            raise InstallError("installed_entrypoint_hash_contract_missing")
+    elif not re.fullmatch(r"0\.5\.0-beta\.[1-5]", version):
+        raise InstallError("legacy_manifest_version_unsupported")
     if verify_payload:
-        _verify_owned_payload(path, wheel, data.get("script_sha256"))
+        _verify_owned_payload(
+            path,
+            wheel,
+            data.get("script_sha256"),
+            legacy=schema == "agentos.install/v1",
+            normalize_caches=normalize_caches,
+        )
     return data
 
 
@@ -100,7 +135,8 @@ def _site_packages(path: Path) -> Path:
 
 
 def _verify_owned_payload(
-    path: Path, wheel: Path, script_hashes: dict | None
+    path: Path, wheel: Path, script_hashes: dict | None, *,
+    legacy: bool = False, normalize_caches: bool = False,
 ) -> dict[str, str]:
     """Compare actual package bytes with the trusted wheel before importing it."""
     site = _site_packages(path)
@@ -134,6 +170,7 @@ def _verify_owned_payload(
     package = site / "agent_os"
     if package.is_symlink() or not package.is_dir():
         raise InstallError("installed_package_directory_invalid")
+    cache_files = []
     for root, dirs, files in os.walk(package, followlinks=False):
         for directory in dirs:
             if (Path(root) / directory).is_symlink():
@@ -144,9 +181,13 @@ def _verify_owned_payload(
                 raise InstallError("installed_payload_type_invalid")
             rel = actual.relative_to(site).as_posix()
             if "__pycache__" in actual.parts and filename.endswith(".pyc"):
+                cache_files.append(actual)
                 continue
             if rel not in expected:
                 raise InstallError("installed_payload_extra:" + rel)
+    # pip and normal use may create caches. Remove only verified regular cache
+    # files in this owned package before any import: -B prevents writes, not
+    # execution of a pre-existing timestamp-valid .pyc.
     dist_info = site / metadata[0].split("/", 1)[0]
     if dist_info.is_symlink() or not dist_info.is_dir():
         raise InstallError("installed_metadata_directory_invalid")
@@ -174,13 +215,37 @@ def _verify_owned_payload(
         if not sep or not module.startswith("agent_os.") or not function.isidentifier():
             raise InstallError("wheel_entrypoint_target_invalid")
         body = script.read_text(encoding="utf-8")
-        if not body.startswith("#!" + str(path / ".venv/bin/python")) or (
+        interpreter = str(path / ".venv/bin/python")
+        direct_shebang = "#!" + interpreter + "\n"
+        # pip/distlib uses a POSIX sh trampoline when the venv path contains
+        # spaces, because a kernel shebang cannot quote its interpreter.
+        shell_shebang = (
+            "#!/bin/sh\n'''exec' \""
+            + interpreter.replace('"', '\\"')
+            + "\" \"$0\" \"$@\"\n' '''\n"
+        )
+        if not body.startswith((direct_shebang, shell_shebang)) or (
             f"from {module} import {function}" not in body
         ):
             raise InstallError("installed_entrypoint_target_mismatch:" + name)
+        if legacy:
+            prefix = direct_shebang if body.startswith(direct_shebang) else shell_shebang
+            canonical = (
+                prefix
+                + "import sys\n"
+                + f"from {module} import {function}\n"
+                + "if __name__ == '__main__':\n"
+                + "    sys.argv[0] = sys.argv[0].removesuffix('.exe')\n"
+                + f"    sys.exit({function}())\n"
+            )
+            if body != canonical:
+                raise InstallError("legacy_entrypoint_not_canonical:" + name)
         scripts[name] = digest(script)
     if script_hashes is not None and scripts != script_hashes:
         raise InstallError("installed_entrypoint_hash_mismatch")
+    if normalize_caches:
+        for cache in cache_files:
+            cache.unlink()
     return scripts
 
 
@@ -269,7 +334,7 @@ assert (r/'schemas/project.schema.json').is_file()
 assert len(TOOLS) == 6
 print(json.dumps({'version': agent_os.__version__, 'tools': len(TOOLS), 'resources': True}))
 """
-    value = json.loads(run([str(path / ".venv/bin/python"), "-I", "-c", code]))
+    value = json.loads(run([str(path / ".venv/bin/python"), "-I", "-B", "-c", code]))
     if value["version"] != expected_version:
         raise InstallError("installed_version_mismatch")
     return value
@@ -320,7 +385,7 @@ def execute(args: argparse.Namespace) -> dict:
         identifier = args.version + "-" + expected[:12]
         target = release(root, identifier)
         manifest = {
-            "schema": "agentos.install/v1",
+            "schema": "agentos.install/v2",
             "version": args.version,
             "wheel_sha256": expected,
             "wheel_name": wheel.name,
@@ -356,10 +421,12 @@ def execute(args: argparse.Namespace) -> dict:
         write_json(lock / "owner.json", {"pid": os.getpid(), "at_unix": time.time()})
         if current_id(root) != old:
             raise InstallError("current_changed_before_install")
+        if args.action == "rollback":
+            read_manifest(target, normalize_caches=True)
         if args.action == "install":
             target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
             if target.exists():
-                stored = read_manifest(target)
+                stored = read_manifest(target, normalize_caches=True)
                 if (
                     stored["wheel_sha256"] != manifest["wheel_sha256"]
                     or stored["version"] != manifest["version"]
@@ -390,7 +457,7 @@ def execute(args: argparse.Namespace) -> dict:
                     ]
                 )
                 manifest["script_sha256"] = _verify_owned_payload(
-                    target, target / wheel.name, None
+                    target, target / wheel.name, None, normalize_caches=True
                 )
                 evidence = probe(target, manifest["version"])
                 manifest["probe"] = evidence

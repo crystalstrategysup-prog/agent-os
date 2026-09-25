@@ -829,21 +829,23 @@ def test_installer_refuses_incompatible_user_metadata_before_activation(
     (user / name).write_text(contents)
     wheel = tmp_path / "synthetic.whl"
     wheel.write_bytes(b"fixture wheel bytes")
-    release_dir = core / "releases" / "0.0.0-fixture"
+    release_id = "0.0.0-fixture-" + mod.digest(wheel)[:12]
+    release_dir = core / "releases" / release_id
     release_dir.mkdir(parents=True)
     (release_dir / wheel.name).write_bytes(wheel.read_bytes())
     mod.write_json(
         release_dir / "INSTALL.json",
         {
-            "schema": "agentos.install/v1",
+            "schema": "agentos.install/v2",
             "version": "0.0.0-fixture",
             "wheel_name": wheel.name,
             "wheel_sha256": mod.digest(wheel),
+            "script_sha256": {"agentos": "0" * 64},
             "overlay_schema": 1,
             "config_schema": "agent-os.community-config/v5",
         },
     )
-    (core / "current").symlink_to("releases/0.0.0-fixture")
+    (core / "current").symlink_to("releases/" + release_id)
     original_pointer = os.readlink(core / "current")
     install_args = mod.parser().parse_args(
         [
@@ -860,21 +862,21 @@ def test_installer_refuses_incompatible_user_metadata_before_activation(
             str(user),
             "--apply",
             "--expected-current",
-            "0.0.0-fixture",
+            release_id,
         ]
     )
     rollback_args = mod.parser().parse_args(
         [
             "rollback",
             "--release-id",
-            "0.0.0-fixture",
+            release_id,
             "--core-home",
             str(core),
             "--user-home",
             str(user),
             "--apply",
             "--expected-current",
-            "0.0.0-fixture",
+            release_id,
         ]
     )
     for args in (install_args, rollback_args):

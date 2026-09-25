@@ -197,6 +197,11 @@ def _entry_journal(root: Path) -> Path:
     return within(root, ".agentos/entry-transaction.json")
 
 
+def _require_entry_recovered(root: Path) -> None:
+    if _entry_journal(root).exists():
+        raise GateError("entry_recovery_required")
+
+
 def _recover_entry(root: Path, user_home: Path) -> None:
     journal = _entry_journal(root)
     record = read_json(journal)
@@ -542,6 +547,7 @@ def next_turn(
     from .turns import advance_standalone_turn
 
     root = root_path(root)
+    _require_entry_recovered(root)
     nonempty(session_id, "session_id", 200)
     identifier(task_id)
     with lock(within(root, ".agentos/write.lock")):
@@ -566,6 +572,7 @@ def register_document(
     task_id: str | None = None,
 ) -> dict:
     root = root_path(root)
+    _require_entry_recovered(root)
     if doc_id not in DOCS:
         raise GateError("unknown_document_id")
     nonempty(owner, "document_owner", 200)
@@ -662,6 +669,7 @@ def _policy_digest(project: dict, task: dict) -> str:
 
 def ready(root: Path, task_id: str, reviewer: str) -> dict:
     root = root_path(root)
+    _require_entry_recovered(root)
     nonempty(reviewer, "reviewer", 200)
     with lock(within(root, ".agentos/write.lock")):
         task = load_task(root, task_id)
@@ -691,6 +699,7 @@ def ready(root: Path, task_id: str, reviewer: str) -> dict:
 
 
 def check_ready(root: Path, task_id: str) -> dict:
+    _require_entry_recovered(root)
     task = load_task(root, task_id)
     project = load_project(root)
     errors = []
@@ -767,25 +776,35 @@ def _bounded_check_process(argv: list[str], root: Path, env: dict, timeout: int)
         )
     except OSError as exc:
         return 127, "CHECK LAUNCH FAILED: " + type(exc).__name__ + "\n"
-    assert process.stdout is not None
-    fd = process.stdout.fileno()
-    os.set_blocking(fd, False)
-    tail = bytearray()
-    total = 0
-    output_limit = 4 * 1024 * 1024
-    deadline = time.monotonic() + timeout
-    eof = False
-    exit_code: int | None = None
-    descendants = False
-    handled_exit = False
-    selector = selectors.DefaultSelector()
-    selector.register(fd, selectors.EVENT_READ)
+    selector = None
     try:
+        if process.stdout is None:
+            raise GateError("check_stdout_pipe_missing")
+        fd = process.stdout.fileno()
+        os.set_blocking(fd, False)
+        tail = bytearray()
+        total = 0
+        output_limit = 4 * 1024 * 1024
+        deadline = time.monotonic() + timeout
+        eof = False
+        exit_code: int | None = None
+        descendants = False
+        handled_exit = False
+        selector = selectors.DefaultSelector()
+        selector.register(fd, selectors.EVENT_READ)
         while True:
             remaining = deadline - time.monotonic()
             if remaining <= 0:
-                exit_code = 124
-                tail.extend(b"\nCHECK TIMEOUT\n")
+                # A parent that already exited while its child holds stdout
+                # open is a descendant failure, even if scheduling consumed
+                # the final deadline tick.
+                if process.poll() is not None and _group_alive(process.pid):
+                    descendants = True
+                    exit_code = 125
+                    tail.extend(b"\nCHECK DESCENDANTS TERMINATED\n")
+                else:
+                    exit_code = 124
+                    tail.extend(b"\nCHECK TIMEOUT\n")
                 break
             for _key, _mask in selector.select(min(remaining, 0.05)):
                 chunk = os.read(fd, 65536)
@@ -833,8 +852,10 @@ def _bounded_check_process(argv: list[str], root: Path, env: dict, timeout: int)
     finally:
         if _group_alive(process.pid):
             _stop_check_group(process.pid, process)
-        selector.close()
-        process.stdout.close()
+        if selector is not None:
+            selector.close()
+        if process.stdout is not None:
+            process.stdout.close()
         if process.poll() is None:
             process.kill()
             try:
@@ -907,6 +928,7 @@ def run_check(root: Path, task_id: str, check_id: str) -> dict:
 
 
 def assess(root: Path, task_id: str, *, _closed: bool = False) -> dict:
+    _require_entry_recovered(root_path(root))
     root = root_path(root)
     task = load_task(root, task_id)
     gate = check_ready(root, task_id)
@@ -980,6 +1002,7 @@ def assess(root: Path, task_id: str, *, _closed: bool = False) -> dict:
 
 def verify_closeout(root: Path, task_id: str) -> dict:
     """Read-only current verification of a registered closeout, never a Stop hook."""
+    _require_entry_recovered(root_path(root))
     root = root_path(root)
     task = load_task(root, task_id)
     if task["status"] != "CLOSED" or not task.get("closeout"):
@@ -995,6 +1018,7 @@ def verify_closeout(root: Path, task_id: str) -> dict:
 
 
 def close(root: Path, task_id: str, review: dict) -> dict:
+    _require_entry_recovered(root_path(root))
     root = root_path(root)
     load_task(root, task_id)
     for key in ("reviewer", "summary", "next_step", "limitations"):
@@ -1051,6 +1075,7 @@ def close(root: Path, task_id: str, review: dict) -> dict:
 
 
 def checkpoint(root: Path, task_id: str, reason: str, next_step: str) -> dict:
+    _require_entry_recovered(root_path(root))
     nonempty(reason, "checkpoint_reason")
     nonempty(next_step, "checkpoint_next_step")
     root = root_path(root)

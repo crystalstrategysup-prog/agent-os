@@ -33,6 +33,11 @@ Partial `project enter` проверяется отказом после соз�
 восстановлением после прерывания и отказом при конкурентной правке владельца.
 Нужны оба способа запуска pytest, чистый Git export, wheel metadata/RECORD,
 изолированные Mac и Linux fixture, затем отдельная приёмка реальной конфигурации.
+Дополнительная независимая проверка stable-кандидата должна покрывать ST-01–ST-06:
+timestamp-valid подменённый `.pyc`, owner edit между двумя чтениями AGENTS,
+pending entry journal перед READY/check, отказ selector после Popen, отсутствующие
+entrypoint hashes в manifest и корректные shell launchers на длинном пути и пути
+с пробелами. Фиксировать полные platform receipts, не только итог PASS.
 
 Baseline native interception tests заменяются тестами retirement/no-install contract,
 а не сохраняются как скрытое обещание enforcement. Остальные critical negative lifecycle,

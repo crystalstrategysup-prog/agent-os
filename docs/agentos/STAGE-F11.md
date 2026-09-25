@@ -1,6 +1,8 @@
 # F11 — stable 0.5.0 hardening and release
 
-Status: IMPLEMENTED_LOCAL_CHECKS_PASS; artifact and target acceptance pending.
+Task: `task-8ce6b2b81c57493c`.
+
+Status: CURATOR_CHANGES_REQUESTED; corrected candidate checks and acceptance pending.
 Owner request on 2026-09-25 expands F10 to a stable public
 foundation and a separately verified Mac configuration. F10 source rule is
 closed at `838b061`; its beta.6 artifacts are historical inputs, not release
@@ -59,9 +61,10 @@ Public source tests do not prove the private Telegram feature is replaced.
 ## Finding closure matrix (local source, before release)
 
 Curator's S1–S8 reproductions are recorded in the selected owner conversation.
-The following local regressions assert each intended invariant; all 245 tests
-pass on macOS with both `python -m pytest` and console `pytest` as of 2026-09-25.
-This records source behavior, not installed runtime behavior.
+The first `d339d6e` candidate passed 245 tests locally, but the curator found
+ST-01–ST-06 and refused its release. Its source ZIP and wheel are HOLD. The
+corrected candidate must be built and checked again; previous pass counts do
+not apply to these changed bytes.
 
 |Finding|Fix|Regression and current result|
 |---|---|---|
@@ -78,3 +81,24 @@ This records source behavior, not installed runtime behavior.
 Curator required the remaining exact source/wheel review, Linux and macOS
 artifact fixtures, release readback and separate private migration before a
 complete acceptance claim.
+
+## Independent review of d339d6e and correction scope
+
+The curator returned CHANGES_REQUESTED. The following corrections are scoped to
+this new candidate, with new regressions and artifact checks required before
+resubmission:
+
+|Finding|Corrected contract|Verification required|
+|---|---|---|
+|ST-01 unverified `.pyc` executed|Remove only package cache files after owned payload and entrypoint verification, before any apply probe; plan remains read-only|Timestamp-valid injected bytecode, install/reactivate/rollback|
+|ST-02 owner AGENTS edit lost|One selected snapshot for planned bytes, preimage, backup and journal; recheck owner/override before write|Edit between snapshot and locked write must cause replan|
+|ST-03 pending enter false READY|Dependent lifecycle calls refuse pending entry journal; questions still work|READY/check/close/checkpoint and read-only contrast|
+|ST-04 runner setup leak|Process-group cleanup starts immediately after Popen, including selector/pipe setup failures|Injected setup failures and no delayed child write|
+|ST-05 manifest hash downgrade|New manifest v2 requires complete script hashes; legacy public beta.5 v1 requires canonical scripts|Modified entrypoint with missing hash refused; beta.5 rollback preserved|
+|ST-06 valid path refused|Validate exact direct shebang or pip shell trampoline|Short path with spaces and long path fixture|
+
+Curator also observed a Linux x86_64 Python 3.13 module `pytest` discrepancy:
+descendant test returned timeout code 124 rather than descendant code 125.
+The runner now classifies an exited parent with a live process group at deadline
+as descendant failure. Both full invocation modes and raw Mac/Linux platform
+receipts must be attached to the next exact candidate packet.
