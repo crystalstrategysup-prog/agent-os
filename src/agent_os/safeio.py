@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import re
+import stat
 import sys
 import tempfile
 from collections.abc import Iterator
@@ -204,7 +205,10 @@ def filemap(
             if path.is_symlink():
                 raise GateError("symlink_file_refused")
             rel = path.relative_to(root).as_posix()
-            size = path.stat().st_size
+            metadata = path.lstat()
+            if not stat.S_ISREG(metadata.st_mode):
+                raise GateError("regular_inventory_file_required:" + rel)
+            size = metadata.st_size
             total += size
             if len(result) >= limit or total > max_bytes:
                 raise GateError("tree_inventory_limit")

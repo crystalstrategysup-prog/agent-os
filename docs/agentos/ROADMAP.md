@@ -1,9 +1,10 @@
-# Active stage — F10
+# Active stage — F11
 
-F10: short AGENTS routing convention → public docs/skills/managed block → local regression
-and clean package proof → separately authorized installation/publication. This stage ends
-with a local versioned source candidate; no Mac switch or remote release. F09 no-hook
-direct-read behavior remains an invariant; old native-hook activation is superseded.
+F10 closed with a local beta.6 source candidate at `838b061`; it did not publish
+or activate the candidate. F11: resolve curator S1–S8 and partial-enter
+stability gaps, verify exact public distribution, obtain independent acceptance,
+publish stable 0.5.0, then separately verify Mac activation and legacy retirement.
+F09 no-hook direct-read behavior remains invariant.
 
 # AgentOS foundation roadmap
 

@@ -7,8 +7,8 @@
 `inputSchema`/`outputSchema` с `tools/list` и фактическими `structuredContent`, а
 task/event schemas — с записями реального локального lifecycle.
 
-Версия выпуска для человека и MCP: `0.5.0-beta.6`; эквивалент Python packaging:
-`0.5.0b6`. `agentos --version`, `agent_os.__version__` и `serverInfo.version`
+Версия выпуска для человека и MCP: `0.5.0`; эквивалент Python packaging:
+`0.5.0`. `agentos --version`, `agent_os.__version__` и `serverInfo.version`
 совпадают буквально. Протокол stdio MCP остаётся `2025-06-18`. HTTP API нет, поэтому
 OpenAPI/Swagger здесь не существует; события пишутся локально в JSONL и описаны
 JSON Schema, а не AsyncAPI.
@@ -18,6 +18,11 @@ JSON Schema, а не AsyncAPI.
 Все команды выводят JSON, кроме справки/интерактивных вопросов. Ошибка foundation gate:
 `{"status":"BLOCKED","error":"..."}`, exit 2. PASS/план/успешное выполнение: exit 0.
 `project check` возвращает FAIL+exit2 для ненулевого процесса или изменения snapshot.
+Проверка ограничивает вывод и завершает запущенную POSIX process group перед receipt;
+timeout, оставшиеся потомки и превышение лимита вывода дают FAIL. `project enter`
+использует recoverable journal: после прерывания следующий вход восстанавливает
+прежнее состояние и возвращает `entry_recovered_retry`; конкурентная правка даёт
+`entry_recovery_conflict` без перезаписи. Вручную удалять журнал нельзя.
 Оригинальные community-команды могут иметь прежние error shapes; callers не должны
 обрабатывать их как новый project contract. `--home`/`--user-home` задаются перед командой.
 

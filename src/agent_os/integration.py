@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import argparse
+import json
+import os
 from pathlib import Path
 
 from .safeio import (
     GateError,
     atomic_bytes,
     atomic_json,
+    lock,
     now,
     read_json,
     sha,
@@ -19,25 +22,118 @@ START = "<!-- AGENTOS FOUNDATION BEGIN -->"
 END = "<!-- AGENTOS FOUNDATION END -->"
 
 
+def _current_bytes(path: Path) -> bytes | None:
+    if path.is_symlink():
+        raise GateError("integration_symlink_refused")
+    if not path.exists():
+        return None
+    if not path.is_file():
+        raise GateError("integration_regular_file_required")
+    return path.read_bytes()
+
+
+def _recover_transaction(journal: Path, codex_home: Path, skills_home: Path, user_home: Path) -> None:
+    record = read_json(journal)
+    if (
+        record.get("schema") != "agentos.integration-transaction/v1"
+        or record.get("codex_home") != str(codex_home)
+        or record.get("skills_home") != str(skills_home)
+        or not isinstance(record.get("files"), list)
+        or len(record["files"]) > 10000
+    ):
+        raise GateError("integration_recovery_journal_invalid")
+    restore = []
+    for row in record["files"]:
+        if not isinstance(row, dict) or set(row) != {"path", "before", "after", "backup"}:
+            raise GateError("integration_recovery_journal_invalid")
+        path = Path(row["path"])
+        if not path.is_absolute() or not (
+            path == codex_home / "AGENTS.md"
+            or path == codex_home / "AGENTS.override.md"
+            or path == codex_home / "agentos-integration.json"
+            or skills_home in path.parents
+        ):
+            raise GateError("integration_recovery_path_invalid")
+        current = _current_bytes(path)
+        current_hash = sha(current) if current is not None else None
+        if current_hash not in {row["before"], row["after"]}:
+            raise GateError("integration_recovery_conflict:" + str(path))
+        backup = row["backup"]
+        if row["before"] is not None:
+            if not isinstance(backup, str):
+                raise GateError("integration_recovery_journal_invalid")
+            old = within(user_home, backup, allow_missing=False).read_bytes()
+            if sha(old) != row["before"]:
+                raise GateError("integration_recovery_backup_mismatch")
+        else:
+            if backup is not None:
+                raise GateError("integration_recovery_journal_invalid")
+            old = None
+        restore.append((path, current_hash, row["before"], old))
+    for path, current_hash, _, _ in restore:
+        current = _current_bytes(path)
+        if (sha(current) if current is not None else None) != current_hash:
+            raise GateError("integration_recovery_conflict:" + str(path))
+    for path, current_hash, before, old in reversed(restore):
+        if current_hash == before:
+            continue
+        if old is None:
+            path.unlink()
+        else:
+            atomic_bytes(path, old)
+    journal.unlink()
+
+
 def install(
     codex_home: Path, skills_home: Path, user_home: Path, *, apply: bool = False
 ) -> dict:
     from .overlay import validate_roots
 
+    codex_home = codex_home.expanduser()
+    if not codex_home.is_absolute():
+        raise GateError("codex_home_absolute_required")
+    if codex_home.is_symlink():
+        raise GateError("codex_home_symlink_refused")
     validate_roots(user_home)
     validate_roots(codex_home)
     validate_roots(skills_home)
-    codex_home = codex_home.expanduser().resolve()
+    user_home = user_home.expanduser().resolve()
+    codex_home = codex_home.resolve()
     skills_home = skills_home.expanduser().resolve()
+    journal = within(user_home, "state/integration-transaction.json")
+    if journal.exists():
+        if not apply:
+            return {
+                "status": "RECOVERY_REQUIRED",
+                "codex_home_selected": str(codex_home),
+                "native_hooks": "DISABLED",
+            }
+        with lock(within(user_home, "state/integration.lock")):
+            _recover_transaction(journal, codex_home, skills_home, user_home)
+        return {
+            "status": "RECOVERED_RETRY",
+            "codex_home_selected": str(codex_home),
+            "native_hooks": "DISABLED",
+        }
     resources = Path(__file__).parent / "resources"
     # Do not manufacture an override that shadows existing owner instructions.
-    agents = codex_home / (
-        "AGENTS.override.md"
-        if (codex_home / "AGENTS.override.md").exists()
-        else "AGENTS.md"
+    override = codex_home / "AGENTS.override.md"
+    if override.is_symlink():
+        raise GateError("integration_symlink_refused")
+    agents = (
+        override
+        if override.is_file() and override.read_bytes().strip()
+        else codex_home / "AGENTS.md"
     )
-    old = agents.read_text(encoding="utf-8") if agents.exists() else ""
-    if old.count(START) != old.count(END) or old.count(START) > 1:
+    if agents.is_symlink():
+        raise GateError("integration_symlink_refused")
+    old = agents.read_bytes() if agents.exists() else b""
+    start, end = START.encode(), END.encode()
+    if (
+        old.count(start) != old.count(end)
+        or old.count(start) > 1
+        or (start in old and old.index(start) > old.index(end))
+    ):
         raise GateError("damaged_managed_agents_block")
     method = str(resources / "skills/agentos-project-entry/SKILL.md")
     block = (
@@ -61,16 +157,16 @@ def install(
         "Close/checkpoint only a registered task; report a pre-entry failure directly, never invent a task ID.\n"
         + END
     )
-    if START in old:
-        a, rest = old.split(START, 1)
-        _, b = rest.split(END, 1)
-        updated = a + block + b
+    if start in old:
+        a, rest = old.split(start, 1)
+        _, b = rest.split(end, 1)
+        updated = a + block.encode() + b
     else:
-        separator = ""
+        separator = b""
         if old:
-            separator = ("" if old.endswith("\n") else "\n") + "\n"
-        updated = old + separator + block + "\n"
-    paths = {str(agents): updated.encode()}
+            separator = (b"" if old.endswith(b"\n") else b"\n") + b"\n"
+        updated = old + separator + block.encode() + b"\n"
+    paths = {str(agents): updated}
     # Copy maintained skills into namespaced folders; never delete user skills.
     for src in sorted((resources / "skills").rglob("*")):
         if not src.is_file():
@@ -85,16 +181,17 @@ def install(
         else {}
     )
     managed = previous.get("managed_files", {})
+    observed = {}
     for name, data in paths.items():
         path = Path(name)
-        if path.is_symlink():
-            raise GateError("integration_symlink_refused")
+        original = _current_bytes(path)
+        observed[name] = original
         if path == agents:
             continue
         if (
-            path.exists()
-            and path.read_bytes() != data
-            and sha(path.read_bytes()) != managed.get(name)
+            original is not None
+            and original != data
+            and sha(original) != managed.get(name)
         ):
             conflicts.append(name)
     report = {
@@ -102,6 +199,7 @@ def install(
         "files": sorted(paths),
         "conflicts": conflicts,
         "agents_selected": str(agents),
+        "codex_home_selected": str(codex_home),
         "auth_changes": False,
         "model_changes": False,
         "hook_trust_changed": False,
@@ -114,31 +212,80 @@ def install(
     }
     if not apply or conflicts:
         return report
-    for name, data in paths.items():
-        path = Path(name)
-        if path.exists() and path.read_bytes() == data:
-            continue
-        if path.exists():
-            old_data = path.read_bytes()
-            backup = within(
-                user_home,
-                "backups/integration/" + sha(str(path).encode()) + "-" + sha(old_data),
-            )
-            if not backup.exists():
-                atomic_bytes(backup, old_data)
-        atomic_bytes(path, data)
+    receipt_path = codex_home / "agentos-integration.json"
+    receipt_before = _current_bytes(receipt_path)
     report["status"] = "INSTALLED_MANUAL_WORKFLOW"
     report["at"] = now()
-    atomic_json(codex_home / "agentos-integration.json", report)
+    receipt_bytes = (
+        json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
+    ).encode()
+    to_write = [(Path(name), data, observed[name]) for name, data in paths.items()]
+    to_write.append((receipt_path, receipt_bytes, receipt_before))
+    with lock(within(user_home, "state/integration.lock")):
+        if journal.exists():
+            raise GateError("integration_recovery_required_replan")
+        for path, _, original in to_write:
+            if _current_bytes(path) != original:
+                raise GateError("integration_target_changed_replan:" + str(path))
+        records = []
+        for path, data, original in to_write:
+            if original == data:
+                continue
+            backup_rel = None
+            if original is not None:
+                backup_rel = (
+                    "backups/integration/"
+                    + sha(str(path).encode())
+                    + "-"
+                    + sha(original)
+                )
+                backup = within(user_home, backup_rel)
+                if backup.exists():
+                    if _current_bytes(backup) != original:
+                        raise GateError("integration_backup_conflict")
+                else:
+                    atomic_bytes(backup, original)
+            records.append(
+                {
+                    "path": str(path),
+                    "before": sha(original) if original is not None else None,
+                    "after": sha(data),
+                    "backup": backup_rel,
+                }
+            )
+        atomic_json(
+            journal,
+            {
+                "schema": "agentos.integration-transaction/v1",
+                "codex_home": str(codex_home),
+                "skills_home": str(skills_home),
+                "files": records,
+            },
+        )
+        try:
+            for path, data, original in to_write:
+                if original != data:
+                    atomic_bytes(path, data)
+            for path, data, _ in to_write:
+                if _current_bytes(path) != data:
+                    raise GateError("integration_readback_failed:" + str(path))
+        except BaseException:
+            _recover_transaction(journal, codex_home, skills_home, user_home)
+            raise
+        journal.unlink()
     return report
 
 
 def command(argv: list[str], home: Path) -> tuple[dict, int]:
     p = argparse.ArgumentParser(prog="agentos integrate")
     p.add_argument("target", choices=["codex"])
-    p.add_argument("--codex-home", type=Path, default=Path.home() / ".codex")
+    p.add_argument("--codex-home", type=Path)
     p.add_argument("--skills-home", type=Path, default=Path.home() / ".agents/skills")
     p.add_argument("--apply", action="store_true")
     a = p.parse_args(argv)
-    result = install(a.codex_home, a.skills_home, home, apply=a.apply)
-    return result, 2 if result["status"] == "CONFLICT" else 0
+    codex_home = a.codex_home
+    if codex_home is None:
+        env_home = os.environ.get("CODEX_HOME", "").strip()
+        codex_home = Path(env_home) if env_home else Path.home() / ".codex"
+    result = install(codex_home, a.skills_home, home, apply=a.apply)
+    return result, 0 if result["status"] in {"PLANNED", "INSTALLED_MANUAL_WORKFLOW"} else 2

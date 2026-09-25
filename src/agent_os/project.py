@@ -10,8 +10,10 @@ import argparse
 import json
 import os
 import re
+import selectors
+import signal
 import subprocess
-import tempfile
+import time
 import uuid
 from datetime import UTC, datetime
 from pathlib import Path
@@ -151,7 +153,6 @@ def initialize(
 def scaffold(root: Path, doc_ids: list[str], task_id: str | None = None) -> list[str]:
     created = []
     for doc_id in doc_ids:
-        title, headings = DOCS[doc_id]
         rel = (
             f"docs/agentos/stages/{task_id}.md"
             if doc_id == "stage" and task_id
@@ -160,15 +161,107 @@ def scaffold(root: Path, doc_ids: list[str], task_id: str | None = None) -> list
         path = within(root, rel)
         if path.exists():
             continue
-        body = f"# {title}\n\n"
-        if task_id and doc_id == "stage":
-            body += f"Задача: `{task_id}`\n\n"
-        body += "Статус: draft. Заполнить по фактам; шаблон не проходит gate.\n\n"
-        for heading in headings:
-            body += f"## {heading}\n\n[REQUIRED] Укажите сведения и источник.\n\n"
-        atomic_bytes(path, body.encode(), 0o644)
+        atomic_bytes(path, _draft_bytes(doc_id, task_id), 0o644)
         created.append(rel)
     return created
+
+
+def _draft_bytes(doc_id: str, task_id: str | None) -> bytes:
+    title, headings = DOCS[doc_id]
+    body = f"# {title}\n\n"
+    if task_id and doc_id == "stage":
+        body += f"Задача: `{task_id}`\n\n"
+    body += "Статус: draft. Заполнить по фактам; шаблон не проходит gate.\n\n"
+    for heading in headings:
+        body += f"## {heading}\n\n[REQUIRED] Укажите сведения и источник.\n\n"
+    return body.encode()
+
+
+def _json_bytes(value: dict) -> bytes:
+    return (json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
+
+
+def _entry_current(path: Path) -> bytes | None:
+    if path.is_symlink():
+        raise GateError("entry_symlink_refused")
+    if not path.exists():
+        return None
+    if not path.is_file():
+        raise GateError("entry_regular_file_required")
+    if path.stat().st_size > 4 * 1024 * 1024:
+        raise GateError("entry_file_limit")
+    return path.read_bytes()
+
+
+def _entry_journal(root: Path) -> Path:
+    return within(root, ".agentos/entry-transaction.json")
+
+
+def _recover_entry(root: Path, user_home: Path) -> None:
+    journal = _entry_journal(root)
+    record = read_json(journal)
+    if (
+        record.get("schema") != "agentos.entry-transaction/v1"
+        or record.get("root") != str(root)
+        or not isinstance(record.get("id"), str)
+        or not re.fullmatch(r"[a-f0-9]{32}", record["id"])
+        or not isinstance(record.get("session_id"), str)
+        or not isinstance(record.get("files"), list)
+        or len(record["files"]) > 100
+    ):
+        raise GateError("entry_recovery_journal_invalid")
+    from .turns import turn_path
+
+    allowed_turn = turn_path(user_home, record["session_id"])
+    restore = []
+    for index, row in enumerate(record["files"]):
+        if not isinstance(row, dict) or set(row) != {"root", "path", "before", "after"}:
+            raise GateError("entry_recovery_journal_invalid")
+        if row["root"] == "project":
+            path = within(root, row["path"])
+            rel = row["path"]
+            if not (
+                rel == ".agentos/project.json"
+                or re.fullmatch(r"\.agentos/tasks/task-[a-f0-9]{16}/(task\.json|events\.jsonl)", rel)
+                or re.fullmatch(r"docs/agentos/(?:[A-Z_-]+|stages/task-[a-f0-9]{16})\.md", rel)
+            ):
+                raise GateError("entry_recovery_path_invalid")
+        elif row["root"] == "user" and row["path"] == str(allowed_turn):
+            path = allowed_turn
+        else:
+            raise GateError("entry_recovery_path_invalid")
+        current = _entry_current(path)
+        current_hash = sha(current) if current is not None else None
+        if current_hash not in (row["before"], row["after"]):
+            raise GateError("entry_recovery_conflict:" + str(path))
+        backup = within(root, f".agentos/entry-backups/{record['id']}/{index}")
+        if row["before"] is None:
+            if backup.exists():
+                raise GateError("entry_recovery_backup_mismatch")
+            original = None
+        else:
+            original = _entry_current(backup)
+            if original is None or sha(original) != row["before"]:
+                raise GateError("entry_recovery_backup_mismatch")
+        restore.append((path, current_hash, row["before"], original))
+    with lock(within(user_home, "state/turns.lock")):
+        for path, current_hash, _, _ in restore:
+            current = _entry_current(path)
+            if (sha(current) if current is not None else None) != current_hash:
+                raise GateError("entry_recovery_conflict:" + str(path))
+        for path, current_hash, before, original in reversed(restore):
+            if current_hash == before:
+                continue
+            if original is None:
+                path.unlink()
+            else:
+                atomic_bytes(path, original)
+        journal.unlink()
+        backup_dir = within(root, f".agentos/entry-backups/{record['id']}")
+        if backup_dir.exists():
+            for backup in backup_dir.iterdir():
+                backup.unlink()
+            backup_dir.rmdir()
 
 
 def reuse_answers(root: Path, task_id: str, supplied: dict) -> dict:
@@ -298,7 +391,8 @@ def enter(
     reuse: bool = False,
 ) -> dict:
     """Every distinct task/turn has a fresh receipt. Resume invalidates readiness."""
-    from .turns import bind_turn, validate_entry
+    from .overlay import validate_roots
+    from .turns import bind_turn, turn_path, validate_entry
 
     root = root_path(root)
     if reuse:
@@ -308,8 +402,12 @@ def enter(
     answers = _answers(answers)
     nonempty(session_id, "session_id", 200)
     nonempty(turn_id, "turn_id", 200)
-    validate_entry(user_home, session_id, turn_id, root)
+    validate_roots(user_home)
     with lock(within(root, ".agentos/write.lock")):
+        if _entry_journal(root).exists():
+            _recover_entry(root, user_home)
+            raise GateError("entry_recovered_retry")
+        validate_entry(user_home, session_id, turn_id, root)
         project = load_project(root)
         active = project.get("active_task")
         if active and active != resume_task:
@@ -348,21 +446,88 @@ def enter(
                 "foundation_version": __version__,
             }
         )
-        atomic_json(task_path(root, task["id"]), task)
+        task_file = task_path(root, task["id"])
         project["active_task"] = task["id"]
-        atomic_json(project_file(root), project)
-        created = scaffold(root, selection["required"], task["id"])
-        _event(
-            root, task, "ENTER", {"revision": task["revision"], "selection": selection}
-        )
-    bind_turn(user_home, session_id, turn_id, root, task["id"])
-    return {
-        "status": "INTAKE",
-        "task_id": task["id"],
-        "required_documents": selection,
-        "created_drafts": created,
-        "missing_documents": document_check(root, task)["errors"],
-    }
+        event_path = within(root, f".agentos/tasks/{task['id']}/events.jsonl")
+        event_before = _entry_current(event_path) or b""
+        if len(event_before) > 4 * 1024 * 1024:
+            raise GateError("event_log_limit")
+        event = {
+            "at": now(), "event": "ENTER",
+            "details": {"revision": task["revision"], "selection": selection},
+        }
+        event_bytes = event_before + (json.dumps(event, ensure_ascii=False) + "\n").encode()
+        if len(event_bytes) > 4 * 1024 * 1024:
+            raise GateError("event_log_limit")
+        turn_file = turn_path(user_home, session_id)
+        turn_stamp = now()
+        turn_value = {
+            "schema": "agentos.turn/v1", "session_id": session_id,
+            "turn_id": turn_id, "root": str(root.resolve()),
+            "task_id": task["id"], "status": "ENTERED",
+            "entered_at": turn_stamp, "hook_seen": False,
+            "source": "standalone_cli",
+        }
+        drafts = []
+        for doc_id in selection["required"]:
+            rel = (
+                f"docs/agentos/stages/{task['id']}.md"
+                if doc_id == "stage" else f"docs/agentos/{doc_id.upper()}.md"
+            )
+            path = within(root, rel)
+            if not path.exists():
+                drafts.append((path, _draft_bytes(doc_id, task["id"]), rel))
+        writes = [
+            ("project", task_file, _json_bytes(task)),
+            ("project", project_file(root), _json_bytes(project)),
+            *(("project", path, data) for path, data, _ in drafts),
+            ("project", event_path, event_bytes),
+            ("user", turn_file, _json_bytes(turn_value)),
+        ]
+        transaction_id = uuid.uuid4().hex
+        records = []
+        for index, (scope, path, data) in enumerate(writes):
+            prior = _entry_current(path)
+            if prior is not None:
+                atomic_bytes(
+                    within(root, f".agentos/entry-backups/{transaction_id}/{index}"),
+                    prior,
+                )
+            records.append({
+                "root": scope,
+                "path": str(path) if scope == "user" else path.relative_to(root).as_posix(),
+                "before": sha(prior) if prior is not None else None,
+                "after": sha(data),
+            })
+        journal = _entry_journal(root)
+        atomic_json(journal, {
+            "schema": "agentos.entry-transaction/v1", "root": str(root),
+            "id": transaction_id, "session_id": session_id, "files": records,
+        })
+        try:
+            atomic_json(task_file, task)
+            atomic_json(project_file(root), project)
+            created = scaffold(root, selection["required"], task["id"])
+            atomic_bytes(event_path, event_bytes)
+            bind_turn(user_home, session_id, turn_id, root, task["id"], entered_at=turn_stamp)
+            for _, path, data in writes:
+                if _entry_current(path) != data:
+                    raise GateError("entry_readback_failed:" + str(path))
+            result = {
+                "status": "INTAKE", "task_id": task["id"],
+                "required_documents": selection, "created_drafts": created,
+                "missing_documents": document_check(root, task)["errors"],
+            }
+        except BaseException:
+            _recover_entry(root, user_home)
+            raise
+        journal.unlink()
+        backup_dir = within(root, f".agentos/entry-backups/{transaction_id}")
+        if backup_dir.exists():
+            for backup in backup_dir.iterdir():
+                backup.unlink()
+            backup_dir.rmdir()
+        return result
 
 
 def next_turn(
@@ -555,6 +720,129 @@ def _scrub(text: str) -> str:
     return text[-200000:]
 
 
+def _group_alive(pgid: int) -> bool:
+    try:
+        os.killpg(pgid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        # macOS may report EPERM for a group containing only unreaped zombies.
+        return True
+    return True
+
+
+def _stop_check_group(pgid: int, process: subprocess.Popen) -> bool:
+    """Stop only the session created for this check; report if it survives."""
+    process.poll()
+    if not _group_alive(pgid):
+        return True
+    for sig in (signal.SIGTERM, signal.SIGKILL):
+        try:
+            os.killpg(pgid, sig)
+        except ProcessLookupError:
+            return True
+        except PermissionError:
+            return False
+        deadline = time.monotonic() + 0.5
+        while time.monotonic() < deadline:
+            process.poll()
+            if not _group_alive(pgid):
+                return True
+            time.sleep(0.02)
+    return not _group_alive(pgid)
+
+
+def _bounded_check_process(argv: list[str], root: Path, env: dict, timeout: int) -> tuple[int, str]:
+    """Drain bounded output and finish owned POSIX descendants before a receipt."""
+    if os.name != "posix":
+        return 127, "CHECK PROCESS-GROUP RUNNER REQUIRES POSIX\n"
+    try:
+        process = subprocess.Popen(
+            argv,
+            cwd=root,
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            start_new_session=True,
+        )
+    except OSError as exc:
+        return 127, "CHECK LAUNCH FAILED: " + type(exc).__name__ + "\n"
+    assert process.stdout is not None
+    fd = process.stdout.fileno()
+    os.set_blocking(fd, False)
+    tail = bytearray()
+    total = 0
+    output_limit = 4 * 1024 * 1024
+    deadline = time.monotonic() + timeout
+    eof = False
+    exit_code: int | None = None
+    descendants = False
+    handled_exit = False
+    selector = selectors.DefaultSelector()
+    selector.register(fd, selectors.EVENT_READ)
+    try:
+        while True:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                exit_code = 124
+                tail.extend(b"\nCHECK TIMEOUT\n")
+                break
+            for _key, _mask in selector.select(min(remaining, 0.05)):
+                chunk = os.read(fd, 65536)
+                if not chunk:
+                    eof = True
+                    selector.unregister(fd)
+                    break
+                total += len(chunk)
+                tail.extend(chunk)
+                if len(tail) > 200000:
+                    del tail[:-200000]
+                if total > output_limit:
+                    exit_code = 125
+                    tail.extend(b"\nCHECK OUTPUT LIMIT\n")
+                    break
+            if exit_code is not None:
+                break
+            parent_code = process.poll()
+            if parent_code is not None and not handled_exit:
+                handled_exit = True
+                if _group_alive(process.pid):
+                    descendants = True
+                    if not _stop_check_group(process.pid, process):
+                        exit_code = 125
+                        tail.extend(b"\nCHECK DESCENDANTS SURVIVED\n")
+                        break
+            if eof and parent_code is not None:
+                exit_code = parent_code
+                break
+        if _group_alive(process.pid):
+            descendants = True
+            if not _stop_check_group(process.pid, process):
+                if exit_code in (None, 0):
+                    exit_code = 125
+                tail.extend(b"\nCHECK DESCENDANTS SURVIVED\n")
+        try:
+            process.wait(timeout=1)
+        except subprocess.TimeoutExpired:
+            exit_code = 125
+            tail.extend(b"\nCHECK PARENT SURVIVED\n")
+        if exit_code == 0 and descendants:
+            exit_code = 125
+            tail.extend(b"\nCHECK DESCENDANTS TERMINATED\n")
+        return exit_code or 0, bytes(tail[-200000:]).decode("utf-8", "replace")
+    finally:
+        if _group_alive(process.pid):
+            _stop_check_group(process.pid, process)
+        selector.close()
+        process.stdout.close()
+        if process.poll() is None:
+            process.kill()
+            try:
+                process.wait(timeout=1)
+            except subprocess.TimeoutExpired:
+                pass
+
+
 def run_check(root: Path, task_id: str, check_id: str) -> dict:
     root = root_path(root)
     with lock(within(root, ".agentos/write.lock")):
@@ -571,28 +859,10 @@ def run_check(root: Path, task_id: str, check_id: str) -> dict:
         started = now()
         env = os.environ.copy()
         env["PYTHONDONTWRITEBYTECODE"] = "1"
-        # shell=False is not a sandbox. These are trusted, stage-reviewed programs.
-        with tempfile.TemporaryFile() as capture:
-            try:
-                result = subprocess.run(
-                    check["argv"],
-                    cwd=root,
-                    env=env,
-                    stdout=capture,
-                    stderr=subprocess.STDOUT,
-                    timeout=check.get("timeout", 120),
-                    check=False,
-                )
-                code = result.returncode
-            except subprocess.TimeoutExpired:
-                code = 124
-                capture.write(b"\nCHECK TIMEOUT\n")
-            except OSError as e:
-                code = 127
-                capture.write(("CHECK LAUNCH FAILED: " + type(e).__name__).encode())
-            length = capture.seek(0, 2)
-            capture.seek(max(0, length - 200000))
-            output = capture.read(200000).decode("utf-8", "replace")
+        # shell=False/process groups are not a sandbox; use reviewed exact argv.
+        code, output = _bounded_check_process(
+            check["argv"], root, env, check.get("timeout", 120)
+        )
         after = source_snapshot(root)
         receipt_id = uuid.uuid4().hex
         log_rel = f".agentos/tasks/{task_id}/evidence/{receipt_id}.log"

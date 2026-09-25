@@ -1,4 +1,15 @@
-# Candidate change: 0.5.0-beta.6 (unreleased)
+# 0.5.0 — stable public foundation
+
+- Harden managed Codex integration with explicit target selection, owner-byte
+  preservation, ordered markers and a recoverable multi-file transaction.
+- Make project entry recoverable when draft creation or turn binding fails;
+  conflicting owner edits stop recovery for manual review.
+- Bound project check output and child process lifetime; reject special files
+  during inventory and verify installed module bytes against the wheel.
+- Keep native hooks disabled and keep public activation separate from private
+  owner Telegram migration and old runtime retirement.
+
+# Candidate change: 0.5.0-beta.6 (historical local source)
 
 - Add a concise inherited AGENTS.md routing norm in the public foundation,
   packaged skills and managed integration text. Detailed knowledge is loaded

@@ -1,12 +1,12 @@
 # Установка, обновление, откат и восстановление
 
-## Статус кандидата
+## Статус версии
 
-`0.5.0-beta.6` / `0.5.0b6` — подготовленный локальный кандидат. Не предполагать, что tag,
-PyPI пакет или release asset опубликован. Проверить полученный source/patch/manifest,
-провести independent tests и отдельное разрешение на установку. Этот review ничего
-на реальном Mac не устанавливает. Python 3.11+, отдельные core/user roots обязательны.
-Ниже описаны будущие авторизованные операции интегратора, не выполненные действия.
+`0.5.0` / `0.5.0` — версия исходников. Проверить, что tag,
+PyPI пакет или release asset действительно опубликован. Проверить полученный source/patch/manifest,
+провести independent tests и отдельно подтвердить целевой runtime. Python 3.11+,
+отдельные core/user roots обязательны. Ниже описан порядок установки; факт её
+выполнения устанавливается только по текущему указателю и read-back.
 
 ## Предварительные проверки
 
@@ -17,15 +17,17 @@ PyPI пакет или release asset опубликован. Проверить 
 
 ```sh
 python3 tools/install.py install \
- --wheel /absolute/crystal_agent_os-0.5.0b6-py3-none-any.whl \
- --sha256 ACTUAL_WHEEL_SHA256 --version 0.5.0-beta.6 \
+ --wheel /absolute/crystal_agent_os-0.5.0-py3-none-any.whl \
+ --sha256 ACTUAL_WHEEL_SHA256 --version 0.5.0 \
  --core-home "$HOME/.local/share/agentos-foundation" --user-home "$HOME/.agentos-user"
 ```
 
 Plan выводит expected_current (первый запуск `none`) и release_id. После проверки:
 повторить **ту же команду** с `--apply --expected-current none` или exact observed release id.
 Wheel копируется с повторной проверкой SHA, venv создаётся по окончательному пути, pip работает
---isolated --no-index --no-deps. Smoke проверяет реальную installed version/resources/MCP tools.
+--isolated --no-index --no-deps. До запуска installed module сравниваются байты
+`agent_os`, wheel metadata и entrypoint scripts с проверенным wheel; затем smoke
+проверяет реальную installed version/resources/MCP tools.
 Only after PASS меняется current symlink. Installer не изменяет пользовательскую папку,
 но читает `overlay.json` и `config.json` для проверки совместимости схем перед планом и
 перед переключением версии. Неизвестная схема, повреждённый JSON или symlink блокируют
@@ -58,10 +60,14 @@ Import создаёт файл только после полной записи
 
 ## Подключение агента
 
-`integrate codex` сначала plan, затем --apply. Существующий AGENTS.override.md выбран, если
-он есть; новый override не создаётся поверх owner instructions. Управляемый блок заменяется,
-остальные инструкции сохраняются. Навыки имеют namespaced directories; чужие modifications
-вызывают CONFLICT. Existing hooks иных владельцев сохраняются. Backup предыдущих файлов —
+`integrate codex` сначала plan, затем --apply. Цель выбирается явным
+`--codex-home`, затем `CODEX_HOME`, затем обычным `~/.codex`. Override выбран,
+только если он содержит непустые инструкции; пустой не заслоняет owner AGENTS.
+Управляемый блок заменяется без изменения bytes вне него, включая CRLF.
+Перепутанные маркеры блокируют запись. Навыки имеют namespaced directories;
+чужие modifications вызывают CONFLICT. AGENTS, skills и receipt обновляются через
+журнал с откатом или явным recovery; конкурентная правка не перезаписывается.
+Existing hooks иных владельцев сохраняются. Backup предыдущих файлов —
 user/backups/integration. Config/auth/model/trust store не редактируются.
 
 Native hooks исключены: integrate не создаёт, не включает, не изменяет и не удаляет
@@ -96,7 +102,8 @@ python3 tools/install.py rollback --release-id PREVIOUS_ID \
 # Затем то же с --apply --expected-current CURRENT_ID
 ```
 
-Rollback проверяет manifest/wheel/probe/schema совместимость, атомарно меняет current и
+Rollback проверяет manifest/wheel/installed payload/probe/schema совместимость,
+атомарно меняет current и
 не трогает user data. **Не запускать integrate старого ядра beta.4 или раньше:** он
 может восстановить hooks. Сохранить no-hook AGENTS/skills или отдельно согласовать их
 ручной откат без hook blocks. Не восстанавливать hooks из backups. Не выполнять old hook entrypoints.

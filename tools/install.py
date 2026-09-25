@@ -8,6 +8,7 @@ This script deliberately does not retire a different/private AgentOS runtime.
 from __future__ import annotations
 
 import argparse
+import configparser
 import hashlib
 import json
 import os
@@ -18,6 +19,7 @@ import sys
 import time
 import uuid
 from pathlib import Path
+from zipfile import BadZipFile, ZipFile
 
 
 class InstallError(ValueError):
@@ -70,7 +72,7 @@ def release(root: Path, identifier: str) -> Path:
     return path
 
 
-def read_manifest(path: Path) -> dict:
+def read_manifest(path: Path, *, verify_payload: bool = True) -> dict:
     marker = path / "INSTALL.json"
     if marker.is_symlink() or not marker.is_file() or (path / "INCOMPLETE").exists():
         raise InstallError("release_not_complete:" + path.name)
@@ -85,7 +87,101 @@ def read_manifest(path: Path) -> dict:
         or digest(wheel) != data["wheel_sha256"]
     ):
         raise InstallError("installed_wheel_hash_mismatch")
+    if verify_payload:
+        _verify_owned_payload(path, wheel, data.get("script_sha256"))
     return data
+
+
+def _site_packages(path: Path) -> Path:
+    candidates = list((path / ".venv/lib").glob("python*/site-packages"))
+    if len(candidates) != 1 or candidates[0].is_symlink() or not candidates[0].is_dir():
+        raise InstallError("installed_site_packages_missing_or_ambiguous")
+    return candidates[0]
+
+
+def _verify_owned_payload(
+    path: Path, wheel: Path, script_hashes: dict | None
+) -> dict[str, str]:
+    """Compare actual package bytes with the trusted wheel before importing it."""
+    site = _site_packages(path)
+    try:
+        with ZipFile(wheel) as archive:
+            names = [n for n in archive.namelist() if not n.endswith("/")]
+            metadata = [n for n in names if n.endswith(".dist-info/entry_points.txt")]
+            if len(metadata) != 1:
+                raise InstallError("wheel_entrypoints_missing_or_ambiguous")
+            entries = configparser.ConfigParser(interpolation=None)
+            entries.read_string(archive.read(metadata[0]).decode("utf-8"))
+            if "console_scripts" not in entries:
+                raise InstallError("wheel_console_scripts_missing")
+            expected = {}
+            for name in names:
+                if name.startswith("agent_os/") or ".dist-info/" in name:
+                    if name.endswith(".dist-info/RECORD"):
+                        continue  # pip rewrites installed RECORD.
+                    if Path(name).is_absolute() or ".." in Path(name).parts:
+                        raise InstallError("wheel_payload_path_invalid")
+                    expected[name] = hashlib.sha256(archive.read(name)).hexdigest()
+    except (BadZipFile, UnicodeError, configparser.Error) as exc:
+        raise InstallError("wheel_payload_invalid") from exc
+    if not expected or not any(n.startswith("agent_os/") for n in expected):
+        raise InstallError("wheel_package_missing")
+    for name, expected_hash in expected.items():
+        actual = site / name
+        if actual.is_symlink() or not actual.is_file() or digest(actual) != expected_hash:
+            raise InstallError("installed_payload_mismatch:" + name)
+    allowed_metadata = {"RECORD", "INSTALLER", "REQUESTED", "direct_url.json"}
+    package = site / "agent_os"
+    if package.is_symlink() or not package.is_dir():
+        raise InstallError("installed_package_directory_invalid")
+    for root, dirs, files in os.walk(package, followlinks=False):
+        for directory in dirs:
+            if (Path(root) / directory).is_symlink():
+                raise InstallError("installed_payload_symlink")
+        for filename in files:
+            actual = Path(root) / filename
+            if actual.is_symlink() or not actual.is_file():
+                raise InstallError("installed_payload_type_invalid")
+            rel = actual.relative_to(site).as_posix()
+            if "__pycache__" in actual.parts and filename.endswith(".pyc"):
+                continue
+            if rel not in expected:
+                raise InstallError("installed_payload_extra:" + rel)
+    dist_info = site / metadata[0].split("/", 1)[0]
+    if dist_info.is_symlink() or not dist_info.is_dir():
+        raise InstallError("installed_metadata_directory_invalid")
+    for root, dirs, files in os.walk(dist_info, followlinks=False):
+        for directory in dirs:
+            if (Path(root) / directory).is_symlink():
+                raise InstallError("installed_metadata_symlink")
+        for filename in files:
+            actual = Path(root) / filename
+            if actual.is_symlink() or not actual.is_file():
+                raise InstallError("installed_metadata_type_invalid")
+            rel = actual.relative_to(site).as_posix()
+            if rel not in expected and not (
+                actual.parent == dist_info and filename in allowed_metadata
+            ):
+                raise InstallError("installed_metadata_extra:" + rel)
+    scripts = {}
+    for name, target in entries["console_scripts"].items():
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", name):
+            raise InstallError("wheel_entrypoint_name_invalid")
+        script = path / ".venv/bin" / name
+        if script.is_symlink() or not script.is_file():
+            raise InstallError("installed_entrypoint_missing:" + name)
+        module, sep, function = target.partition(":")
+        if not sep or not module.startswith("agent_os.") or not function.isidentifier():
+            raise InstallError("wheel_entrypoint_target_invalid")
+        body = script.read_text(encoding="utf-8")
+        if not body.startswith("#!" + str(path / ".venv/bin/python")) or (
+            f"from {module} import {function}" not in body
+        ):
+            raise InstallError("installed_entrypoint_target_mismatch:" + name)
+        scripts[name] = digest(script)
+    if script_hashes is not None and scripts != script_hashes:
+        raise InstallError("installed_entrypoint_hash_mismatch")
+    return scripts
 
 
 def check_user_compatibility(user: Path, manifest: dict) -> None:
@@ -142,7 +238,8 @@ def current_id(root: Path) -> str:
     target = current.resolve()
     if target.parent != (root / "releases").resolve():
         raise InstallError("refuse_replace_foreign_current")
-    read_manifest(target)
+    if not target.is_dir() or target.is_symlink():
+        raise InstallError("current_release_directory_missing")
     return target.name
 
 
@@ -209,7 +306,7 @@ def execute(args: argparse.Namespace) -> dict:
     old = current_id(root)
     if args.action == "rollback":
         target = release(root, args.release_id)
-        manifest = read_manifest(target)
+        manifest = read_manifest(target, verify_payload=False)
         identifier = target.name
     else:
         wheel = args.wheel.expanduser().absolute()
@@ -231,6 +328,8 @@ def execute(args: argparse.Namespace) -> dict:
             "config_schema": "agent-os.community-config/v5",
         }
     check_user_compatibility(user, manifest)
+    if args.action == "rollback":
+        read_manifest(target)
     plan = {
         "status": "PLANNED",
         "action": args.action,
@@ -289,6 +388,9 @@ def execute(args: argparse.Namespace) -> dict:
                         "--disable-pip-version-check",
                         str(target / wheel.name),
                     ]
+                )
+                manifest["script_sha256"] = _verify_owned_payload(
+                    target, target / wheel.name, None
                 )
                 evidence = probe(target, manifest["version"])
                 manifest["probe"] = evidence

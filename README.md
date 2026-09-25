@@ -4,9 +4,9 @@
 
 AgentOS gives a project a repeatable path from its current state to a verified change: project dossier → roadmap → documented stage → implementation → checks → updated documentation. A short intake selects only the relevant document layers. The CLI keeps the task, source, documents and check evidence bound to the same stage; ordinary read-only questions bypass intake entirely. Native hooks are excluded; explicit CLI checks do not intercept arbitrary tools.
 
-This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). This local candidate source is `0.5.0-beta.6` (Python distribution version `0.5.0b6`). It is separate from any maintainer's private runtime, infrastructure and personal data.
+This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). This source declares `0.5.0` (Python distribution version `0.5.0`). It is separate from any maintainer's private runtime, infrastructure and personal data.
 
-Visit the [public project website](https://crystalstrategy.ru/agent-os/), read the [changelog](CHANGELOG.md), or open an [issue](https://github.com/crystalstrategysup-prog/agent-os/issues) with a bug or technical review. This candidate does not assert that a new tag, release asset or website deployment exists.
+Visit the [public project website](https://crystalstrategy.ru/agent-os/), read the [changelog](CHANGELOG.md), or open an [issue](https://github.com/crystalstrategysup-prog/agent-os/issues) with a bug or technical review. Verify tag, release asset and website deployment separately.
 
 ## Two physical layers
 
@@ -21,13 +21,13 @@ Project lifecycle records in a project's `.agentos/` directory are a separate lo
 
 Profiles are optional files under the user overlay. `agentos profiles inventory` reports their hashes and overlaps; `profiles select` activates none, one, or all in an explicit order. Conflicting values need an owner choice. `profiles interview` prefills observed device facts and asks about missing user fields. Editing or removing a profile leaves the installed foundation unchanged.
 
-## Candidate verification, not installation authority
+## Source verification and installation
 
 Python 3.11+ is required. Review the exact source and diff, run the local tests and compare
-package resources before integration. `0.5.0-beta.6` is a local candidate, not an assertion
-that its tag or distribution is published. See [Install and update](docs/INSTALL_UPDATE.md)
+package resources before integration. A version string alone does not prove
+publication or activation. See [Install and update](docs/INSTALL_UPDATE.md)
 for the separately authorized offline flow, overlay preservation and no-hook rollback.
-No global hooks, model/auth or client security changes are part of this candidate.
+No global hooks, model/auth or client security changes are part of this release.
 
 ## Ordinary read-only requests
 
@@ -77,6 +77,6 @@ python tools/demo_lifecycle.py
 python tools/verify_public.py
 ```
 
-Start with the [project dossier](docs/agentos/DOSSIER.md), [roadmap](docs/agentos/ROADMAP.md), [current stage](docs/agentos/STAGE-F10.md), [architecture](docs/ARCHITECTURE.md) and [developer onboarding](docs/ONBOARDING.md). The [changelog](CHANGELOG.md) and [release policy](docs/RELEASE.md) state the beta status and limits. GitHub Actions are not used.
+Start with the [project dossier](docs/agentos/DOSSIER.md), [roadmap](docs/agentos/ROADMAP.md), [current stage](docs/agentos/STAGE-F11.md), [architecture](docs/ARCHITECTURE.md) and [developer onboarding](docs/ONBOARDING.md). The [changelog](CHANGELOG.md) and [release policy](docs/RELEASE.md) state the release status and limits. GitHub Actions are not used.
 
 Crystal AgentOS is Apache-2.0 software. Contributions and skeptical technical reviews are welcome; see [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), [Governance](GOVERNANCE.md) and the [AI Stewardship Charter](STEWARDSHIP.md). [Русская документация](docs/README.ru.md).

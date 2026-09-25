@@ -26,6 +26,14 @@ F10: managed AGENTS должен содержать короткий маршр�
 Проверять сохранность owner text при integrate и читать effective instructions в
 новой сессии; synthetic test не доказывает отсутствие обрезки на любом клиенте.
 
+F11: S1–S8 проверяются отдельными отрицательными случаями для выбора CODEX_HOME,
+пустого override, partial integration, CRLF/marker order, потомков check-процесса,
+FIFO/socket inventory, повреждённой installed payload и console pytest.
+Partial `project enter` проверяется отказом после создания черновика/turn receipt,
+восстановлением после прерывания и отказом при конкурентной правке владельца.
+Нужны оба способа запуска pytest, чистый Git export, wheel metadata/RECORD,
+изолированные Mac и Linux fixture, затем отдельная приёмка реальной конфигурации.
+
 Baseline native interception tests заменяются тестами retirement/no-install contract,
 а не сохраняются как скрытое обещание enforcement. Остальные critical negative lifecycle,
 path/symlink/duplicate JSON, evidence hash/age/version, profile/import/installer/MCP

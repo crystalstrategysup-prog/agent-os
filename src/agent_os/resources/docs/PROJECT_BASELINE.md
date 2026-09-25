@@ -8,7 +8,7 @@ source archives and the wheel; sanitized evidence travels separately when needed
 installed wheel contains universal mechanisms and this frozen overview, not a mutable
 shadow copy of project state.
 
-0.5.0-beta.1 is historical context; 0.5.0-beta.6 is a local source candidate.
+0.5.0-beta.1 is historical context; 0.5.0 is the current source release identity.
 F02/F03 added governed intake/docs/evidence and separate overlay/offline
 install/rollback. F04 is independent target verification, publication and
 installation. Private executable provider parity must be established separately before retiring

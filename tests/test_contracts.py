@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import sys
 import tomllib
@@ -21,7 +22,7 @@ def test_release_and_mcp_versions_have_one_beta_identity():
     package_version = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"][
         "version"
     ]
-    assert __version__ == "0.5.0-beta.6"
+    assert __version__ == "0.5.0"
     assert package_version == __version__.replace("-beta.", "b")
     initialized = response({"jsonrpc": "2.0", "id": 1, "method": "initialize"})
     assert initialized["result"]["serverInfo"] == MCP_CONTRACT["serverInfo"]
@@ -147,7 +148,12 @@ def test_cli_contract_is_packaged_and_release_tree_refuses_runtime_receipts(tmp_
         "overlay import",
         "install.py rollback",
     } <= {row["name"] for row in source["commands"]}
-    from tools import verify_public
+    spec = importlib.util.spec_from_file_location(
+        "agentos_public_verifier", ROOT / "tools/verify_public.py"
+    )
+    assert spec and spec.loader
+    verify_public = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(verify_public)
 
     (tmp_path / ".agentos").mkdir()
     assert verify_public.runtime_receipts_present(tmp_path)

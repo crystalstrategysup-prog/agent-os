@@ -1,9 +1,11 @@
-# Current candidate note — F10
+# Current stage note — F11
 
-`0.5.0-beta.6` is a local source-only candidate for concise AGENTS routing.
-Current workflow is defined by PROCESS/ARCHITECTURE and STAGE-F10; F09 and earlier
-native-hook requirements below are historical evidence for earlier sources only.
-No Mac rollout, external service change or private settings installation is authorized here.
+F10 produced only a local beta.6 source candidate at `838b061`. The independent
+curator found additional reproducible defects S1–S8. F11 targets stable public
+0.5.0 after exact review and separately proven Mac activation. See STAGE-F11 for
+scope and acceptance. F09 and earlier native-hook requirements below are
+historical evidence; hooks remain disabled and excluded. Private RC retirement
+requires a distinct live dependency/target proof before archiving or deletion.
 
 # Crystal AgentOS Community Edition — project dossier
 

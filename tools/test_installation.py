@@ -152,6 +152,100 @@ def verify(wheel: Path, overlay: Path | None = None) -> dict:
         assert snapshot() == before
         b = install(wheel, __version__, a["release_id"])
         assert snapshot() == before
+        release_dir = core / "releases" / b["release_id"]
+        site = next((release_dir / ".venv/lib").glob("python*/site-packages"))
+        workflow_file = site / "agent_os/workflow.py"
+        original_workflow = workflow_file.read_bytes()
+        reactivate = [
+            sys.executable,
+            installer,
+            "install",
+            "--wheel",
+            wheel,
+            "--sha256",
+            digest(wheel),
+            "--version",
+            __version__,
+            "--core-home",
+            core,
+            "--user-home",
+            user,
+            "--apply",
+            "--expected-current",
+            b["release_id"],
+        ]
+
+        def blocked_reactivation(expected_error):
+            result = subprocess.run(
+                [str(x) for x in reactivate],
+                capture_output=True,
+                text=True,
+                timeout=30,
+                env={**os.environ, "PIP_NO_INDEX": "1"},
+                check=False,
+            )
+            value = json.loads(result.stdout)
+            assert result.returncode == 2 and value["status"] == "BLOCKED"
+            assert expected_error in value["error"], value
+            assert (core / "current").resolve() == release_dir.resolve()
+            assert snapshot() == before
+            runs.append(
+                {
+                    "check": "corrupt_installed_payload_refused",
+                    "expected_error": expected_error,
+                    "return_code": result.returncode,
+                }
+            )
+
+        workflow_file.write_bytes(original_workflow + b"\n# fixture drift\n")
+        blocked_reactivation("installed_payload_mismatch")
+        workflow_file.write_bytes(original_workflow)
+        held = workflow_file.with_suffix(".held")
+        workflow_file.rename(held)
+        blocked_reactivation("installed_payload_mismatch")
+        held.rename(workflow_file)
+        extra = site / "agent_os/unexpected.py"
+        extra.write_text("# fixture extra module\n")
+        blocked_reactivation("installed_payload_extra")
+        extra.unlink()
+        workflow_file.rename(held)
+        workflow_file.symlink_to(held)
+        blocked_reactivation("installed_payload_mismatch")
+        workflow_file.unlink()
+        held.rename(workflow_file)
+        manifest_path = release_dir / "INSTALL.json"
+        original_manifest = manifest_path.read_bytes()
+        manifest = json.loads(original_manifest)
+        manifest["overlay_schema"] = 99
+        manifest_path.write_text(json.dumps(manifest))
+        blocked_reactivation("release_schema_incompatible")
+        manifest_path.write_bytes(original_manifest)
+        entrypoint = release_dir / ".venv/bin/agentos"
+        original_entrypoint = entrypoint.read_bytes()
+        entrypoint.write_bytes(original_entrypoint + b"\n# fixture drift\n")
+        blocked_reactivation("installed_entrypoint_hash_mismatch")
+        entrypoint.write_bytes(original_entrypoint)
+        workflow_file.write_bytes(original_workflow + b"\n# damaged current fixture\n")
+        run(
+            [
+                sys.executable,
+                installer,
+                "rollback",
+                "--release-id",
+                a["release_id"],
+                "--core-home",
+                core,
+                "--user-home",
+                user,
+                "--apply",
+                "--expected-current",
+                b["release_id"],
+            ]
+        )
+        assert (core / "current").resolve() == (core / "releases" / a["release_id"]).resolve()
+        workflow_file.write_bytes(original_workflow)
+        install(wheel, __version__, a["release_id"])
+        assert snapshot() == before
         run(
             [
                 sys.executable,
@@ -247,6 +341,8 @@ def verify(wheel: Path, overlay: Path | None = None) -> dict:
                 "overlay_import_and_init_preserve_config": bool(overlay),
                 "installed_resource_presence": True,
                 "integration_preserves_native_trust": True,
+                "corrupt_installed_payload_refused": True,
+                "damaged_current_can_switch_to_verified_release": True,
             },
             "target_mac_verified": False,
             "native_hooks_activated": False,

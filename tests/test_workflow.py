@@ -6,6 +6,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -173,6 +174,325 @@ def test_F_long_owner_agents_remains_intact_without_size_gate(tmp_path):
     integrated = agents.read_bytes()
     integration.install(codex, tmp_path / "skills", tmp_path / "user", apply=True)
     assert agents.read_bytes() == integrated
+
+
+def test_F_integration_uses_selected_codex_home(tmp_path, monkeypatch):
+    default = tmp_path / "default"
+    selected = tmp_path / "selected"
+    explicit = tmp_path / "explicit"
+    monkeypatch.setattr(integration.Path, "home", lambda: default)
+    monkeypatch.setenv("CODEX_HOME", str(selected))
+    result, code = integration.command(["codex"], tmp_path / "user")
+    assert code == 0
+    assert result["agents_selected"] == str(selected / "AGENTS.md")
+    result, code = integration.command(
+        ["codex", "--codex-home", str(explicit)], tmp_path / "user"
+    )
+    assert code == 0
+    assert result["agents_selected"] == str(explicit / "AGENTS.md")
+    monkeypatch.setenv("CODEX_HOME", "")
+    result, code = integration.command(["codex"], tmp_path / "user")
+    assert code == 0
+    assert result["agents_selected"] == str(default / ".codex/AGENTS.md")
+    monkeypatch.setenv("CODEX_HOME", "relative/codex")
+    with pytest.raises(p.GateError, match="codex_home_absolute_required"):
+        integration.command(["codex"], tmp_path / "user")
+
+
+@pytest.mark.parametrize("empty_override", [b"", b"  \r\n\t"])
+def test_F_empty_override_does_not_shadow_owner_agents(tmp_path, empty_override):
+    codex = tmp_path / "codex"
+    codex.mkdir()
+    base = codex / "AGENTS.md"
+    base.write_bytes(b"Owner limits stay effective.\n")
+    override = codex / "AGENTS.override.md"
+    override.write_bytes(empty_override)
+    result = integration.install(codex, tmp_path / "skills", tmp_path / "user", apply=True)
+    assert result["agents_selected"] == str(base)
+    assert override.read_bytes() == empty_override
+    assert base.read_bytes().startswith(b"Owner limits stay effective.\n")
+
+
+def test_F_integration_preserves_crlf_owner_bytes_and_rejects_reversed_markers(tmp_path):
+    codex = tmp_path / "codex"
+    codex.mkdir()
+    base = codex / "AGENTS.md"
+    owner = b"Owner section\r\nSecond line  \r\n"
+    base.write_bytes(owner)
+    integration.install(codex, tmp_path / "skills", tmp_path / "user", apply=True)
+    assert base.read_bytes().startswith(owner)
+    base.write_bytes((integration.END + "\n" + integration.START).encode())
+    before = base.read_bytes()
+    with pytest.raises(p.GateError, match="damaged_managed_agents_block"):
+        integration.install(codex, tmp_path / "skills", tmp_path / "user", apply=True)
+    assert base.read_bytes() == before
+
+
+def test_F_file_inventory_rejects_fifo_without_opening_it(tmp_path):
+    if not hasattr(os, "mkfifo"):
+        pytest.skip("FIFO is unavailable on this platform")
+    fifo = tmp_path / "waiting.pipe"
+    os.mkfifo(fifo)
+    with pytest.raises(GateError, match="regular_inventory_file_required"):
+        filemap(tmp_path)
+
+
+@pytest.mark.skipif(os.name != "posix", reason="Unix sockets require POSIX")
+def test_F_file_inventory_rejects_socket(tmp_path):
+    import socket
+    import tempfile
+
+    with tempfile.TemporaryDirectory(prefix="aos-", dir="/tmp") as short_root:
+        endpoint = Path(short_root) / "endpoint.sock"
+        server = socket.socket(socket.AF_UNIX)
+        try:
+            server.bind(str(endpoint))
+            with pytest.raises(GateError, match="regular_inventory_file_required"):
+                filemap(Path(short_root))
+        finally:
+            server.close()
+
+
+@pytest.mark.skipif(os.name != "posix", reason="process-group checks require POSIX")
+@pytest.mark.parametrize("parent_sleep,expected_code", [(0, 125), (2, 124)])
+def test_F_check_runner_stops_late_descendant_writes(tmp_path, parent_sleep, expected_code):
+    late = tmp_path / "late.txt"
+    child = (
+        "import pathlib,time; time.sleep(1.6); "
+        + f"pathlib.Path({str(late)!r}).write_text('late')"
+    )
+    parent = (
+        "import subprocess,sys,time; "
+        + f"subprocess.Popen([sys.executable,'-c',{child!r}]); "
+        + f"time.sleep({parent_sleep})"
+    )
+    code, output = p._bounded_check_process(
+        [sys.executable, "-c", parent], tmp_path, os.environ.copy(), 1
+    )
+    assert code == expected_code
+    assert "CHECK " in output
+    time.sleep(1.8)
+    assert not late.exists()
+
+
+@pytest.mark.skipif(os.name != "posix", reason="process-group checks require POSIX")
+def test_F_check_runner_bounds_output_and_launch_failure(tmp_path):
+    code, output = p._bounded_check_process(
+        [sys.executable, "-c", "print('x' * 5000000)"],
+        tmp_path,
+        os.environ.copy(),
+        5,
+    )
+    assert code == 125
+    assert "CHECK OUTPUT LIMIT" in output
+    assert len(output.encode()) <= 200000
+    code, output = p._bounded_check_process(
+        [str(tmp_path / "missing-command")], tmp_path, os.environ.copy(), 1
+    )
+    assert code == 127
+    assert "CHECK LAUNCH FAILED" in output
+
+
+def test_B_failed_scaffold_leaves_no_active_or_orphan_task(setup, monkeypatch):
+    root, home, answers = setup
+    original = p.scaffold
+
+    def fail_after_scaffold(*args, **kwargs):
+        original(*args, **kwargs)
+        raise OSError("synthetic scaffold failure")
+
+    monkeypatch.setattr(p, "scaffold", fail_after_scaffold)
+    with pytest.raises(OSError, match="synthetic scaffold failure"):
+        p.enter(root, answers, session_id="failed-scaffold", turn_id="t", user_home=home)
+    assert p.load_project(root).get("active_task") is None
+    assert not list((root / ".agentos/tasks").glob("*/task.json"))
+    assert not list((root / "docs/agentos/stages").glob("task-*.md"))
+
+
+def test_B_failed_turn_bind_restores_project_and_turn(setup, monkeypatch):
+    root, home, answers = setup
+    original = turns.bind_turn
+
+    def fail_after_bind(*args, **kwargs):
+        original(*args, **kwargs)
+        raise OSError("synthetic turn bind failure")
+
+    monkeypatch.setattr(turns, "bind_turn", fail_after_bind)
+    with pytest.raises(OSError, match="synthetic turn bind failure"):
+        p.enter(root, answers, session_id="failed-bind", turn_id="t", user_home=home)
+    assert p.load_project(root).get("active_task") is None
+    assert not list((root / ".agentos/tasks").glob("*/task.json"))
+    assert not turns.turn_path(home, "failed-bind").exists()
+
+
+def test_B_interrupted_enter_recovers_before_new_task(setup, monkeypatch):
+    root, home, answers = setup
+    original_scaffold = p.scaffold
+    original_recovery = p._recover_entry
+
+    def fail_after_scaffold(*args, **kwargs):
+        original_scaffold(*args, **kwargs)
+        raise OSError("synthetic interruption")
+
+    def interrupted_recovery(*args, **kwargs):
+        raise OSError("synthetic process loss")
+
+    monkeypatch.setattr(p, "scaffold", fail_after_scaffold)
+    monkeypatch.setattr(p, "_recover_entry", interrupted_recovery)
+    with pytest.raises(OSError, match="synthetic process loss"):
+        p.enter(root, answers, session_id="interrupted", turn_id="t", user_home=home)
+    assert (root / ".agentos/entry-transaction.json").exists()
+    monkeypatch.setattr(p, "scaffold", original_scaffold)
+    monkeypatch.setattr(p, "_recover_entry", original_recovery)
+    with pytest.raises(GateError, match="entry_recovered_retry"):
+        p.enter(root, answers, session_id="interrupted", turn_id="t", user_home=home)
+    assert p.load_project(root).get("active_task") is None
+    assert not list((root / ".agentos/tasks").glob("*/task.json"))
+    assert not list((root / "docs/agentos/stages").glob("task-*.md"))
+    result = p.enter(root, answers, session_id="interrupted", turn_id="t", user_home=home)
+    assert result["status"] == "INTAKE"
+
+
+def test_B_interrupted_enter_preserves_concurrent_owner_edit(setup, monkeypatch):
+    root, home, answers = setup
+    original_scaffold = p.scaffold
+    original_recovery = p._recover_entry
+
+    def fail_after_scaffold(*args, **kwargs):
+        original_scaffold(*args, **kwargs)
+        raise OSError("synthetic interruption")
+
+    monkeypatch.setattr(p, "scaffold", fail_after_scaffold)
+    monkeypatch.setattr(p, "_recover_entry", lambda *_: (_ for _ in ()).throw(OSError("process loss")))
+    with pytest.raises(OSError, match="process loss"):
+        p.enter(root, answers, session_id="edited", turn_id="t", user_home=home)
+    project_path = root / ".agentos/project.json"
+    project_path.write_bytes(project_path.read_bytes() + b"owner edit\n")
+    monkeypatch.setattr(p, "_recover_entry", original_recovery)
+    with pytest.raises(GateError, match="entry_recovery_conflict"):
+        p.enter(root, answers, session_id="edited", turn_id="t", user_home=home)
+    assert project_path.read_bytes().endswith(b"owner edit\n")
+
+
+def test_F_integration_failure_restores_owner_agents_and_omits_success_receipt(
+    tmp_path, monkeypatch
+):
+    codex, skills, home = tmp_path / "codex", tmp_path / "skills", tmp_path / "user"
+    codex.mkdir()
+    agents = codex / "AGENTS.md"
+    owner = b"Owner rules.  \r\n"
+    agents.write_bytes(owner)
+    write = integration.atomic_bytes
+
+    def fail_first_skill(path, data):
+        if skills in path.parents:
+            raise OSError("synthetic skill write failure")
+        return write(path, data)
+
+    monkeypatch.setattr(integration, "atomic_bytes", fail_first_skill)
+    with pytest.raises(OSError, match="synthetic skill write failure"):
+        integration.install(codex, skills, home, apply=True)
+    assert agents.read_bytes() == owner
+    assert not (codex / "agentos-integration.json").exists()
+    assert not (home / "state/integration-transaction.json").exists()
+
+
+@pytest.mark.parametrize("failure_position", ["first", "middle", "receipt"])
+def test_F_integration_fault_after_each_phase_rolls_back(tmp_path, monkeypatch, failure_position):
+    codex, skills, home = tmp_path / "codex", tmp_path / "skills", tmp_path / "user"
+    codex.mkdir()
+    agents = codex / "AGENTS.md"
+    owner = b"Owner original\n"
+    agents.write_bytes(owner)
+    planned = integration.install(codex, skills, home)
+    failure_at = {"first": 1, "middle": 5, "receipt": len(planned["files"]) + 1}[
+        failure_position
+    ]
+    count = 0
+    write = integration.atomic_bytes
+
+    def fail_target_write(path, data):
+        nonlocal count
+        if codex in path.parents or skills in path.parents:
+            count += 1
+            if count == failure_at:
+                raise OSError("synthetic phase failure")
+        return write(path, data)
+
+    monkeypatch.setattr(integration, "atomic_bytes", fail_target_write)
+    with pytest.raises(OSError, match="synthetic phase failure"):
+        integration.install(codex, skills, home, apply=True)
+    assert count >= failure_at
+    assert agents.read_bytes() == owner
+    assert not (codex / "agentos-integration.json").exists()
+    assert filemap(skills) == {}
+    assert not (home / "state/integration-transaction.json").exists()
+
+
+def test_F_integration_interrupted_journal_recovers_without_overwriting_owner_edit(
+    tmp_path, monkeypatch
+):
+    codex, skills, home = tmp_path / "codex", tmp_path / "skills", tmp_path / "user"
+    codex.mkdir()
+    agents = codex / "AGENTS.md"
+    agents.write_bytes(b"Original owner rules.\n")
+    write = integration.atomic_bytes
+
+    def fail_first_skill(path, data):
+        if skills in path.parents:
+            raise OSError("synthetic interruption")
+        return write(path, data)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(integration, "atomic_bytes", fail_first_skill)
+        patch.setattr(
+            integration,
+            "_recover_transaction",
+            lambda *args: (_ for _ in ()).throw(OSError("synthetic recovery interruption")),
+        )
+        with pytest.raises(OSError, match="synthetic recovery interruption"):
+            integration.install(codex, skills, home, apply=True)
+    assert (home / "state/integration-transaction.json").exists()
+    assert not (codex / "agentos-integration.json").exists()
+    assert integration.install(codex, skills, home)["status"] == "RECOVERY_REQUIRED"
+    agents.write_bytes(b"New owner edit after interruption.\n")
+    with pytest.raises(GateError, match="integration_recovery_conflict"):
+        integration.install(codex, skills, home, apply=True)
+    assert agents.read_bytes() == b"New owner edit after interruption.\n"
+    assert (home / "state/integration-transaction.json").exists()
+    journal = read_json(home / "state/integration-transaction.json")
+    agent_row = next(row for row in journal["files"] if row["path"] == str(agents))
+    assert agent_row["before"] == safeio.sha(b"Original owner rules.\n")
+    # The conflict is intentionally left for a human reconciliation.
+
+
+def test_F_integration_interrupted_journal_can_restore_and_retry(tmp_path, monkeypatch):
+    codex, skills, home = tmp_path / "codex", tmp_path / "skills", tmp_path / "user"
+    codex.mkdir()
+    agents = codex / "AGENTS.md"
+    original = b"Owner before interruption.\n"
+    agents.write_bytes(original)
+    write = integration.atomic_bytes
+
+    def fail_first_skill(path, data):
+        if skills in path.parents:
+            raise OSError("synthetic interruption")
+        return write(path, data)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(integration, "atomic_bytes", fail_first_skill)
+        patch.setattr(
+            integration,
+            "_recover_transaction",
+            lambda *args: (_ for _ in ()).throw(OSError("synthetic recovery interruption")),
+        )
+        with pytest.raises(OSError, match="synthetic recovery interruption"):
+            integration.install(codex, skills, home, apply=True)
+    assert integration.install(codex, skills, home, apply=True)["status"] == "RECOVERED_RETRY"
+    assert agents.read_bytes() == original
+    assert not (home / "state/integration-transaction.json").exists()
+    assert not (codex / "agentos-integration.json").exists()
+    assert integration.install(codex, skills, home, apply=True)["status"] == "INSTALLED_MANUAL_WORKFLOW"
 
 
 def test_F_hook_symlink_is_untouched_by_integration(tmp_path):

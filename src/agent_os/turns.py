@@ -22,7 +22,8 @@ def turn_path(home: Path, session_id: str) -> Path:
 
 
 def bind_turn(
-    home: Path, session_id: str, turn_id: str, root: Path, task_id: str
+    home: Path, session_id: str, turn_id: str, root: Path, task_id: str,
+    *, entered_at: str | None = None,
 ) -> None:
     from .overlay import validate_roots
 
@@ -37,7 +38,7 @@ def bind_turn(
             "root": str(root.resolve()),
             "task_id": task_id,
             "status": "ENTERED",
-            "entered_at": now(),
+            "entered_at": entered_at or now(),
             "hook_seen": False,
             "source": "standalone_cli",
         }
