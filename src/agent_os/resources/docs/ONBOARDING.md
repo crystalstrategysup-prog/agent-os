@@ -3,7 +3,7 @@
 ## Чистая установка и исходники
 
 Канонический исходник — `https://github.com/crystalstrategysup-prog/agent-os`.
-Для beta используйте проверенный tag `v0.5.0-beta.2` после публикации. На macOS/Linux
+Для beta используйте проверенный tag `v0.5.0-beta.3` после публикации. На macOS/Linux
 нужен Python 3.11+: `python3 -m venv .venv`, затем `python -m pip install -e '.[dev]'`,
 `agentos init`, `agentos doctor`, `python -m pytest -q`. Это установка из исходника,
 не из PyPI: проект `crystal-agent-os` там пока даёт 404. Запуск `init` создаёт только
@@ -32,6 +32,9 @@ checks, обновите документацию по факту и выпол�
 `agentos resources --list` показывает установленный нормативный комплект; пользовательский
 `overlay index` указывает релевантные private docs, но не вываливает секреты и историю.
 Перед задачей вызвать questions, использовать известные ответы, провести enter для session/turn.
+В CLI-only сессии после checkpoint/close выполните `project next-turn` с точными
+`--session S --from-turn OLD --turn NEW --task TASK`, затем новый `enter` с `--turn NEW`.
+Для native hooks новый turn приходит только от UserPromptSubmit; CLI-переход его не подменяет.
 Для незнакомого existing проекта начните read-only обследование, не scaffolding поверх неизвестного.
 
 Практический пример полностью выполняется `python3 tools/demo_lifecycle.py` в tmpdir.

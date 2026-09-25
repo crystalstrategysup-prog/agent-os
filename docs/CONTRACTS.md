@@ -7,8 +7,8 @@
 `inputSchema`/`outputSchema` с `tools/list` и фактическими `structuredContent`, а
 task/event schemas — с записями реального локального lifecycle.
 
-Версия выпуска для человека и MCP: `0.5.0-beta.2`; эквивалент Python packaging:
-`0.5.0b2`. `agentos --version`, `agent_os.__version__` и `serverInfo.version`
+Версия выпуска для человека и MCP: `0.5.0-beta.3`; эквивалент Python packaging:
+`0.5.0b3`. `agentos --version`, `agent_os.__version__` и `serverInfo.version`
 совпадают буквально. Протокол stdio MCP остаётся `2025-06-18`. HTTP API нет, поэтому
 OpenAPI/Swagger здесь не существует; события пишутся локально в JSONL и описаны
 JSON Schema, а не AsyncAPI.
@@ -23,7 +23,7 @@ JSON Schema, а не AsyncAPI.
 
 |Группа|Команды|Контракт записи|
 |---|---|---|
-|project|init, questions, enter, document, ready, check, assess, status, close, checkpoint, gate, snapshot|Только явные действия в указанном проекте; вопросы/чтение без product writes|
+|project|init, questions, enter, next-turn, document, ready, check, assess, status, close, checkpoint, gate, snapshot|Только явные действия в указанном проекте; вопросы/чтение без product writes|
 |project observe|--root --answers --session --turn|Только user receipt, без .agentos в проекте|
 |overlay|status, index, import, migrate-config|import/migrate план по умолчанию; apply явно|
 |integrate codex|--codex-home --skills-home --apply|Управляемые блоки, backup; native trust не меняется|
@@ -31,7 +31,9 @@ JSON Schema, а не AsyncAPI.
 |hook|JSON stdin|UserPromptSubmit пишет turn; PreToolUse/Stop читают gate|
 
 Session/turn предоставляются настоящим клиентом. При CLI-only испытании задаются явно;
-это не доказывает hook_seen. Совпадение session/turn/root обязательно. Request для legacy
+это не доказывает hook_seen. После checkpoint/close `project next-turn` с точным
+`--from-turn` обновляет только CLI receipt; native-hook receipt он не принимает. Совпадение
+session/turn/root обязательно. Request для legacy
 dispatch должен совпасть с objective и destination_session; receipt потребляется однократно,
 даже если downstream запуск упал. Для повторной попытки требуется новый проверенный turn.
 

@@ -338,6 +338,102 @@ def test_resume_resets_gate(setup):
     assert t["revision"] == 2 and t["receipts"] == [] and "ready" not in t
 
 
+def test_standalone_cli_next_turn_resumes_checkpoint_without_hook_claim(setup):
+    root, home, answers = setup
+    hooks.turn_path(home, "s").unlink()
+    task = start(setup)
+    assert read_json(hooks.turn_path(home, "s"))["hook_seen"] is False
+    assert documents(setup, task)["status"] == "READY"
+    p.checkpoint(root, task, "Synthetic pause", "Continue in a new CLI turn")
+    next_result, code = p.command(
+        [
+            "next-turn",
+            "--root",
+            str(root),
+            "--session",
+            "s",
+            "--from-turn",
+            "t",
+            "--turn",
+            "t2",
+            "--task",
+            task,
+        ],
+        home,
+    )
+    assert code == 0 and next_result["status"] == "INTAKE_REQUIRED"
+    assert read_json(hooks.turn_path(home, "s"))["hook_seen"] is False
+    answers_file = root / "answers.json"
+    atomic_json(answers_file, answers)
+    resumed, code = p.command(
+        [
+            "enter",
+            "--root",
+            str(root),
+            "--session",
+            "s",
+            "--turn",
+            "t2",
+            "--resume-task",
+            task,
+            "--answers",
+            str(answers_file),
+        ],
+        home,
+    )
+    assert code == 0 and resumed["task_id"] == task
+    assert read_json(hooks.turn_path(home, "s"))["hook_seen"] is False
+    updated = p.load_task(root, task)
+    assert updated["status"] == "INTAKE" and "ready" not in updated
+    assert updated["revision"] == 2 and updated["receipts"] == []
+
+
+def test_standalone_cli_next_turn_after_close_starts_new_task(setup):
+    root, home, answers = setup
+    hooks.turn_path(home, "s").unlink()
+    task = prepared(setup)
+    p.run_check(root, task, "unit")
+    p.close(root, task, review(setup, task))
+    p.next_turn(
+        root, home, session_id="s", previous_turn="t", turn_id="t2", task_id=task
+    )
+    result = p.enter(root, answers, session_id="s", turn_id="t2", user_home=home)
+    assert result["task_id"] != task
+    assert p.load_task(root, task)["status"] == "CLOSED"
+
+
+def test_standalone_cli_next_turn_refuses_native_or_mismatched_receipt(setup):
+    root, home, _ = setup
+    task = start(setup)
+    p.checkpoint(root, task, "Synthetic pause", "Continue after review")
+    path = hooks.turn_path(home, "s")
+    before = path.read_bytes()
+    with pytest.raises(GateError, match="standalone_turn_transition_mismatch"):
+        p.next_turn(
+            root, home, session_id="s", previous_turn="t", turn_id="t2", task_id=task
+        )
+    assert path.read_bytes() == before
+    path.unlink()
+    hooks.bind_turn(home, "s", "t", root, task)
+    before = path.read_bytes()
+    for previous, new_task in [("wrong", task), ("t", "task-wrong")]:
+        with pytest.raises(GateError):
+            p.next_turn(
+                root,
+                home,
+                session_id="s",
+                previous_turn=previous,
+                turn_id="t2",
+                task_id=new_task,
+            )
+        assert path.read_bytes() == before
+    with pytest.raises(GateError, match="standalone_turn_transition_mismatch"):
+        hooks.advance_standalone_turn(
+            home, "s", "t", "t2", root.parent / "different", task
+        )
+    assert path.read_bytes() == before
+
+
 def test_active_task_conflict(setup):
     start(setup)
     with pytest.raises(ValueError):
@@ -855,7 +951,7 @@ def test_installer_root_separation_and_wheel_hash(tmp_path):
             "--sha256",
             "0" * 64,
             "--version",
-            "0.5.0-beta.2",
+            "0.5.0-beta.3",
             "--core-home",
             str(tmp_path / "core"),
             "--user-home",
@@ -915,7 +1011,7 @@ def test_installer_refuses_incompatible_user_metadata_before_activation(
             "--sha256",
             mod.digest(wheel),
             "--version",
-            "0.5.0-beta.2",
+            "0.5.0-beta.3",
             "--core-home",
             str(core),
             "--user-home",

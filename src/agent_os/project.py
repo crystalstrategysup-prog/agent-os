@@ -330,6 +330,32 @@ def enter(
     }
 
 
+def next_turn(
+    root: Path,
+    user_home: Path,
+    *,
+    session_id: str,
+    previous_turn: str,
+    turn_id: str,
+    task_id: str,
+) -> dict:
+    from .hooks import advance_standalone_turn
+
+    root = root_path(root)
+    nonempty(session_id, "session_id", 200)
+    identifier(task_id)
+    with lock(within(root, ".agentos/write.lock")):
+        project = load_project(root)
+        if project.get("active_task") != task_id:
+            raise GateError("standalone_turn_task_mismatch")
+        task = load_task(root, task_id)
+        if task["status"] not in {"CHECKPOINT", "CLOSED"}:
+            raise GateError("standalone_turn_requires_finished_or_checkpointed_task")
+        return advance_standalone_turn(
+            user_home, session_id, previous_turn, turn_id, root, task_id
+        )
+
+
 def register_document(
     root: Path,
     doc_id: str,
@@ -734,6 +760,10 @@ def make_parser() -> argparse.ArgumentParser:
     ent.add_argument("--session", required=True)
     ent.add_argument("--turn", required=True)
     ent.add_argument("--resume-task")
+    nxt = sub.add_parser("next-turn")
+    nxt.add_argument("--session", required=True)
+    nxt.add_argument("--from-turn", required=True)
+    nxt.add_argument("--turn", required=True)
     doc = sub.add_parser("document")
     for name in ("id", "path", "owner", "source", "summary"):
         doc.add_argument("--" + name, required=True)
@@ -755,6 +785,7 @@ def make_parser() -> argparse.ArgumentParser:
         child.add_argument("--root", type=Path, default=Path.cwd())
         if name in {
             "ready",
+            "next-turn",
             "check",
             "assess",
             "status",
@@ -798,6 +829,15 @@ def command(argv: list[str], user_home: Path) -> tuple[dict, int]:
             turn_id=args.turn,
             user_home=user_home,
             resume_task=args.resume_task,
+        )
+    elif args.action == "next-turn":
+        result = next_turn(
+            root,
+            user_home,
+            session_id=args.session,
+            previous_turn=args.from_turn,
+            turn_id=args.turn,
+            task_id=args.task,
         )
     elif args.action == "document":
         result = register_document(

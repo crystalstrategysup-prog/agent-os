@@ -21,7 +21,7 @@ def test_release_and_mcp_versions_have_one_beta_identity():
     package_version = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"][
         "version"
     ]
-    assert __version__ == "0.5.0-beta.2"
+    assert __version__ == "0.5.0-beta.3"
     assert package_version == __version__.replace("-beta.", "b")
     initialized = response({"jsonrpc": "2.0", "id": 1, "method": "initialize"})
     assert initialized["result"]["serverInfo"] == MCP_CONTRACT["serverInfo"]
@@ -142,6 +142,7 @@ def test_cli_contract_is_packaged_and_release_tree_refuses_runtime_receipts(tmp_
     assert source["release"] == __version__
     assert {
         "project enter",
+        "project next-turn",
         "project close",
         "overlay import",
         "install.py rollback",

@@ -2,10 +2,10 @@
 
 ## Установка из публичного исходника
 
-После публикации проверенного tag `v0.5.0-beta.2` на macOS или Linux с Python 3.11+:
+После публикации проверенного tag `v0.5.0-beta.3` на macOS или Linux с Python 3.11+:
 
 ```sh
-git clone --branch v0.5.0-beta.2 https://github.com/crystalstrategysup-prog/agent-os.git
+git clone --branch v0.5.0-beta.3 https://github.com/crystalstrategysup-prog/agent-os.git
 cd agent-os
 python3 -m venv .venv
 . .venv/bin/activate
@@ -30,8 +30,8 @@ agentos doctor
 
 ```sh
 python3 tools/install.py install \
- --wheel /absolute/crystal_agent_os-0.5.0b2-py3-none-any.whl \
- --sha256 ACTUAL_WHEEL_SHA256 --version 0.5.0-beta.2 \
+ --wheel /absolute/crystal_agent_os-0.5.0b3-py3-none-any.whl \
+ --sha256 ACTUAL_WHEEL_SHA256 --version 0.5.0-beta.3 \
  --core-home "$HOME/.local/share/agentos-foundation" --user-home "$HOME/.agentos-user"
 ```
 
@@ -74,6 +74,9 @@ write до intake должен DENY → intake/docs/READY → только за�
 Повторить пропуск closeout (Stop блокирует), новый turn (старый gate больше не подходит).
 Проверьте stdout/native event log, не только наличие hooks.json. При отсутствии механизма
 статус ENFORCEMENT_NOT_PROVEN; правило в Markdown не заменяет эту проверку.
+Для CLI-only режима без native hooks после checkpoint/close используйте
+`agentos project next-turn` с точными session, previous turn, new turn и task,
+затем отдельный `project enter`. Этот переход не подтверждает native enforcement.
 
 ## Обновление
 

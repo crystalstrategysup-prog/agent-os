@@ -32,6 +32,18 @@ agentos project enter --root /work/project --session SESSION --turn TURN --answe
 Один active task на проект. Для продолжения незакрытого — --resume-task с новой анкетой;
 revision возрастает, READY и receipts сбрасываются. CLOSED не редактируется — новый task.
 Если scope меняется в ходе этапа, сначала checkpoint, затем новый turn/entry или resume.
+В самостоятельном CLI-режиме без native hooks следующий turn той же session после checkpoint
+или close требует явного перехода:
+
+```sh
+agentos project next-turn --root /work/project --session SESSION --from-turn OLD_TURN --turn NEW_TURN --task TASK
+agentos project enter --root /work/project --session SESSION --turn NEW_TURN --resume-task TASK --answers answers.json
+```
+
+После close начните новый task через `enter` без `--resume-task`. `next-turn` принимает только
+точную предыдущую CLI-привязку (`hook_seen=false`), тот же project root и checkpointed/closed
+task. Он пишет лишь запись ожидания intake в user home; READY и прошлые checks не наследуются.
+В native-hook режиме новый turn создаёт реальный UserPromptSubmit, а `next-turn` откажет.
 Изменение типов/признаков существующего проекта: пока нет отдельной revise-команды,
 оформить архитектурный этап и контролируемо обновить project.json, затем **новый enter**;
 check_ready блокирует старую policy. Не менять метаданные из-под READY.

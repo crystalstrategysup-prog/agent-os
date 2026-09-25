@@ -4,7 +4,7 @@
 
 AgentOS gives a project a repeatable path from its current state to a verified change: project dossier → roadmap → documented stage → implementation → checks → updated documentation. A short intake selects only the relevant document layers. The CLI keeps the task, source, documents and check evidence bound to the same stage; an integrated native hook can enforce entry and closeout only after the client actually loads and trusts it.
 
-This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). The current beta source is `0.5.0-beta.2` (Python distribution version `0.5.0b2`). It is separate from any maintainer's private runtime, infrastructure and personal data.
+This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). The current beta source is `0.5.0-beta.3` (Python distribution version `0.5.0b3`). It is separate from any maintainer's private runtime, infrastructure and personal data.
 
 Visit the [public project website](https://crystalstrategy.ru/agent-os/), read the [changelog](CHANGELOG.md), or open an [issue](https://github.com/crystalstrategysup-prog/agent-os/issues) with a bug or technical review. The release tag is the installation authority while website deployment is pending.
 
@@ -23,7 +23,7 @@ See [Foundation ↔ Overlay](docs/FOUNDATION_OVERLAY.md) for versioning, conflic
 Python 3.11+ is required. On macOS or Linux, after verifying the intended public tag and source:
 
 ```sh
-git clone --branch v0.5.0-beta.2 https://github.com/crystalstrategysup-prog/agent-os.git
+git clone --branch v0.5.0-beta.3 https://github.com/crystalstrategysup-prog/agent-os.git
 cd agent-os
 python3 -m venv .venv
 . .venv/bin/activate

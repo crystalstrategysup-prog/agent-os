@@ -1,6 +1,6 @@
 # F06 — beta hardening after external review
 
-Status: LOCAL PASS, PUBLICATION READY. Baseline is the published `v0.5.0-beta.1` source plus F05 result on main. This stage fixes three independently confirmed local state boundary defects and publishes a new beta tag; the existing tag remains immutable.
+Status: PUBLIC RELEASE PASS. Baseline is the published `v0.5.0-beta.1` source plus F05 result on main. This stage fixed three local state boundary defects and published a new beta tag; the existing tag remains immutable.
 
 ## Defects and bounded fixes
 
@@ -25,3 +25,7 @@ The host gates recorded in F05 remain separate. This stage does not activate the
 - The public-tree validator and temporary lifecycle demo passed. The beta.2 wheel SHA-256 is `d3034d3f46d9b1582f518970bcfe9e50cab5ea398ff10947cfa316c2221ba615`.
 - A disposable Darwin arm64 Python 3.14 fixture passed offline install, update, rollback, reactivation, overlay preservation and packaged-resource checks. A Linux arm64 Python 3.12 container installed the wheel with network disabled and passed version, init, doctor and resources read-back.
 - These are synthetic/local checks. Public tag, release asset and site source read-back remain publication steps; the target host gates remain unresolved.
+
+## Publication result
+
+Annotated `v0.5.0-beta.2` and public `main` resolve to source commit `3e618b18b29cc14c8c8952127978c9baf2124b95`. The [GitHub pre-release](https://github.com/crystalstrategysup-prog/agent-os/releases/tag/v0.5.0-beta.2) is published; the downloaded wheel SHA-256 matched `d3034d3f46d9b1582f518970bcfe9e50cab5ea398ff10947cfa316c2221ba615`. Maintained site source commit `185b8aa9268f906db536a4cdb34cbeb9c5372eda` points to beta.2. The live site still serves its older page and broken PyPI command because the required host deployment scope is not available. The independent review's final report identified a different third defect involving standalone CLI turn transition; it is scoped to F07 rather than rewriting this immutable tag.

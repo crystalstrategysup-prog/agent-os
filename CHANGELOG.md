@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0-beta.3 — standalone CLI turn transition, 2026-09-25
+
+- Add an exact `project next-turn` command for CLI-only sessions after checkpoint or close. It advances the user-home receipt to a fresh turn without claiming native-hook provenance or restoring task readiness.
+- Preserve `hook_seen=false` across CLI-only entry. Native-hook receipts and mismatched session, root, task or previous turn cannot use the standalone transition.
+- Keep beta.1 and beta.2 tags and assets immutable. This release uses `v0.5.0-beta.3` (`0.5.0b3` in Python packaging); target platform and deployment limits remain in the release guide.
+
 ## 0.5.0-beta.2 — beta hardening, 2026-09-25
 
 - Publish imported overlay files atomically with create-only semantics, so an interrupted write cannot leave a partial user file.

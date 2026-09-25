@@ -1,6 +1,6 @@
 # F07 — standalone CLI turn transition
 
-Status: DOCUMENTED BEFORE IMPLEMENTATION. Baseline is published `v0.5.0-beta.2`; the independent review of beta.1 identified a third defect that its intermediate summary had not captured. This stage has its own immutable beta ordinal.
+Status: LOCAL PASS, PUBLICATION READY. Baseline is published `v0.5.0-beta.2`; the independent review of beta.1 identified a third defect that its intermediate summary had not captured. This stage has its own immutable beta ordinal.
 
 ## Reproduction and scope
 
@@ -20,3 +20,10 @@ Regression covers CLI-only checkpoint → next-turn → resume, CLOSED → new t
 ## Limits
 
 The live Mac and website deployment gates from F05 remain separate. This work does not authorize bypassing them or claim Windows/native hook target proof.
+
+## Local result before publication
+
+- `164` pytest cases, Ruff, the public-tree validator and temporary lifecycle demo passed. Tests cover exact standalone transition after checkpoint and close, preserved `hook_seen=false`, native-hook refusal, mismatched prior turn/task/root, and reset of readiness on resume.
+- Built wheel `crystal_agent_os-0.5.0b3-py3-none-any.whl` with SHA-256 `75ebdbee2a9545d06407cdf084a914adf0a9f64694102192b3ee014d7f4e49aa`.
+- A disposable Darwin arm64 Python 3.14 fixture passed offline install, update, rollback, reactivation and user-tree preservation. Linux arm64 Python 3.12 installed the wheel without network and passed version, init, doctor and packaged CLI-contract read-back.
+- These are local checks. Public tag/release/asset and site source remain publication steps; target host gates remain unresolved.

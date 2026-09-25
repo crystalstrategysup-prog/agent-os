@@ -74,9 +74,62 @@ def bind_turn(
             "task_id": task_id,
             "status": "ENTERED",
             "entered_at": now(),
-            "hook_seen": value is not None,
+            "hook_seen": value.get("hook_seen", True) if value is not None else False,
         }
         atomic_json(path, value)
+
+
+def advance_standalone_turn(
+    home: Path,
+    session_id: str,
+    previous_turn: str,
+    next_turn: str,
+    root: Path,
+    task_id: str,
+) -> dict:
+    """Advance an exact CLI-only receipt without impersonating a native hook."""
+    from .overlay import validate_roots
+
+    validate_roots(home)
+    nonempty(previous_turn, "previous_turn", 200)
+    nonempty(next_turn, "next_turn", 200)
+    if previous_turn == next_turn:
+        raise GateError("next_turn_must_be_new")
+    with lock(within(home, "state/turns.lock")):
+        path = turn_path(home, session_id)
+        if not path.exists():
+            raise GateError("standalone_previous_turn_missing")
+        value = read_json(path)
+        if (
+            value.get("schema") != "agentos.turn/v1"
+            or value.get("session_id") != session_id
+            or value.get("turn_id") != previous_turn
+            or value.get("root") != str(root.resolve())
+            or value.get("task_id") != task_id
+            or value.get("status") != "ENTERED"
+            or value.get("hook_seen") is not False
+        ):
+            raise GateError("standalone_turn_transition_mismatch")
+        result = {
+            "schema": "agentos.turn/v1",
+            "session_id": session_id,
+            "turn_id": next_turn,
+            "root": str(root.resolve()),
+            "task_id": None,
+            "status": "INTAKE_REQUIRED",
+            "at": now(),
+            "hook_seen": False,
+            "source": "standalone_cli",
+        }
+        atomic_json(path, result)
+    return {
+        "status": "INTAKE_REQUIRED",
+        "session_id": session_id,
+        "turn_id": next_turn,
+        "root": str(root.resolve()),
+        "previous_task": task_id,
+        "native_hook_proven": False,
+    }
 
 
 def _pending(home: Path, payload: dict) -> dict:

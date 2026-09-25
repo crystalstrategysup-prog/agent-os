@@ -195,6 +195,16 @@
     },
     {
       "effect": "user_receipt_only",
+      "name": "project next-turn",
+      "status_values": [
+        "INTAKE_REQUIRED"
+      ],
+      "write_surfaces": [
+        "state/turns/"
+      ]
+    },
+    {
+      "effect": "user_receipt_only",
       "name": "project observe",
       "status_values": [
         "OBSERVATION_RECORDED"
@@ -245,12 +255,12 @@
       "write_surfaces": []
     }
   ],
-  "distribution_version": "0.5.0b2",
+  "distribution_version": "0.5.0b3",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.5.0-beta.2",
+  "release": "0.5.0-beta.3",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",

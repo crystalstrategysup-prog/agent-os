@@ -1,6 +1,6 @@
 # Политика выпуска
 
-Публичная версия: 0.5.0-beta.2; Python packaging equivalent: 0.5.0b2.
+Публичная версия: 0.5.0-beta.3; Python packaging equivalent: 0.5.0b3.
 User overlay version независима от версии ядра; schema совместимость проверяется отдельно.
 Release tag и версия пакета должны соответствовать. Не публиковать beta под v0.4.0 и не
 подменять текущий stable. GitHub Actions не требуется и не добавляется: локальные проверки
