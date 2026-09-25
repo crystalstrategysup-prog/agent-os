@@ -10,6 +10,7 @@ from pathlib import Path
 
 import pytest
 from test_foundation import documents, prepared, review, start
+from test_foundation import setup as foundation_setup
 
 from agent_os import (
     foundation_cli,
@@ -23,7 +24,7 @@ from agent_os import (
 from agent_os import project as p
 from agent_os.safeio import GateError, atomic_json, filemap, read_json, read_json_input
 
-pytest_plugins = ("test_foundation",)
+setup = foundation_setup
 
 
 def cli(tmp_path, *args, payload="", home=None):
@@ -146,12 +147,29 @@ def test_F_integration_never_creates_restores_or_rewrites_hooks(tmp_path, existi
     assert text.startswith("Owner-specific narrower host boundaries.")
     assert "Native hooks are DISABLED" in text
     assert "Keep inherited project AGENTS.md concise" in text
-    assert "Read detailed project knowledge on demand" in text
+    assert "not a size gate or prerequisite for read-only work" in text
+    assert "A read-only request does not authorize rewriting instructions" in text
+    assert "Read detailed knowledge on demand" in text
     assert not (codex / "AGENTS.md").exists()
     agent_bytes = (codex / "AGENTS.override.md").read_bytes()
     integration.install(codex, skills, home, apply=True)
     assert (codex / "AGENTS.override.md").read_bytes() == agent_bytes
     assert (hook_file.read_bytes() if hook_file.exists() else None) == existing_hook
+
+
+def test_F_long_owner_agents_remains_intact_without_size_gate(tmp_path):
+    codex = tmp_path / "codex"
+    codex.mkdir()
+    agents = codex / "AGENTS.md"
+    owner_text = "Owner instructions.\n" + "Project context.\n" * 800
+    agents.write_text(owner_text)
+
+    result = integration.install(codex, tmp_path / "skills", tmp_path / "user", apply=True)
+
+    assert result["status"] == "INSTALLED_MANUAL_WORKFLOW"
+    assert agents.read_text().startswith(owner_text)
+    assert "not a size gate or prerequisite for read-only work" in agents.read_text()
+    assert result["hook_files_changed"] is False
 
 
 def test_F_hook_symlink_is_untouched_by_integration(tmp_path):

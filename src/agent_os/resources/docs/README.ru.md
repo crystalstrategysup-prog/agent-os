@@ -6,5 +6,6 @@ native hooks исключены. Это локальный патч, не объ
 Для изменения проекта начните с PROCESS и переходите к тематическим документам
 по задаче: ARCHITECTURE, CONTRACTS, SECURITY_MODEL, INSTALL_UPDATE или QUALITY.
 Документы FOUNDATION_OVERLAY и DOCUMENTATION_CATALOG описывают физическую границу и
-применимые слои. Актуальный stage — agentos/STAGE-F09.md; предыдущие stages исторические.
+применимые слои. Текущий исходный stage — agentos/STAGE-F10.md; предыдущие stages исторические.
+Stage-документы не входят в wheel; установленная норма находится в resources/docs/PROCESS.md.
 Матрица непроверенного на целевом устройстве — COMPATIBILITY.md.

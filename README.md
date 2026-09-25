@@ -17,6 +17,7 @@ Visit the [public project website](https://crystalstrategy.ru/agent-os/), read t
 | Updated or rolled back by selecting a verified release | Preserved on core update; imported and migrated only through explicit guarded commands |
 
 See [Foundation ↔ Overlay](docs/FOUNDATION_OVERLAY.md) for versioning, conflicts and recovery. Project documents remain in their projects; the overlay indexes them without copying every project into the core.
+Project lifecycle records in a project's `.agentos/` directory are a separate local state surface and are excluded from public source exports.
 
 Profiles are optional files under the user overlay. `agentos profiles inventory` reports their hashes and overlaps; `profiles select` activates none, one, or all in an explicit order. Conflicting values need an owner choice. `profiles interview` prefills observed device facts and asks about missing user fields. Editing or removing a profile leaves the installed foundation unchanged.
 
@@ -41,8 +42,9 @@ Keep inherited project `AGENTS.md` short: define its scope, universal limits and
 links to the project documents or skills that explain each topic. Read detailed
 material only when the task requires it, and verify dated status against current
 source or runtime evidence. A size target such as 4 KiB is editorial guidance,
-not an entry or read-only gate. The public foundation stays host-neutral; owner
-and host details belong in the separate user overlay. See
+not an entry or read-only gate. Reorganizing instructions is a separate project
+change; a read-only request does not authorize that edit. The public foundation
+stays host-neutral; owner and host details belong in the separate user overlay. See
 [architecture](docs/ARCHITECTURE.md) and [process](docs/PROCESS.md).
 
 ## Start a project task

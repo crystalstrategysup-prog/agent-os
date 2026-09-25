@@ -4,6 +4,8 @@
   packaged skills and managed integration text. Detailed knowledge is loaded
   by task; dated claims require current evidence.
 - Keep size guidance advisory. No native hook, new Stop gate or read-only intake.
+- Clarify that read-only requests do not authorize instruction edits; correct
+  project-local receipt packaging guidance and test fixture collection order.
 - Source candidate only; installation and publication need separate verification.
 
 # Candidate change: 0.5.0-beta.5 (historical local candidate)

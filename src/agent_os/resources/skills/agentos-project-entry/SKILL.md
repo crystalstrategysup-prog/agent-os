@@ -18,6 +18,7 @@ Inherited AGENTS.md serves as a short routing index. Follow links to relevant
 project docs/skills as needed; do not preload every topic or private history.
 Verify dated project status from current source/runtime evidence. A suggested
 AGENTS.md length is advisory only and never blocks entry or read-only work.
+Changing the index requires a project-change task; a read-only request does not authorize it.
 До task creation ошибка сообщается прямо без fake TASK. Для реальной привязки используйте
 explicit workflow session/turn, terminal next-turn; не имитируйте native events.
 
