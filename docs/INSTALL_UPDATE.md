@@ -2,10 +2,10 @@
 
 ## Установка из публичного исходника
 
-После публикации проверенного tag `v0.5.0-beta.3` на macOS или Linux с Python 3.11+:
+После публикации проверенного tag `v0.5.0-beta.4` на macOS или Linux с Python 3.11+:
 
 ```sh
-git clone --branch v0.5.0-beta.3 https://github.com/crystalstrategysup-prog/agent-os.git
+git clone --branch v0.5.0-beta.4 https://github.com/crystalstrategysup-prog/agent-os.git
 cd agent-os
 python3 -m venv .venv
 . .venv/bin/activate
@@ -30,8 +30,8 @@ agentos doctor
 
 ```sh
 python3 tools/install.py install \
- --wheel /absolute/crystal_agent_os-0.5.0b3-py3-none-any.whl \
- --sha256 ACTUAL_WHEEL_SHA256 --version 0.5.0-beta.3 \
+ --wheel /absolute/crystal_agent_os-0.5.0b4-py3-none-any.whl \
+ --sha256 ACTUAL_WHEEL_SHA256 --version 0.5.0-beta.4 \
  --core-home "$HOME/.local/share/agentos-foundation" --user-home "$HOME/.agentos-user"
 ```
 
@@ -46,6 +46,16 @@ Only after PASS меняется current symlink. Installer не изменяе�
 команда. Установка не делает global PATH, service, auth changes.
 
 ## Пользовательская надстройка
+
+Профили необязательны. Для их включения сохраните каждый `profile.json` под
+`USER/profiles/ID/` по схеме `agentos.profile/v1`, затем выполните
+`agentos --home USER profiles inventory` и изучите конфликты. `profiles select
+--mode one --id ID --inventory-digest DIGEST` выбирает один профиль. `--mode all`
+требует все точные ID в выбранном порядке; для разных значений одного ключа
+передайте `--decisions` с JSON `{ "ключ": "профиль-победитель" }`. `--mode none`
+отключает выбор. После изменения/удаления файлов проверьте `profiles context` и
+выберите снова; ядро менять не нужно. `profiles interview` показывает текущие
+факты устройства, выбранные поля и открытые вопросы, но не записывает ответы.
 
 До init: `agentos --home USER overlay import --source OVERLAY` (план), затем `--apply`.
 При CONFLICT ничего не перезаписывать: сохранить действующий файл, сравнить локально по ключам,

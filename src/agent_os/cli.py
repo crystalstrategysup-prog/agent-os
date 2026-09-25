@@ -27,7 +27,7 @@ def parser() -> argparse.ArgumentParser:
     root = argparse.ArgumentParser(
         prog="agentos",
         description="Documentation-first agent foundation",
-        epilog="Foundation groups: project, overlay, integrate, resources, hook. Run agentos GROUP --help.",
+        epilog="Foundation groups: project, overlay, profiles, integrate, resources, hook. Run agentos GROUP --help.",
     )
     root.add_argument("--home", "--user-home", dest="home", type=Path)
     root.add_argument("--version", action="version", version=__version__)

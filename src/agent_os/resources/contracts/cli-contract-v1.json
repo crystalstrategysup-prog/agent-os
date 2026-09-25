@@ -113,6 +113,42 @@
     },
     {
       "effect": "read_only",
+      "name": "profiles context",
+      "status_values": [
+        "NONE",
+        "ACTIVE",
+        "STALE_SELECTION"
+      ],
+      "write_surfaces": []
+    },
+    {
+      "effect": "read_only",
+      "name": "profiles interview",
+      "status_values": [],
+      "write_surfaces": []
+    },
+    {
+      "effect": "read_only",
+      "name": "profiles inventory",
+      "status_values": [
+        "PASS",
+        "CONFLICTS",
+        "BINDING_MISMATCH"
+      ],
+      "write_surfaces": []
+    },
+    {
+      "effect": "explicit_selection",
+      "name": "profiles select",
+      "status_values": [
+        "SELECTED"
+      ],
+      "write_surfaces": [
+        "state/profile-selection.json"
+      ]
+    },
+    {
+      "effect": "read_only",
       "name": "project assess",
       "status_values": [
         "PASS",
@@ -255,12 +291,12 @@
       "write_surfaces": []
     }
   ],
-  "distribution_version": "0.5.0b3",
+  "distribution_version": "0.5.0b4",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.5.0-beta.3",
+  "release": "0.5.0-beta.4",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",

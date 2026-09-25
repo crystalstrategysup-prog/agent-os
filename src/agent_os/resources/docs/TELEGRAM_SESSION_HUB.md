@@ -1,4 +1,4 @@
-# Compatibility notice for 0.5.0-beta.3
+# Compatibility notice for 0.5.0-beta.4
 
 The inherited Session Hub code is retained, but mutating dispatch now fails closed without
 AGENTOS_SESSION_ID/AGENTOS_TURN_ID and exact objective/destination bound to a READY task.

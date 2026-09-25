@@ -2,6 +2,8 @@
 
 Status: public `v0.5.0-beta.3` is published from `f6968c249f8bff1ce571cf92bbd960ba7cc2c1b2` with a verified wheel; live Mac installation and website deployment remain blocked by existing host gates.
 
+F08 prepares a new public beta for optional external profiles. The published beta.3 remains the active release until the new source, wheel, tag and release are verified. The Mac owner profile is a separate draft and is not part of this public repository.
+
 ## Purpose and users
 
 AgentOS gives a person and an agent a repeatable way to enter a project task, understand the current system, document the next bounded stage, execute it, prove the result and leave current knowledge for the next developer. The public edition must work without the maintainer's hosts, accounts, business rules or secrets. This repository is the first project expected to follow that cycle itself.
@@ -18,6 +20,8 @@ AgentOS gives a person and an agent a repeatable way to enter a project task, un
 ## Target state
 
 The foundation is an independently updatable public package containing universal code, rules, contracts, templates and developer documentation. One obvious, versioned user overlay outside the package holds configuration, knowledge, project references, local state and user extensions. A core update preserves that overlay byte for byte unless an explicit, backed-up data migration is separately requested. New product tasks follow the documentation-first stage cycle. A short intake selects relevant document layers; closing checks current evidence and documentation against the implemented state.
+
+F08 adds optional profile files under that external user home and an explicit selection of none, one or all. The adapter reports conflicts and stale selections without rewriting the public core. Owner and host facts enter an interview only through verified observations or selected profile entries; unknown facts remain questions.
 
 ## Scope and boundaries
 

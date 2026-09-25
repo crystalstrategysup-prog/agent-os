@@ -15,6 +15,13 @@ hooks; project input↔system policy; публичный source↔личная �
 |Частные сведения попали в релиз|Publish только public source/wheel, отдельные manifests|Secret scanning эвристический, нужен review|
 |Подменили выпуск|SHA manifest, exact current compare, local probe|SHA не цифровая подпись и не подтверждение издателя|
 |Изменили сторонние инструкции|Managed block, backups, conflicts|Native trust остаётся внешним контролем|
+|Профиль подменил выбор или навязал полномочия|Точные ID, хеши, host binding, явные решения конфликтов, `profile_authority=false`|Same-UID writer и prompt injection в текстовых полях остаются риском; клиент сохраняет свой authority gate|
+
+Профили содержат только ограниченные текстовые поля, не credential body. Валидатор
+отклоняет некоторые узнаваемые формы токенов, но это эвристика, а не DLP. Профильные
+`instruction` поля считаются пользовательским контекстом и не меняют system/developer
+instructions, sandbox, host lease или подтверждение внешних действий. Перед применением
+нескольких профилей владелец явно выбирает победителя для каждого несовместимого ключа.
 
 До readiness допускается обследование и подготовка docs. После readiness проверяется
 смысловой scope, но tool не является полномочным OS policy engine: write_paths контролируются

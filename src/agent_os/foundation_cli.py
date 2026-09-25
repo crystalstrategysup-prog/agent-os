@@ -18,6 +18,7 @@ def dispatch(argv: list[str]) -> int | None:
     if not rest or rest[0] not in {
         "project",
         "overlay",
+        "profiles",
         "integrate",
         "resources",
         "hook",
@@ -34,6 +35,10 @@ def dispatch(argv: list[str]) -> int | None:
             result, code = command(rest, home)
         elif cmd == "overlay":
             from .overlay import command
+
+            result, code = command(rest, home)
+        elif cmd == "profiles":
+            from .profile_adapter import command
 
             result, code = command(rest, home)
         elif cmd == "integrate":

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0-beta.4 — optional external profiles, 2026-09-25
+
+- Add a versioned adapter for zero, one or all user-owned profiles outside the public package. Inventory reports hashes and overlapping keys; conflicting values require explicit owner decisions.
+- Bind selection to exact profile hashes and host identity. Changed or deleted selected profiles produce `STALE_SELECTION`; the public core and previous release assets remain unchanged.
+- Add a profile interview that prefills live device observations and selected facts, plus selected context in project questions and a status hint at SessionStart.
+- Package the profile schema and interview skill. The adapter supplies context only and grants no new authority. Live Mac installation, native hook enforcement and Windows remain separate target proofs.
+
 ## 0.5.0-beta.3 — standalone CLI turn transition, 2026-09-25
 
 - Add an exact `project next-turn` command for CLI-only sessions after checkpoint or close. It advances the user-home receipt to a fresh turn without claiming native-hook provenance or restoring task readiness.

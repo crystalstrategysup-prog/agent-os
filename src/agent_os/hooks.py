@@ -239,8 +239,10 @@ def handle(payload: dict[str, Any], home: Path) -> dict:
     root = Path(payload.get("cwd") or ".").resolve()
     if event == "SessionStart":
         from .overlay import metadata
+        from .profile_adapter import context as profile_context
 
         info = metadata(home)
+        profiles = profile_context(home)
         return _allow_context(
             event,
             "AgentOS: public core="
@@ -249,7 +251,10 @@ def handle(payload: dict[str, Any], home: Path) -> dict:
             + str(home)
             + ". Each new project task must run agentos project questions / enter; "
             "read selected docs and overlay index, never preload history. Overlay="
-            + info["status"],
+            + info["status"]
+            + "; profiles="
+            + profiles["status"]
+            + ". Run agentos profiles context for bounded verified profile facts.",
         )
     if event == "UserPromptSubmit":
         value = arm_turn(

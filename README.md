@@ -4,7 +4,7 @@
 
 AgentOS gives a project a repeatable path from its current state to a verified change: project dossier → roadmap → documented stage → implementation → checks → updated documentation. A short intake selects only the relevant document layers. The CLI keeps the task, source, documents and check evidence bound to the same stage; an integrated native hook can enforce entry and closeout only after the client actually loads and trusts it.
 
-This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). The current beta source is `0.5.0-beta.3` (Python distribution version `0.5.0b3`). It is separate from any maintainer's private runtime, infrastructure and personal data.
+This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). The current beta source is `0.5.0-beta.4` (Python distribution version `0.5.0b4`). It is separate from any maintainer's private runtime, infrastructure and personal data.
 
 Visit the [public project website](https://crystalstrategy.ru/agent-os/), read the [changelog](CHANGELOG.md), or open an [issue](https://github.com/crystalstrategysup-prog/agent-os/issues) with a bug or technical review. The release tag is the installation authority while website deployment is pending.
 
@@ -12,18 +12,20 @@ Visit the [public project website](https://crystalstrategy.ru/agent-os/), read t
 
 | Foundation, maintained here | User overlay, owned by the user |
 | --- | --- |
-| Python code, universal rules, schemas, templates, skills and docs | Configuration, knowledge references, local state, secrets and extensions |
+| Python code, universal rules, schemas, templates, skills and docs | Configuration, knowledge references, optional 0 / 1 / N profiles, local state, secrets and extensions |
 | Installed in a virtual environment or an immutable release directory | One separate folder, default `~/.agentos-user` |
 | Updated or rolled back by selecting a verified release | Preserved on core update; imported and migrated only through explicit guarded commands |
 
 See [Foundation ↔ Overlay](docs/FOUNDATION_OVERLAY.md) for versioning, conflicts and recovery. Project documents remain in their projects; the overlay indexes them without copying every project into the core.
+
+Profiles are optional files under the user overlay. `agentos profiles inventory` reports their hashes and overlaps; `profiles select` activates none, one, or all in an explicit order. Conflicting values need an owner choice. `profiles interview` prefills observed device facts and asks about missing user fields. Editing or removing a profile leaves the installed foundation unchanged.
 
 ## Install from the public source
 
 Python 3.11+ is required. On macOS or Linux, after verifying the intended public tag and source:
 
 ```sh
-git clone --branch v0.5.0-beta.3 https://github.com/crystalstrategysup-prog/agent-os.git
+git clone --branch v0.5.0-beta.4 https://github.com/crystalstrategysup-prog/agent-os.git
 cd agent-os
 python3 -m venv .venv
 . .venv/bin/activate
@@ -65,6 +67,6 @@ python tools/demo_lifecycle.py
 python tools/verify_public.py
 ```
 
-Start with the [project dossier](docs/agentos/DOSSIER.md), [roadmap](docs/agentos/ROADMAP.md), [current stage](docs/agentos/STAGE-F05.md), [architecture](docs/ARCHITECTURE.md) and [developer onboarding](docs/ONBOARDING.md). The [changelog](CHANGELOG.md) and [release policy](docs/RELEASE.md) state the beta status and limits. GitHub Actions are not used.
+Start with the [project dossier](docs/agentos/DOSSIER.md), [roadmap](docs/agentos/ROADMAP.md), [current stage](docs/agentos/STAGE-F08.md), [architecture](docs/ARCHITECTURE.md) and [developer onboarding](docs/ONBOARDING.md). The [changelog](CHANGELOG.md) and [release policy](docs/RELEASE.md) state the beta status and limits. GitHub Actions are not used.
 
 Crystal AgentOS is Apache-2.0 software. Contributions and skeptical technical reviews are welcome; see [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), [Governance](GOVERNANCE.md) and the [AI Stewardship Charter](STEWARDSHIP.md). [Русская документация](docs/README.ru.md).

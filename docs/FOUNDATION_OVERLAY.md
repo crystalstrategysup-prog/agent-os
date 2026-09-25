@@ -1,12 +1,18 @@
 # Foundation ↔ user overlay contract
 
-Contract version: `agentos.foundation-overlay/v1` (design for the next public beta; implementation status is tracked in the roadmap).
+Contract version: `agentos.foundation-overlay/v1` with optional `agentos.profile/v1` adapter.
 
 ## Physical boundary
 
 The foundation is the installed Python package plus immutable release assets. Runtime commands never put user content into that package or its source checkout. The default overlay is one user-owned folder, `~/.agentos-user`, overridable by one explicit absolute user-home setting. An optional managed core install uses a separate `~/.local/share/agentos-foundation` root. The two roots may not be equal, nested or symlinked into each other. Existing `~/.agent-os` is legacy input and is not silently deleted, moved or replaced.
 
-The overlay has a versioned `overlay.json` catalog and named areas: `config.json`, `state/`, `secrets/`, `knowledge/`, `preferences/`, `projects/`, `extensions/` and `backups/`. The catalog records overlay schema/version and compatibility metadata, not credential values. Knowledge indexing uses bounded references and never auto-loads history or raw project contents. A user can inspect and back up this one folder independently of the core.
+The overlay has a versioned `overlay.json` catalog and named areas: `config.json`, `state/`, `secrets/`, `knowledge/`, `preferences/`, `projects/`, `extensions/` and `backups/`. The optional `profiles/<id>/profile.json` files and `state/profile-selection.json` also live here. The catalog records overlay schema/version and compatibility metadata, not credential values. Knowledge indexing uses bounded references and never auto-loads history or raw project contents. A user can inspect and back up this one folder independently of the core.
+
+## Optional profiles: 0 / 1 / N
+
+The user home is a storage root, not a mandatory active profile. With no selection the adapter returns `NONE`; a user can select `none`, one exact ID, or every inventoried ID in an explicit order. Profile files use `agentos.profile/v1` and contain bounded facts, preferences or owner-authored instructions with source, timestamp and verification status. The adapter does not discover other homes or silently select a profile.
+
+`agentos profiles inventory` lists exact IDs, versions, hashes, host bindings and overlapping keys. Before selecting `all`, the owner must choose the winning profile for every differing key; ordering alone does not resolve a conflict. Selection stores exact hashes and inventory digest outside the package. A changed or deleted selected profile, or a changed set under `all`, yields `STALE_SELECTION` with no entries until the owner inventories and selects again. `none` remains available when profile storage is broken. `agentos profiles interview` prefills current device observations and selected profile fields, then asks about missing owner/host fields. It never infers the owner's identity from a home path.
 
 ## Ownership and authority
 

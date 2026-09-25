@@ -96,10 +96,10 @@ def verify() -> dict:
     for doc_id in DOCS:
         if not (ROOT / f"src/agent_os/resources/templates/{doc_id}.md").is_file():
             errors.append("missing_template:" + doc_id)
-    if counts["skills"] != 8:
-        errors.append("expected_eight_skills")
+    if counts["skills"] != 9:
+        errors.append("expected_nine_skills")
     version_text = (ROOT / "pyproject.toml").read_text()
-    if 'version = "0.5.0b3"' not in version_text or __version__ != "0.5.0-beta.3":
+    if 'version = "0.5.0b4"' not in version_text or __version__ != "0.5.0-beta.4":
         errors.append("version_mismatch")
     return {
         "status": "PASS" if not errors else "FAIL",

@@ -11,6 +11,7 @@ Every product stage follows: dossier and roadmap read-back → current stage con
 | F05 — verification and public release | F02–F04; STAGE-F05 | Mac install/upgrade/read-back, available Linux/Windows probes with honest limits, regression and security review, direct push/tag/release, published URL read-back | PUBLIC RELEASE PASS; website and live Mac target BLOCKED by host gates; result in STAGE-F05 |
 | F06 — beta hardening | External review; STAGE-F06 | Atomic create-only overlay import, user schema compatibility before activation, immutable readiness baseline; new beta release | PUBLIC RELEASE PASS; result in STAGE-F06; CLI follow-up in F07 |
 | F07 — standalone CLI turn transition | Independent beta.1 review; STAGE-F07 | Exact CLI-only next-turn receipt after checkpoint/close, native-hook provenance preserved; next immutable beta | PUBLIC RELEASE PASS; result in STAGE-F07; target gates still pending |
+| F08 — optional external profiles | Owner 0 / 1 / N decision; STAGE-F08 | Versioned profile adapter, explicit conflict decisions, interview, packaged schema and public beta.4 | LOCAL PASS; 179 tests and wheel fixture; publication and live Mac gate separate |
 
 ## Stage dependencies and stop rules
 

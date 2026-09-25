@@ -170,14 +170,21 @@ def scaffold(root: Path, doc_ids: list[str], task_id: str | None = None) -> list
     return created
 
 
-def questionnaire(root: Path, answers: dict | None = None) -> dict:
+def questionnaire(
+    root: Path, answers: dict | None = None, user_home: Path | None = None
+) -> dict:
     root = root_path(root)
     project = load_project(root) if project_file(root).exists() else None
     answers = answers or {}
+    from .profile_adapter import context as profile_context
+
     return {
         "schema": "agentos.questionnaire/v1",
         "existing_project": bool(project),
         "known_context": project["context"] if project else {},
+        "selected_profile_context": (
+            profile_context(user_home) if user_home is not None else None
+        ),
         "project_types": project["types"] if project else [],
         "questions": [
             {"id": key, "question": value}
@@ -809,7 +816,9 @@ def command(argv: list[str], user_home: Path) -> tuple[dict, int]:
             root, args.name, args.type, args.feature, read_json(args.context)
         )
     elif args.action == "questions":
-        result = questionnaire(root, read_json(args.answers) if args.answers else None)
+        result = questionnaire(
+            root, read_json(args.answers) if args.answers else None, user_home
+        )
     elif args.action == "enter":
         answers = read_json(args.answers) if args.answers else {}
         if args.interactive:

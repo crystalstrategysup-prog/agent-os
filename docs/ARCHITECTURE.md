@@ -30,6 +30,7 @@ flowchart LR
 |hooks / observation|Новый turn, pre-tool guard, stop, read-only receipts|Не OS sandbox и не native trust manager|
 |integration|Сохраняющий merge AGENTS/skills/hooks|Не меняет auth/model config или trust store|
 |overlay / config|Отдельные пути, import, backup migration|Не читает отсутствующие secrets из архива|
+|profile_adapter|0 / 1 / N внешних профилей, inventory, точный выбор и drift check|Не создаёт полномочий и не сливает конфликты автоматически|
 |dispatch_gate|Одноразовая привязка legacy dispatch к контракту|Не полноценный Telegram onboarding workflow|
 |mcp_server|Шесть planning/status tools|Нет произвольных write/shell tools|
 |tools/install|Wheel→venv→probe→atomic current→rollback|Нет service/production изменений|
@@ -49,6 +50,11 @@ Network filesystems, hostile symlink races, распределённые writers
 ADR-004: неизменяемые release directories, venv сразу по конечному пути. Venv не переносится
 после установки: его entrypoints содержат абсолютный interpreter. Atomic current позволяет откат
 без изменения user home. Новый interpreter требует повторного integrate/native trust review.
+
+ADR-005: пользовательские профили хранятся под одним внешним user home и версионируются
+отдельно от ядра. Публичный адаптер только проверяет выбранные exact ID, хеши, host binding
+и решения конфликтов. Отсутствие профиля — штатное состояние; изменение профиля требует
+повторного выбора, но не пересборки ядра.
 
 ADR-005: schema/hash gate структурный; именованный reviewer проверяет содержание и полномочия.
 Check receipts не подписаны внешним доверенным ключом, поэтому это traceability, а не доказательство
