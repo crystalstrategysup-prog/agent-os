@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from pathlib import Path
 
 from .safeio import GateError
@@ -22,9 +21,20 @@ def dispatch(argv: list[str]) -> int | None:
         "integrate",
         "resources",
         "hook",
+        "workflow",
     }:
         return None
     try:
+        if rest[0] == "hook":
+            from .hooks import main
+
+            return main()
+        if rest[0] == "workflow":
+            from .workflow import command
+
+            result, code = command(rest[1:])
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return code
         from .config import AgentOSPaths
 
         home = AgentOSPaths.discover(global_args.home).home
@@ -45,11 +55,6 @@ def dispatch(argv: list[str]) -> int | None:
             from .integration import command
 
             result, code = command(rest, home)
-        elif cmd == "hook":
-            from .hooks import handle
-
-            result = handle(json.load(sys.stdin), home)
-            code = 0
         else:
             p = argparse.ArgumentParser(prog="agentos resources")
             p.add_argument("--list", action="store_true")

@@ -1,105 +1,133 @@
-# Регламент проекта и задачи
+# Процесс: чтение без барьеров, изменения через документацию
 
-## 1. Вход — обязателен, повторный допрос — нет
+Норма кандидата `0.5.0-beta.5`. Native hooks исключены: не создавать, не включать,
+не доверять заново и не восстанавливать при откате. Старые STAGE-F01…F08 — история,
+а не действующее разрешение вернуть перехват запросов или Stop.
 
-Триггеры: создать проект, изменить существующий, продолжить после паузы, новый запрос
-в активной сессии, сменить проект/cwd или изменить scope. Hook UserPromptSubmit создаёт
-новую запись INTAKE_REQUIRED. Прочитать README/AGENTS, досье, roadmap, текущий этап,
-индекс пользовательских знаний. Отделить observed facts, owner requirements, assumptions,
-unknowns. Известное не спрашивать повторно. Противоречия фиксировать со ссылками на источники.
+## 1. Сначала определить действие, не регистрировать каждый запрос
 
-`project questions --root P` выводит известный контекст и недостающие вопросы. До init
-существующую систему сначала исследуют; создание метаданных не должно подменять понимание.
-Для нового проекта init получает context.json: purpose, current_state, boundaries, constraints.
-Можно указать несколько --type и --feature. Не притворяться, что project type определён автоматически:
-агент выбирает его по фактам, script детерминированно объясняет выбранные документы.
+Обычный вопрос, поиск, read-only аудит кода/данных и discovery API выполняются сразу
+в рамках уже имеющегося read-доступа. Не нужны `init`, `questions`, `enter`, `observe`,
+answers.json, активный профиль или closeout. Незарегистрированный cwd допустим.
+Создание файла отчёта, запрошенного пользователем, само по себе не изменение продукта;
+но исправление исходников, настроек или runtime уже изменение, даже названное аудитом.
 
-## 2. Контракт входа
+Необязательная команда `workflow route --kind audit` возвращает FAST_PATH и ничего
+не читает/пишет. `--kind project-change` или `--effect local-project-write` возвращает
+DOCUMENTATION_FIRST. `--effect deploy` (также external-send, production-write,
+runtime-write, db-write, credentials, destructive) возвращает BLOCKED с точной
+категорией требуемых полномочий. Это маршрутизация **объявленных** действий, не анализ
+естественного языка и не проверка подлинности разрешения. Обычный вопрос не обязан
+сначала запускать даже эту команду. Доступ к чужой почте/данным всё равно должен быть разрешён.
 
-```sh
-agentos project init --root /work/project --name Example --type backend --feature database --context context.json
-agentos project questions --root /work/project --answers answers.json
-agentos project enter --root /work/project --session SESSION --turn TURN --answers answers.json
-```
+## 2. Подготовить реальное изменение
 
-В examples/ есть валидные context, task, review, observation формы. `--interactive`
-задаёт только незаполненные строковые вопросы, сложные списки принимает JSON.
-Операция enter обязательна даже при полностью известной анкете. Поля: цель, зачем,
-результат, in/out scope, ограничения, устройство/способ работы, полномочия, kind,
-разрешённые пути, критерии и mapping criteria→checks. Check — точный argv, timeout,
-не свободный shell script. Интерпретатор в argv разрешён лишь как осознанно проверенная программа.
+Сначала прочитать README, досье, roadmap, последний этап/результат, архитектуру и
+контракты затронутых компонентов. Для неизвестного существующего проекта — read-only
+обследование до scaffolding. Известные факты берутся из актуальных документов и
+текущего поручения, не запрашиваются повторно. Уточняются лишь существенные неизвестные.
+Профили загружаются только для релевантных фактов; NONE/STALE_SELECTION не блокирует
+несвязанный вопрос. Нельзя применять устаревшие сведения о целевом хосте.
 
-Один active task на проект. Для продолжения незакрытого — --resume-task с новой анкетой;
-revision возрастает, READY и receipts сбрасываются. CLOSED не редактируется — новый task.
-Если scope меняется в ходе этапа, сначала checkpoint, затем новый turn/entry или resume.
-В самостоятельном CLI-режиме без native hooks следующий turn той же session после checkpoint
-или close требует явного перехода:
+Если metadata нет, `project init --root P --name N --type TYPE --context context.json`
+создаёт `.agentos/project.json` и черновики docs. Контекст содержит purpose, current_state, boundaries, constraints; точный список
+полей — `project.CONTEXT_KEYS` и `examples/context.json`. Затем:
 
 ```sh
-agentos project next-turn --root /work/project --session SESSION --from-turn OLD_TURN --turn NEW_TURN --task TASK
-agentos project enter --root /work/project --session SESSION --turn NEW_TURN --resume-task TASK --answers answers.json
+agentos project questions --root P --answers answers.json
+agentos project enter --root P --session S --turn T --answers answers.json
 ```
 
-После close начните новый task через `enter` без `--resume-task`. `next-turn` принимает только
-точную предыдущую CLI-привязку (`hook_seen=false`), тот же project root и checkpointed/closed
-task. Он пишет лишь запись ожидания intake в user home; READY и прошлые checks не наследуются.
-В native-hook режиме новый turn создаёт реальный UserPromptSubmit, а `next-turn` откажет.
-Изменение типов/признаков существующего проекта: пока нет отдельной revise-команды,
-оформить архитектурный этап и контролируемо обновить project.json, затем **новый enter**;
-check_ready блокирует старую policy. Не менять метаданные из-под READY.
-
-## 3. Документация до реализации
-
-Selection содержит обязательные doc IDs, причины и неприменимые IDs. Минимум:
-досье, roadmap, контракт этапа, стратегия проверок. Для маленького проекта допустим
-один содержательный Markdown с отдельными разделами, зарегистрированный для нескольких IDs.
-Для API нужны контракты, для PII — карта данных/доступа, для эксплуатации — runbook и откат.
-Все варианты форматов — в DOCUMENTATION_CATALOG.md; не создавать OpenAPI без HTTP API.
-
-Скрипт создаёт **draft**, не доказательство. Reviewer заполняет фактами, обозначает источники,
-неизвестное и измеримую приёмку. Документы регистрируют по одному:
+Идентификаторы S/T — явно выбранные стабильные идентификаторы CLI workflow, не имитация
+нативного события клиента. Использовать клиентские ID только когда они реально известны.
+Подготовка context/answers/docs до READY разрешена; не использовать её для скрытой
+продуктовой записи. Все JSON-входы context/answers/review поддерживают `-` как stdin:
 
 ```sh
-agentos project document --root /work/project --id dossier --path docs/agentos/DOSSIER.md --owner Reviewer --source 'source inspection and owner task' --summary 'Verified purpose and boundary'
-# Для stage дополнительно --task TASK; текст обязательно содержит этот TASK.
-agentos project ready --root /work/project --task TASK --reviewer Reviewer
+cat answers.json | agentos project enter --root P --session S --turn T --answers -
 ```
 
-DoR: обязательные ответы, выбранные документы current и совпадают по SHA, stage привязан
-к задаче, scope/authority/checks согласованы, reviewer назван. READY — не разрешение на
-деплой или удаление внешних данных. Подготовка документов до READY разрешена специально.
+Можно передать JSON из собственного процесса напрямую, не создавая answers.json.
+Stdin ограничен 4 MiB, требует JSON object, запрещает дубликаты ключей. Обычные пути
+остаются regular files без symlink: `/dev/stdin` не обход этой защиты.
 
-## 4. Реализация и проверка
+## 3. Не спрашивать заново при продолжении
 
-Работать только в approved paths. Не подменять результаты демо-данными. Сохранять
-обратную совместимость либо явно документировать breaking change. Уточнение scope — новый вход.
-`project check --check-id NAME` выполняет stage-approved программу с shell=False.
-Timeout/ненулевой rc/изменившееся во время проверки source tree → FAIL. Лог ограничен
-последними 200000 байтами; редактирование лога/кода после PASS делает evidence непригодным.
-Проверки не sandbox: они могут менять внешнюю систему. Такие команды запрещены без отдельной
-target authority; в fixture-контуре использовать tmpdir и изолированные тестовые данные.
+```sh
+agentos project questions --root P --resume-task TASK
+agentos project enter --root P --session S --turn T --resume-task TASK \
+  --reuse-answers --answers current-authority.json
+```
 
-## 5. Закрытие
+`current-authority.json` содержит текущий `authority`, остальные неизменные ответы
+берутся из задачи. Authority не наследуется. Проверенные факты повторно используются
+только при том же scope; изменение любого другого переданного поля требует полного
+набора ответов без `--reuse-answers`. Новые задачи могут подавать заранее заполненные
+ответы по актуальным документам; автоматического угадывания цели нет.
+`--interactive` спрашивает лишь ещё отсутствующее. Возобновление сбрасывает READY
+и evidence, повышает revision. CLOSED неизменяем: создаётся новая задача.
 
-Актуализировать docs по реально полученному результату. Повторно зарегистрировать изменённые
-документы, затем assess и close. Reviewer обязан по отдельности принять все criteria,
-перечислить все выбранные docs, подтвердить scope review и назвать ограничения/следующий этап.
-Повторная регистрация docs сама по себе не делает их истинными; ответственность за смысл
-остаётся за reviewer. Проверки относятся к текущему source hash; менять тесты после PASS нельзя.
+Один активный task на проект. После CHECKPOINT/CLOSED для того же workflow-session:
+`project next-turn --root P --session S --from-turn OLD --turn NEW --task TASK`, затем
+явный enter. Активная чужая привязка блокирует ошибочный вход. Незавязанные старые
+prompt/observation receipts не мешают явному входу; связанные записи сохраняются,
+пока реальная задача не закрыта или не checkpoint. Нативная provenance не является
+правом исполнения; explicit next-turn не доказывает native enforcement.
 
-DoD: текущие checks PASS, source/task/revision/policy/log совпадают, возраст ≤24ч,
-нет out-of-scope, выполнена смысловая приёмка, текущая документация, truthful deployment status.
-Локальный closeout разрешает только not_requested или pending_target_verification.
-Существующий legacy assess-result — аналитическая подсказка, не заменяет этот closeout.
+## 4. Документы до реализации
 
-Если шаг заблокирован: checkpoint(reason,next_step), complete=false. Следующий исполнитель
-сначала читает свежие документы и checkpoint. Stop hook не зацикливает пользователя:
-повторный stop_hook_active сообщает NOT COMPLETE, но не выдаёт автоматический PASS.
+Каталог выбирает только применимые слои по типу/изменению: досье, roadmap, stage;
+для API — контракт, для PII — доступ/данные, для эксплуатации — runbook/откат.
+Черновик не проходит READY. Reviewer заполняет факты, источники, неизвестное,
+write-set, архитектурное решение, измеримую приёмку и откат. Затем для каждого doc:
 
-## 6. Read-only
+```sh
+agentos project document --root P --id dossier --path docs/agentos/DOSSIER.md \
+  --owner Reviewer --source 'current source and owner task' --summary 'Reviewed facts'
+agentos project ready --root P --task TASK --reviewer Reviewer
+```
 
-`project observe --root P --session S --turn T --answers observation.json` записывает
-цель/зачем/полномочия/вывод/ограничения/следующий шаг и SHA реально прочитанных файлов только
-в user home. Отдельный project init не нужен. Это не разрешает продуктовые tool writes.
-Stop сверяет источники повторно. Такой режим не доказывает неизменность всего диска,
-достоверность внешнего API или полноту проведённого аудита.
+Для stage дополнительно `--task TASK`, task ID есть в тексте. READY проверяет хеши,
+актуальность, соответствие stage/task и заявленного контракта. Это явная проверка,
+а **не перехват произвольных tool calls**. Агент соблюдает границу, внешнее жёсткое
+ограничение обеспечивается клиентом/ОС/целевым executor. Документы не дают production authority.
+
+## 5. Реализация, точечные полномочия и проверки
+
+Только approved write_paths. `project check --root P --task TASK --check-id NAME`
+исполняет exact argv, timeout, собирает ограниченный лог и source-bound receipt.
+Ненулевой rc/timeout/изменение source во время check → FAIL. Shell-интерполяции нет,
+но `shell=False` **не sandbox**: программа может обращаться к сети/хосту. До запуска
+нужны проверенные полномочия на её реальные эффекты. В локальной приёмке — tmpdir,
+тестовые данные, отсутствие credentials и опасных executors.
+
+Для внешних отправок, prod/runtime/DB writes, credentials, destructive и deploy
+отдельно проверяются субъект, операция, точный объект/host/account, срок/lease,
+лимиты и разрешённые эффекты. Разрешение на чтение не разрешает отправку; локальный
+READY не разрешает production. Нет capability — остановить только соответствующую
+операцию и продолжить разрешённую подготовку. Не добавлять универсальный --authorized.
+
+## 6. Завершение только существующей задачи
+
+Актуализировать и повторно зарегистрировать изменённые docs; выполнить точные checks,
+`assess`, затем `close --review review.json` или `--review -`. Reviewer принимает
+каждый criterion и каждый required doc, scope, ограничения и следующий этап.
+DoD: task/revision/policy/source/log совпадают; последний check PASS, возраст ≤24h;
+нет out-of-scope; документы current; смысловая приёмка проведена. Разрешены лишь
+not_requested/pending_target_verification как deployment_status локального закрытия.
+
+`project verify-closeout --root P --task TASK` без записи проверяет актуальность
+закрытого результата, включая changed source/docs/log, policy и срок evidence.
+CLOSED — исторический факт; последующая устарелость не переписывает историю.
+Невыполненная зарегистрированная задача — `checkpoint --reason ... --next-step ...`,
+complete=false. Ошибка **до создания задачи** сообщается прямо; не выдумывать TASK
+и не требовать closeout. Ответ на обычный вопрос просто заканчивается. Stop отсутствует.
+
+## 7. Необязательная фиксация аудита
+
+`project observe --root P --session S --turn T --answers audit.json` — только по
+явной необходимости хранить выводы/хеши прочитанных локальных файлов. Пишет отдельный
+`USER/state/observations/<digest>.json`, не создаёт project metadata и не меняет
+активную task/turn receipt. Повтор того же S/T/root отклоняется вместо перезаписи.
+Никакой обязательной квитанции для чтения API/почты нет. Такой receipt не доказывает
+неизменность диска, достоверность внешнего API или полноту аудита.

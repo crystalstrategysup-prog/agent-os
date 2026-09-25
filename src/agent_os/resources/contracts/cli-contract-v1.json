@@ -10,12 +10,10 @@
       "write_surfaces": []
     },
     {
-      "effect": "event_dependent",
+      "effect": "retired_no_op",
       "name": "hook",
       "status_values": [],
-      "write_surfaces": [
-        "state/turns/"
-      ]
+      "write_surfaces": []
     },
     {
       "effect": "create_if_missing",
@@ -60,14 +58,14 @@
       "name": "integrate codex",
       "status_values": [
         "PLANNED",
-        "INSTALLED_NOT_YET_PROVEN_ACTIVE",
+        "INSTALLED_MANUAL_WORKFLOW",
         "CONFLICT"
       ],
       "write_surfaces": [
-        "AGENTS.md",
-        "hooks.json",
+        "AGENTS.md or existing AGENTS.override.md",
         "skills",
-        "backups/integration"
+        "backups/integration",
+        "agentos-integration.json"
       ]
     },
     {
@@ -289,14 +287,32 @@
       "name": "resources --list",
       "status_values": [],
       "write_surfaces": []
+    },
+    {
+      "name": "workflow route",
+      "effect": "read_only",
+      "status_values": [
+        "PASS",
+        "BLOCKED"
+      ],
+      "write_surfaces": []
+    },
+    {
+      "name": "project verify-closeout",
+      "effect": "read_only",
+      "status_values": [
+        "PASS",
+        "BLOCKED"
+      ],
+      "write_surfaces": []
     }
   ],
-  "distribution_version": "0.5.0b4",
+  "distribution_version": "0.5.0b5",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.5.0-beta.4",
+  "release": "0.5.0-beta.5",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",

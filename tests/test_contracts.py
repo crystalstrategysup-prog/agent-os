@@ -21,7 +21,7 @@ def test_release_and_mcp_versions_have_one_beta_identity():
     package_version = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"][
         "version"
     ]
-    assert __version__ == "0.5.0-beta.4"
+    assert __version__ == "0.5.0-beta.5"
     assert package_version == __version__.replace("-beta.", "b")
     initialized = response({"jsonrpc": "2.0", "id": 1, "method": "initialize"})
     assert initialized["result"]["serverInfo"] == MCP_CONTRACT["serverInfo"]

@@ -1,18 +1,14 @@
-# Проверенные источники интерфейсов
+# Источники интерфейсов и границы применения
 
-Дата консультации: 2026-09-25. Это источники форматов, не гарантия поддержки на конкретном Mac.
+Консультация: 2026-09-25. Документация — не доказательство конкретного Mac runtime.
 
 - OpenAI, AGENTS.md: https://learn.chatgpt.com/docs/agent-configuration/agents-md
-  Инструкции читаются при запуске; global override имеет приоритет, ближайший проектный файл
-  уточняет; объём инструкций ограничен. Поэтому install не создаёт новый global override поверх старого.
-- OpenAI, Skills: https://learn.chatgpt.com/docs/build-skills
-  SKILL.md c name/description; repo .agents/skills и user ~/.agents/skills. Навык сам по себе
-  не является техническим принуждением; для действия нужны trusted hooks и пробы.
-- OpenAI, Hooks: https://learn.chatgpt.com/docs/hooks
-  SessionStart/UserPromptSubmit/PreToolUse/Stop, hookSpecificOutput, permissionDecision,
-  native review/trust; не все виды tooling покрыты. Не self-trust и не permissive fallback.
-- SemVer: https://semver.org/ — prerelease beta не выдаётся за стабильный выпуск.
+  Global AGENTS.override.md имеет приоритет перед AGENTS.md; проектные инструкции
+  уточняют цепочку до cwd. После изменения нужен новый запуск/сеанс для чтения цепочки.
+- OpenAI, hooks: https://learn.chatgpt.com/docs/hooks
+  Stop decision=block может продолжить turn; stop_hook_active сообщает повторный проход.
+  Это объясняет историческую ошибку beta.4, а не разрешает использовать hooks в beta.5.
 
-Точные API/флаги необходимо сверить с установленным клиентом при передаче: документация
-может обновляться отдельно от приложения. При несовместимости coordinator фиксирует BLOCKED
-и исправляет adapter в отдельном документированном stage, не отключает gate для «успешной установки».
+Текущий контракт: никаких native hooks/самодоверия/восстановления из backups. AGENTS/skills
+не техническая песочница; правила клиента и target executor остаются отдельными контролями.
+Изменение возможностей клиента требует новой явной проверки, не тихого расширения authority.

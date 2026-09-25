@@ -2,68 +2,52 @@
 
 ## Контекст и границы
 
-Агент/человек → CLI / native hook adapter → project lifecycle → файлы проекта и локальная
-пользовательская папка. MCP — отдельная read-only поверхность discovery/planning, не shell.
-Сеть не нужна новым project/overlay/hook-командам. Унаследованные функции обновления,
-Telegram и speech имеют собственные сетевые зависимости и не являются prerequisite gate.
-
-```mermaid
-flowchart LR
- A[Agent / human] --> H[Trusted native hooks]
- A --> C[agentos CLI]
- H --> G[Readiness and closeout]
- C --> G
- G --> P[Project docs and .agentos]
- G --> U[Separate user home]
- M[MCP read-only] --> D[Selection / status]
- I[Offline installer] --> R[Immutable releases + current]
- U -. never installed into .-> R
-```
-
-## Компоненты
+Обычное разрешённое чтение → непосредственный ответ, без AgentOS lifecycle.
+Реальное изменение → inspect → docs/architecture → entry/READY → implementation →
+checks → close/checkpoint. Внешний эффект → отдельный target authority gate у executor.
+MCP — read-only discovery/planning, не shell. Native hooks исключены.
+Project/workflow governance не требует сети; optional legacy Telegram/update/speech
+не являются prerequisite и не исполняются маршрутизатором.
 
 |Модуль|Ответственность|Не делает|
 |---|---|---|
-|project|Анкета, документы, transitions, checks, evidence|Не доказывает бизнес-истину и live deploy|
-|doc_catalog|Детерминированная применимость|Не выбирает тип за человека без фактов|
-|safeio|Containment, atomic replace, locks, SHA|Не защищает от злонамеренного same-UID процесса|
-|hooks / observation|Новый turn, pre-tool guard, stop, read-only receipts|Не OS sandbox и не native trust manager|
-|integration|Сохраняющий merge AGENTS/skills/hooks|Не меняет auth/model config или trust store|
-|overlay / config|Отдельные пути, import, backup migration|Не читает отсутствующие secrets из архива|
-|profile_adapter|0 / 1 / N внешних профилей, inventory, точный выбор и drift check|Не создаёт полномочий и не сливает конфликты автоматически|
-|dispatch_gate|Одноразовая привязка legacy dispatch к контракту|Не полноценный Telegram onboarding workflow|
-|mcp_server|Шесть planning/status tools|Нет произвольных write/shell tools|
-|tools/install|Wheel→venv→probe→atomic current→rollback|Нет service/production изменений|
+|workflow|Stateless optional route по declared kind/effects|Не NLP, не executor, не выдаёт capability|
+|project / doc_catalog|Применимые docs, reuse, readiness, checks, current closeout|Не перехватывает все tools и не доказывает live deploy|
+|turns|Явные project entry/terminal transitions|Не получает UserPromptSubmit и не сбрасывает task на вопросе|
+|observation|Необязательные отдельные audit receipts|Не prerequisite для чтения и не меняет task binding|
+|hooks|Retired no-op для старых callback entrypoints|Не читает stdin/config, не пишет state, не выдаёт deny/allow/complete|
+|integration|Managed AGENTS + 9 namespaced skills, backup/conflict check|Не трогает hooks.json, config.toml, auth/model/trust|
+|safeio|Containment, bounded regular JSON / explicit stdin, locks, atomic writes|Не защита от злонамеренного same-UID процесса|
+|overlay / config / profile_adapter|Физически отдельные данные, 0/1/N verified profiles|Не создаёт полномочий и не подменяет runtime proof|
+|dispatch_gate|Сохранённая одноразовая привязка legacy dispatch|Не общий сетевой sandbox|
+|mcp_server|Шесть bounded planning/status tools|Нет произвольных write/shell tools|
+|tools/install|Offline wheel→venv→probe→atomic current→rollback|Нет service/production изменений|
 
-## Решения (ADR)
+## Решения
 
-ADR-001: version 0.5.0-beta.1: развитие публичной 0.4.0, не механический скачок в 0.99
-и не переименование частной ветки. Причина: новая архитектурная граница требует испытания клиента/хоста.
+ADR-001: публичное ядро развивается отдельно от private runtime; сравнение source/wheel
+не подтверждает публикацию или реальную установку.
+ADR-002: core, user home и project docs физически разделены, config v5/overlay v1
+версионируются независимо; вложенность/пересечение запрещены.
+ADR-003: JSON+Markdown/stdlib, один active task, local locks; не distributed DB.
+ADR-004: immutable release directories, venv сразу по конечному пути; current меняется
+только после probe. Ни обновление, ни откат не меняют пользовательские данные неявно.
+ADR-005: внешние профили optional, exact IDs/hashes/host/conflicts. Нет профиля — штатно;
+STALE запрещает использовать устаревшее содержимое, не блокирует несвязанное чтение.
+ADR-006: checks/schema/hash — traceability и структурный gate. Semantic reviewer и
+target executor проверяют смысл/полномочия. Same-UID автор может подделать receipts.
+ADR-007: private providers — отдельные контракты/разрешения/target parity; не копировать
+их исполняемый код в public package под видом настроек.
 
-ADR-002: core, user home и project docs физически разделены. Config v5 и overlay v1
-версионируются независимо. Env не может переопределить инвариант вложенности.
+ADR-008 (F09, заменяет прежнюю норму native-hook enforcement): отделить лёгкий read path
+от обязательного documentation-first процесса **изменений**. Удалить глобальный callback
+цикл, а не расширять shell/tool allowlist. Сохранить retired callback entrypoints как
+пустой совместимый ответ без новых регистраций, чтобы старые ссылки не создавали ошибку.
+Перенести нужные явному lifecycle turn helpers в turns.py; observation хранить отдельно.
+Предоставить ограниченный stdin transport вместо ослабления symlink-защиты. Same-scope
+reuse не наследует authority. Сохранить строгие project gates и отдельные target controls.
 
-ADR-003: JSON+Markdown, стандартная библиотека Python; без БД/демона для governance.
-Один активный task на проект; локальные mkdir locks защищают нормальные параллельные процессы.
-Network filesystems, hostile symlink races, распределённые writers не заявлены поддерживаемыми.
-
-ADR-004: неизменяемые release directories, venv сразу по конечному пути. Venv не переносится
-после установки: его entrypoints содержат абсолютный interpreter. Atomic current позволяет откат
-без изменения user home. Новый interpreter требует повторного integrate/native trust review.
-
-ADR-005: пользовательские профили хранятся под одним внешним user home и версионируются
-отдельно от ядра. Публичный адаптер только проверяет выбранные exact ID, хеши, host binding
-и решения конфликтов. Отсутствие профиля — штатное состояние; изменение профиля требует
-повторного выбора, но не пересборки ядра.
-
-ADR-005: schema/hash gate структурный; именованный reviewer проверяет содержание и полномочия.
-Check receipts не подписаны внешним доверенным ключом, поэтому это traceability, а не доказательство
-против злоумышленника с правом записи. Регулируемые среды требуют внешнего append-only audit.
-
-ADR-006: механизм обязателен на поддерживаемом пути, но внешние клиенты не контролируются
-из этого Python пакета. Адаптер с отключёнными hooks не называется enforced.
-Подключение одного MCP недостаточно для контроля всех действий произвольного агента.
-
-ADR-007: частные интеграции не копируются в публичное ядро. Пользовательские знания остаются
-user overlay, исполняемые private providers требуют explicit contract, отдельного review и
-пробы на целевом устройстве. Удаление исходного runtime без parity доказательств запрещено.
+Компромисс: AgentOS больше не заявляет глобальный runtime-interceptor. Markdown/CLI не
+заменяют client sandbox, ACL или scoped connector. Нельзя честно обещать запрет любого
+произвольного shell действия, имея лишь библиотеку Python и AGENTS. Такая изоляция требует
+отдельного host-specific этапа, а не возвращения исключённых хуков.

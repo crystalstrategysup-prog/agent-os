@@ -1,3 +1,10 @@
+# Current candidate note — F09
+
+`0.5.0-beta.5` is a local source-only no-hook fix, not a published or installed release.
+Current workflow is defined by PROCESS/ARCHITECTURE and STAGE-F09. Earlier native-hook
+requirements and PASS claims below are historical evidence for earlier sources only.
+No Mac rollout, external service change or private settings installation is authorized here.
+
 # Crystal AgentOS Community Edition — project dossier
 
 Status: public `v0.5.0-beta.4` is published from `f69a74620a614c2f55c17ceacfe4a9c18dfc0455` with a verified wheel; live Mac installation and website deployment remain blocked by existing host gates.

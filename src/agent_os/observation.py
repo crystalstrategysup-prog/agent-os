@@ -1,4 +1,4 @@
-"""Read-only project intake, stored outside the project; it grants no write gate."""
+"""Optional source-hash audit receipt. Never a prerequisite for ordinary reads."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from .safeio import (
     lock,
     nonempty,
     now,
-    read_json,
+    read_json_input,
     sha,
     within,
 )
@@ -35,7 +35,6 @@ def verify(root: Path, receipt: dict) -> None:
 def record(
     root: Path, answers: dict, home: Path, session_id: str, turn_id: str
 ) -> dict:
-    from .hooks import turn_path
     from .overlay import validate_roots
 
     validate_roots(home)
@@ -72,29 +71,18 @@ def record(
         "sources": sources,
         "scope": "read-only findings about listed files; no whole-tree immutability claim",
     }
-    with lock(within(home, "state/turns.lock")):
-        path = turn_path(home, session_id)
-        current = read_json(path) if path.exists() else None
-        if current and (
-            current["turn_id"] != turn_id
-            or current["root"] != str(root)
-            or current.get("task_id")
-        ):
-            raise GateError("observation_turn_conflict")
-        value = {
-            **(current or {}),
-            "schema": "agentos.turn/v1",
-            "session_id": session_id,
-            "turn_id": turn_id,
-            "root": str(root),
-            "status": "OBSERVATION_RECORDED",
-            "task_id": None,
-            "observation": receipt,
-        }
-        atomic_json(path, value)
+    # Optional observations never bind or overwrite a project task/turn receipt.
+    relative = "state/observations/" + digest([session_id, turn_id, str(root)]) + ".json"
+    receipt.update(session_id=session_id, turn_id=turn_id, root=str(root))
+    with lock(within(home, "state/observations.lock")):
+        path = within(home, relative)
+        if path.exists():
+            raise GateError("observation_receipt_exists_use_new_turn")
+        atomic_json(path, receipt)
     return {
         "status": "OBSERVATION_RECORDED",
         "receipt_sha256": digest(receipt),
+        "receipt_path": relative,
         "project_writes": [],
         "external_runtime_proven": False,
     }
@@ -107,4 +95,4 @@ def command(argv: list[str], home: Path) -> tuple[dict, int]:
     p.add_argument("--session", required=True)
     p.add_argument("--turn", required=True)
     a = p.parse_args(argv)
-    return record(a.root, read_json(a.answers), home, a.session, a.turn), 0
+    return record(a.root, read_json_input(a.answers), home, a.session, a.turn), 0

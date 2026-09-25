@@ -1,25 +1,12 @@
 # Установка, обновление, откат и восстановление
 
-## Установка из публичного исходника
+## Статус кандидата
 
-После публикации проверенного tag `v0.5.0-beta.4` на macOS или Linux с Python 3.11+:
-
-```sh
-git clone --branch v0.5.0-beta.4 https://github.com/crystalstrategysup-prog/agent-os.git
-cd agent-os
-python3 -m venv .venv
-. .venv/bin/activate
-python -m pip install -e .
-agentos init
-agentos doctor
-```
-
-Это локальная установка из source в отдельное виртуальное окружение. `init` создаёт
-пользовательскую папку по умолчанию `~/.agentos-user`; укажите `--home` или
-`AGENTOS_USER_HOME`, если нужна иная папка. Для развития проекта используйте
-`python -m pip install -e '.[dev]'` и тесты. Публичной загрузки с PyPI на момент
-выпуска нет. Дальнейший управляемый offline installer принимает заранее
-проверенный wheel и хранит выпуски ядра отдельно от пользовательских данных.
+`0.5.0-beta.5` / `0.5.0b5` — подготовленный локальный кандидат. Не предполагать, что tag,
+PyPI пакет или release asset опубликован. Проверить полученный source/patch/manifest,
+провести independent tests и отдельное разрешение на установку. Этот review ничего
+на реальном Mac не устанавливает. Python 3.11+, отдельные core/user roots обязательны.
+Ниже описаны будущие авторизованные операции интегратора, не выполненные действия.
 
 ## Предварительные проверки
 
@@ -30,8 +17,8 @@ agentos doctor
 
 ```sh
 python3 tools/install.py install \
- --wheel /absolute/crystal_agent_os-0.5.0b4-py3-none-any.whl \
- --sha256 ACTUAL_WHEEL_SHA256 --version 0.5.0-beta.4 \
+ --wheel /absolute/crystal_agent_os-0.5.0b5-py3-none-any.whl \
+ --sha256 ACTUAL_WHEEL_SHA256 --version 0.5.0-beta.5 \
  --core-home "$HOME/.local/share/agentos-foundation" --user-home "$HOME/.agentos-user"
 ```
 
@@ -77,22 +64,26 @@ Import создаёт файл только после полной записи
 вызывают CONFLICT. Existing hooks иных владельцев сохраняются. Backup предыдущих файлов —
 user/backups/integration. Config/auth/model/trust store не редактируются.
 
-В actual клиенте проверить [features].hooks=true, доступность команд, /hooks, перечень
-событий и доверие к точным определениям. Изменение команды/interpreter после апдейта требует
-повторного review. Новый процесс/сессия: SessionStart → UserPromptSubmit → заведомый product
-write до intake должен DENY → intake/docs/READY → только затем разрешённый write → check/close.
-Повторить пропуск closeout (Stop блокирует), новый turn (старый gate больше не подходит).
-Проверьте stdout/native event log, не только наличие hooks.json. При отсутствии механизма
-статус ENFORCEMENT_NOT_PROVEN; правило в Markdown не заменяет эту проверку.
-Для CLI-only режима без native hooks после checkpoint/close используйте
-`agentos project next-turn` с точными session, previous turn, new turn и task,
-затем отдельный `project enter`. Этот переход не подтверждает native enforcement.
+Native hooks исключены: integrate не создаёт, не включает, не изменяет и не удаляет
+hooks.json/config.toml. Он также не проверяет, не остались ли чужие/старые AgentOS callbacks.
+Перед применением отдельно readback actual config/hooks: у владельца AgentOS hooks должны
+оставаться отключены. Если они активны, остановить интеграцию и получить отдельное решение;
+не «лечить» повторным доверием к ним. Не изменять auth, модель или sandbox.
+
+Новая сессия клиента: проверить effective AGENTS/skills, прямой read-only ответ без служебных
+файлов и registration; проектные изменения — docs/READY/check/close. Existing owner/global
+project overrides сохраняются, поэтому противоречащие universal intake/observe инструкции
+исправляются отдельным owner overlay change. Автоматически их удалять нельзя.
+
+Для explicit workflow после checkpoint/close: `project next-turn` с точными session,
+previous/new turn и task, затем enter. До регистрации задачи checkpoint/close не нужны.
 
 ## Обновление
 
 Старый release immutable. Выполнить offline install нового wheel с observed expected_current.
 Существующий user home остаётся неизменным; installer не мигрирует данные неявно.
-После switch переподключить managed agent integration, затем новый native trust/probe.
+После switch отдельно обновить managed AGENTS/skills из нового interpreter и проверить
+их в новой сессии. Никаких native hooks/trust/probe с их включением.
 Не делать автоматическую установку только потому, что update advisory нашёл tag.
 Обновлять документацию, compatibility матрицу и health evidence того же source SHA.
 
@@ -106,7 +97,9 @@ python3 tools/install.py rollback --release-id PREVIOUS_ID \
 ```
 
 Rollback проверяет manifest/wheel/probe/schema совместимость, атомарно меняет current и
-не трогает user data. Затем повторный integrate из выбранного interpreter и native review.
+не трогает user data. **Не запускать integrate старого ядра beta.4 или раньше:** он
+может восстановить hooks. Сохранить no-hook AGENTS/skills или отдельно согласовать их
+ручной откат без hook blocks. Не восстанавливать hooks из backups. Не выполнять old hook entrypoints.
 Если несовместимо состояние пользователя, не делать downgrade; восстановить отдельный
 backup в **новую** user папку и проверить там. Первый install не «откатывает» чужой runtime.
 

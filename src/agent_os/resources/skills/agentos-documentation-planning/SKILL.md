@@ -16,4 +16,4 @@ description: "Выбор и ведение документации проект
 Нельзя принять contradiction/placeholder как current, даже если проверка длины проходит.
 
 Нормативная основа: установленный resources/docs/PROCESS.md и README; путь — `agentos resources`.
-Hook/CLI gate нельзя выключать пользовательской настройкой. Навык не заменяет native hook trust.
+Project gates относятся к реальным изменениям. Чтение не требует intake/observe. Native hooks исключены: не включать и не восстанавливать. CLI/профиль не дают внешних полномочий.

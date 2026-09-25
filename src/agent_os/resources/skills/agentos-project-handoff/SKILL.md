@@ -14,4 +14,4 @@ active task/checkpoint, команды начала и безопасный сл
 Не скрывай пропущенные capabilities и concurrent work. Выход: self-contained packet + acceptance contract.
 
 Нормативная основа: установленный resources/docs/PROCESS.md и README; путь — `agentos resources`.
-Hook/CLI gate нельзя выключать пользовательской настройкой. Навык не заменяет native hook trust.
+Project gates относятся к реальным изменениям. Чтение не требует intake/observe. Native hooks исключены: не включать и не восстанавливать. CLI/профиль не дают внешних полномочий.

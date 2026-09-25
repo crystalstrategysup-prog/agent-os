@@ -23,7 +23,8 @@ total bytes≤128MiB: большой проект надо осознанно д
 
 config.json — community-config/v5; overlay.json — agentos.user-overlay/v1;
 knowledge/INDEX.json — индекс с provenance; preferences — персональные решения;
-projects — ссылки; extensions — metadata вне ядра; state — turn/dispatch/import receipts;
+projects — ссылки; extensions — metadata вне ядра; state — explicit turn/dispatch/import receipts;
+state/observations/<digest>.json — необязательные независимые read-only audit receipts;
 backups — предыдущие конфигурации/интеграции; secrets — локальное хранилище не для архивов.
 Новая папка приватна (0700), создаваемые config/state файлы 0600. Existing source docs
 могут быть 0644 как публичные материалы. ACL/дисковое шифрование остаются обязанностью хоста.
@@ -45,3 +46,13 @@ Import проверяет точный manifest, schema, SHA, allowlist путе
 и требованиям проекта; не выдумывать юридический retention. Перед удалением — отдельный
 scope/authority, export проверенных метаданных и восстановительная проба. Чувствительные
 логи не публиковать; встроенная redaction эвристическая и не гарантирует отсутствие секретов.
+
+## Изменение поведения beta.5 без schema migration
+
+turn/v1 остаётся форматом явной project-привязки, не создаётся на каждом prompt.
+Unbound INTAKE_REQUIRED/OBSERVATION_RECORDED не блокирует новый explicit enter;
+существующая bound task требует прежних корректных переходов. Старые receipts не удаляются.
+Новые optional observation receipts keyed по session/turn/root и не перезаписывают task state.
+Same-scope reuse не наследует authority. verify-closeout читает CLOSED, но не переписывает
+его при устаревании evidence. Смена foundation_version/module SHA делает старые checks
+неактуальными; история сохраняется, новая приёмка требует новых checks.

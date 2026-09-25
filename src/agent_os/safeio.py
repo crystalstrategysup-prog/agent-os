@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import re
+import sys
 import tempfile
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -36,12 +37,7 @@ def digest(value: Any) -> str:
     )
 
 
-def read_json(path: Path) -> Any:
-    if path.is_symlink():
-        raise GateError("symlink_file_refused")
-    if path.stat().st_size > MAX_JSON:
-        raise GateError("json_size_limit")
-
+def _parse_json(text: str | bytes) -> Any:
     def unique(pairs):
         result = {}
         for key, value in pairs:
@@ -50,7 +46,36 @@ def read_json(path: Path) -> Any:
             result[key] = value
         return result
 
-    return json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique)
+    return json.loads(text, object_pairs_hook=unique)
+
+
+def read_json(path: Path) -> Any:
+    if path.is_symlink():
+        raise GateError("symlink_file_refused")
+    if not path.is_file():
+        raise GateError("regular_json_file_required")
+    with path.open("rb") as stream:
+        data = stream.read(MAX_JSON + 1)
+    if len(data) > MAX_JSON:
+        raise GateError("json_size_limit")
+    return _parse_json(data)
+
+
+def read_json_input(path: Path) -> dict:
+    """Only CLI inputs accept '-', never stored metadata paths."""
+    if str(path) == "-":
+        stream = getattr(sys.stdin, "buffer", sys.stdin)
+        data = stream.read(MAX_JSON + 1)
+        if isinstance(data, str):
+            data = data.encode("utf-8")
+        if len(data) > MAX_JSON:
+            raise GateError("json_size_limit")
+        value = _parse_json(data)
+    else:
+        value = read_json(path)
+    if not isinstance(value, dict):
+        raise GateError("json_object_required")
+    return value
 
 
 def within(root: Path, rel: str, *, allow_missing: bool = True) -> Path:

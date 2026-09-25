@@ -1,3 +1,13 @@
+# Candidate change: 0.5.0-beta.5 (unreleased)
+
+- Direct read-only workflow; optional stateless declared-effects route.
+- Native hooks retired; integration manages AGENTS/skills only, never restores hooks/config.
+- Explicit turn helpers; abandoned unbound prompt receipts no longer trap entry.
+- Bounded object stdin for context/answers/review; regular-file safety retained.
+- Same-scope answer reuse without inherited authority; revision/readiness/evidence reset.
+- Optional observations separated from task turns; explicit current closeout verification.
+- Documentation/skills/contracts and A–F regressions updated. Mac/client validation separate.
+
 # Changelog
 
 ## 0.5.0-beta.4 — optional external profiles, 2026-09-25

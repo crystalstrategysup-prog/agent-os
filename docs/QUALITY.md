@@ -1,36 +1,37 @@
 # Стратегия качества
 
-Проверяются четыре уровня: функции/отрицательные сценарии; целый lifecycle на временном
-проекте; реальный wheel+offline venv installer/rollback с отдельной пользовательской папкой;
-независимая target-проверка после передачи. Последний уровень нельзя заменить первыми тремя.
+Точные числа и среда — в evidence конкретного кандидата, не hard-coded обещание.
+Проверяются функции, negative cases, whole lifecycle в tmpdir, package resources/contracts,
+offline wheel build/smoke и затем отдельная actual Mac/Codex приёмка интегратором.
 
 ```sh
-PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q
-python3 tools/demo_lifecycle.py
-python3 tools/verify_public.py
+PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider
+PYTHONDONTWRITEBYTECODE=1 python3 tools/demo_lifecycle.py
+PYTHONDONTWRITEBYTECODE=1 python3 tools/verify_public.py
+python3 tools/sync_resources.py
 ```
 
-Regression baseline — 42 tests из community source, адаптированные только под новые version/schema,
-число MCP tools и обязательную dispatch границу. Дополнительные tests: обязательные поля,
-неприменимые документы, draft/stale doc, missing/failed/stale/tampered evidence, changed source,
-out-of-scope, revision reset, stop/new turn, path traversal, overlapping roots, symlink import,
-конфликты/идемпотентность, migration backup, сохранение сторонних AGENTS/hooks/skills,
-неизменность read-only проекта, одноразовый dispatch. Точное число — в реальном test log,
-не hard-coded promise в документации.
+A: direct/stateless read path без project/overlay; optional audit отдельно.
+B: новая задача, stdin bootstrap, docs/READY до реального кода, exact checks/close.
+C: существующий недокументированный проект не меняется до docs.
+D: same-scope resume без повторных вопросов, без наследования authority; gates reset.
+E: declared local effects идут в docs path, target effects BLOCKED; отрицательные
+scope/check/MCP/dispatch tests. Это не испытание универсального network sandbox.
+F: malformed/missing callbacks no-op, Stop не блокирует; integrate не создаёт hooks,
+сохраняет config/owner blocks; active tasks защищены, stale unbound receipts не мешают;
+нет fake closeout, verify-closeout выявляет tampering.
 
-Gate не оценивает качество теста по его названию. Stage reviewer отвечает, что checks действительно
-проверяют criterion, а не выполняют `true`. На демо используется маленькая проверяемая функция;
-её происхождение как synthetic fixture обозначено явно. Интеграционный runner должен логировать
-actual argv, environment class, source/wheel SHA, exit code, stdout и unsupported conditions.
+Baseline native interception tests заменяются тестами retirement/no-install contract,
+а не сохраняются как скрытое обещание enforcement. Остальные critical negative lifecycle,
+path/symlink/duplicate JSON, evidence hash/age/version, profile/import/installer/MCP
+контракты должны остаться. Проверять diff и объяснять удалённые obsolete tests.
 
-Публичная privacy проверка сканирует только publishable tree по известным host/private маркерам
-и проверяет наличие нормативных документов/ресурсов. Это не доказательство отсутствия любых
-секретов. Review изменений обязателен. Схемы Draft2020-12 — reference contracts; production
-validators stdlib выполняют критические проверки напрямую, не загружают удалённые $ref.
-Проверка выпуска блокируется при наличии `.agentos/` runtime receipts в экспортируемом дереве.
-`tests/test_contracts.py` сверяет версии, MCP input/output, task/event schemas и пакетные копии.
+Checks должны проверять acceptance criterion, не просто называться unit. Synthetic fixtures
+помечаются явно. Отдельные logs хранят argv, environment, source/wheel hash, rc и ограничения.
+Public-tree scanner — эвристика, не security certification. Нельзя публиковать `.agentos/`
+receipts или owner settings вместе с core. Package docs/schemas совпадают с maintained source.
 
-Локальный Linux PASS не подтверждает macOS launchd/Keychain/кодекс-хуки и чужие services.
-Required target matrix: source SHA + runtime version; actual core/user paths disjoint;
-existing config preserved; authentic native DENY/PASS/Stop/new-turn probes; existing integrations
-read-only health before/after; rollback rehearsal and fresh readback. До этого target UNVERIFIED.
+Linux tests/build не доказывают macOS/Keychain/launchd/Codex session behavior. На Mac нужны
+source/runtime identity, disjoint roots, отсутствие AgentOS hooks, неизменность config/auth,
+fresh effective AGENTS, A–F на локальных fixtures без внешних writes, rollback/readback.
+До реального выполнения target acceptance NOT_RUN. Hooks не часть этих проверок и не включаются.

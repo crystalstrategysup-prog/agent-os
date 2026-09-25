@@ -7,7 +7,7 @@ import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from agent_os import hooks, project
+from agent_os import project
 
 
 def demonstrate() -> dict:
@@ -26,9 +26,6 @@ def demonstrate() -> dict:
                 "boundaries": "Local maths.py, metadata, documents and checks only.",
                 "constraints": "No network, no production, no actual user data.",
             },
-        )
-        hooks.arm_turn(
-            home, "demo-session", "demo-turn", root, "Implement local addition fixture"
         )
         answers = {
             k: "Synthetic local arithmetic fixture; no external authority is implied."
@@ -103,18 +100,6 @@ Next stage: the next real task starts with a new intake. No target deployment is
             },
         )
         assert result["status"] == "CLOSED"
-        assert (
-            hooks.handle(
-                {
-                    "hook_event_name": "Stop",
-                    "cwd": str(root),
-                    "session_id": "demo-session",
-                    "turn_id": "demo-turn",
-                },
-                home,
-            )
-            == {}
-        )
         return {
             "status": "PASS",
             "fixture": "synthetic temporary arithmetic project",

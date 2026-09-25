@@ -7,8 +7,8 @@
 `inputSchema`/`outputSchema` с `tools/list` и фактическими `structuredContent`, а
 task/event schemas — с записями реального локального lifecycle.
 
-Версия выпуска для человека и MCP: `0.5.0-beta.4`; эквивалент Python packaging:
-`0.5.0b4`. `agentos --version`, `agent_os.__version__` и `serverInfo.version`
+Версия выпуска для человека и MCP: `0.5.0-beta.5`; эквивалент Python packaging:
+`0.5.0b5`. `agentos --version`, `agent_os.__version__` и `serverInfo.version`
 совпадают буквально. Протокол stdio MCP остаётся `2025-06-18`. HTTP API нет, поэтому
 OpenAPI/Swagger здесь не существует; события пишутся локально в JSONL и описаны
 JSON Schema, а не AsyncAPI.
@@ -23,13 +23,13 @@ JSON Schema, а не AsyncAPI.
 
 |Группа|Команды|Контракт записи|
 |---|---|---|
-|project|init, questions, enter, next-turn, document, ready, check, assess, status, close, checkpoint, gate, snapshot|Только явные действия в указанном проекте; вопросы/чтение без product writes|
+|project|init, questions, enter, next-turn, document, ready, check, assess, verify-closeout, status, close, checkpoint, gate, snapshot|Только явные действия в указанном проекте; вопросы/чтение без product writes|
 |project observe|--root --answers --session --turn|Только user receipt, без .agentos в проекте|
 |overlay|status, index, import, migrate-config|import/migrate план по умолчанию; apply явно|
 |profiles|inventory, select, context, interview|Профили и выбор только в указанном user home; `select` — явная запись|
-|integrate codex|--codex-home --skills-home --apply|Управляемые блоки, backup; native trust не меняется|
+|integrate codex|--codex-home --skills-home --apply|AGENTS/skills, backup; hooks/config/trust не меняются|
 |resources|--list|Путь к установленным схемам, шаблонам, навыкам, документации|
-|hook|JSON stdin|UserPromptSubmit пишет turn; PreToolUse/Stop читают gate|
+|hook|Retired compatibility entrypoint|Пустой JSON, exit0; stdin/home не читаются, записи нет|
 
 `profiles inventory` показывает хеши, bindings и конфликты заявленных полей.
 `profiles select --mode none|one|all` сохраняет выбор в `state/profile-selection.json`;
@@ -57,17 +57,32 @@ agentos_get_project_entry_plan; agentos_select_documents; agentos_get_foundation
 Unknown argument/tool возвращает tool error. HTTP/OpenAPI здесь не применимы: сервер stdio.
 MCP не регистрирует автоматически AGENTS/hooks в любом клиенте.
 
-## Native hooks
+## Retired native callbacks / explicit workflow
 
-Схемы в resources/schemas и код hooks.py. SessionStart даёт пути core/user;
-UserPromptSubmit перезапускает обязательный вход; PreToolUse до READY допускает
-консервативный набор чтения и документарную подготовку, остальные local tools deny;
-Stop требует свежий CLOSED или честный CHECKPOINT/read-only receipt.
+Native hooks исключены. `agentos hook` / `agentos-hook` — retired compatibility entrypoints:
+stdout `{}`, exit 0, не читают stdin/home/config и ничего не пишут, не возвращают allow/deny
+или COMPLETE. integrate не регистрирует их; hook input/output schema files сохранены лишь
+для исторической совместимости, не обозначают активный hook protocol.
 
-Неподдерживаемая payload shape, отсутствующий turn/cwd или ошибка — не повод пропустить
-контроль. Сопоставить adapter с реально установленной версией клиента. Не внедрять shim,
-который придумывает turn_id только для получения PASS. Native trust выполняется клиентом.
-Владелец решает разрешение на изменение безопасности; внешний Codex не может сам доверить hook.
+`workflow route --kind question|search|audit|discovery|project-change` необязателен и stateless.
+Повторяемый --effect: local-project-write, external-send, production-write, runtime-write,
+db-write, credentials, destructive, deploy. FAST_PATH/DOCUMENTATION_FIRST — exit0;
+TARGET_AUTHORITY_REQUIRED — BLOCKED/exit2. external_authority_granted=false всегда.
+
+Все --context/--answers/--review принимают JSON object stdin через `-` (4 MiB,
+no duplicate keys), обычные пути — только regular files без symlink. questions --resume-task
+предлагает known answers без authority; enter --resume-task --reuse-answers требует текущий
+authority, допускает только прежний scope, сбрасывает readiness/check receipts. Новые поля
+questionnaire suggested_answers/reused_from_task/reuse_scope — additive.
+
+project verify-closeout — read-only current proof зарегистрированного CLOSED результата.
+Local CLOSED не означает remote deployed. project observe — optional state/observations
+receipt; не связывает и не перезаписывает task/turn. Abandoned unbound turn receipts
+заменяются лишь explicit enter; conflicting bound tasks остаются заблокированы.
+
+MCP entry plan сохраняет deprecated entry_required_every_task=false и добавляет
+entry_required_for=project_changes, read_only_intake_required=false, native_hooks=DISABLED.
+Точные JSON shape/version — schemas и проверяемые copies в wheel.
 
 ## Пользовательские расширения
 

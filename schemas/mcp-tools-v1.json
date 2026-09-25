@@ -3,7 +3,7 @@
   "schema": "agentos.mcp-tools/v1",
   "serverInfo": {
     "name": "crystal-agent-os",
-    "version": "0.5.0-beta.4"
+    "version": "0.5.0-beta.5"
   },
   "tools": [
     {
@@ -133,7 +133,7 @@
       }
     },
     {
-      "description": "Return required intake questions and the documentation-first lifecycle; no project mutation.",
+      "description": "Plan project changes only. Ordinary read-only requests need no intake; native hooks are disabled.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {},
@@ -148,7 +148,7 @@
             "type": "array"
           },
           "entry_required_every_task": {
-            "type": "boolean"
+            "const": false
           },
           "external_authority_granted": {
             "type": "boolean"
@@ -158,6 +158,15 @@
           },
           "schema": {
             "type": "string"
+          },
+          "entry_required_for": {
+            "const": "project_changes"
+          },
+          "read_only_intake_required": {
+            "const": false
+          },
+          "native_hooks": {
+            "const": "DISABLED"
           }
         },
         "required": [
@@ -165,7 +174,10 @@
           "questions",
           "cycle",
           "entry_required_every_task",
-          "external_authority_granted"
+          "external_authority_granted",
+          "entry_required_for",
+          "read_only_intake_required",
+          "native_hooks"
         ],
         "type": "object"
       }

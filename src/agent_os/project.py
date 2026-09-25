@@ -29,6 +29,7 @@ from .safeio import (
     nonempty,
     now,
     read_json,
+    read_json_input,
     sha,
     within,
 )
@@ -170,17 +171,40 @@ def scaffold(root: Path, doc_ids: list[str], task_id: str | None = None) -> list
     return created
 
 
+def reuse_answers(root: Path, task_id: str, supplied: dict) -> dict:
+    """Explicit same-scope resume draft. Current authority must come from this entry."""
+    task = load_task(root, task_id)
+    if task.get("project_id") != load_project(root)["id"]:
+        raise GateError("resume_project_mismatch")
+    if task["status"] == "CLOSED":
+        raise GateError("closed_task_is_immutable_start_new_task")
+    if not isinstance(supplied, dict):
+        raise GateError("answers_must_be_object")
+    previous = task["answers"]
+    if any(k != "authority" and previous.get(k) != v for k, v in supplied.items()):
+        raise GateError("scope_changed_supply_full_answers")
+    return {**{k: v for k, v in previous.items() if k != "authority"}, **supplied}
+
+
 def questionnaire(
-    root: Path, answers: dict | None = None, user_home: Path | None = None
+    root: Path,
+    answers: dict | None = None,
+    user_home: Path | None = None,
+    resume_task: str | None = None,
 ) -> dict:
     root = root_path(root)
     project = load_project(root) if project_file(root).exists() else None
     answers = answers or {}
+    if resume_task:
+        answers = reuse_answers(root, resume_task, answers)
     from .profile_adapter import context as profile_context
 
     return {
         "schema": "agentos.questionnaire/v1",
         "existing_project": bool(project),
+        "suggested_answers": answers,
+        "reused_from_task": resume_task,
+        "reuse_scope": "same_scope_only_current_authority_not_inherited",
         "known_context": project["context"] if project else {},
         "selected_profile_context": (
             profile_context(user_home) if user_home is not None else None
@@ -191,7 +215,10 @@ def questionnaire(
             for key, value in QUESTIONS.items()
             if not isinstance(answers.get(key), str) or not answers[key].strip()
         ],
-        "additional_required": ["change_kind", "write_paths", "acceptance", "checks"],
+        "additional_required": [
+            k for k in ("change_kind", "write_paths", "acceptance", "checks")
+            if k not in answers
+        ],
         "rule": "Use verified project facts first; ask the owner only unresolved material questions.",
     }
 
@@ -268,19 +295,20 @@ def enter(
     turn_id: str,
     user_home: Path,
     resume_task: str | None = None,
+    reuse: bool = False,
 ) -> dict:
     """Every distinct task/turn has a fresh receipt. Resume invalidates readiness."""
-    from .hooks import bind_turn, turn_path
+    from .turns import bind_turn, validate_entry
 
     root = root_path(root)
+    if reuse:
+        if not resume_task:
+            raise GateError("reuse_requires_resume_task")
+        answers = reuse_answers(root, resume_task, answers)
     answers = _answers(answers)
     nonempty(session_id, "session_id", 200)
     nonempty(turn_id, "turn_id", 200)
-    pending_path = turn_path(user_home, session_id)
-    if pending_path.exists():
-        pending = read_json(pending_path)
-        if pending["turn_id"] != turn_id or pending["root"] != str(root):
-            raise GateError("turn_binding_mismatch_reenter_correct_turn")
+    validate_entry(user_home, session_id, turn_id, root)
     with lock(within(root, ".agentos/write.lock")):
         project = load_project(root)
         active = project.get("active_task")
@@ -346,7 +374,7 @@ def next_turn(
     turn_id: str,
     task_id: str,
 ) -> dict:
-    from .hooks import advance_standalone_turn
+    from .turns import advance_standalone_turn
 
     root = root_path(root)
     nonempty(session_id, "session_id", 200)
@@ -608,11 +636,15 @@ def run_check(root: Path, task_id: str, check_id: str) -> dict:
     return receipt
 
 
-def assess(root: Path, task_id: str) -> dict:
+def assess(root: Path, task_id: str, *, _closed: bool = False) -> dict:
     root = root_path(root)
     task = load_task(root, task_id)
     gate = check_ready(root, task_id)
     errors = list(gate["errors"])
+    if _closed and task["status"] == "CLOSED" and task.get("ready"):
+        errors = document_check(root, task)["errors"]
+        if task["ready"]["policy_digest"] != _policy_digest(load_project(root), task):
+            errors.append("scope_changed_reenter_required")
     snapshot = source_snapshot(root)
     latest = {}
     for rid in task["receipts"]:
@@ -676,8 +708,25 @@ def assess(root: Path, task_id: str) -> dict:
     }
 
 
+def verify_closeout(root: Path, task_id: str) -> dict:
+    """Read-only current verification of a registered closeout, never a Stop hook."""
+    root = root_path(root)
+    task = load_task(root, task_id)
+    if task["status"] != "CLOSED" or not task.get("closeout"):
+        return {"status": "BLOCKED", "errors": ["registered_closeout_required"]}
+    result = assess(root, task_id, _closed=True)
+    if result["source_sha256"] != task["closeout"]["assessment"]["source_sha256"]:
+        result["errors"].append("source_changed_after_close")
+    docs = document_check(root, task)
+    if docs["documents_digest"] != task["closeout"]["documents"]["documents_digest"]:
+        result["errors"].append("documentation_changed_after_close")
+    result["status"] = "BLOCKED" if result["errors"] else "PASS"
+    return result
+
+
 def close(root: Path, task_id: str, review: dict) -> dict:
     root = root_path(root)
+    load_task(root, task_id)
     for key in ("reviewer", "summary", "next_step", "limitations"):
         nonempty(review.get(key), key)
     if review.get("scope_reviewed") is not True:
@@ -735,6 +784,7 @@ def checkpoint(root: Path, task_id: str, reason: str, next_step: str) -> dict:
     nonempty(reason, "checkpoint_reason")
     nonempty(next_step, "checkpoint_next_step")
     root = root_path(root)
+    load_task(root, task_id)
     with lock(within(root, ".agentos/write.lock")):
         task = load_task(root, task_id)
         if task["status"] == "CLOSED":
@@ -761,12 +811,14 @@ def make_parser() -> argparse.ArgumentParser:
     init.add_argument("--context", type=Path, required=True)
     ask = sub.add_parser("questions")
     ask.add_argument("--answers", type=Path)
+    ask.add_argument("--resume-task")
     ent = sub.add_parser("enter")
     ent.add_argument("--answers", type=Path)
     ent.add_argument("--interactive", action="store_true")
     ent.add_argument("--session", required=True)
     ent.add_argument("--turn", required=True)
     ent.add_argument("--resume-task")
+    ent.add_argument("--reuse-answers", action="store_true")
     nxt = sub.add_parser("next-turn")
     nxt.add_argument("--session", required=True)
     nxt.add_argument("--from-turn", required=True)
@@ -780,6 +832,7 @@ def make_parser() -> argparse.ArgumentParser:
     chk = sub.add_parser("check")
     chk.add_argument("--check-id", required=True)
     sub.add_parser("assess")
+    sub.add_parser("verify-closeout")
     sub.add_parser("status")
     fin = sub.add_parser("close")
     fin.add_argument("--review", type=Path, required=True)
@@ -795,6 +848,7 @@ def make_parser() -> argparse.ArgumentParser:
             "next-turn",
             "check",
             "assess",
+            "verify-closeout",
             "status",
             "close",
             "checkpoint",
@@ -813,14 +867,19 @@ def command(argv: list[str], user_home: Path) -> tuple[dict, int]:
     root = args.root
     if args.action == "init":
         result = initialize(
-            root, args.name, args.type, args.feature, read_json(args.context)
+            root, args.name, args.type, args.feature, read_json_input(args.context)
         )
     elif args.action == "questions":
         result = questionnaire(
-            root, read_json(args.answers) if args.answers else None, user_home
+            root, read_json_input(args.answers) if args.answers else None, user_home,
+            args.resume_task,
         )
     elif args.action == "enter":
-        answers = read_json(args.answers) if args.answers else {}
+        answers = read_json_input(args.answers) if args.answers else {}
+        if args.reuse_answers:
+            if not args.resume_task:
+                raise GateError("reuse_requires_resume_task")
+            answers = reuse_answers(root_path(root), args.resume_task, answers)
         if args.interactive:
             for key, question in QUESTIONS.items():
                 if not answers.get(key):
@@ -860,12 +919,14 @@ def command(argv: list[str], user_home: Path) -> tuple[dict, int]:
         result = run_check(root, args.task, args.check_id)
     elif args.action == "assess":
         result = assess(root, args.task)
+    elif args.action == "verify-closeout":
+        result = verify_closeout(root, args.task)
     elif args.action == "status":
         result = load_task(root, args.task)
     elif args.action == "snapshot":
         result = source_snapshot(root)
     elif args.action == "close":
-        result = close(root, args.task, read_json(args.review))
+        result = close(root, args.task, read_json_input(args.review))
     else:
         result = checkpoint(root, args.task, args.reason, args.next_step)
     return result, (2 if result.get("status") in {"BLOCKED", "FAIL"} else 0)

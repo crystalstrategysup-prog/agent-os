@@ -110,7 +110,10 @@ def _call(name: str, arguments: dict[str, Any]) -> dict[str, Any]:
                     "docs_refresh",
                     "close",
                 ],
-                "entry_required_every_task": True,
+                "entry_required_every_task": False,
+                "entry_required_for": "project_changes",
+                "read_only_intake_required": False,
+                "native_hooks": "DISABLED",
                 "external_authority_granted": False,
             }
         elif name == "agentos_select_documents":

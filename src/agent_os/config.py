@@ -89,6 +89,7 @@ def default_config() -> dict[str, object]:
         "schema": "agent-os.community-config/v5",
         "name": "My AgentOS",
         "governance": {
+            # Applies to project changes only; not a prompt-time/hook requirement.
             "intake_required": True,
             "closeout_required": True,
             "external_authority_granted": False,

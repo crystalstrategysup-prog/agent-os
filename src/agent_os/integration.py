@@ -1,11 +1,8 @@
-"""Non-destructive Codex bootstrap. Installation is not proof that hooks are active."""
+"""AGENTS/skills bootstrap only. Native hooks and client security config are untouched."""
 
 from __future__ import annotations
 
 import argparse
-import json
-import shlex
-import sys
 from pathlib import Path
 
 from .safeio import (
@@ -20,7 +17,6 @@ from .safeio import (
 
 START = "<!-- AGENTOS FOUNDATION BEGIN -->"
 END = "<!-- AGENTOS FOUNDATION END -->"
-EVENTS = ("SessionStart", "UserPromptSubmit", "PreToolUse", "Stop")
 
 
 def install(
@@ -46,15 +42,19 @@ def install(
     method = str(resources / "skills/agentos-project-entry/SKILL.md")
     block = (
         START + "\n## AgentOS foundation\n"
-        "For every new or resumed project task run the AgentOS project intake before product writes.\n"
+        "Questions, searches, read-only audits and API discovery proceed directly, even from an unregistered cwd.\n"
+        "No project init/intake/observe, answers file or closeout is required for those reads.\n"
+        "For actual project changes, inspect current architecture and write missing docs before product writes.\n"
         "Reuse verified existing answers; do not interrogate the owner again for known facts.\n"
-        "Read " + method + " on entry. Use `agentos project questions`, then `enter`, "
+        "For project changes read " + method + ". Use `agentos project questions`, then `enter`, "
         "register required documents, `ready`, approved checks and `close` or `checkpoint`.\n"
         "Core resources: " + str(resources) + "\n"
         "Private user overlay: " + str(user_home) + "\n"
-        "Load its index first and only relevant verified host/project knowledge. Never preload history.\n"
+        "Load only relevant verified overlay knowledge; absent/stale profiles do not block unrelated reads. Never preload history.\n"
         "Project intake and semantic reviews do not grant external authority. Preserve narrower host rules.\n"
-        "An untrusted/unavailable hook is NOT active enforcement. Report that condition; do not bypass it.\n"
+        "Native hooks are DISABLED and excluded: do not install, enable or restore them.\n"
+        "Bootstrap context/answers and docs may be prepared before readiness; JSON stdin is supported with --answers -.\n"
+        "Close/checkpoint only a registered task; report a pre-entry failure directly, never invent a task ID.\n"
         + END
     )
     if START in old:
@@ -63,55 +63,7 @@ def install(
         updated = a + block + b
     else:
         updated = old.rstrip() + "\n\n" + block + "\n"
-    # Explicit pinned interpreter and separate user path; no secret/auth/model edits.
-    command = " ".join(
-        shlex.quote(x)
-        for x in [
-            sys.executable,
-            "-m",
-            "agent_os.cli",
-            "--home",
-            str(user_home),
-            "hook",
-        ]
-    )
-    hooks_path = codex_home / "hooks.json"
-    hooks = read_json(hooks_path) if hooks_path.exists() else {"hooks": {}}
-    if not isinstance(hooks.get("hooks"), dict):
-        raise GateError("invalid_existing_hooks")
-    for event in EVENTS:
-        groups = hooks["hooks"].setdefault(event, [])
-        if not isinstance(groups, list):
-            raise GateError("invalid_hook_groups")
-        # Only replace our tagged command definitions; every other hook is preserved.
-        cleaned = []
-        for group in groups:
-            if not isinstance(group, dict) or not isinstance(group.get("hooks"), list):
-                raise GateError("invalid_existing_hook_group")
-            kept = [
-                h
-                for h in group["hooks"]
-                if h.get("statusMessage") != "AgentOS project lifecycle"
-            ]
-            if kept:
-                cleaned.append({**group, "hooks": kept})
-        groups[:] = cleaned
-        groups.append(
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": command,
-                        "timeout": 20,
-                        "statusMessage": "AgentOS project lifecycle",
-                    }
-                ]
-            }
-        )
-    paths = {
-        str(agents): updated.encode(),
-        str(hooks_path): (json.dumps(hooks, indent=2) + "\n").encode(),
-    }
+    paths = {str(agents): updated.encode()}
     # Copy maintained skills into namespaced folders; never delete user skills.
     for src in sorted((resources / "skills").rglob("*")):
         if not src.is_file():
@@ -130,7 +82,7 @@ def install(
         path = Path(name)
         if path.is_symlink():
             raise GateError("integration_symlink_refused")
-        if path in (agents, hooks_path):
+        if path == agents:
             continue
         if (
             path.exists()
@@ -146,10 +98,12 @@ def install(
         "auth_changes": False,
         "model_changes": False,
         "hook_trust_changed": False,
-        "activation_status": "PENDING_NATIVE_TRUST_AND_NEW_SESSION_PROBE",
+        "activation_status": "MANUAL_WORKFLOW_NO_HOOKS",
+        "native_hooks": "DISABLED",
+        "hook_files_changed": False,
         "managed_files": {p: sha(d) for p, d in paths.items()},
-        "required_config": {"features.hooks": True},
-        "note": "Review /hooks in the actual Codex client. No trust bypass is performed.",
+        "required_config": {},
+        "note": "Read back AGENTS/skills in a new session. Existing hooks/config are untouched; never restore retired AgentOS hooks.",
     }
     if not apply or conflicts:
         return report
@@ -166,7 +120,7 @@ def install(
             if not backup.exists():
                 atomic_bytes(backup, old_data)
         atomic_bytes(path, data)
-    report["status"] = "INSTALLED_NOT_YET_PROVEN_ACTIVE"
+    report["status"] = "INSTALLED_MANUAL_WORKFLOW"
     report["at"] = now()
     atomic_json(codex_home / "agentos-integration.json", report)
     return report

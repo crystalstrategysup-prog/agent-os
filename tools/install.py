@@ -304,7 +304,7 @@ def execute(args: argparse.Namespace) -> dict:
             "activation_proven": True,
             "local_probe": evidence,
             "previous": old,
-            "next": "Import separate overlay, then integrate and verify hooks in the actual agent. No live service was replaced.",
+            "next": "Import separate overlay, then integrate AGENTS/skills and read back in a new session. Keep native hooks disabled. No live service was replaced.",
         }
     finally:
         (lock / "owner.json").unlink(missing_ok=True)

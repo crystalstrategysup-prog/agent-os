@@ -29,3 +29,14 @@ The package CLI targets Python 3.11+ on macOS, Linux and Windows where its compo
 ## Failure and recovery
 
 An interrupted import may leave create-only files and a rerun must classify them as identical; it never overwrites. A failed migration retains its backup and reports the current config hash. An incomplete core release never becomes current. Rollback points to the prior verified core and leaves the overlay untouched. Existing private runtime is never selected as a rollback target for this public installer.
+
+## Workflow scope (beta.5 candidate)
+
+Ordinary questions/search/read-only audits/API discovery require neither profiles nor intake.
+Use selected verified facts only when relevant; stale host facts must not be used. A missing
+profile does not block unrelated reading. Owner instructions which universally require
+questions/observe must be migrated separately, preserving their narrower host authority rules.
+Partial sanitized exports are review evidence, not complete replacement profiles. After a
+real profile edit, inventory and explicit re-selection refresh the exact hashes; schema-only
+selection evidence does not prove ACTIVE. Never use mode none to evade a required host identity.
+Core rollback must not restore native hooks or call a legacy integration generator.

@@ -19,8 +19,8 @@ def claim(
     destination_session: str | None = None,
 ) -> None:
     from .config import AgentOSPaths
-    from .hooks import turn_path
     from .project import check_ready, load_task
+    from .turns import turn_path
 
     home = AgentOSPaths.discover().home
     session = os.environ.get("AGENTOS_SESSION_ID", "")

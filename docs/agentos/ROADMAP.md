@@ -1,3 +1,9 @@
+# Active stage — F09
+
+F09: no-hook direct-read correction → independent Codex integration review → separately
+scoped Mac fixture/readback → owner-authorized release only. Current work ends with a local
+patch/test packet; no publishing/install. Any old native-hook activation work is superseded.
+
 # AgentOS foundation roadmap
 
 Every product stage follows: dossier and roadmap read-back → current stage contract → implementation → checks and result record → dossier/roadmap/contract update. Intake chooses only relevant document layers; it does not replace these three project documents. A read-only R0 task keeps a short path.

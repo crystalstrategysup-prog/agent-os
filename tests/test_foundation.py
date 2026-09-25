@@ -15,6 +15,7 @@ from agent_os import (
     observation,
     overlay,
     safeio,
+    turns,
 )
 from agent_os import (
     project as p,
@@ -67,7 +68,6 @@ def setup(tmp_path):
             }
         ],
     )
-    hooks.arm_turn(home, "s", "t", root, answers["objective"])
     return root, home, answers
 
 
@@ -325,7 +325,8 @@ def test_checkpoint_is_not_complete(setup):
 def test_resume_resets_gate(setup):
     task = prepared(setup)
     p.run_check(setup[0], task, "unit")
-    hooks.arm_turn(setup[1], "s", "t2", setup[0], "resume")
+    p.checkpoint(setup[0], task, "Pause fixture", "Resume fixture")
+    p.next_turn(setup[0], setup[1], session_id="s", previous_turn="t", turn_id="t2", task_id=task)
     p.enter(
         setup[0],
         setup[2],
@@ -340,9 +341,8 @@ def test_resume_resets_gate(setup):
 
 def test_standalone_cli_next_turn_resumes_checkpoint_without_hook_claim(setup):
     root, home, answers = setup
-    hooks.turn_path(home, "s").unlink()
     task = start(setup)
-    assert read_json(hooks.turn_path(home, "s"))["hook_seen"] is False
+    assert read_json(turns.turn_path(home, "s"))["hook_seen"] is False
     assert documents(setup, task)["status"] == "READY"
     p.checkpoint(root, task, "Synthetic pause", "Continue in a new CLI turn")
     next_result, code = p.command(
@@ -362,7 +362,7 @@ def test_standalone_cli_next_turn_resumes_checkpoint_without_hook_claim(setup):
         home,
     )
     assert code == 0 and next_result["status"] == "INTAKE_REQUIRED"
-    assert read_json(hooks.turn_path(home, "s"))["hook_seen"] is False
+    assert read_json(turns.turn_path(home, "s"))["hook_seen"] is False
     answers_file = root / "answers.json"
     atomic_json(answers_file, answers)
     resumed, code = p.command(
@@ -382,7 +382,7 @@ def test_standalone_cli_next_turn_resumes_checkpoint_without_hook_claim(setup):
         home,
     )
     assert code == 0 and resumed["task_id"] == task
-    assert read_json(hooks.turn_path(home, "s"))["hook_seen"] is False
+    assert read_json(turns.turn_path(home, "s"))["hook_seen"] is False
     updated = p.load_task(root, task)
     assert updated["status"] == "INTAKE" and "ready" not in updated
     assert updated["revision"] == 2 and updated["receipts"] == []
@@ -390,7 +390,6 @@ def test_standalone_cli_next_turn_resumes_checkpoint_without_hook_claim(setup):
 
 def test_standalone_cli_next_turn_after_close_starts_new_task(setup):
     root, home, answers = setup
-    hooks.turn_path(home, "s").unlink()
     task = prepared(setup)
     p.run_check(root, task, "unit")
     p.close(root, task, review(setup, task))
@@ -402,35 +401,19 @@ def test_standalone_cli_next_turn_after_close_starts_new_task(setup):
     assert p.load_task(root, task)["status"] == "CLOSED"
 
 
-def test_standalone_cli_next_turn_refuses_native_or_mismatched_receipt(setup):
+def test_standalone_cli_next_turn_refuses_mismatched_receipt(setup):
     root, home, _ = setup
     task = start(setup)
     p.checkpoint(root, task, "Synthetic pause", "Continue after review")
-    path = hooks.turn_path(home, "s")
-    before = path.read_bytes()
-    with pytest.raises(GateError, match="standalone_turn_transition_mismatch"):
-        p.next_turn(
-            root, home, session_id="s", previous_turn="t", turn_id="t2", task_id=task
-        )
-    assert path.read_bytes() == before
-    path.unlink()
-    hooks.bind_turn(home, "s", "t", root, task)
+    path = turns.turn_path(home, "s")
     before = path.read_bytes()
     for previous, new_task in [("wrong", task), ("t", "task-wrong")]:
         with pytest.raises(GateError):
-            p.next_turn(
-                root,
-                home,
-                session_id="s",
-                previous_turn=previous,
-                turn_id="t2",
-                task_id=new_task,
-            )
+            p.next_turn(root, home, session_id="s", previous_turn=previous,
+                        turn_id="t2", task_id=new_task)
         assert path.read_bytes() == before
     with pytest.raises(GateError, match="standalone_turn_transition_mismatch"):
-        hooks.advance_standalone_turn(
-            home, "s", "t", "t2", root.parent / "different", task
-        )
+        turns.advance_standalone_turn(home, "s", "t", "t2", root.parent / "different", task)
     assert path.read_bytes() == before
 
 
@@ -441,129 +424,11 @@ def test_active_task_conflict(setup):
 
 
 def test_turn_mismatch_no_task_side_effect(setup):
+    task = start(setup)
+    before = filemap(setup[0])
     with pytest.raises(ValueError):
-        p.enter(setup[0], setup[2], session_id="s", turn_id="wrong", user_home=setup[1])
-    assert p.load_project(setup[0]).get("active_task") is None
-
-
-def test_hook_before_intake_denies(setup):
-    r = hooks.handle(
-        {
-            "hook_event_name": "PreToolUse",
-            "tool_name": "Bash",
-            "tool_input": {"command": 'python3 -c "print(1)"'},
-            "cwd": str(setup[0]),
-            "session_id": "s",
-            "turn_id": "t",
-        },
-        setup[1],
-    )
-    assert r["hookSpecificOutput"]["permissionDecision"] == "deny"
-
-
-def test_hook_after_ready(setup):
-    prepared(setup)
-    r = hooks.handle(
-        {
-            "hook_event_name": "PreToolUse",
-            "tool_name": "apply_patch",
-            "tool_input": {
-                "command": "*** Begin Patch\n*** Add File: code.py\n+x=1\n*** End Patch"
-            },
-            "cwd": str(setup[0]),
-            "session_id": "s",
-            "turn_id": "t",
-        },
-        setup[1],
-    )
-    assert r.get("hookSpecificOutput", {}).get("permissionDecision") != "deny"
-
-
-def test_hook_new_turn_invalidates(setup):
-    prepared(setup)
-    hooks.arm_turn(setup[1], "s", "new", setup[0], "new task")
-    r = hooks.handle(
-        {
-            "hook_event_name": "PreToolUse",
-            "tool_name": "Write",
-            "cwd": str(setup[0]),
-            "session_id": "s",
-            "turn_id": "new",
-        },
-        setup[1],
-    )
-    assert r["hookSpecificOutput"]["permissionDecision"] == "deny"
-
-
-@pytest.mark.parametrize(
-    "command",
-    [
-        "cat README.md; rm x",
-        "cat $(touch bad)",
-        "echo hi > file",
-        'python3 -c "pass"',
-        "git diff --output=x",
-        "rg --pre=touch x",
-        "bash -c pwd",
-    ],
-)
-def test_conservative_shell_denies(command):
-    assert not hooks._safe_shell(command)
-
-
-@pytest.mark.parametrize(
-    "command",
-    [
-        "pwd",
-        "cat README.md",
-        "git status --porcelain",
-        "agentos project questions --root /tmp/p",
-    ],
-)
-def test_discovery_shell_allows(command):
-    assert hooks._safe_shell(command)
-
-
-def test_stop_requires_close_or_checkpoint(setup):
-    start(setup)
-    r = hooks.handle(
-        {
-            "hook_event_name": "Stop",
-            "cwd": str(setup[0]),
-            "session_id": "s",
-            "turn_id": "t",
-        },
-        setup[1],
-    )
-    assert r["decision"] == "block"
-
-
-def test_stop_loop_never_false_pass(setup):
-    r = hooks.handle(
-        {
-            "hook_event_name": "Stop",
-            "stop_hook_active": True,
-            "cwd": str(setup[0]),
-            "session_id": "s",
-            "turn_id": "t",
-        },
-        setup[1],
-    )
-    assert "NOT COMPLETE" in r["systemMessage"]
-
-
-def test_missing_turn_denied(setup):
-    prepared(setup)
-    r = hooks.handle(
-        {
-            "hook_event_name": "PreToolUse",
-            "tool_name": "Write",
-            "cwd": str(setup[0]),
-            "session_id": "s",
-        },
-        setup[1],
-    )
-    assert r["hookSpecificOutput"]["permissionDecision"] == "deny"
+        p.enter(setup[0], setup[2], session_id="s", turn_id="wrong", user_home=setup[1], resume_task=task)
+    assert filemap(setup[0]) == before
 
 
 def test_observation_no_project_writes(tmp_path):
@@ -585,31 +450,14 @@ def test_observation_no_project_writes(tmp_path):
         )
     }
     a["sources"] = ["README.md"]
-    observation.record(root, a, home, "s", "t")
+    result = observation.record(root, a, home, "s", "t")
     assert filemap(root) == before
-    r = hooks.handle(
-        {
-            "hook_event_name": "Stop",
-            "cwd": str(root),
-            "session_id": "s",
-            "turn_id": "t",
-        },
-        home,
-    )
-    assert r.get("decision") != "block"
+    receipt = read_json(home / result["receipt_path"])
+    observation.verify(root, receipt)
+    assert not turns.turn_path(home, "s").exists()
     (root / "README.md").write_text("changed")
-    assert (
-        hooks.handle(
-            {
-                "hook_event_name": "Stop",
-                "cwd": str(root),
-                "session_id": "s",
-                "turn_id": "t",
-            },
-            home,
-        )["decision"]
-        == "block"
-    )
+    with pytest.raises(GateError, match="observation_source_changed"):
+        observation.verify(root, receipt)
 
 
 @pytest.mark.parametrize(
@@ -917,21 +765,15 @@ def test_core_cannot_be_overlay():
         AgentOSPaths.discover(source / "user")
 
 
-def test_closed_task_source_change_blocks_stop(setup):
+def test_closed_task_source_change_blocks_explicit_verification(setup):
     task = prepared(setup)
     p.run_check(setup[0], task, "unit")
     p.close(setup[0], task, review(setup, task))
+    assert p.verify_closeout(setup[0], task)["status"] == "PASS"
     (setup[0] / "code.py").write_text("changed")
-    r = hooks.handle(
-        {
-            "hook_event_name": "Stop",
-            "session_id": "s",
-            "turn_id": "t",
-            "cwd": str(setup[0]),
-        },
-        setup[1],
-    )
-    assert r["decision"] == "block"
+    result = p.verify_closeout(setup[0], task)
+    assert result["status"] == "BLOCKED"
+    assert "source_changed_after_close" in result["errors"]
 
 
 def test_installer_root_separation_and_wheel_hash(tmp_path):
@@ -1074,30 +916,6 @@ def test_installer_refuses_symlinked_user_metadata(tmp_path):
             user, {"overlay_schema": 1, "config_schema": "agent-os.community-config/v5"}
         )
 
-
-def test_discovery_with_explicit_user_home():
-    assert hooks._safe_shell(
-        "agentos --home /tmp/example-user project questions --root /tmp/project"
-    )
-    assert hooks._safe_shell("agentos --user-home /tmp/example-user overlay index")
-    assert not hooks._safe_shell(
-        "agentos --home /tmp/example-user overlay import --source /tmp/source --apply"
-    )
-
-
-def test_native_patch_key_document_preparation(setup):
-    r = hooks.handle(
-        {
-            "hook_event_name": "PreToolUse",
-            "tool_name": "apply_patch",
-            "cwd": str(setup[0]),
-            "tool_input": {
-                "patch": "*** Begin Patch\n*** Add File: docs/agentos/notes.md\n+Facts\n*** End Patch"
-            },
-        },
-        setup[1],
-    )
-    assert r == {}
 
 
 def test_installed_canon_matches_maintained_docs():

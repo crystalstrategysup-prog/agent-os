@@ -1,62 +1,36 @@
-# Начало работы следующего разработчика
+# Вход человека и нового агента
 
-## Чистая установка и исходники
+Для вопроса, поиска, read-only аудита или discovery: использовать уже разрешённый доступ
+и ответить. Не запускать intake/observe/profile interview и не создавать служебную задачу.
 
-Канонический исходник — `https://github.com/crystalstrategysup-prog/agent-os`.
-Для beta используйте проверенный tag `v0.5.0-beta.4` после публикации. На macOS/Linux
-нужен Python 3.11+: `python3 -m venv .venv`, затем `python -m pip install -e '.[dev]'`,
-`agentos init`, `agentos doctor`, `python -m pytest -q`. Это установка из исходника,
-не из PyPI: проект `crystal-agent-os` там пока даёт 404. Запуск `init` создаёт только
-пользовательский home `~/.agentos-user`; он не меняет глобальный Codex и private runtime.
-Изолированный offline wheel install/rollback описан в `INSTALL_UPDATE.md`.
+Для реального изменения прочитать dossier → roadmap → stage/last result → затронутые
+architecture/contracts. Нет docs — сначала read-only обследование, затем заполнение
+досье/roadmap/stage по фактам. Не scaffolding поверх неизвестной структуры. Запустить
+project questions с уже известными ответами; enter с current authority. Лишь неизвестные
+существенные решения требуют вопроса владельцу. Same-scope continuation:
+questions --resume-task; enter --resume-task --reuse-answers, текущий authority подать
+через JSON или stdin. Подробности и exact gates: PROCESS.md.
 
-## Состав и контракты
+Register required docs → READY → approved product edits → exact checks → актуальные docs
+→ assess/close или честный checkpoint. READY не даёт внешних прав. Проверка бессодержательным
+`true` не считается смысловой приёмкой. tools/demo_lifecycle.py — tmpdir учебный пример,
+не live evidence. После CLOSED verify-closeout проверяет текущую пригодность результата.
 
-`src/agent_os/` — runtime, `src/agent_os/resources/` — файлы, реально попадающие в wheel,
-`schemas/` — исходные машинные контракты, `docs/` — поддерживаемые объяснения,
-`tests/` и `tools/demo_lifecycle.py` — проверка поведения. При изменении публичного
-документа верхнего уровня `docs/*.md` обновите его пакетную копию в
-`src/agent_os/resources/docs/`; тест проверяет побайтовое совпадение. Для нового CLI,
-MCP, config, data или events поведения обновите соответствующий контракт и тест.
+Профили optional и снаружи core. Читать только релевантные verified entries; missing/stale
+не блокирует независимое чтение, но устаревшие host facts не применять. interview не нужна
+для каждого вопроса. Full history/secrets не загружаются. Метаданные и документы проекта
+остаются в его каталоге, runtime receipts не публикуются в public source.
 
-## Документация перед реализацией
+Роли: owner задаёт результат/authority; coordinator — scope/этап; implementer — изменения;
+reviewer — смысл и evidence; target operator — фактический live result. Самопроверка
+допустима с раскрытием, но не называется независимым аудитом.
 
-Прочтите досье `agentos/DOSSIER.md`, roadmap `agentos/ROADMAP.md` и документ текущего
-этапа. Для существующего проекта сначала исследуйте его read-only. Входной сценарий
-использует известные факты и спрашивает лишь недостающее; из каталога выбираются только
-релевантные слои. До `READY` допускается подготовка документов, но продуктовая запись
-блокируется на поддерживаемом активном hook path. После реализации запустите точные
-checks, обновите документацию по факту и выполните close либо checkpoint.
+Интеграция — managed AGENTS + namespaced skills, **без native hooks**. Проверить точный
+interpreter/resources и эффективные инструкции в новой сессии; global owner block и
+project override могут противоречить новому правилу. Не редактировать их по частичному
+экспорту целиком и не менять модель/auth/security config.
 
-Порядок чтения: README → dossier → roadmap → последний этап/результат → architecture/contracts.
-`agentos resources --list` показывает установленный нормативный комплект; пользовательский
-`overlay index` указывает релевантные private docs, но не вываливает секреты и историю.
-Перед задачей вызвать questions, использовать известные ответы, провести enter для session/turn.
-В CLI-only сессии после checkpoint/close выполните `project next-turn` с точными
-`--session S --from-turn OLD --turn NEW --task TASK`, затем новый `enter` с `--turn NEW`.
-Для native hooks новый turn приходит только от UserPromptSubmit; CLI-переход его не подменяет.
-Для незнакомого existing проекта начните read-only обследование, не scaffolding поверх неизвестного.
-
-Если проектной документации нет, `project questions` показывает неизвестные поля; агент
-сначала исследует код и существующие документы, затем создаёт досье, roadmap и документ
-этапа из подтверждённых фактов. Личные настройки не выводятся из отсутствия документов:
-`profiles context` показывает только выбранный внешний профиль, а `profiles interview`
-предлагает живые факты устройства и вопросы, требующие ответа владельца.
-
-Практический пример полностью выполняется `python3 tools/demo_lifecycle.py` в tmpdir.
-Он демонстрирует заблокированный ранний gate, реальные документы, реализацию маленькой функции,
-source-bound check, смысловой closeout и Stop. Это учебный проект, не доказательство live installation.
-В examples лежат JSON формы. Заменять поля фактами, а не выдавать fixture за работу владельца.
-
-Основные роли: owner определяет результат/полномочия; coordinator управляет этапом/scope;
-implementer меняет разрешённое; reviewer проверяет смысл и evidence; target operator подтверждает
-live состояние. Один агент может совмещать роли с явным раскрытием, но самопроверка не независимый аудит.
-Подключение нового агента: интеграция, native trust и отрицательная проба без intake; простой
-прочитанный SKILL.md не означает enforced tool boundary.
-
-Troubleshooting: draft/unregistered → заполнить и register; unreviewed_change → сверить и
-register фактические изменения; scope_changed → новый entry; stale_check → повторить approved
-check на текущем исходнике; out_of_scope → откат лишнего либо новый согласованный stage;
-turn mismatch → точный session/turn клиента, не выдумывать; conflict import → согласовать private
-данные локально; lock → проверить writer, не удалять вслепую; hook skipped → проверить native trust.
-Если нет достоверного пути дальше — checkpoint с конкретным следующим действием.
+Ошибки: draft/stale → факты + register; scope changed → новый полный entry; stale checks →
+повтор актуальных approved checks; out-of-scope → откат лишнего или согласованный этап;
+bound turn mismatch → inspect реальной задачи и explicit checkpoint/next-turn;
+pre-entry error → прямое сообщение без fake closeout. Не удалять lock вслепую.
