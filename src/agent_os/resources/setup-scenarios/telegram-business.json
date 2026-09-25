@@ -1,0 +1,43 @@
+{
+  "schema": "agentos.setup-scenario/v1",
+  "id": "telegram-business",
+  "version": "1.0.0",
+  "title": "Подключить Telegram Business-бота",
+  "goal": "Разрешить конкретному боту работать в выбранных чатах Telegram-аккаунта с явно выбранными правами и проверить фактическую Business-связь.",
+  "implementation_status": "guide_only",
+  "evidence": {
+    "level": "documented",
+    "scope": "Официальный Telegram Business API; универсальный AgentOS adapter подключения пока не реализован и не проверен.",
+    "reviewed_on": "2026-09-26",
+    "sources": [
+      "https://core.telegram.org/bots/features",
+      "https://core.telegram.org/api/bots/connected-business-bots"
+    ]
+  },
+  "prerequisites": [
+    "Бот принадлежит пользователю или назначенному им оператору и поддерживает Business-режим.",
+    "Пользователь заранее видит область чатов и набор разрешаемых действий.",
+    "MTProto-сессия не является обязательной для ручного подключения Business-бота."
+  ],
+  "flows": [
+    {
+      "id": "connect",
+      "when": "Business-бот готов и пользователь выбрал чаты и права.",
+      "steps": [
+        {"id": "enable-mode", "actor": "person", "action": "Включить Business-режим бота в Telegram, если он ещё не включён.", "proof": "Telegram помечает бота как доступного для Business-подключения."},
+        {"id": "review-scope", "actor": "agent", "action": "Показать точный список разрешённых чатов и действий перед подключением.", "proof": "Пользователь подтвердил именно показанную область доступа."},
+        {"id": "connect-bot", "actor": "person", "action": "Подключить бота к аккаунту в Telegram с выбранной областью доступа.", "proof": "Telegram создал действующую Business-связь."},
+        {"id": "verify-connection", "actor": "provider", "action": "Прочитать текущую связь, её разрешения и состояние; провести разрешённый безопасный тест.", "proof": "Текущие Telegram connection и rights совпадают с подтверждённым выбором; результат теста получен."}
+      ]
+    }
+  ],
+  "sensitive_inputs": ["токен бота", "идентификатор Business-связи", "содержимое пользовательских чатов"],
+  "recovery": [
+    "Если Telegram не подтвердил Business-связь, не объявлять бота подключённым.",
+    "Показать владельцу, как изменить права, поставить бота на паузу или отключить связь."
+  ],
+  "maintenance": {
+    "owner": "AgentOS community maintainers",
+    "review_triggers": ["изменение Telegram Business API", "изменение модели прав", "неуспешная проверка связи", "плановый пересмотр источников"]
+  }
+}

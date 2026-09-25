@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agentos.setup-scenario/v1",
+  "title": "AgentOS public setup scenario",
+  "type": "object",
+  "required": ["schema", "id", "version", "title", "goal", "implementation_status", "evidence", "prerequisites", "flows", "sensitive_inputs", "recovery", "maintenance"],
+  "properties": {
+    "schema": {"const": "agentos.setup-scenario/v1"},
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "title": {"type": "string", "minLength": 1, "maxLength": 120},
+    "goal": {"type": "string", "minLength": 1, "maxLength": 500},
+    "implementation_status": {"enum": ["guide_only", "adapter_available"]},
+    "evidence": {
+      "type": "object",
+      "required": ["level", "scope", "reviewed_on", "sources"],
+      "properties": {
+        "level": {"enum": ["documented", "source_verified", "live_verified"]},
+        "scope": {"type": "string", "minLength": 1},
+        "reviewed_on": {"type": "string", "format": "date"},
+        "sources": {"type": "array", "minItems": 1, "items": {"type": "string", "format": "uri"}}
+      },
+      "additionalProperties": false
+    },
+    "prerequisites": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "flows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "when", "steps"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
+          "when": {"type": "string", "minLength": 1},
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["id", "actor", "action", "proof"],
+              "properties": {
+                "id": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
+                "actor": {"enum": ["person", "agent", "provider"]},
+                "action": {"type": "string", "minLength": 1},
+                "proof": {"type": "string", "minLength": 1}
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "sensitive_inputs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "recovery": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "maintenance": {
+      "type": "object",
+      "required": ["owner", "review_triggers"],
+      "properties": {
+        "owner": {"type": "string", "minLength": 1},
+        "review_triggers": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

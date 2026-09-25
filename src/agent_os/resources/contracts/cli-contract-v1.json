@@ -289,6 +289,18 @@
       "write_surfaces": []
     },
     {
+      "effect": "read_only",
+      "name": "setup list",
+      "status_values": [],
+      "write_surfaces": []
+    },
+    {
+      "effect": "read_only",
+      "name": "setup show",
+      "status_values": [],
+      "write_surfaces": []
+    },
+    {
       "name": "workflow route",
       "effect": "read_only",
       "status_values": [

@@ -22,6 +22,7 @@ def dispatch(argv: list[str]) -> int | None:
         "resources",
         "hook",
         "workflow",
+        "setup",
     }:
         return None
     try:
@@ -35,6 +36,12 @@ def dispatch(argv: list[str]) -> int | None:
             result, code = command(rest[1:])
             print(json.dumps(result, ensure_ascii=False, indent=2))
             return code
+        if rest[0] == "setup":
+            from .setup_scenarios import command
+
+            result = command(rest[1:])
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
         from .config import AgentOSPaths
 
         home = AgentOSPaths.discover(global_args.home).home

@@ -98,3 +98,14 @@ provider_kind, enabled, source, core_api, data_schema, authority и verification
 написание такого adapter — самостоятельный stage с угрозами/контрактом/tests.
 Подмена knowledge файлом исполняемой private ветки запрещена. Отсутствие переносимого provider
 фиксируется как gap, старый runtime сохраняется, а не объявляется мигрированным.
+
+## Сценарии подключения
+
+Упакованный `resources/setup-scenarios/index.json` перечисляет только явно
+опубликованные карточки `agentos.setup-scenario/v1`; их структура проверяется
+`schemas/setup-scenario-v1.schema.json`. `agentos setup list` возвращает краткие
+метаданные, `agentos setup show <id>` — одну карточку. Это read-only discovery:
+команды не читают overlay, не делают запросов в сеть и не запускают provider.
+`implementation_status=guide_only` прямо сообщает, что рабочего общего адаптера нет;
+доказательства частной инсталляции не повышают этот статус. Порядок добавления,
+использования и проверки карточек описан в `docs/SETUP_SCENARIOS.md`.

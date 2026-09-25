@@ -1,9 +1,10 @@
-# Active stage — F11
+# Active source stage — F12
 
-F10 closed with a local beta.6 source candidate at `838b061`; it did not publish
-or activate the candidate. F11: resolve curator S1–S8 and partial-enter
-stability gaps, verify exact public distribution, obtain independent acceptance,
-publish stable 0.5.0, then separately verify Mac activation and legacy retirement.
+The canonical public source currently declares stable 0.5.0. F12 adds the
+connection-scenario catalog and protocol as a source candidate; its branch
+does not itself publish a new release or activate a Mac installation.
+See [STAGE-F12](STAGE-F12.md) for scope and local acceptance. Earlier F11
+release and activation history remains in [STAGE-F11](STAGE-F11.md).
 F09 no-hook direct-read behavior remains invariant.
 
 # AgentOS foundation roadmap
@@ -20,6 +21,7 @@ Every product stage follows: dossier and roadmap read-back → current stage con
 | F06 — beta hardening | External review; STAGE-F06 | Atomic create-only overlay import, user schema compatibility before activation, immutable readiness baseline; new beta release | PUBLIC RELEASE PASS; result in STAGE-F06; CLI follow-up in F07 |
 | F07 — standalone CLI turn transition | Independent beta.1 review; STAGE-F07 | Exact CLI-only next-turn receipt after checkpoint/close, native-hook provenance preserved; next immutable beta | PUBLIC RELEASE PASS; result in STAGE-F07; target gates still pending |
 | F08 — optional external profiles | Owner 0 / 1 / N decision; STAGE-F08 | Versioned profile adapter, explicit conflict decisions, interview, packaged schema and public beta.4 | PUBLIC RELEASE PASS; 179 tests, wheel read-back; live Mac gate blocked |
+| F12 — connection scenarios | Stable 0.5.0 public source; STAGE-F12 | Versioned index and scenario cards, read-only discovery, authoring and maintenance protocol, local schema/CLI/package checks | SOURCE CANDIDATE; release and activation separate |
 
 ## Stage dependencies and stop rules
 

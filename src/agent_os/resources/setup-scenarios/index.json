@@ -1,0 +1,18 @@
+{
+  "schema": "agentos.setup-index/v1",
+  "version": "1.0.0",
+  "scenarios": [
+    {
+      "id": "telegram-mtproto",
+      "title": "Подключить пользовательскую сессию Telegram",
+      "summary": "Вход по номеру и коду через защищённый интерфейс или подтверждение QR; конкретный provider подключается отдельно.",
+      "implementation_status": "guide_only"
+    },
+    {
+      "id": "telegram-business",
+      "title": "Подключить Telegram Business-бота",
+      "summary": "Связать Business-бота с выбранными чатами и правами после подтверждения владельца аккаунта.",
+      "implementation_status": "guide_only"
+    }
+  ]
+}

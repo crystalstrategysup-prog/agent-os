@@ -36,6 +36,17 @@ No registration, answers file, profile interview, observe receipt or closeout is
 Optional `agentos workflow route --kind audit` explains the route without reading overlay
 or changing files; calling it is not a prerequisite for answering a question.
 
+## Connection scenarios
+
+The public foundation includes an indexed catalog of versioned connection
+scenarios. `agentos setup list` shows the available scenarios and
+`agentos setup show telegram-mtproto` opens one card. The initial catalog
+covers Telegram MTProto and Telegram Business. Both are marked `guide_only`:
+the commands return guidance and do not log in, create bots, grant rights or
+read user secrets. An interactive installer or provider adapter requires its
+own implementation and authority. See the [authoring and maintenance
+protocol](docs/SETUP_SCENARIOS.md) and the [index](src/agent_os/resources/setup-scenarios/index.json).
+
 ## Instruction routing
 
 Keep inherited project `AGENTS.md` short: define its scope, universal limits and
@@ -77,6 +88,6 @@ python tools/demo_lifecycle.py
 python tools/verify_public.py
 ```
 
-Start with the [project dossier](docs/agentos/DOSSIER.md), [roadmap](docs/agentos/ROADMAP.md), [current stage](docs/agentos/STAGE-F11.md), [architecture](docs/ARCHITECTURE.md) and [developer onboarding](docs/ONBOARDING.md). The [changelog](CHANGELOG.md) and [release policy](docs/RELEASE.md) state the release status and limits. GitHub Actions are not used.
+Start with the [project dossier](docs/agentos/DOSSIER.md), [roadmap](docs/agentos/ROADMAP.md), [current source stage](docs/agentos/STAGE-F12.md), [architecture](docs/ARCHITECTURE.md) and [developer onboarding](docs/ONBOARDING.md). The [changelog](CHANGELOG.md) and [release policy](docs/RELEASE.md) state the release status and limits. GitHub Actions are not used.
 
 Crystal AgentOS is Apache-2.0 software. Contributions and skeptical technical reviews are welcome; see [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), [Governance](GOVERNANCE.md) and the [AI Stewardship Charter](STEWARDSHIP.md). [Русская документация](docs/README.ru.md).
