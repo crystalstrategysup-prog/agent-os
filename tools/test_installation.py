@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 import platform
@@ -253,6 +254,82 @@ cache.write_bytes(be._code_to_timestamp_pyc(compile(payload, str(module), 'exec'
         assert cache.exists(), "plan must not modify installed cache"
         run(reactivate)
         assert not marker.exists(), "unverified bytecode executed during activation"
+        # A package-directory ancestor redirected into the user overlay must
+        # fail before cache normalization can unlink an owner file.
+        python_tree = site.parent
+        foreign = user / "foreign-python-tree"
+        python_tree.rename(foreign)
+        python_tree.symlink_to(foreign, target_is_directory=True)
+        foreign_cache = foreign / "site-packages/agent_os/__pycache__/owner-sentinel.pyc"
+        foreign_cache.parent.mkdir(exist_ok=True)
+        foreign_cache.write_bytes(b"owner cache sentinel")
+        try:
+            result = subprocess.run(
+                [str(x) for x in reactivate], capture_output=True, text=True,
+                timeout=30, env={**os.environ, "PIP_NO_INDEX": "1"}, check=False,
+            )
+            value = json.loads(result.stdout)
+            assert result.returncode == 2 and value["status"] == "BLOCKED", value
+            assert "installed_site_packages_directory_invalid" in value["error"], value
+            assert foreign_cache.read_bytes() == b"owner cache sentinel"
+            assert (core / "current").resolve() == release_dir.resolve()
+            runs.append({
+                "check": "package_ancestor_symlink_refused_without_owner_write",
+                "argv": [str(x) for x in reactivate],
+                "return_code": result.returncode,
+                "stdout": result.stdout,
+                "stderr": result.stderr,
+                "owner_cache_preserved": True,
+                "current_preserved": True,
+            })
+        finally:
+            python_tree.unlink()
+            foreign_cache.unlink()
+            foreign.rename(python_tree)
+        assert snapshot() == before
+        # Public beta.5 can have either pip launcher template. The v1 check
+        # accepts only exact known bodies, without weakening v2 hash checks.
+        spec = importlib.util.spec_from_file_location("agentos_test_installer", installer)
+        module = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(module)
+        old_scripts = {}
+        for name, target in (("agentos", "agent_os.cli"), ("agentos-hook", "agent_os.hooks")):
+            script = release_dir / ".venv/bin" / name
+            old_scripts[script] = script.read_bytes()
+            body = script.read_text()
+            prefix = body[:body.index("import sys\n")]
+            script.write_text(
+                prefix + "# -*- coding: utf-8 -*-\nimport re\nimport sys\n"
+                + f"from {target} import main\nif __name__ == '__main__':\n"
+                + "    sys.argv[0] = re.sub(r'(-script\\.pyw|\\.exe)?$', '', sys.argv[0])\n"
+                + "    sys.exit(main())\n"
+            )
+        try:
+            selected_release = release_dir.resolve()
+            module._verify_owned_payload(
+                selected_release, selected_release / wheel.name, None, legacy=True
+            )
+            tampered = selected_release / ".venv/bin/agentos"
+            tampered.write_bytes(tampered.read_bytes() + b"# unexpected launcher tail\n")
+            try:
+                module._verify_owned_payload(
+                    selected_release, selected_release / wheel.name, None, legacy=True
+                )
+            except module.InstallError as exc:
+                assert "legacy_entrypoint_not_canonical" in str(exc)
+            else:
+                raise AssertionError("legacy launcher tail accepted")
+            runs.append({
+                "check": "legacy_launcher_templates",
+                "status": "PASS",
+                "templates": ["pip-removesuffix", "pip-re.sub"],
+                "unexpected_tail_refused": True,
+                "fixture": "installed stable wheel with exact old pip script body",
+            })
+        finally:
+            for script, original in old_scripts.items():
+                script.write_bytes(original)
         workflow_file.write_bytes(original_workflow + b"\n# damaged current fixture\n")
         run(
             [
@@ -349,16 +426,22 @@ cache.write_bytes(be._code_to_timestamp_pyc(compile(payload, str(module), 'exec'
             "skills/agentos-project-entry/SKILL.md" in resources["files"]
             and "docs/PROCESS.md" in resources["files"]
         )
-        long_core = t / ("long-" + "x" * 65) / ("y" * 70) / ("z" * 70) / "core"
-        long_user = t / "long-user"
-        long_user.mkdir()
-        long_install = run([
-            sys.executable, installer, "install", "--wheel", wheel,
-            "--sha256", digest(wheel), "--version", __version__,
-            "--core-home", long_core, "--user-home", long_user,
-            "--apply", "--expected-current", "none",
-        ])
-        assert long_install["status"] == "INSTALLED"
+        # Use a separate no-space prefix: Linux pip emits an unquoted /bin/sh
+        # trampoline for a long safe path, unlike the quoted space-path form.
+        with tempfile.TemporaryDirectory(prefix="agentos-long-") as long_td:
+            long_base = Path(long_td)
+            long_core = (
+                long_base / ("long-" + "x" * 65) / ("y" * 70) / ("z" * 70) / "core"
+            )
+            long_user = long_base / "user"
+            long_user.mkdir()
+            long_install = run([
+                sys.executable, installer, "install", "--wheel", wheel,
+                "--sha256", digest(wheel), "--version", __version__,
+                "--core-home", long_core, "--user-home", long_user,
+                "--apply", "--expected-current", "none",
+            ])
+            assert long_install["status"] == "INSTALLED"
         return {
             "schema": "agentos.local-install-verification/v1",
             "status": "PASS",
@@ -380,6 +463,8 @@ cache.write_bytes(be._code_to_timestamp_pyc(compile(payload, str(module), 'exec'
                 "installed_resource_presence": True,
                 "integration_preserves_native_trust": True,
                 "corrupt_installed_payload_refused": True,
+                "package_ancestor_symlink_refused_without_owner_write": True,
+                "legacy_launcher_templates": True,
                 "damaged_current_can_switch_to_verified_release": True,
                 "space_and_long_paths": True,
             },

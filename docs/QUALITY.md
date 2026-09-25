@@ -38,6 +38,16 @@ timestamp-valid подменённый `.pyc`, owner edit между двумя 
 pending entry journal перед READY/check, отказ selector после Popen, отсутствующие
 entrypoint hashes в manifest и корректные shell launchers на длинном пути и пути
 с пробелами. Фиксировать полные platform receipts, не только итог PASS.
+Путь с пробелами проверять отдельно от длинного пути без пробелов: pip может
+создать quoted и unquoted shell trampoline соответственно. Проверка потомков
+должна дать достаточно времени на запуск Python в сценарии немедленного выхода
+родителя и отдельно сохранить короткий deadline для timeout-сценария.
+Для F12 дополнительно проверять отказ при symlink в цепочке каталогов пакета до
+удаления cache, реальный прерванный enter между предварительной проверкой ready
+и lock, точные старые шаблоны pip launcher для v1 rollback и сохранение кода
+потомка 125, когда cleanup пересёк execution deadline. В installer fixtures
+проверять сохранность owner-tree и current; запускать обе формы полного pytest
+на Linux x86_64 Python 3.13.
 
 Baseline native interception tests заменяются тестами retirement/no-install contract,
 а не сохраняются как скрытое обещание enforcement. Остальные critical negative lifecycle,

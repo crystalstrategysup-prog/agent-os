@@ -95,10 +95,33 @@ resubmission:
 |ST-03 pending enter false READY|Dependent lifecycle calls refuse pending entry journal; questions still work|READY/check/close/checkpoint and read-only contrast|
 |ST-04 runner setup leak|Process-group cleanup starts immediately after Popen, including selector/pipe setup failures|Injected setup failures and no delayed child write|
 |ST-05 manifest hash downgrade|New manifest v2 requires complete script hashes; legacy public beta.5 v1 requires canonical scripts|Modified entrypoint with missing hash refused; beta.5 rollback preserved|
-|ST-06 valid path refused|Validate exact direct shebang or pip shell trampoline|Short path with spaces and long path fixture|
+|ST-06 valid path refused|Validate exact direct shebang, quoted pip shell trampoline for spaces, and unquoted shell-safe trampoline for a long path|Short path with spaces and separate long path without spaces; arbitrary shell remains rejected|
 
 Curator also observed a Linux x86_64 Python 3.13 module `pytest` discrepancy:
-descendant test returned timeout code 124 rather than descendant code 125.
-The runner now classifies an exited parent with a live process group at deadline
-as descendant failure. Both full invocation modes and raw Mac/Linux platform
-receipts must be attached to the next exact candidate packet.
+the immediate-exit descendant test returned timeout code 124 rather than
+descendant code 125 with a one-second startup deadline. The runner classifies
+an exited parent with a live process group at deadline as descendant failure
+and retains that classification after successfully stopping the group.
+The regression now gives that immediate-exit scenario five seconds for slower
+interpreter startup while retaining the separate one-second timeout scenario;
+both still check that the delayed child cannot write. Both full invocation modes
+and raw Mac/Linux platform receipts must be attached to the next exact candidate.
+
+## F12 boundary review of 029d838
+
+The curator verified the immutable source/wheel identity, all 96 source-to-wheel
+package files, and 101 RECORD hashes, then returned CHANGES_REQUESTED for five
+reproduced boundary failures. That candidate remains HOLD. The next candidate
+must include these fixes and exact-platform receipts:
+
+|Finding|Contract and regression|
+|---|---|
+|F12-01 package ancestor symlink|Refuse a symlink at every `.venv/lib/pythonX/site-packages` ancestor before payload reads, cache cleanup or probe; an owner-root cache sentinel and `current` must remain unchanged.|
+|F12-02 pending enter race|Repeat the pending-journal check inside the project write lock for ready, document registration, next turn, close and checkpoint. Interleave a real interrupted resume-enter before ready obtains that lock.|
+|F12-03 long path launcher|Accept only exact direct, quoted and shell-safe unquoted pip launcher prefixes; exercise a long path without spaces separately from a path with spaces.|
+|F12-04 v1 rollback template|Accept the two exact known pip launcher bodies for legacy beta.1–beta.5 while retaining mandatory v2 hashes; prove both via a fixture and a real beta.5 wheel cycle.|
+|F12-05 descendant status|Keep a proven descendant failure as 125 when bounded cleanup crosses the execution deadline; deterministic delayed-cleanup and full Linux x86_64 Python 3.13 pytest are required.|
+
+No public release or Mac activation may use 029d838. The private Telegram
+runtime still depends on a snapshot of the old RC kernel and remains a separate
+migration before RC retirement. Native hooks remain disabled.

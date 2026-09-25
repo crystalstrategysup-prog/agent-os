@@ -551,6 +551,7 @@ def next_turn(
     nonempty(session_id, "session_id", 200)
     identifier(task_id)
     with lock(within(root, ".agentos/write.lock")):
+        _require_entry_recovered(root)
         project = load_project(root)
         if project.get("active_task") != task_id:
             raise GateError("standalone_turn_task_mismatch")
@@ -592,6 +593,7 @@ def register_document(
         if task_id not in content:
             raise GateError("stage_must_name_task")
     with lock(within(root, ".agentos/write.lock")):
+        _require_entry_recovered(root)
         project = load_project(root)
         old = project["documents"].get(doc_id, {})
         record = {
@@ -672,6 +674,7 @@ def ready(root: Path, task_id: str, reviewer: str) -> dict:
     _require_entry_recovered(root)
     nonempty(reviewer, "reviewer", 200)
     with lock(within(root, ".agentos/write.lock")):
+        _require_entry_recovered(root)
         task = load_task(root, task_id)
         project = load_project(root)
         if task["status"] != "INTAKE":
@@ -798,7 +801,9 @@ def _bounded_check_process(argv: list[str], root: Path, env: dict, timeout: int)
                 # A parent that already exited while its child holds stdout
                 # open is a descendant failure, even if scheduling consumed
                 # the final deadline tick.
-                if process.poll() is not None and _group_alive(process.pid):
+                if descendants or (
+                    process.poll() is not None and _group_alive(process.pid)
+                ):
                     descendants = True
                     exit_code = 125
                     tail.extend(b"\nCHECK DESCENDANTS TERMINATED\n")
@@ -1026,6 +1031,7 @@ def close(root: Path, task_id: str, review: dict) -> dict:
     if review.get("scope_reviewed") is not True:
         raise GateError("scope_review_required")
     with lock(within(root, ".agentos/write.lock")):
+        _require_entry_recovered(root)
         task = load_task(root, task_id)
         assessment = assess(root, task_id)
         if assessment["status"] != "PASS":
@@ -1081,6 +1087,7 @@ def checkpoint(root: Path, task_id: str, reason: str, next_step: str) -> dict:
     root = root_path(root)
     load_task(root, task_id)
     with lock(within(root, ".agentos/write.lock")):
+        _require_entry_recovered(root)
         task = load_task(root, task_id)
         if task["status"] == "CLOSED":
             raise GateError("closed_task_is_immutable")

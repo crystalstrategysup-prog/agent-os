@@ -1,6 +1,7 @@
 """No-hook regressions A-F. All mutations are temporary fixture writes, not host setup."""
 from __future__ import annotations
 
+import contextlib
 import io
 import json
 import os
@@ -254,8 +255,8 @@ def test_F_file_inventory_rejects_socket(tmp_path):
 
 
 @pytest.mark.skipif(os.name != "posix", reason="process-group checks require POSIX")
-@pytest.mark.parametrize("parent_sleep,expected_code", [(0, 125), (2, 124)])
-def test_F_check_runner_stops_late_descendant_writes(tmp_path, parent_sleep, expected_code):
+@pytest.mark.parametrize("parent_sleep,timeout,expected_code", [(0, 5, 125), (2, 1, 124)])
+def test_F_check_runner_stops_late_descendant_writes(tmp_path, parent_sleep, timeout, expected_code):
     late = tmp_path / "late.txt"
     child = (
         "import pathlib,time; time.sleep(1.6); "
@@ -267,12 +268,76 @@ def test_F_check_runner_stops_late_descendant_writes(tmp_path, parent_sleep, exp
         + f"time.sleep({parent_sleep})"
     )
     code, output = p._bounded_check_process(
-        [sys.executable, "-c", parent], tmp_path, os.environ.copy(), 1
+        # Give the immediate-exit parent enough time to start on slower Linux
+        # interpreters; the other case still proves the one-second timeout.
+        [sys.executable, "-c", parent], tmp_path, os.environ.copy(), timeout
     )
     assert code == expected_code
     assert "CHECK " in output
     time.sleep(1.8)
     assert not late.exists()
+
+
+@pytest.mark.skipif(os.name != "posix", reason="process-group checks require POSIX")
+def test_F_descendant_failure_survives_cleanup_past_execution_deadline(tmp_path, monkeypatch):
+    original_stop = p._stop_check_group
+    cleaned = []
+
+    def slow_cleanup(pgid, process):
+        result = original_stop(pgid, process)
+        cleaned.append(result)
+        if result and len(cleaned) == 1:
+            time.sleep(1.15)
+        return result
+
+    monkeypatch.setattr(p, "_stop_check_group", slow_cleanup)
+    child = "import time; time.sleep(20)"
+    parent = f"import subprocess,sys; subprocess.Popen([sys.executable,'-S','-c',{child!r}])"
+    code, output = p._bounded_check_process(
+        [sys.executable, "-S", "-c", parent], tmp_path, os.environ.copy(), 1
+    )
+    assert cleaned and cleaned[0] is True
+    assert code == 125
+    assert "DESCENDANTS TERMINATED" in output
+
+
+def test_B_ready_rechecks_pending_entry_under_project_lock(setup, monkeypatch):
+    root, home, answers = setup
+    task = prepared(setup)
+    p.enter(root, answers, session_id="s", turn_id="t", user_home=home, resume_task=task)
+    original_lock = p.lock
+    original_scaffold = p.scaffold
+    original_recovery = p._recover_entry
+    injected = False
+
+    def fail_after_scaffold(*args, **kwargs):
+        original_scaffold(*args, **kwargs)
+        raise OSError("fixture scaffold interruption")
+
+    @contextlib.contextmanager
+    def interleaved_lock(directory):
+        nonlocal injected
+        if directory == root / ".agentos/write.lock" and not injected:
+            injected = True
+            monkeypatch.setattr(p, "scaffold", fail_after_scaffold)
+            monkeypatch.setattr(
+                p, "_recover_entry", lambda *_: (_ for _ in ()).throw(OSError("fixture recovery interruption"))
+            )
+            try:
+                with pytest.raises(OSError, match="fixture recovery interruption"):
+                    p.enter(root, answers, session_id="s", turn_id="t", user_home=home, resume_task=task)
+            finally:
+                monkeypatch.setattr(p, "scaffold", original_scaffold)
+                monkeypatch.setattr(p, "_recover_entry", original_recovery)
+            assert (root / ".agentos/entry-transaction.json").exists()
+        with original_lock(directory):
+            yield
+
+    monkeypatch.setattr(p, "lock", interleaved_lock)
+    with pytest.raises(GateError, match="entry_recovery_required"):
+        p.ready(root, task, "fixture reviewer")
+    assert p.load_task(root, task)["status"] != "READY"
+    assert (root / ".agentos/entry-transaction.json").exists()
 
 
 @pytest.mark.skipif(os.name != "posix", reason="process-group checks require POSIX")

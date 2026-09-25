@@ -128,10 +128,19 @@ def read_manifest(
 
 
 def _site_packages(path: Path) -> Path:
+    for directory in (path / ".venv", path / ".venv/lib"):
+        if directory.is_symlink() or not directory.is_dir():
+            raise InstallError("installed_site_packages_directory_invalid")
     candidates = list((path / ".venv/lib").glob("python*/site-packages"))
-    if len(candidates) != 1 or candidates[0].is_symlink() or not candidates[0].is_dir():
+    if len(candidates) != 1:
         raise InstallError("installed_site_packages_missing_or_ambiguous")
-    return candidates[0]
+    site = candidates[0]
+    # glob/is_dir follow an intermediate symlink. A linked pythonX directory
+    # could otherwise make cache normalization delete bytes in the owner tree.
+    for directory in (site.parent, site):
+        if directory.is_symlink() or not directory.is_dir():
+            raise InstallError("installed_site_packages_directory_invalid")
+    return site
 
 
 def _verify_owned_payload(
@@ -224,13 +233,22 @@ def _verify_owned_payload(
             + interpreter.replace('"', '\\"')
             + "\" \"$0\" \"$@\"\n' '''\n"
         )
-        if not body.startswith((direct_shebang, shell_shebang)) or (
+        # On Linux distlib uses the sh trampoline for a long shebang even when
+        # the interpreter has no spaces, and then leaves a shell-safe path
+        # unquoted. Accept that exact form only for safe path characters.
+        plain_shell_shebang = (
+            "#!/bin/sh\n'''exec' " + interpreter + " \"$0\" \"$@\"\n' '''\n"
+            if re.fullmatch(r"[A-Za-z0-9/_.-]+", interpreter)
+            else ""
+        )
+        prefixes = tuple(x for x in (direct_shebang, shell_shebang, plain_shell_shebang) if x)
+        if not body.startswith(prefixes) or (
             f"from {module} import {function}" not in body
         ):
             raise InstallError("installed_entrypoint_target_mismatch:" + name)
         if legacy:
-            prefix = direct_shebang if body.startswith(direct_shebang) else shell_shebang
-            canonical = (
+            prefix = next(x for x in prefixes if body.startswith(x))
+            modern = (
                 prefix
                 + "import sys\n"
                 + f"from {module} import {function}\n"
@@ -238,7 +256,17 @@ def _verify_owned_payload(
                 + "    sys.argv[0] = sys.argv[0].removesuffix('.exe')\n"
                 + f"    sys.exit({function}())\n"
             )
-            if body != canonical:
+            pip_legacy = (
+                prefix
+                + "# -*- coding: utf-8 -*-\n"
+                + "import re\n"
+                + "import sys\n"
+                + f"from {module} import {function}\n"
+                + "if __name__ == '__main__':\n"
+                + "    sys.argv[0] = re.sub(r'(-script\\.pyw|\\.exe)?$', '', sys.argv[0])\n"
+                + f"    sys.exit({function}())\n"
+            )
+            if body not in (modern, pip_legacy):
                 raise InstallError("legacy_entrypoint_not_canonical:" + name)
         scripts[name] = digest(script)
     if script_hashes is not None and scripts != script_hashes:
