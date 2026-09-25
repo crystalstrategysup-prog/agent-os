@@ -1,4 +1,5 @@
 """Bounded, read-only inventory of registered AgentOS project knowledge."""
+
 from __future__ import annotations
 
 import hashlib
@@ -57,7 +58,9 @@ def write_result(path: Path, payload: dict[str, Any]) -> Path:
         if target.exists() or target.is_symlink():
             current = target.lstat()
             if not stat.S_ISREG(current.st_mode) or stat.S_ISLNK(current.st_mode):
-                raise FullInventoryError("inventory output must be a regular non-symlink file")
+                raise FullInventoryError(
+                    "inventory output must be a regular non-symlink file"
+                )
     except OSError as exc:
         raise FullInventoryError("inventory output is unavailable") from exc
     encoded = (
@@ -206,7 +209,14 @@ def _catalog_projects(catalog: dict[str, Any]) -> list[dict[str, Any]]:
     seen: set[str] = set()
     seen_roots: set[Path] = set()
     result: list[dict[str, Any]] = []
-    allowed = {"project_id", "host_id", "root", "policy_paths", "roadmap_paths", "enabled"}
+    allowed = {
+        "project_id",
+        "host_id",
+        "root",
+        "policy_paths",
+        "roadmap_paths",
+        "enabled",
+    }
     for row in rows:
         if not isinstance(row, dict) or not set(row) <= allowed:
             raise FullInventoryError("project entry fields are invalid")
@@ -219,7 +229,9 @@ def _catalog_projects(catalog: dict[str, Any]) -> list[dict[str, Any]]:
             or project_id in seen
         ):
             raise FullInventoryError("project_id is invalid or duplicated")
-        if host_id is not None and (not isinstance(host_id, str) or not host_id or len(host_id) > 128):
+        if host_id is not None and (
+            not isinstance(host_id, str) or not host_id or len(host_id) > 128
+        ):
             raise FullInventoryError("host_id is invalid")
         enabled = row.get("enabled", True)
         if not isinstance(enabled, bool):
@@ -233,8 +245,12 @@ def _catalog_projects(catalog: dict[str, Any]) -> list[dict[str, Any]]:
             or len(roadmap_paths) > 32
         ):
             raise FullInventoryError("project path lists are invalid")
-        policies = [_portable_relative(value, label="policy path") for value in policy_paths]
-        roadmaps = [_portable_relative(value, label="roadmap path") for value in roadmap_paths]
+        policies = [
+            _portable_relative(value, label="policy path") for value in policy_paths
+        ]
+        roadmaps = [
+            _portable_relative(value, label="roadmap path") for value in roadmap_paths
+        ]
         if len(set(policies)) != len(policies) or len(set(roadmaps)) != len(roadmaps):
             raise FullInventoryError("project path lists contain duplicates")
         root_value = row.get("root")
@@ -244,7 +260,12 @@ def _catalog_projects(catalog: dict[str, Any]) -> list[dict[str, Any]]:
                 raise FullInventoryError("enabled project root is duplicated")
             seen_roots.add(project_root)
         else:
-            if not isinstance(root_value, str) or not root_value or "\x00" in root_value or not Path(root_value).is_absolute():
+            if (
+                not isinstance(root_value, str)
+                or not root_value
+                or "\x00" in root_value
+                or not Path(root_value).is_absolute()
+            ):
                 raise FullInventoryError("disabled project root must be absolute")
             project_root = Path(root_value)
         result.append(
@@ -278,7 +299,9 @@ def _hash_file(root: Path, relative: str) -> tuple[str, int]:
     path = _ensure_components_safe(root, relative)
     before = path.lstat()
     if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1:
-        raise FullInventoryError("knowledge artifact must be a single-link regular file")
+        raise FullInventoryError(
+            "knowledge artifact must be a single-link regular file"
+        )
     if before.st_size > MAX_SINGLE_FILE_BYTES:
         raise FullInventoryError("knowledge artifact exceeds the per-file bound")
     flags = os.O_RDONLY | getattr(os, "O_CLOEXEC", 0)
@@ -312,7 +335,9 @@ def _hash_file(root: Path, relative: str) -> tuple[str, int]:
     return digest.hexdigest(), read
 
 
-def _walk_fixed_root(root: Path, relative_root: str, suffixes: tuple[str, ...]) -> Iterable[str]:
+def _walk_fixed_root(
+    root: Path, relative_root: str, suffixes: tuple[str, ...]
+) -> Iterable[str]:
     base = root / relative_root
     try:
         base_item = base.lstat()
@@ -326,7 +351,9 @@ def _walk_fixed_root(root: Path, relative_root: str, suffixes: tuple[str, ...]) 
     if not stat.S_ISDIR(base_item.st_mode):
         raise FullInventoryError("canonical knowledge root is not a directory")
     found: list[str] = []
-    for directory, dirnames, filenames in os.walk(base, topdown=True, followlinks=False):
+    for directory, dirnames, filenames in os.walk(
+        base, topdown=True, followlinks=False
+    ):
         directory_path = Path(directory)
         safe_dirs: list[str] = []
         for name in sorted(dirnames):
@@ -350,13 +377,20 @@ def _project_doc_paths(root: Path) -> tuple[str, ...]:
     return tuple(
         path
         for path in paths
-        if not any(path.casefold().startswith(prefix.casefold()) for prefix in _PROJECT_DOC_EXCLUDED)
+        if not any(
+            path.casefold().startswith(prefix.casefold())
+            for prefix in _PROJECT_DOC_EXCLUDED
+        )
     )
 
 
 def _artifact_kind(knowledge_class: str, path: str) -> str:
     if knowledge_class == "project":
-        return "project_policy" if PurePosixPath(path).name in {"AGENTS.md", "AGENTS.override.md"} else "project_document"
+        return (
+            "project_policy"
+            if PurePosixPath(path).name in {"AGENTS.md", "AGENTS.override.md"}
+            else "project_document"
+        )
     return {
         "roadmap": "roadmap",
         "skill": "runbook" if "/runbooks/" in f"/{path}" else "skill",
@@ -380,12 +414,23 @@ def _artifact(root: Path, knowledge_class: str, path: str) -> dict[str, Any]:
     }
 
 
-def collect(catalog_path: Path, *, max_files: int = DEFAULT_MAX_FILES, max_bytes: int = DEFAULT_MAX_BYTES) -> dict[str, Any]:
+def collect(
+    catalog_path: Path,
+    *,
+    max_files: int = DEFAULT_MAX_FILES,
+    max_bytes: int = DEFAULT_MAX_BYTES,
+) -> dict[str, Any]:
     if not isinstance(max_files, int) or max_files < 1 or max_files > 100_000:
         raise FullInventoryError("max_files is invalid")
-    if not isinstance(max_bytes, int) or max_bytes < 1 or max_bytes > 1024 * 1024 * 1024:
+    if (
+        not isinstance(max_bytes, int)
+        or max_bytes < 1
+        or max_bytes > 1024 * 1024 * 1024
+    ):
         raise FullInventoryError("max_bytes is invalid")
-    catalog = _read_bounded_json(catalog_path, limit=MAX_CATALOG_BYTES, label="inventory catalog")
+    catalog = _read_bounded_json(
+        catalog_path, limit=MAX_CATALOG_BYTES, label="inventory catalog"
+    )
     projects = _catalog_projects(catalog)
     output_projects: list[dict[str, Any]] = []
     total_files = 0
@@ -425,7 +470,9 @@ def collect(catalog_path: Path, *, max_files: int = DEFAULT_MAX_FILES, max_bytes
             for path in sorted(classified[knowledge_class]):
                 folded = path.casefold()
                 if folded in seen_paths:
-                    raise FullInventoryError("knowledge artifact is classified more than once")
+                    raise FullInventoryError(
+                        "knowledge artifact is classified more than once"
+                    )
                 seen_paths.add(folded)
                 artifact = _artifact(project["root"], knowledge_class, path)
                 total_files += 1
@@ -435,7 +482,10 @@ def collect(catalog_path: Path, *, max_files: int = DEFAULT_MAX_FILES, max_bytes
                 if total_bytes > max_bytes:
                     raise FullInventoryError("inventory exceeds the byte bound")
                 artifacts.append(artifact)
-        counts = {name: sum(1 for item in artifacts if item["class"] == name) for name in CLASSES}
+        counts = {
+            name: sum(1 for item in artifacts if item["class"] == name)
+            for name in CLASSES
+        }
         output_projects.append(
             {
                 "project_id": project["project_id"],
@@ -450,7 +500,9 @@ def collect(catalog_path: Path, *, max_files: int = DEFAULT_MAX_FILES, max_bytes
     payload: dict[str, Any] = {
         "schema": INVENTORY_SCHEMA,
         "catalog_id": catalog["catalog_id"],
-        "status": "PASS" if all(row["status"] in {"PASS", "DISABLED"} for row in output_projects) else "PARTIAL",
+        "status": "PASS"
+        if all(row["status"] in {"PASS", "DISABLED"} for row in output_projects)
+        else "PARTIAL",
         "projects": output_projects,
         "project_count": len(output_projects),
         "file_count": total_files,
@@ -465,13 +517,26 @@ def collect(catalog_path: Path, *, max_files: int = DEFAULT_MAX_FILES, max_bytes
 def _validated_inventory(path: Path) -> dict[str, Any]:
     inventory = _read_bounded_json(path, limit=32 * 1024 * 1024, label="full inventory")
     recorded = inventory.get("inventory_sha256")
-    payload = {key: value for key, value in inventory.items() if key != "inventory_sha256"}
-    if inventory.get("schema") != INVENTORY_SCHEMA or not isinstance(recorded, str) or _digest(payload) != recorded:
+    payload = {
+        key: value for key, value in inventory.items() if key != "inventory_sha256"
+    }
+    if (
+        inventory.get("schema") != INVENTORY_SCHEMA
+        or not isinstance(recorded, str)
+        or _digest(payload) != recorded
+    ):
         raise FullInventoryError("full inventory hash is invalid")
     expected_fields = {
-        "schema", "catalog_id", "status", "projects", "project_count",
-        "file_count", "total_bytes", "contents_included",
-        "history_auto_loaded", "inventory_sha256",
+        "schema",
+        "catalog_id",
+        "status",
+        "projects",
+        "project_count",
+        "file_count",
+        "total_bytes",
+        "contents_included",
+        "history_auto_loaded",
+        "inventory_sha256",
     }
     if set(inventory) != expected_fields:
         raise FullInventoryError("full inventory fields are invalid")
@@ -495,11 +560,22 @@ def _validated_inventory(path: Path) -> dict[str, Any]:
     total_files = 0
     total_bytes = 0
     expected_project_fields = {
-        "project_id", "host_id", "root", "status", "artifacts",
-        "class_counts", "missing_required",
+        "project_id",
+        "host_id",
+        "root",
+        "status",
+        "artifacts",
+        "class_counts",
+        "missing_required",
     }
     expected_artifact_fields = {
-        "class", "kind", "path", "sha256", "size_bytes", "state", "retrieval",
+        "class",
+        "kind",
+        "path",
+        "sha256",
+        "size_bytes",
+        "state",
+        "retrieval",
     }
     for project in inventory["projects"]:
         if not isinstance(project, dict) or set(project) != expected_project_fields:
@@ -520,7 +596,9 @@ def _validated_inventory(path: Path) -> dict[str, Any]:
             or not isinstance(artifacts, list)
             or not isinstance(counts, dict)
             or set(counts) != set(CLASSES)
-            or any(type(counts[name]) is not int or counts[name] < 0 for name in CLASSES)
+            or any(
+                type(counts[name]) is not int or counts[name] < 0 for name in CLASSES
+            )
             or not isinstance(missing, list)
             or any(not isinstance(value, str) for value in missing)
         ):
@@ -529,10 +607,15 @@ def _validated_inventory(path: Path) -> dict[str, Any]:
         seen_paths: set[str] = set()
         observed_counts = {name: 0 for name in CLASSES}
         for artifact in artifacts:
-            if not isinstance(artifact, dict) or set(artifact) != expected_artifact_fields:
+            if (
+                not isinstance(artifact, dict)
+                or set(artifact) != expected_artifact_fields
+            ):
                 raise FullInventoryError("full inventory artifact is invalid")
             knowledge_class = artifact.get("class")
-            relative = _portable_relative(artifact.get("path"), label="inventory artifact path")
+            relative = _portable_relative(
+                artifact.get("path"), label="inventory artifact path"
+            )
             sha256 = artifact.get("sha256")
             size = artifact.get("size_bytes")
             history = knowledge_class == "history"
@@ -545,7 +628,8 @@ def _validated_inventory(path: Path) -> dict[str, Any]:
                 or any(character not in "0123456789abcdef" for character in sha256)
                 or type(size) is not int
                 or not 0 <= size <= MAX_SINGLE_FILE_BYTES
-                or artifact.get("state") != ("HISTORICAL_EVIDENCE" if history else "CURRENT_STATE")
+                or artifact.get("state")
+                != ("HISTORICAL_EVIDENCE" if history else "CURRENT_STATE")
                 or artifact.get("retrieval") != ("disabled" if history else "on_demand")
                 or relative.casefold() in seen_paths
             ):
@@ -562,11 +646,19 @@ def _validated_inventory(path: Path) -> dict[str, Any]:
             raise FullInventoryError("complete project inventory is invalid")
         if project["status"] == "INCOMPLETE" and not missing:
             raise FullInventoryError("incomplete project inventory is invalid")
-    if total_files != inventory["file_count"] or total_bytes != inventory["total_bytes"]:
+    if (
+        total_files != inventory["file_count"]
+        or total_bytes != inventory["total_bytes"]
+    ):
         raise FullInventoryError("full inventory totals are invalid")
-    expected_status = "PASS" if all(
-        project["status"] in {"PASS", "DISABLED"} for project in inventory["projects"]
-    ) else "PARTIAL"
+    expected_status = (
+        "PASS"
+        if all(
+            project["status"] in {"PASS", "DISABLED"}
+            for project in inventory["projects"]
+        )
+        else "PARTIAL"
+    )
     if inventory["status"] != expected_status:
         raise FullInventoryError("full inventory status is invalid")
     return inventory
@@ -581,9 +673,15 @@ def select(
     inventory = _validated_inventory(inventory_path)
     minimal_default = classes is None
     selected_classes = tuple(dict.fromkeys(classes or ("project", "roadmap")))
-    if not selected_classes or any(value not in CLASSES or value == "history" for value in selected_classes):
+    if not selected_classes or any(
+        value not in CLASSES or value == "history" for value in selected_classes
+    ):
         raise FullInventoryError("selected classes must be durable knowledge classes")
-    rows = [row for row in inventory.get("projects", []) if row.get("project_id") == project_id]
+    rows = [
+        row
+        for row in inventory.get("projects", [])
+        if row.get("project_id") == project_id
+    ]
     if len(rows) != 1:
         raise FullInventoryError("project_id is not present exactly once")
     project = rows[0]
@@ -594,7 +692,11 @@ def select(
     for item in project.get("artifacts", []):
         if item.get("class") not in selected_classes:
             continue
-        if minimal_default and item.get("class") == "project" and item.get("kind") != "project_policy":
+        if (
+            minimal_default
+            and item.get("class") == "project"
+            and item.get("kind") != "project_policy"
+        ):
             continue
         relative = _portable_relative(item.get("path"), label="inventory artifact path")
         digest, size = _hash_file(root, relative)

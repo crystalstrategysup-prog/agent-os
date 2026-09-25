@@ -1,0 +1,34 @@
+{
+  "objective": "Implement a tested add function.",
+  "why": "Demonstrate the governed lifecycle.",
+  "outcome": "add(2,3) returns 5.",
+  "scope_in": "maths.py and local checks.",
+  "scope_out": "No production or network changes.",
+  "constraints": "Python standard library, isolated example.",
+  "operation": "Call add(a,b) locally.",
+  "authority": "Owner authorized this synthetic local example.",
+  "change_kind": "implementation",
+  "write_paths": [
+    "maths.py"
+  ],
+  "acceptance": [
+    {
+      "id": "A1",
+      "criterion": "Exact addition example passes.",
+      "checks": [
+        "unit"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "unit",
+      "argv": [
+        "python3",
+        "-c",
+        "from maths import add; assert add(2,3)==5"
+      ],
+      "timeout": 30
+    }
+  ]
+}

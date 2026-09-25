@@ -1,0 +1,255 @@
+{
+  "protocolVersion": "2025-06-18",
+  "schema": "agentos.mcp-tools/v1",
+  "serverInfo": {
+    "name": "crystal-agent-os",
+    "version": "0.5.0-beta.1"
+  },
+  "tools": [
+    {
+      "description": "Return the secret-free Telegram Business onboarding plan.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "agentos_get_telegram_setup_plan",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": true,
+        "properties": {
+          "channel": {
+            "type": "string"
+          },
+          "schema": {
+            "type": "string"
+          },
+          "steps": {
+            "type": "array"
+          }
+        },
+        "required": [
+          "schema",
+          "channel",
+          "steps"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Normalize a bounded task request without executing it.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "objective": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "risk": {
+            "enum": [
+              "R0",
+              "R1",
+              "R2",
+              "R3",
+              "R4",
+              "R5"
+            ],
+            "type": "string"
+          },
+          "target": {
+            "enum": [
+              "local",
+              "remote",
+              "custom"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "objective"
+        ],
+        "type": "object"
+      },
+      "name": "agentos_normalize_task",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": true,
+        "properties": {
+          "objective": {
+            "type": "string"
+          },
+          "risk": {
+            "type": "string"
+          },
+          "schema": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          },
+          "task_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema",
+          "task_id",
+          "objective",
+          "target",
+          "risk"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Run non-secret checks against the local AgentOS home.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "agentos_doctor",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": true,
+        "properties": {
+          "checks": {
+            "type": "array"
+          },
+          "schema": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema",
+          "status",
+          "checks"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Return required intake questions and the documentation-first lifecycle; no project mutation.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "agentos_get_project_entry_plan",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": true,
+        "properties": {
+          "cycle": {
+            "type": "array"
+          },
+          "entry_required_every_task": {
+            "type": "boolean"
+          },
+          "external_authority_granted": {
+            "type": "boolean"
+          },
+          "questions": {
+            "type": "object"
+          },
+          "schema": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema",
+          "questions",
+          "cycle",
+          "entry_required_every_task",
+          "external_authority_granted"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Select applicable documentation from explicit project types and features. A selection is not readiness.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "features": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "types": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "types"
+        ],
+        "type": "object"
+      },
+      "name": "agentos_select_documents",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": true,
+        "properties": {
+          "not_applicable": {
+            "type": "array"
+          },
+          "reasons": {
+            "type": "object"
+          },
+          "required": {
+            "type": "array"
+          },
+          "schema": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema",
+          "required",
+          "reasons",
+          "not_applicable"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Locate public core and separate local overlay without returning knowledge bodies or secrets.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "agentos_get_foundation_status",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": true,
+        "properties": {
+          "schema": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "user_home": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema",
+          "status",
+          "user_home"
+        ],
+        "type": "object"
+      }
+    }
+  ]
+}

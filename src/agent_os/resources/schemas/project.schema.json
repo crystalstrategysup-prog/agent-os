@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "schema",
+    "id",
+    "name",
+    "types",
+    "features",
+    "context",
+    "documents",
+    "revision"
+  ],
+  "properties": {
+    "schema": {
+      "const": "agentos.project/v1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "types": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "general",
+          "backend",
+          "frontend",
+          "mobile",
+          "data-ml",
+          "platform",
+          "embedded",
+          "legacy"
+        ]
+      },
+      "minItems": 1
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "http-api",
+          "events",
+          "database",
+          "pii",
+          "public",
+          "deployment",
+          "ui",
+          "ml",
+          "external-send",
+          "safety-critical"
+        ]
+      }
+    },
+    "context": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "required": [
+        "purpose",
+        "current_state",
+        "boundaries",
+        "constraints"
+      ],
+      "properties": {
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "current_state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "boundaries": {
+          "type": "string",
+          "minLength": 1
+        },
+        "constraints": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "documents": {
+      "type": "object"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

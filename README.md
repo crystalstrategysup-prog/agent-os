@@ -1,215 +1,70 @@
-# Crystal AgentOS
+# Crystal AgentOS Community Edition
 
-**A free, local-first control plane for personal AI agents.**
+**A local, documentation-first foundation for agents and the people who direct them.**
 
-Crystal AgentOS helps you turn an AI client into a governed working environment:
-local configuration, bounded task briefs, MCP tools, health checks and a clear
-Telegram Business onboarding path.
+AgentOS gives a project a repeatable path from its current state to a verified change: project dossier → roadmap → documented stage → implementation → checks → updated documentation. A short intake selects only the relevant document layers. The CLI keeps the task, source, documents and check evidence bound to the same stage; an integrated native hook can enforce entry and closeout only after the client actually loads and trusts it.
 
-The canonical public repository is
-**[crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os)**,
-published through the Crystal Strategy GitHub account and linked from the
-[AgentOS Community page](https://crystalstrategy.ru/agent-os/community/).
-Similarly named personal or internal fleet repositories are separate operating
-contours and are not public AgentOS distribution endpoints.
+This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). The current beta source is `0.5.0-beta.1` (Python distribution version `0.5.0b1`). It is separate from any maintainer's private runtime, infrastructure and personal data.
 
-The community edition is intentionally small. It contains no vendor account,
-private host, production credential or hidden cloud dependency.
+Visit the [public project website](https://crystalstrategy.ru/agent-os/), read the [changelog](CHANGELOG.md), or open an [issue](https://github.com/crystalstrategysup-prog/agent-os/issues) with a bug or technical review.
 
-## Latest release
+## Two physical layers
 
-**[v0.4.0](https://github.com/crystalstrategysup-prog/agent-os/tree/v0.4.0)**
-adds Full Inventory and an AgentOS-native two-day public update advisory. It
-also includes deterministic model routing, evidence-based completion and the
-owner-only Telegram Session Hub.
+| Foundation, maintained here | User overlay, owned by the user |
+| --- | --- |
+| Python code, universal rules, schemas, templates, skills and docs | Configuration, knowledge references, local state, secrets and extensions |
+| Installed in a virtual environment or an immutable release directory | One separate folder, default `~/.agentos-user` |
+| Updated or rolled back by selecting a verified release | Preserved on core update; imported and migrated only through explicit guarded commands |
 
-Read the [release notes](CHANGELOG.md), visit the
-[project website](https://crystalstrategy.ru/agent-os/) or open an
-[issue](https://github.com/crystalstrategysup-prog/agent-os/issues) with a bug,
-question or blunt technical review.
+See [Foundation ↔ Overlay](docs/FOUNDATION_OVERLAY.md) for versioning, conflicts and recovery. Project documents remain in their projects; the overlay indexes them without copying every project into the core.
 
-## Why AgentOS?
+## Install from the public source
 
-An AI model can reason, but a dependable agent also needs boundaries:
+Python 3.11+ is required. On macOS or Linux, after verifying the intended public tag and source:
 
-- where configuration and secrets live;
-- which actions are allowed;
-- how a task is classified before execution;
-- how tools are exposed to ChatGPT and other MCP clients;
-- how browser work stays bound to the intended in-app or Chrome surface;
-- how a personal Telegram account becomes an authorized business interface;
-- how a result can be checked and rolled back.
-
-AgentOS provides that control layer without taking ownership of your data.
-
-## Governed model routing
-
-Version 0.3 adds a deterministic routing plan for Codex tasks:
-
-- Sol/high coordinates the root task and difficult reviews;
-- Terra/medium handles bounded implementation and investigation;
-- Luna/low handles narrow classification, extraction and routing;
-- Astra/high is reserved for explicitly critical root work.
-
-```bash
-agentos route-task --mode implementation --role root
-agentos route-task --mode classification --role worker --complexity low
-```
-
-The command returns an exact model and reasoning effort. It does **not** claim
-that a model ran. Codex delegates in supported clients after a direct request or
-an applicable project/skill instruction; runtime activity still needs separate
-proof. The default is `delegate_by_default=false`.
-
-## Truthful completion gate
-
-A completed thread or successful command is not sufficient evidence that a
-product outcome works. `agentos assess-result --file evidence.json` requires
-current PASS evidence for every acceptance criterion. Missing, stale,
-future-dated, failed or historically bound evidence blocks `COMPLETE`, and a
-newer failure supersedes an older PASS. See [Result evidence](docs/RESULT_EVIDENCE.md).
-
-## Full Inventory
-
-Register the project roots you want AgentOS to know. The collector emits only
-paths, knowledge classes, sizes and SHA-256 identities; it never copies file
-contents and never auto-loads history.
-
-```bash
-agentos inventory collect --catalog /absolute/path/projects.json --output ~/.agent-os/state/inventory.json
-agentos inventory select --input ~/.agent-os/state/inventory.json --project-id my-project
-```
-
-The six classes are `project`, `roadmap`, `skill`, `problem`, `host` and
-`history`. See [Full Inventory](docs/FULL_INVENTORY.md).
-
-## Update advisory
-
-Every AgentOS command checks the local advisory state. If 48 hours have elapsed,
-AgentOS reads the official public GitHub tags and records whether a newer
-Community Edition exists. It stays quiet while current, retries an unavailable
-check after six hours and never installs anything automatically.
-
-```bash
-agentos update-check
-agentos update-check --force
-```
-
-This is activity-driven, not a background daemon: if AgentOS is idle, the check
-runs on the next command. Public tag metadata is informational and cannot
-authorize software or host mutation. See [Update checks](docs/UPDATE_CHECK.md).
-
-## Install
-
-Requires Python 3.11 or newer.
-
-```bash
+```sh
+git clone --branch v0.5.0-beta.1 https://github.com/crystalstrategysup-prog/agent-os.git
+cd agent-os
 python3 -m venv .venv
 . .venv/bin/activate
-pip install .
+python -m pip install .
 agentos init
 agentos doctor
+agentos --version
 ```
 
-For development:
+The package is **not published on PyPI**: `pip install crystal-agent-os` is not an installation method. The managed offline wheel installer, explicit overlay import, update and rollback are documented in [Install and update](docs/INSTALL_UPDATE.md). Windows has no verified managed installer; do not infer full Windows support from a Python import or source inspection.
 
-```bash
-pip install -e '.[dev]'
-pytest
-ruff check .
+## Start a project task
+
+```sh
+agentos project questions --root /absolute/path/to/project
+agentos project init --root /absolute/path/to/new-project --name Example \
+  --type platform --feature public --context context.json
+agentos project enter --root /absolute/path/to/project \
+  --session ACTUAL_SESSION --turn ACTUAL_TURN --answers answers.json
 ```
 
-## Telegram Business onboarding
+`questions` reuses verified project facts and shows only missing answers. The required documents depend on project type and changed surfaces. A new project starts with a dossier and roadmap; every product stage has its own contract and acceptance checks before code changes. `ready` rejects draft or stale documents. `check`, `assess` and `close` require current source-bound evidence plus named semantic review. Read-only investigation uses `project observe` without writing project metadata. The [process](docs/PROCESS.md), [documentation catalog](docs/DOCUMENTATION_CATALOG.md) and [synthetic example](tools/demo_lifecycle.py) show the full flow.
 
-AgentOS uses a Telegram-first sequence:
+## Interfaces and boundaries
 
-1. Create an account in the official Telegram application if you do not have one.
-2. Request approval from your AgentOS owner or administrator.
-3. Authorize a `StringSession` using Telegram QR.
-4. Store the explicitly approved `API_ID`, `API_HASH`, `STRING_SESSION` bundle locally.
-5. Connect Telegram Business and its business bot.
-6. Add AgentOS to an MCP-compatible client.
-7. Run a harmless end-to-end verification task.
+- The stdio MCP server exposes six narrow planning/status tools. `tools/list` includes versioned input and output schemas; it does not expose arbitrary shell, SSH, file contents or credentials. See [MCP contract](schemas/mcp-tools-v1.json).
+- The [CLI contract](schemas/cli-contract-v1.json), [data schemas](src/agent_os/resources/schemas/) and [contracts guide](docs/CONTRACTS.md) describe the machine-readable surfaces. No HTTP server is provided, so OpenAPI is not applicable to this release.
+- Codex AGENTS, namespaced skills and hook definitions can be integrated without overwriting other owners' content. **Installed is not active:** native trust and a real new-session negative/positive probe are required before claiming enforcement.
+- The optional Telegram Session Hub remains owner-allowlisted and disabled by default. This beta changes its dispatch boundary; read [compatibility](docs/COMPATIBILITY.md) before replacing any existing connector.
+- Existing model routing, current-evidence result assessment, Full Inventory and update advisory remain available through the CLI. Their contracts and limits are in [architecture](docs/ARCHITECTURE.md), [result evidence](docs/RESULT_EVIDENCE.md), [Full Inventory](docs/FULL_INVENTORY.md) and [update checks](docs/UPDATE_CHECK.md).
+- The Codex in-app Browser and Chrome remain separate documented surfaces; see [browser surfaces](docs/BROWSER_SURFACES.md). The optional [Telegram onboarding plan](docs/TELEGRAM_SESSION_HUB.md) does not require a website or transmit credentials to this repository.
 
-No website is required by this flow. Credentials must never be pasted into an
-AI conversation, issue, log or repository.
+## Develop and verify
 
-Print the machine-readable plan:
-
-```bash
-agentos telegram-plan
+```sh
+python -m pip install -e '.[dev]'
+python -m pytest -q
+python tools/demo_lifecycle.py
+python tools/verify_public.py
 ```
 
-## MCP
+Start with the [project dossier](docs/agentos/DOSSIER.md), [roadmap](docs/agentos/ROADMAP.md), [current stage](docs/agentos/STAGE-F05.md), [architecture](docs/ARCHITECTURE.md) and [developer onboarding](docs/ONBOARDING.md). The [changelog](CHANGELOG.md) and [release policy](docs/RELEASE.md) state the beta status and limits. GitHub Actions are not used.
 
-Generate a client configuration template:
-
-```bash
-agentos mcp-config
-```
-
-The included stdio server exposes three safe starter tools:
-
-- `agentos_get_telegram_setup_plan`
-- `agentos_normalize_task`
-- `agentos_doctor`
-
-It does not expose arbitrary shell, SSH, file reads or stored credentials.
-
-## Browser surfaces
-
-AgentOS keeps the Codex in-app Browser and Chrome with the supported Playwright
-Extension as separate first-class surfaces. Explicit user or workstream binding
-wins; otherwise the required capability selects the surface. See
-[Browser surfaces](docs/BROWSER_SURFACES.md).
-
-## Telegram Session Hub
-
-Version 0.2 adds an owner-only local Telegram control surface for Codex:
-
-- discover recent persisted sessions from the platform default or configured folders;
-- inspect GNU Screen sessions on Linux and macOS and show their mapped Codex UUID;
-- select an existing session and send its next task;
-- create a new persisted Codex session or a new GNU Screen attached to one;
-- receive documents and media into a private local inbox;
-- transcribe voice with local Whisper or an optional OpenAI transcription provider.
-
-GNU Screen is not available on Windows; ordinary Codex session discovery and
-creation remain supported there. The bot is disabled until an explicit owner ID
-allowlist and a token environment variable are configured.
-
-The Session Hub bot is bound to the local AgentOS instance. It can receive
-files and voice for that host after owner authorization; it does not create a
-second “personal” or “report” bot automatically. Telegram Business uses its
-own business bot and authorization path. If you operate separate bots or hosts,
-give each listener its own bot identity, credential and explicit routing; this
-Community Edition does not provide a multi-host bot broker.
-
-```bash
-agentos sessions
-agentos screens
-agentos session-capabilities
-agentos telegram-bot
-```
-
-See [Telegram Session Hub](docs/TELEGRAM_SESSION_HUB.md) for configuration and
-the exact security/proof model.
-
-## Status
-
-`0.4.0` is an alpha community release. It is suitable for evaluation and local
-development. Production connectors must add their own authentication, durable
-receipts, least-privilege runtime and rollback policy.
-
-## Community
-
-AgentOS is free software under Apache License 2.0. Use it, study it, adapt it,
-teach with it and contribute improvements. See [CONTRIBUTING.md](CONTRIBUTING.md)
-and [GOVERNANCE.md](GOVERNANCE.md).
-
-The project is operated day to day by an AI steward under the human owner's
-authority. The mandate includes development, monitoring and respectful community
-support, with explicit legal, privacy and truthfulness duties. See the
-[AI Stewardship Charter](STEWARDSHIP.md).
-
-Languages: [Русский](docs/README.ru.md) · English
+Crystal AgentOS is Apache-2.0 software. Contributions and skeptical technical reviews are welcome; see [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), [Governance](GOVERNANCE.md) and the [AI Stewardship Charter](STEWARDSHIP.md). [Русская документация](docs/README.ru.md).

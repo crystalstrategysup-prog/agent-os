@@ -17,7 +17,9 @@ _UUID = re.compile(
     r"(?P<id>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})",
     re.IGNORECASE,
 )
-_SCREEN_LINE = re.compile(r"^\s*(?P<socket>\d+\.[^\s]+)\s+\([^)]*\)\s+\((?P<state>[^)]+)\)")
+_SCREEN_LINE = re.compile(
+    r"^\s*(?P<socket>\d+\.[^\s]+)\s+\([^)]*\)\s+\((?P<state>[^)]+)\)"
+)
 _SCREEN_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,47}$")
 
 
@@ -82,7 +84,9 @@ def allowed_workspaces(config: dict[str, Any]) -> list[Path]:
     return [Path(str(value)).expanduser().resolve() for value in values]
 
 
-def validate_workspace(config: dict[str, Any], requested: str | Path | None = None) -> Path:
+def validate_workspace(
+    config: dict[str, Any], requested: str | Path | None = None
+) -> Path:
     section = config.get("codex", {})
     value = requested or section.get("default_workspace") or Path.home()
     candidate = Path(value).expanduser().resolve()
@@ -94,8 +98,12 @@ def validate_workspace(config: dict[str, Any], requested: str | Path | None = No
     raise ValueError("workspace_not_allowed")
 
 
-def discover_sessions(config: dict[str, Any], limit: int | None = None) -> list[CodexSession]:
-    maximum = int(limit or config.get("telegram_session_hub", {}).get("max_sessions", 20))
+def discover_sessions(
+    config: dict[str, Any], limit: int | None = None
+) -> list[CodexSession]:
+    maximum = int(
+        limit or config.get("telegram_session_hub", {}).get("max_sessions", 20)
+    )
     files: list[Path] = []
     for root in session_roots(config):
         if root.is_dir():
@@ -138,7 +146,9 @@ def _session_from_file(path: Path) -> CodexSession | None:
     if not session_id or not _UUID.fullmatch(session_id):
         return None
     updated = datetime.fromtimestamp(path.stat().st_mtime, tz=UTC).isoformat()
-    return CodexSession(session_id, updated, str(workspace) if workspace else None, str(path))
+    return CodexSession(
+        session_id, updated, str(workspace) if workspace else None, str(path)
+    )
 
 
 def discover_screens() -> list[ScreenSession]:
@@ -170,7 +180,11 @@ def discover_screens() -> list[ScreenSession]:
 
 def _process_rows() -> list[tuple[int, int, str]]:
     completed = subprocess.run(
-        ["ps", "-eo", "pid=,ppid=,args="], capture_output=True, text=True, timeout=5, check=False
+        ["ps", "-eo", "pid=,ppid=,args="],
+        capture_output=True,
+        text=True,
+        timeout=5,
+        check=False,
     )
     rows: list[tuple[int, int, str]] = []
     for line in completed.stdout.splitlines():
@@ -180,7 +194,9 @@ def _process_rows() -> list[tuple[int, int, str]]:
     return rows
 
 
-def _codex_descendant_session(root_pid: int, rows: list[tuple[int, int, str]]) -> str | None:
+def _codex_descendant_session(
+    root_pid: int, rows: list[tuple[int, int, str]]
+) -> str | None:
     descendants = {root_pid}
     changed = True
     while changed:
@@ -210,12 +226,17 @@ class CodexRunner:
             "screen": os.name != "nt" and shutil.which("screen") is not None,
             "platform": "windows" if os.name == "nt" else "unix",
             "session_roots": [str(path) for path in session_roots(self.config)],
-            "allowed_workspaces": [str(path) for path in allowed_workspaces(self.config)],
+            "allowed_workspaces": [
+                str(path) for path in allowed_workspaces(self.config)
+            ],
         }
 
     def continue_session(self, session_id: str, prompt: str) -> DispatchResult:
         if not _UUID.fullmatch(session_id):
             raise ValueError("session_id_invalid")
+        from .dispatch_gate import claim
+
+        claim(prompt, destination_session=session_id)
         command = [
             self.executable,
             "exec",
@@ -226,8 +247,13 @@ class CodexRunner:
         ]
         return self._run(command, prompt)
 
-    def create_session(self, prompt: str, workspace: str | Path | None = None) -> DispatchResult:
+    def create_session(
+        self, prompt: str, workspace: str | Path | None = None
+    ) -> DispatchResult:
         selected = validate_workspace(self.config, workspace)
+        from .dispatch_gate import claim
+
+        claim(prompt, workspace=selected)
         command = [
             self.executable,
             "exec",
@@ -271,7 +297,9 @@ class CodexRunner:
             check=False,
             env=self._environment(),
         )
-        status = "screen_started" if completed.returncode == 0 else "screen_start_failed"
+        status = (
+            "screen_started" if completed.returncode == 0 else "screen_start_failed"
+        )
         output = _bounded_output(created.output + "\n" + completed.stderr)
         return DispatchResult(status, created.session_id, output, completed.returncode)
 
@@ -288,6 +316,13 @@ class CodexRunner:
         )
         if record is None:
             raise RuntimeError("screen_codex_session_file_missing")
+        from .dispatch_gate import claim
+
+        claim(
+            prompt,
+            workspace=Path(record.workspace) if record.workspace else None,
+            destination_session=screen.codex_session_id,
+        )
         path = Path(record.source_file)
         offset = path.stat().st_size
         subprocess.run(
@@ -308,7 +343,9 @@ class CodexRunner:
                 check=True,
             )
             proof = _wait_for_screen_proof(path, offset, prompt, 8.0)
-        return DispatchResult(proof, screen.codex_session_id, "", 0 if proof == "accepted" else 3)
+        return DispatchResult(
+            proof, screen.codex_session_id, "", 0 if proof == "accepted" else 3
+        )
 
     def _run(self, command: list[str], prompt: str) -> DispatchResult:
         if not 1 <= len(prompt.strip()) <= 20_000:
@@ -374,7 +411,11 @@ def _wait_for_screen_proof(path: Path, offset: int, prompt: str, timeout: float)
 def _is_matching_user_message(payload: dict[str, Any], prompt: str) -> bool:
     if payload.get("type") != "message" or payload.get("role") != "user":
         return False
-    texts = [part.get("text", "") for part in payload.get("content", []) if isinstance(part, dict)]
+    texts = [
+        part.get("text", "")
+        for part in payload.get("content", [])
+        if isinstance(part, dict)
+    ]
     return prompt in texts
 
 
@@ -382,7 +423,9 @@ def _is_non_user_event(item: dict[str, Any]) -> bool:
     if item.get("type") == "response_item":
         payload = item.get("payload", {})
         return payload.get("role") != "user"
-    return item.get("type") == "event_msg" and item.get("payload", {}).get("type") not in {
+    return item.get("type") == "event_msg" and item.get("payload", {}).get(
+        "type"
+    ) not in {
         "user_message",
         "token_count",
     }

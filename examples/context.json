@@ -1,0 +1,6 @@
+{
+  "purpose": "Provide a tiny tested example function.",
+  "current_state": "A new synthetic demonstration repository.",
+  "boundaries": "Only example Python source and local documentation.",
+  "constraints": "No network, no external services, no user data."
+}

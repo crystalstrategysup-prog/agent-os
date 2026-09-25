@@ -1,0 +1,25 @@
+# Foundation ↔ user overlay contract
+
+Contract version: `agentos.foundation-overlay/v1` (design for the next public beta; implementation status is tracked in the roadmap).
+
+## Physical boundary
+
+The foundation is the installed Python package plus immutable release assets. Runtime commands never put user content into that package or its source checkout. The default overlay is one user-owned folder, `~/.agentos-user`, overridable by one explicit absolute user-home setting. An optional managed core install uses a separate `~/.local/share/agentos-foundation` root. The two roots may not be equal, nested or symlinked into each other. Existing `~/.agent-os` is legacy input and is not silently deleted, moved or replaced.
+
+The overlay has a versioned `overlay.json` catalog and named areas: `config.json`, `state/`, `secrets/`, `knowledge/`, `preferences/`, `projects/`, `extensions/` and `backups/`. The catalog records overlay schema/version and compatibility metadata, not credential values. Knowledge indexing uses bounded references and never auto-loads history or raw project contents. A user can inspect and back up this one folder independently of the core.
+
+## Ownership and authority
+
+The foundation owns schemas, default templates, validators, CLI/MCP contracts and opt-in adapters. The user owns all overlay bytes. An overlay entry cannot grant new shell, network, host or deployment authority merely by being present. Private executable providers are separate code with explicit interfaces and approval; they are not treated as user knowledge. No secrets, auth files, host passport, production route or private business rule enters the public package or its release artifacts.
+
+## Migration and update behavior
+
+Import is a plan by default. Apply creates missing files only after path, schema, manifest and SHA-256 checks; identical existing bytes are preserved and conflicting bytes block. No overwrite/delete fallback. Legacy community config v1–v4 may be upgraded explicitly to v5: preserve unknown keys, create a byte-exact backup first, write atomically and read back. A partial private config needs a separately reviewed field mapping. Core installation/rollback reads compatibility metadata but does not mutate the overlay. A newer core with an unsupported overlay schema blocks rather than guessing a downgrade.
+
+## Portability and proof
+
+The package CLI targets Python 3.11+ on macOS, Linux and Windows where its components use portable APIs. The managed immutable-release installer is POSIX-only until an actual Windows installer is designed and tested. GNU Screen remains unavailable on Windows. Platform claims require a clean installation, `doctor`, version/MCP read-back and overlay preserve probe on that platform; source inspection alone yields NOT_TESTED.
+
+## Failure and recovery
+
+An interrupted import may leave create-only files and a rerun must classify them as identical; it never overwrites. A failed migration retains its backup and reports the current config hash. An incomplete core release never becomes current. Rollback points to the prior verified core and leaves the overlay untouched. Existing private runtime is never selected as a rollback target for this public installer.

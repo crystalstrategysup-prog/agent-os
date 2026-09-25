@@ -13,11 +13,19 @@ class OnboardingStep:
 
 
 STEPS = (
-    OnboardingStep("telegram_account", "Create an account in the official Telegram app", True),
+    OnboardingStep(
+        "telegram_account", "Create an account in the official Telegram app", True
+    ),
     OnboardingStep("owner_approval", "Request access from the AgentOS owner", True),
-    OnboardingStep("string_session", "Authorize a StringSession using Telegram QR", True),
-    OnboardingStep("credential_bundle", "Store the approved credential bundle locally", True),
-    OnboardingStep("telegram_business", "Connect Telegram Business and its business bot", True),
+    OnboardingStep(
+        "string_session", "Authorize a StringSession using Telegram QR", True
+    ),
+    OnboardingStep(
+        "credential_bundle", "Store the approved credential bundle locally", True
+    ),
+    OnboardingStep(
+        "telegram_business", "Connect Telegram Business and its business bot", True
+    ),
     OnboardingStep("mcp", "Connect AgentOS to an MCP-compatible client", True),
     OnboardingStep("verify", "Run a harmless end-to-end task", False),
 )

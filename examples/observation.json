@@ -1,0 +1,12 @@
+{
+  "objective": "Inspect project entry documentation.",
+  "why": "Understand the existing project before writes.",
+  "outcome": "Source-backed observations.",
+  "authority": "Read-only inspection authorized.",
+  "summary": "Summarize actual findings here before using this form.",
+  "limitations": "Only the explicitly named files were inspected.",
+  "next_step": "Resolve missing material information.",
+  "sources": [
+    "README.md"
+  ]
+}

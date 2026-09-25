@@ -1,0 +1,30 @@
+{
+  "$id": "https://github.com/crystalstrategysup-prog/agent-os/schemas/project-event-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "details": {
+      "type": "object"
+    },
+    "event": {
+      "enum": [
+        "ENTER",
+        "READY",
+        "CHECK",
+        "CLOSE",
+        "CHECKPOINT"
+      ]
+    }
+  },
+  "required": [
+    "at",
+    "event",
+    "details"
+  ],
+  "title": "AgentOS project event JSONL record v1",
+  "type": "object"
+}

@@ -15,7 +15,7 @@ from agent_os.tasks import normalize_task
 def test_init_creates_private_tree(tmp_path):
     paths = AgentOSPaths.discover(tmp_path / "agent-os")
     paths.initialize()
-    assert load_config(paths)["schema"] == "agent-os.community-config/v4"
+    assert load_config(paths)["schema"] == "agent-os.community-config/v5"
     assert stat.S_IMODE(paths.secrets.stat().st_mode) == 0o700
     assert run(paths)["status"] == "PASS"
 
@@ -43,13 +43,16 @@ def test_task_is_deterministic_and_bounded():
 
 def test_mcp_lists_and_calls_safe_tools():
     listed = response({"jsonrpc": "2.0", "id": 1, "method": "tools/list"})
-    assert len(listed["result"]["tools"]) == 3
+    assert len(listed["result"]["tools"]) == 6
     called = response(
         {
             "jsonrpc": "2.0",
             "id": 2,
             "method": "tools/call",
-            "params": {"name": "agentos_normalize_task", "arguments": {"objective": "Hello"}},
+            "params": {
+                "name": "agentos_normalize_task",
+                "arguments": {"objective": "Hello"},
+            },
         }
     )
     assert called["result"]["structuredContent"]["risk"] == "R0"

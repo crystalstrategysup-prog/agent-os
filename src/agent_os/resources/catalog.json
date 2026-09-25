@@ -1,0 +1,433 @@
+{
+  "schema": "agentos.documentation-catalog/v1",
+  "layers": [
+    {
+      "name": "Продукт",
+      "options": [
+        "Vision",
+        "PRD",
+        "BRD",
+        "MRD",
+        "Roadmap",
+        "User Stories / Use Cases",
+        "Personas / JTBD",
+        "Acceptance Criteria",
+        "Glossary",
+        "FAQ"
+      ],
+      "gate_ids": [
+        "dossier",
+        "requirements",
+        "roadmap",
+        "ux"
+      ]
+    },
+    {
+      "name": "Аналитика",
+      "options": [
+        "SRS",
+        "FR",
+        "NFR",
+        "Business Rules",
+        "BPMN",
+        "Event Storming",
+        "Domain Model / Bounded Contexts",
+        "DFD"
+      ],
+      "gate_ids": [
+        "requirements",
+        "architecture"
+      ]
+    },
+    {
+      "name": "Архитектура",
+      "options": [
+        "C4",
+        "arc42",
+        "ADR",
+        "RFC / Design Doc / TDD",
+        "UML",
+        "Sequence / State / Activity",
+        "Structurizr DSL",
+        "Deployment / Integration diagrams",
+        "STRIDE / LINDDUN"
+      ],
+      "gate_ids": [
+        "architecture",
+        "security"
+      ]
+    },
+    {
+      "name": "API и контракты",
+      "options": [
+        "OpenAPI",
+        "AsyncAPI",
+        "GraphQL SDL",
+        "gRPC .proto / buf",
+        "RAML",
+        "API Blueprint",
+        "SOAP WSDL / WADL",
+        "JSON Schema",
+        "Avro / Protobuf",
+        "Postman / Insomnia",
+        "HAR",
+        "Webhooks",
+        "deprecation / style guides",
+        "Overlays / Spectral"
+      ],
+      "gate_ids": [
+        "contracts",
+        "http-api",
+        "events"
+      ]
+    },
+    {
+      "name": "Данные",
+      "options": [
+        "ERD",
+        "DBML",
+        "DDL comments",
+        "Dictionary / Catalog",
+        "Lineage",
+        "Master Data",
+        "migrations",
+        "dbt docs",
+        "retention / PII map"
+      ],
+      "gate_ids": [
+        "data",
+        "privacy"
+      ]
+    },
+    {
+      "name": "Код",
+      "options": [
+        "README",
+        "CONTRIBUTING",
+        "CODE_OF_CONDUCT",
+        "CHANGELOG",
+        "JSDoc / TSDoc",
+        "Javadoc",
+        "Doxygen",
+        "Sphinx",
+        "GoDoc",
+        "Rustdoc",
+        "XML-doc",
+        "docstrings",
+        "comments",
+        "fitness functions"
+      ],
+      "gate_ids": [
+        "onboarding",
+        "quality"
+      ]
+    },
+    {
+      "name": "Эксплуатация",
+      "options": [
+        "IaC",
+        "Helm values",
+        "CRD",
+        "Docker / compose",
+        "Runbook",
+        "SLO / SLI / error budget",
+        "on-call",
+        "postmortem",
+        "capacity",
+        "DR",
+        "backup / restore",
+        "topology",
+        "CI/CD",
+        "environments"
+      ],
+      "gate_ids": [
+        "operations",
+        "incident",
+        "release"
+      ]
+    },
+    {
+      "name": "Безопасность",
+      "options": [
+        "SECURITY",
+        "threat model",
+        "SBOM SPDX/CycloneDX",
+        "VEX",
+        "disclosure",
+        "privacy / DPIA",
+        "access matrix",
+        "audit spec",
+        "compliance mapping",
+        "pen-test",
+        "secrets policy"
+      ],
+      "gate_ids": [
+        "security",
+        "privacy",
+        "safety"
+      ]
+    },
+    {
+      "name": "Качество",
+      "options": [
+        "Test strategy/plan",
+        "cases/suites",
+        "BDD Gherkin",
+        "coverage",
+        "Pact contracts",
+        "performance/load",
+        "chaos",
+        "QA checklist",
+        "bug template"
+      ],
+      "gate_ids": [
+        "quality"
+      ]
+    },
+    {
+      "name": "Процесс",
+      "options": [
+        "SDLC",
+        "DoR/DoD",
+        "review",
+        "branching",
+        "release notes",
+        "SemVer",
+        "incident/RFC process",
+        "team charter/RACI",
+        "meetings/decision log"
+      ],
+      "gate_ids": [
+        "stage",
+        "release",
+        "incident"
+      ]
+    },
+    {
+      "name": "Знания",
+      "options": [
+        "Wiki",
+        "onboarding",
+        "handbook",
+        "glossary",
+        "Diátaxis tutorial/how-to/reference/explanation",
+        "cookbook",
+        "migration/troubleshooting/known issues/demo"
+      ],
+      "gate_ids": [
+        "onboarding",
+        "operations"
+      ]
+    },
+    {
+      "name": "Метадокументация",
+      "options": [
+        "Docs-as-code MkDocs/Docusaurus/Antora/Sphinx",
+        "navigation/style",
+        "versioning",
+        "CI/link checks",
+        "Mermaid/PlantUML/D2/Excalidraw",
+        "templates",
+        "ownership/CODEOWNERS"
+      ],
+      "gate_ids": [
+        "quality",
+        "release",
+        "onboarding"
+      ]
+    }
+  ],
+  "types": [
+    "general",
+    "backend",
+    "frontend",
+    "mobile",
+    "data-ml",
+    "platform",
+    "embedded",
+    "legacy"
+  ],
+  "features": [
+    "http-api",
+    "events",
+    "database",
+    "pii",
+    "public",
+    "deployment",
+    "ui",
+    "ml",
+    "external-send",
+    "safety-critical"
+  ],
+  "documents": {
+    "dossier": {
+      "title": "Досье проекта",
+      "headings": [
+        "Назначение",
+        "Текущее состояние",
+        "Границы",
+        "Ограничения"
+      ]
+    },
+    "roadmap": {
+      "title": "Дорожная карта",
+      "headings": [
+        "Этапы",
+        "Зависимости",
+        "Следующий этап"
+      ]
+    },
+    "stage": {
+      "title": "Контракт текущего этапа",
+      "headings": [
+        "Цель",
+        "Область изменений",
+        "Приёмка",
+        "Откат"
+      ]
+    },
+    "quality": {
+      "title": "Стратегия проверок",
+      "headings": [
+        "Проверки",
+        "Доказательства",
+        "Ограничения"
+      ]
+    },
+    "architecture": {
+      "title": "Архитектура",
+      "headings": [
+        "Контекст",
+        "Компоненты",
+        "Границы доверия",
+        "Решения"
+      ]
+    },
+    "requirements": {
+      "title": "Требования",
+      "headings": [
+        "Функции",
+        "Нефункциональные требования",
+        "Правила"
+      ]
+    },
+    "contracts": {
+      "title": "Интерфейсы и контракты",
+      "headings": [
+        "Интерфейсы",
+        "Схемы",
+        "Совместимость",
+        "Ошибки"
+      ]
+    },
+    "http-api": {
+      "title": "HTTP API",
+      "headings": [
+        "Операции",
+        "Авторизация",
+        "OpenAPI",
+        "Версионирование"
+      ]
+    },
+    "events": {
+      "title": "Событийные контракты",
+      "headings": [
+        "Каналы",
+        "Схемы",
+        "Доставка",
+        "Совместимость"
+      ]
+    },
+    "data": {
+      "title": "Модель данных",
+      "headings": [
+        "Сущности",
+        "Хранение",
+        "Миграции",
+        "Удаление"
+      ]
+    },
+    "security": {
+      "title": "Безопасность",
+      "headings": [
+        "Активы",
+        "Угрозы",
+        "Полномочия",
+        "Секреты"
+      ]
+    },
+    "privacy": {
+      "title": "Персональные данные",
+      "headings": [
+        "Категории",
+        "Основания",
+        "Сроки",
+        "Доступ"
+      ]
+    },
+    "operations": {
+      "title": "Эксплуатация",
+      "headings": [
+        "Установка",
+        "Проверка",
+        "Обновление",
+        "Откат",
+        "Восстановление"
+      ]
+    },
+    "release": {
+      "title": "Выпуск",
+      "headings": [
+        "Версии",
+        "Состав",
+        "Проверки",
+        "Публикация"
+      ]
+    },
+    "onboarding": {
+      "title": "Онбординг разработчика",
+      "headings": [
+        "Начало",
+        "Навигация",
+        "Команды",
+        "Неисправности"
+      ]
+    },
+    "ux": {
+      "title": "Пользовательские сценарии",
+      "headings": [
+        "Пользователи",
+        "Сценарии",
+        "Доступность",
+        "Приёмка"
+      ]
+    },
+    "model-card": {
+      "title": "Модель и данные ML",
+      "headings": [
+        "Назначение",
+        "Данные",
+        "Оценка",
+        "Ограничения"
+      ]
+    },
+    "safety": {
+      "title": "Анализ безопасности эксплуатации",
+      "headings": [
+        "Опасности",
+        "Контроли",
+        "Проверка",
+        "Ответственность"
+      ]
+    },
+    "incident": {
+      "title": "Разбор инцидента",
+      "headings": [
+        "Влияние",
+        "Хронология",
+        "Причина",
+        "Меры"
+      ]
+    }
+  }
+}

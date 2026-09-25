@@ -1,0 +1,17 @@
+{
+  "reviewer": "Example reviewer",
+  "summary": "Synthetic local example verified; not a live deployment.",
+  "next_step": "Start the next real task with new intake.",
+  "limitations": "No target device or network was tested.",
+  "scope_reviewed": true,
+  "accepted_criteria": [
+    "A1"
+  ],
+  "reviewed_documents": [
+    "dossier",
+    "quality",
+    "roadmap",
+    "stage"
+  ],
+  "deployment_status": "not_requested"
+}

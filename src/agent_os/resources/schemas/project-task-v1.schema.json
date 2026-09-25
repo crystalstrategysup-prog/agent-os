@@ -1,0 +1,76 @@
+{
+  "$id": "https://github.com/crystalstrategysup-prog/agent-os/schemas/project-task-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "answers": {
+      "type": "object"
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "entered_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "foundation_version": {
+      "type": "string"
+    },
+    "id": {
+      "pattern": "^task-[0-9a-f]{16}$",
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "receipts": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "revision": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "schema": {
+      "const": "agentos.project-task/v1"
+    },
+    "selection": {
+      "type": "object"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "INTAKE",
+        "READY",
+        "VERIFYING",
+        "CLOSED",
+        "CHECKPOINT"
+      ]
+    },
+    "turn_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "id",
+    "project_id",
+    "created_at",
+    "revision",
+    "answers",
+    "receipts",
+    "status",
+    "selection",
+    "session_id",
+    "turn_id",
+    "entered_at",
+    "foundation_version"
+  ],
+  "title": "AgentOS project task v1",
+  "type": "object"
+}

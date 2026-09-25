@@ -1,5 +1,8 @@
 # Project contract
 
+- For every new or resumed product task, read `docs/agentos/DOSSIER.md`, `docs/agentos/ROADMAP.md` and the current stage document before product writes. Run `agentos project questions` and `project enter` for the actual session and turn, reusing verified existing facts. `docs/PROCESS.md` defines readiness, checks, closeout and checkpoint. A read-only observation uses its short path and does not require creating project metadata.
+- The stage cycle is dossier → roadmap → stage contract → implementation → result evidence → documentation update. Relevant document layers are selected by project type and changed surfaces; all catalog layers are never mandatory by default. Draft, stale or unregistered required documents cannot establish READY. Do not edit `.agentos` task records to bypass the gate.
+- Keep the public foundation and versioned user overlay physically separate as defined in `docs/FOUNDATION_OVERLAY.md`. Installed hooks require actual client trust and live probes before claiming enforcement. An AgentOS CLI or MCP plan does not itself grant external mutation authority.
 - This repository is the canonical public, host-neutral Crystal AgentOS Community Edition: `https://github.com/crystalstrategysup-prog/agent-os`.
 - The public project is owned and published through the Crystal Strategy GitHub account. Never substitute a similarly named personal or internal fleet repository when publishing, linking, reporting visibility, or preparing a community release.
 - Never commit credentials, Telegram identifiers, private hostnames, Codex auth files, session contents, or production routes.

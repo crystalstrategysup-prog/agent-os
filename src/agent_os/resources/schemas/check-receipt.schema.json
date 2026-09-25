@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "schema",
+    "task_id",
+    "task_revision",
+    "status",
+    "source_before",
+    "source_after",
+    "log_sha256",
+    "external_runtime_proven"
+  ],
+  "properties": {
+    "schema": {
+      "const": "agentos.check-receipt/v1"
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "FAIL"
+      ]
+    },
+    "source_before": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_after": {
+      "type": "string",
+      "minLength": 1
+    },
+    "log_sha256": {
+      "type": "string",
+      "minLength": 1
+    },
+    "external_runtime_proven": {
+      "const": false
+    }
+  }
+}

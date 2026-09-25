@@ -1,0 +1,259 @@
+{
+  "commands": [
+    {
+      "effect": "read_only",
+      "name": "doctor",
+      "status_values": [
+        "PASS",
+        "FAIL"
+      ],
+      "write_surfaces": []
+    },
+    {
+      "effect": "event_dependent",
+      "name": "hook",
+      "status_values": [],
+      "write_surfaces": [
+        "state/turns/"
+      ]
+    },
+    {
+      "effect": "create_if_missing",
+      "name": "init",
+      "status_values": [
+        "PASS"
+      ],
+      "write_surfaces": [
+        "overlay.json",
+        "config.json",
+        "state/",
+        "secrets/"
+      ]
+    },
+    {
+      "effect": "plan_or_immutable_release",
+      "name": "install.py install",
+      "status_values": [
+        "PLANNED",
+        "INSTALLED",
+        "BLOCKED"
+      ],
+      "write_surfaces": [
+        "core/releases/",
+        "core/current"
+      ]
+    },
+    {
+      "effect": "plan_or_pointer_switch",
+      "name": "install.py rollback",
+      "status_values": [
+        "PLANNED",
+        "ROLLED_BACK",
+        "BLOCKED"
+      ],
+      "write_surfaces": [
+        "core/current"
+      ]
+    },
+    {
+      "effect": "plan_or_preserving_merge",
+      "name": "integrate codex",
+      "status_values": [
+        "PLANNED",
+        "INSTALLED_NOT_YET_PROVEN_ACTIVE",
+        "CONFLICT"
+      ],
+      "write_surfaces": [
+        "AGENTS.md",
+        "hooks.json",
+        "skills",
+        "backups/integration"
+      ]
+    },
+    {
+      "effect": "plan_or_create_missing",
+      "name": "overlay import",
+      "status_values": [
+        "READY",
+        "CONFLICT",
+        "IMPORTED"
+      ],
+      "write_surfaces": [
+        "overlay files",
+        "state/last-overlay-import.json"
+      ]
+    },
+    {
+      "effect": "read_only",
+      "name": "overlay index",
+      "status_values": [],
+      "write_surfaces": []
+    },
+    {
+      "effect": "plan_or_backup_and_replace",
+      "name": "overlay migrate-config",
+      "status_values": [
+        "PLANNED",
+        "MIGRATED",
+        "CURRENT"
+      ],
+      "write_surfaces": [
+        "backups/",
+        "config.json"
+      ]
+    },
+    {
+      "effect": "read_only",
+      "name": "overlay status",
+      "status_values": [
+        "PASS",
+        "NOT_INITIALIZED"
+      ],
+      "write_surfaces": []
+    },
+    {
+      "effect": "read_only",
+      "name": "project assess",
+      "status_values": [
+        "PASS",
+        "BLOCKED"
+      ],
+      "write_surfaces": []
+    },
+    {
+      "effect": "check_process_and_receipt",
+      "name": "project check",
+      "status_values": [
+        "PASS",
+        "FAIL"
+      ],
+      "write_surfaces": [
+        ".agentos/tasks/"
+      ]
+    },
+    {
+      "effect": "project_metadata",
+      "name": "project checkpoint",
+      "status_values": [
+        "CHECKPOINT"
+      ],
+      "write_surfaces": [
+        ".agentos/tasks/"
+      ]
+    },
+    {
+      "effect": "project_metadata",
+      "name": "project close",
+      "status_values": [
+        "CLOSED",
+        "BLOCKED"
+      ],
+      "write_surfaces": [
+        ".agentos/tasks/"
+      ]
+    },
+    {
+      "effect": "project_metadata",
+      "name": "project document",
+      "status_values": [
+        "current"
+      ],
+      "write_surfaces": [
+        ".agentos/project.json"
+      ]
+    },
+    {
+      "effect": "project_metadata_and_user_turn",
+      "name": "project enter",
+      "status_values": [
+        "INTAKE"
+      ],
+      "write_surfaces": [
+        ".agentos/tasks/",
+        "state/turns/"
+      ]
+    },
+    {
+      "effect": "read_only",
+      "name": "project gate",
+      "status_values": [
+        "PASS",
+        "BLOCKED"
+      ],
+      "write_surfaces": []
+    },
+    {
+      "effect": "project_metadata_and_doc_drafts",
+      "name": "project init",
+      "status_values": [
+        "DOCUMENTATION_REQUIRED"
+      ],
+      "write_surfaces": [
+        ".agentos/project.json",
+        "docs/agentos/"
+      ]
+    },
+    {
+      "effect": "user_receipt_only",
+      "name": "project observe",
+      "status_values": [
+        "OBSERVATION_RECORDED"
+      ],
+      "write_surfaces": [
+        "state/observations/"
+      ]
+    },
+    {
+      "effect": "read_only",
+      "name": "project questions",
+      "status_values": [],
+      "write_surfaces": []
+    },
+    {
+      "effect": "project_metadata",
+      "name": "project ready",
+      "status_values": [
+        "READY",
+        "BLOCKED"
+      ],
+      "write_surfaces": [
+        ".agentos/tasks/"
+      ]
+    },
+    {
+      "effect": "read_only",
+      "name": "project snapshot",
+      "status_values": [],
+      "write_surfaces": []
+    },
+    {
+      "effect": "read_only",
+      "name": "project status",
+      "status_values": [
+        "INTAKE",
+        "READY",
+        "VERIFYING",
+        "CLOSED",
+        "CHECKPOINT"
+      ],
+      "write_surfaces": []
+    },
+    {
+      "effect": "read_only",
+      "name": "resources --list",
+      "status_values": [],
+      "write_surfaces": []
+    }
+  ],
+  "distribution_version": "0.5.0b1",
+  "global_options": [
+    "--home",
+    "--user-home"
+  ],
+  "release": "0.5.0-beta.1",
+  "schema": "agentos.cli-contract/v1",
+  "standard_exit_codes": {
+    "0": "completed command or plan",
+    "2": "blocked, validation failure or argparse error"
+  }
+}

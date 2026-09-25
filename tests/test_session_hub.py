@@ -29,7 +29,9 @@ def test_discovers_only_bounded_session_metadata(tmp_path):
             }
         )
         + "\n"
-        + json.dumps({"type": "response_item", "payload": {"role": "user", "secret": "x"}})
+        + json.dumps(
+            {"type": "response_item", "payload": {"role": "user", "secret": "x"}}
+        )
         + "\n",
         encoding="utf-8",
     )
@@ -71,6 +73,9 @@ def test_thread_started_is_parsed_from_codex_jsonl():
 
 
 def test_runner_preserves_thread_id_before_bounding_output(monkeypatch):
+    # This test isolates output framing. The one-shot gate is covered separately.
+    monkeypatch.setattr("agent_os.dispatch_gate.claim", lambda *a, **k: None)
+
     class Completed:
         returncode = 0
         stdout = (
@@ -80,7 +85,9 @@ def test_runner_preserves_thread_id_before_bounding_output(monkeypatch):
         )
         stderr = ""
 
-    monkeypatch.setattr("agent_os.session_hub.subprocess.run", lambda *args, **kwargs: Completed())
+    monkeypatch.setattr(
+        "agent_os.session_hub.subprocess.run", lambda *args, **kwargs: Completed()
+    )
     result = CodexRunner(default_config()).create_session("hello")
     assert result.session_id == SESSION_ID
     assert len(result.output) == 8_000

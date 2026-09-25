@@ -24,27 +24,47 @@ def _print(value: object) -> None:
 
 
 def parser() -> argparse.ArgumentParser:
-    root = argparse.ArgumentParser(prog="agentos", description="Local-first agent control plane")
-    root.add_argument("--home", type=Path)
+    root = argparse.ArgumentParser(
+        prog="agentos",
+        description="Documentation-first agent foundation",
+        epilog="Foundation groups: project, overlay, integrate, resources, hook. Run agentos GROUP --help.",
+    )
+    root.add_argument("--home", "--user-home", dest="home", type=Path)
     root.add_argument("--version", action="version", version=__version__)
     commands = root.add_subparsers(dest="command", required=True)
     commands.add_parser("init", help="Create a private local AgentOS home")
     commands.add_parser("doctor", help="Run secret-free local checks")
-    commands.add_parser("telegram-plan", help="Print Telegram Business onboarding steps")
+    commands.add_parser(
+        "telegram-plan", help="Print Telegram Business onboarding steps"
+    )
     commands.add_parser("mcp-config", help="Print an MCP client configuration template")
     commands.add_parser("sessions", help="List local persisted Codex sessions")
-    commands.add_parser("screens", help="List local GNU Screen sessions and Codex bindings")
-    commands.add_parser("session-capabilities", help="Show Telegram Session Hub readiness")
+    commands.add_parser(
+        "screens", help="List local GNU Screen sessions and Codex bindings"
+    )
+    commands.add_parser(
+        "session-capabilities", help="Show Telegram Session Hub readiness"
+    )
     commands.add_parser("telegram-bot", help="Run the owner-only Telegram Session Hub")
-    update = commands.add_parser("update-check", help="Check the official public tag when due")
+    update = commands.add_parser(
+        "update-check", help="Check the official public tag when due"
+    )
     update.add_argument("--force", action="store_true")
-    inventory = commands.add_parser("inventory", help="Collect or select maintained project knowledge")
-    inventory_commands = inventory.add_subparsers(dest="inventory_action", required=True)
+    inventory = commands.add_parser(
+        "inventory", help="Collect or select maintained project knowledge"
+    )
+    inventory_commands = inventory.add_subparsers(
+        dest="inventory_action", required=True
+    )
     collect = inventory_commands.add_parser("collect")
     collect.add_argument("--catalog", type=Path, required=True)
     collect.add_argument("--output", type=Path)
-    collect.add_argument("--max-files", type=int, default=full_inventory.DEFAULT_MAX_FILES)
-    collect.add_argument("--max-bytes", type=int, default=full_inventory.DEFAULT_MAX_BYTES)
+    collect.add_argument(
+        "--max-files", type=int, default=full_inventory.DEFAULT_MAX_FILES
+    )
+    collect.add_argument(
+        "--max-bytes", type=int, default=full_inventory.DEFAULT_MAX_BYTES
+    )
     select = inventory_commands.add_parser("select")
     select.add_argument("--input", type=Path, required=True)
     select.add_argument("--project-id", required=True)
@@ -55,11 +75,17 @@ def parser() -> argparse.ArgumentParser:
         choices=full_inventory.CLASSES[:-1],
     )
     select.add_argument("--output", type=Path)
-    route = commands.add_parser("route-task", help="Plan an exact model and reasoning effort")
+    route = commands.add_parser(
+        "route-task", help="Plan an exact model and reasoning effort"
+    )
     route.add_argument("--mode", default="implementation")
-    route.add_argument("--complexity", choices=("low", "medium", "high", "critical"), default="medium")
+    route.add_argument(
+        "--complexity", choices=("low", "medium", "high", "critical"), default="medium"
+    )
     route.add_argument("--role", choices=("root", "worker", "verifier"), default="root")
-    gate = commands.add_parser("assess-result", help="Check current evidence before reporting COMPLETE")
+    gate = commands.add_parser(
+        "assess-result", help="Check current evidence before reporting COMPLETE"
+    )
     gate.add_argument("--file", type=Path, required=True)
     task = commands.add_parser("task", help="Normalize a bounded task brief")
     task.add_argument("objective")
@@ -69,6 +95,11 @@ def parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    from .foundation_cli import dispatch
+
+    handled = dispatch(list(sys.argv[1:] if argv is None else argv))
+    if handled is not None:
+        return handled
     args = parser().parse_args(argv)
     paths = AgentOSPaths.discover(args.home)
     config: dict[str, object] | None = None
@@ -81,7 +112,10 @@ def main(argv: list[str] | None = None) -> int:
             __version__,
             force=args.command == "update-check" and args.force,
         )
-        if args.command != "update-check" and advisory.get("status") == "UPDATE_AVAILABLE":
+        if (
+            args.command != "update-check"
+            and advisory.get("status") == "UPDATE_AVAILABLE"
+        ):
             print(
                 f"AgentOS {advisory['latest_version']} is available: "
                 f"{advisory['latest_tag_url']}",
@@ -96,7 +130,12 @@ def main(argv: list[str] | None = None) -> int:
         _print(public_plan())
     elif args.command == "mcp-config":
         _print(client_config())
-    elif args.command in {"sessions", "screens", "session-capabilities", "telegram-bot"}:
+    elif args.command in {
+        "sessions",
+        "screens",
+        "session-capabilities",
+        "telegram-bot",
+    }:
         assert config is not None
         if args.command == "sessions":
             _print({"sessions": [item.as_dict() for item in discover_sessions(config)]})
@@ -118,7 +157,11 @@ def main(argv: list[str] | None = None) -> int:
             run(paths, config)
     elif args.command == "route-task":
         assert config is not None
-        _print(route_task(config, mode=args.mode, complexity=args.complexity, role=args.role))
+        _print(
+            route_task(
+                config, mode=args.mode, complexity=args.complexity, role=args.role
+            )
+        )
     elif args.command == "assess-result":
         payload = json.loads(args.file.read_text(encoding="utf-8"))
         result = evaluate_result(
