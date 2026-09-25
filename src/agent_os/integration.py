@@ -66,7 +66,10 @@ def install(
         _, b = rest.split(END, 1)
         updated = a + block + b
     else:
-        updated = old.rstrip() + "\n\n" + block + "\n"
+        separator = ""
+        if old:
+            separator = ("" if old.endswith("\n") else "\n") + "\n"
+        updated = old + separator + block + "\n"
     paths = {str(agents): updated.encode()}
     # Copy maintained skills into namespaced folders; never delete user skills.
     for src in sorted((resources / "skills").rglob("*")):

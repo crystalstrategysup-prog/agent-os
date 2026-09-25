@@ -161,15 +161,18 @@ def test_F_long_owner_agents_remains_intact_without_size_gate(tmp_path):
     codex = tmp_path / "codex"
     codex.mkdir()
     agents = codex / "AGENTS.md"
-    owner_text = "Owner instructions.\n" + "Project context.\n" * 800
+    owner_text = "Owner instructions.  \n" + "Project context.\n" * 800 + "trailing spaces  "
     agents.write_text(owner_text)
 
     result = integration.install(codex, tmp_path / "skills", tmp_path / "user", apply=True)
 
     assert result["status"] == "INSTALLED_MANUAL_WORKFLOW"
-    assert agents.read_text().startswith(owner_text)
+    assert agents.read_bytes().startswith(owner_text.encode())
     assert "not a size gate or prerequisite for read-only work" in agents.read_text()
     assert result["hook_files_changed"] is False
+    integrated = agents.read_bytes()
+    integration.install(codex, tmp_path / "skills", tmp_path / "user", apply=True)
+    assert agents.read_bytes() == integrated
 
 
 def test_F_hook_symlink_is_untouched_by_integration(tmp_path):
