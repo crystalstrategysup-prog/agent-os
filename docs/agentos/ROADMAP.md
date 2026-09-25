@@ -8,7 +8,7 @@ Every product stage follows: dossier and roadmap read-back → current stage con
 | F02 — foundation and overlay | F01 accepted; joint F02/F03 contract | Clean install; one versioned user overlay; create-only import; backed-up migration; upgrade/rollback without lost user bytes | LOCAL_PASS on Darwin fixture; live target pending |
 | F03 — documentation lifecycle | Joint F02/F03 contract | Mandatory project intake/entry, relevant doc selection, stage readiness, evidence-backed closeout and repeat-entry enforcement; R0 remains light | CLI/fixture PASS; native hook proof pending |
 | F04 — interfaces and onboarding | F02–F03; STAGE-F04 | Machine-readable MCP input/output/version and affected CLI/config/data contracts; developer guide; package/site/release version and installation agree | LOCAL PASS; result in STAGE-F04; publication pending |
-| F05 — verification and public release | F02–F04; STAGE-F05 | Mac install/upgrade/read-back, available Linux/Windows probes with honest limits, regression and security review, direct push/tag/release, published URL read-back | DOCUMENTED BEFORE PUBLICATION |
+| F05 — verification and public release | F02–F04; STAGE-F05 | Mac install/upgrade/read-back, available Linux/Windows probes with honest limits, regression and security review, direct push/tag/release, published URL read-back | PUBLIC RELEASE PASS; website and live Mac target BLOCKED by host gates; result in STAGE-F05 |
 
 ## Stage dependencies and stop rules
 

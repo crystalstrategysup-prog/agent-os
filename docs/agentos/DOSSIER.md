@@ -1,6 +1,6 @@
 # Crystal AgentOS Community Edition — project dossier
 
-Status: isolated public branch based on `552ac9a3c812959e9d62883fd0a9052d6e44400f` contains a locally verified foundation beta candidate; it is not published or installed for live use.
+Status: public `v0.5.0-beta.1` is published from `4b6d59e82cc74a3991e5cbd3c607d49caaf6c8ee` with a verified wheel; live Mac installation and website deployment remain blocked by existing host gates.
 
 ## Purpose and users
 
@@ -25,9 +25,9 @@ This work may change only the canonical public repository, its public release ar
 
 ## Current risks and unknowns
 
-- The final staged diff and exact public export still need independent code/privacy review before push.
+- The public source, release asset and tag have been read back; independent external review of beta behavior remains valuable, especially native hook trust and a real target installation.
 - Windows bootstrap and native Codex hook enforcement need actual supported runtime/client proof; unit fixtures alone do not establish either.
-- The public website source is identified at its separate Git remote and corrected locally. The actual deploy path is not documented in that repository; the publicly readable `/agent-os/` route must be read back after source push and any deploy.
+- The public website source is pushed to its separate Git remote, but the live `/agent-os/` route still serves 0.4.0. Its service-host scope is not allowlisted in the installed host-mutation gate; source push alone is not deployment.
 - Publishing to PyPI requires a real package account and upload receipt; until then GitHub source/wheel installation is the documented path.
 
 ## Sources and evidence
