@@ -26,6 +26,18 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def launcher_prefix(body: str) -> str:
+    """Keep only pip's interpreter header when building a legacy script fixture."""
+    lines = body.splitlines(keepends=True)
+    if not lines or not lines[0].startswith("#!"):
+        raise ValueError("launcher_shebang_missing")
+    if lines[0] != "#!/bin/sh\n":
+        return lines[0]
+    if len(lines) < 3 or not lines[1].startswith("'''exec' ") or lines[2] != "' '''\n":
+        raise ValueError("launcher_trampoline_invalid")
+    return "".join(lines[:3])
+
+
 def verify(wheel: Path, overlay: Path | None = None) -> dict:
     source = Path(__file__).resolve().parents[1]
     sys.path.insert(0, str(source / "src"))
@@ -298,7 +310,7 @@ cache.write_bytes(be._code_to_timestamp_pyc(compile(payload, str(module), 'exec'
             script = release_dir / ".venv/bin" / name
             old_scripts[script] = script.read_bytes()
             body = script.read_text()
-            prefix = body[:body.index("import sys\n")]
+            prefix = launcher_prefix(body)
             script.write_text(
                 prefix + "# -*- coding: utf-8 -*-\nimport re\nimport sys\n"
                 + f"from {target} import main\nif __name__ == '__main__':\n"
