@@ -1,6 +1,6 @@
 # F08 — внешний протокол профилей и Mac-first интервью
 
-Task: `task-b7f82196dc0e45f1`. Status: LOCAL_PASS, PUBLICATION_PENDING. Baseline: immutable public `v0.5.0-beta.3` at `f6968c249f8bff1ce571cf92bbd960ba7cc2c1b2`; source worktree starts at `7203fbb86a316ce9ab9813d3ed7cd699fe35ef62`.
+Task: `task-b7f82196dc0e45f1`. Status: PUBLIC_RELEASE_PASS, MAC_TARGET_BLOCKED. Baseline: immutable public `v0.5.0-beta.3` at `f6968c249f8bff1ce571cf92bbd960ba7cc2c1b2`; source worktree starts at `7203fbb86a316ce9ab9813d3ed7cd699fe35ef62`.
 
 ## Цель и причина
 
@@ -49,3 +49,23 @@ returned `0.5.0-beta.4`, zero-profile inventory returned PASS, and resource list
 contained the schema and skill. These are local fixture proofs, not live Mac
 activation or native hook proof. The export privacy check and exact source/release
 read-back remain release gates.
+
+## Publication and target read-back
+
+The public `main` branch and annotated `v0.5.0-beta.4` tag resolve to source commit
+`f69a74620a614c2f55c17ceacfe4a9c18dfc0455`. The [GitHub pre-release](https://github.com/crystalstrategysup-prog/agent-os/releases/tag/v0.5.0-beta.4)
+shows that exact commit and the wheel asset. A separate download of the published
+wheel matched SHA-256 `98eab5889e272c8564e81aac5b45ee34c1516f075f72bf74197c245acdc9d434`.
+All four registered F08 checks (`profiles`, `suite`, `lint`, `tree`) passed and
+`project assess` returned PASS at source snapshot
+`0b767e7e94bee4a76e92a92ea6e0843464540740fe0cb104dc0b578c77b5cd8f`.
+No blocking code-review findings remained. Residual limits: same-UID filesystem
+races are outside the adapter's guarantee; secret-like detection is heuristic;
+actual native hook trust, Windows and live Mac installation require target proof.
+
+The intended live Mac installation remains blocked by an external host gate.
+No managed install in the owner runtime or global integration change occurred.
+The disposable wheel venv is local test evidence only.
+The Mac profile candidate remains an external draft awaiting owner review of
+uncertain personal and host choices; neither it nor private host instructions
+were put in the public release. Beta.3 remains the release rollback anchor.

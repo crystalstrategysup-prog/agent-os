@@ -1,8 +1,8 @@
 # Crystal AgentOS Community Edition — project dossier
 
-Status: public `v0.5.0-beta.3` is published from `f6968c249f8bff1ce571cf92bbd960ba7cc2c1b2` with a verified wheel; live Mac installation and website deployment remain blocked by existing host gates.
+Status: public `v0.5.0-beta.4` is published from `f69a74620a614c2f55c17ceacfe4a9c18dfc0455` with a verified wheel; live Mac installation and website deployment remain blocked by existing host gates.
 
-F08 prepares a new public beta for optional external profiles. The published beta.3 remains the active release until the new source, wheel, tag and release are verified. The Mac owner profile is a separate draft and is not part of this public repository.
+F08 published a new public beta for optional external profiles. Beta.3 remains an immutable rollback anchor. The Mac owner profile is a separate draft and is not part of this public repository.
 
 ## Purpose and users
 
@@ -30,6 +30,7 @@ This work may change only the canonical public repository, its public release ar
 ## Current risks and unknowns
 
 - The public source, release asset and tag have been read back. The external beta.1 review reproduced two defects and identified a third in the standalone CLI path; all three have local regression coverage in beta.3. A new independent beta.3 review and actual native hook trust proof remain valuable.
+- Beta.4 passed 179 local tests, Ruff and export validation. The published wheel downloaded from the release matches SHA-256 `98eab5889e272c8564e81aac5b45ee34c1516f075f72bf74197c245acdc9d434`. Live Mac installation is pending a separate host gate. The existing private runtime was not switched.
 - Windows bootstrap and native Codex hook enforcement need actual supported runtime/client proof; unit fixtures alone do not establish either.
 - The public website source is pushed to its separate Git remote, but the live `/agent-os/` route still serves 0.4.0. The existing website deployment gate has no applicable scope; source push alone is not deployment.
 - Publishing to PyPI requires a real package account and upload receipt; until then GitHub source/wheel installation is the documented path.
