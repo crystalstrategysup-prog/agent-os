@@ -10,7 +10,7 @@ Every product stage follows: dossier and roadmap read-back → current stage con
 | F04 — interfaces and onboarding | F02–F03; STAGE-F04 | Machine-readable MCP input/output/version and affected CLI/config/data contracts; developer guide; package/site/release version and installation agree | LOCAL PASS; result in STAGE-F04; publication pending |
 | F05 — verification and public release | F02–F04; STAGE-F05 | Mac install/upgrade/read-back, available Linux/Windows probes with honest limits, regression and security review, direct push/tag/release, published URL read-back | PUBLIC RELEASE PASS; website and live Mac target BLOCKED by host gates; result in STAGE-F05 |
 | F06 — beta hardening | External review; STAGE-F06 | Atomic create-only overlay import, user schema compatibility before activation, immutable readiness baseline; new beta release | PUBLIC RELEASE PASS; result in STAGE-F06; CLI follow-up in F07 |
-| F07 — standalone CLI turn transition | Independent beta.1 review; STAGE-F07 | Exact CLI-only next-turn receipt after checkpoint/close, native-hook provenance preserved; next immutable beta | LOCAL PASS; publication ready; result in STAGE-F07 |
+| F07 — standalone CLI turn transition | Independent beta.1 review; STAGE-F07 | Exact CLI-only next-turn receipt after checkpoint/close, native-hook provenance preserved; next immutable beta | PUBLIC RELEASE PASS; result in STAGE-F07; target gates still pending |
 
 ## Stage dependencies and stop rules
 

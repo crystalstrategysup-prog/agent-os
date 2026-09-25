@@ -1,6 +1,6 @@
 # F07 — standalone CLI turn transition
 
-Status: LOCAL PASS, PUBLICATION READY. Baseline is published `v0.5.0-beta.2`; the independent review of beta.1 identified a third defect that its intermediate summary had not captured. This stage has its own immutable beta ordinal.
+Status: PUBLIC RELEASE PASS. Baseline is published `v0.5.0-beta.2`; the independent review of beta.1 identified a third defect that its intermediate summary had not captured. This stage has its own immutable beta ordinal.
 
 ## Reproduction and scope
 
@@ -26,4 +26,8 @@ The live Mac and website deployment gates from F05 remain separate. This work do
 - `164` pytest cases, Ruff, the public-tree validator and temporary lifecycle demo passed. Tests cover exact standalone transition after checkpoint and close, preserved `hook_seen=false`, native-hook refusal, mismatched prior turn/task/root, and reset of readiness on resume.
 - Built wheel `crystal_agent_os-0.5.0b3-py3-none-any.whl` with SHA-256 `75ebdbee2a9545d06407cdf084a914adf0a9f64694102192b3ee014d7f4e49aa`.
 - A disposable Darwin arm64 Python 3.14 fixture passed offline install, update, rollback, reactivation and user-tree preservation. Linux arm64 Python 3.12 installed the wheel without network and passed version, init, doctor and packaged CLI-contract read-back.
-- These are local checks. Public tag/release/asset and site source remain publication steps; target host gates remain unresolved.
+- These are local checks; publication evidence is recorded below. Target host gates remain unresolved.
+
+## Publication result
+
+Annotated tag `v0.5.0-beta.3` and public `main` resolve to source commit `f6968c249f8bff1ce571cf92bbd960ba7cc2c1b2`. The [GitHub pre-release](https://github.com/crystalstrategysup-prog/agent-os/releases/tag/v0.5.0-beta.3) is published; an independent download of its wheel matched SHA-256 `75ebdbee2a9545d06407cdf084a914adf0a9f64694102192b3ee014d7f4e49aa`. A fresh clone of the tag installed, initialized and passed `agentos doctor` on a disposable Mac user home. Maintained site source commit `a7a191bd1be0a98a65f2ada4622d0fc668445b67` points to beta.3. The live site still serves the older page with the broken PyPI command; its required deployment scope remains unavailable. No live Mac installation or native hook activation was performed.
