@@ -1,8 +1,9 @@
-# Active stage — F09
+# Active stage — F10
 
-F09: no-hook direct-read correction → independent Codex integration review → separately
-scoped Mac fixture/readback → owner-authorized release only. Current work ends with a local
-patch/test packet; no publishing/install. Any old native-hook activation work is superseded.
+F10: short AGENTS routing convention → public docs/skills/managed block → local regression
+and clean package proof → separately authorized installation/publication. This stage ends
+with a local versioned source candidate; no Mac switch or remote release. F09 no-hook
+direct-read behavior remains an invariant; old native-hook activation is superseded.
 
 # AgentOS foundation roadmap
 

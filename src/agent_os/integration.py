@@ -45,6 +45,8 @@ def install(
         "Questions, searches, read-only audits and API discovery proceed directly, even from an unregistered cwd.\n"
         "No project init/intake/observe, answers file or closeout is required for those reads.\n"
         "For actual project changes, inspect current architecture and write missing docs before product writes.\n"
+        "Keep inherited project AGENTS.md concise: scope, universal limits and links to relevant docs/skills.\n"
+        "Read detailed project knowledge on demand; verify dated status against current evidence.\n"
         "Reuse verified existing answers; do not interrogate the owner again for known facts.\n"
         "For project changes read " + method + ". Use `agentos project questions`, then `enter`, "
         "register required documents, `ready`, approved checks and `close` or `checkpoint`.\n"

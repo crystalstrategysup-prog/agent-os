@@ -18,6 +18,13 @@ The user home is a storage root, not a mandatory active profile. With no selecti
 
 The foundation owns schemas, default templates, validators, CLI/MCP contracts and opt-in adapters. The user owns all overlay bytes. An overlay entry cannot grant new shell, network, host or deployment authority merely by being present. Private executable providers are separate code with explicit interfaces and approval; they are not treated as user knowledge. No secrets, auth files, host passport, production route or private business rule enters the public package or its release artifacts.
 
+The foundation also owns the general instruction to keep inherited `AGENTS.md`
+files concise and route agents to relevant project documents and skills. It does
+not own the detailed content of each project's guide. Host/owner facts stay in
+the external overlay; dated project state stays in the project's own docs and
+must be checked against current source/runtime before action. A long-file
+warning is advisory, never a permission grant or lifecycle gate.
+
 ## Migration and update behavior
 
 Import is a plan by default. Apply creates missing files only after path, schema, manifest and SHA-256 checks; identical existing bytes are preserved and conflicting bytes block. No overwrite/delete fallback. Legacy community config v1–v4 may be upgraded explicitly to v5: preserve unknown keys, create a byte-exact backup first, write atomically and read back. A partial private config needs a separately reviewed field mapping. Core installation/rollback reads compatibility metadata but does not mutate the overlay. A newer core with an unsupported overlay schema blocks rather than guessing a downgrade.

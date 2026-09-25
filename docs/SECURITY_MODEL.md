@@ -13,6 +13,7 @@ Native hooks исключены; это **не** отключение клиен
 |Потеря настроек при update|Disjoint roots, immutable releases, create-only import, backups|ACL/host I/O/restore требуют отдельной проверки|
 |Traversal/symlink/бесконечный stdin|Containment, regular JSON files, bounded object stdin only via `-`|Не полная защита от hostile filesystem races|
 |Изменение сторонних instructions/config|Managed AGENTS block, skill conflicts/backups; hooks/config untouched|Противоречащий owner block надо согласовать отдельно|
+|Большой AGENTS обрезан и скрывает важные правила|Короткий индекс, адресные ссылки, fresh-session readback|Размер и Markdown не доказывают, что клиент прочитал все адресные документы|
 |Профиль навязал authority|Exact IDs/hashes/host/conflicts, profile_authority=false|Prompt injection в тексте остаётся риском|
 |Секреты или подмена релиза|Separate public tree, manifests, exact-current compare|Hash не подпись; scanning эвристический|
 
@@ -31,6 +32,8 @@ read vs write vs send vs destructive. При отсутствии останов
 Старые callbacks возвращают `{}`, не permissionDecision=allow и не COMPLETE. Их не
 регистрируют и не запускают как guard; это миграционная совместимость, а не тайный
 permissive security fallback. Сохранять client/connector/host security controls.
+Рекомендация сократить AGENTS не вводит новый fail-closed read gate и не отменяет
+проверку конкретных target capabilities.
 
 Overlay exports не содержат secret stores: auth.json, SSH keys, cookies, Telegram sessions
 не переносить из отчётного архива. Log redaction — только дополнительный контроль.

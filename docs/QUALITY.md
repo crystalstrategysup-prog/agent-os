@@ -21,6 +21,11 @@ F: malformed/missing callbacks no-op, Stop не блокирует; integrate н
 сохраняет config/owner blocks; active tasks защищены, stale unbound receipts не мешают;
 нет fake closeout, verify-closeout выявляет tampering.
 
+F10: managed AGENTS должен содержать короткий маршрут к тематическим docs/skills,
+при этом не добавлять размерный gate, hook или обязательную загрузку всей истории.
+Проверять сохранность owner text при integrate и читать effective instructions в
+новой сессии; synthetic test не доказывает отсутствие обрезки на любом клиенте.
+
 Baseline native interception tests заменяются тестами retirement/no-install contract,
 а не сохраняются как скрытое обещание enforcement. Остальные critical negative lifecycle,
 path/symlink/duplicate JSON, evidence hash/age/version, profile/import/installer/MCP

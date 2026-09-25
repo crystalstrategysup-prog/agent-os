@@ -7,8 +7,8 @@
 `inputSchema`/`outputSchema` с `tools/list` и фактическими `structuredContent`, а
 task/event schemas — с записями реального локального lifecycle.
 
-Версия выпуска для человека и MCP: `0.5.0-beta.5`; эквивалент Python packaging:
-`0.5.0b5`. `agentos --version`, `agent_os.__version__` и `serverInfo.version`
+Версия выпуска для человека и MCP: `0.5.0-beta.6`; эквивалент Python packaging:
+`0.5.0b6`. `agentos --version`, `agent_os.__version__` и `serverInfo.version`
 совпадают буквально. Протокол stdio MCP остаётся `2025-06-18`. HTTP API нет, поэтому
 OpenAPI/Swagger здесь не существует; события пишутся локально в JSONL и описаны
 JSON Schema, а не AsyncAPI.

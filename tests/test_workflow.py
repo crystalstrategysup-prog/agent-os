@@ -145,6 +145,8 @@ def test_F_integration_never_creates_restores_or_rewrites_hooks(tmp_path, existi
     text = (codex / "AGENTS.override.md").read_text()
     assert text.startswith("Owner-specific narrower host boundaries.")
     assert "Native hooks are DISABLED" in text
+    assert "Keep inherited project AGENTS.md concise" in text
+    assert "Read detailed project knowledge on demand" in text
     assert not (codex / "AGENTS.md").exists()
     agent_bytes = (codex / "AGENTS.override.md").read_bytes()
     integration.install(codex, skills, home, apply=True)

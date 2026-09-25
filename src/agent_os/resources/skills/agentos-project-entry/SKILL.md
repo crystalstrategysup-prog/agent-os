@@ -14,6 +14,10 @@ known verified facts. Нет docs — создать нужные docs до prod
 Same-scope resume: questions --resume-task; enter --resume-task --reuse-answers с новым
 authority. Остальные известные ответы не спрашивать снова; scope change — полный entry.
 Register docs → READY → approved changes/checks → updated docs → close/checkpoint.
+Inherited AGENTS.md serves as a short routing index. Follow links to relevant
+project docs/skills as needed; do not preload every topic or private history.
+Verify dated project status from current source/runtime evidence. A suggested
+AGENTS.md length is advisory only and never blocks entry or read-only work.
 До task creation ошибка сообщается прямо без fake TASK. Для реальной привязки используйте
 explicit workflow session/turn, terminal next-turn; не имитируйте native events.
 

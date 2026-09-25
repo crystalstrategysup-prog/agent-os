@@ -2,7 +2,7 @@
 
 ## Статус кандидата
 
-`0.5.0-beta.5` / `0.5.0b5` — подготовленный локальный кандидат. Не предполагать, что tag,
+`0.5.0-beta.6` / `0.5.0b6` — подготовленный локальный кандидат. Не предполагать, что tag,
 PyPI пакет или release asset опубликован. Проверить полученный source/patch/manifest,
 провести independent tests и отдельное разрешение на установку. Этот review ничего
 на реальном Mac не устанавливает. Python 3.11+, отдельные core/user roots обязательны.
@@ -17,8 +17,8 @@ PyPI пакет или release asset опубликован. Проверить 
 
 ```sh
 python3 tools/install.py install \
- --wheel /absolute/crystal_agent_os-0.5.0b5-py3-none-any.whl \
- --sha256 ACTUAL_WHEEL_SHA256 --version 0.5.0-beta.5 \
+ --wheel /absolute/crystal_agent_os-0.5.0b6-py3-none-any.whl \
+ --sha256 ACTUAL_WHEEL_SHA256 --version 0.5.0-beta.6 \
  --core-home "$HOME/.local/share/agentos-foundation" --user-home "$HOME/.agentos-user"
 ```
 

@@ -4,7 +4,7 @@
 
 AgentOS gives a project a repeatable path from its current state to a verified change: project dossier → roadmap → documented stage → implementation → checks → updated documentation. A short intake selects only the relevant document layers. The CLI keeps the task, source, documents and check evidence bound to the same stage; ordinary read-only questions bypass intake entirely. Native hooks are excluded; explicit CLI checks do not intercept arbitrary tools.
 
-This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). This local candidate source is `0.5.0-beta.5` (Python distribution version `0.5.0b5`). It is separate from any maintainer's private runtime, infrastructure and personal data.
+This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). This local candidate source is `0.5.0-beta.6` (Python distribution version `0.5.0b6`). It is separate from any maintainer's private runtime, infrastructure and personal data.
 
 Visit the [public project website](https://crystalstrategy.ru/agent-os/), read the [changelog](CHANGELOG.md), or open an [issue](https://github.com/crystalstrategysup-prog/agent-os/issues) with a bug or technical review. This candidate does not assert that a new tag, release asset or website deployment exists.
 
@@ -23,7 +23,7 @@ Profiles are optional files under the user overlay. `agentos profiles inventory`
 ## Candidate verification, not installation authority
 
 Python 3.11+ is required. Review the exact source and diff, run the local tests and compare
-package resources before integration. `0.5.0-beta.5` is a local candidate, not an assertion
+package resources before integration. `0.5.0-beta.6` is a local candidate, not an assertion
 that its tag or distribution is published. See [Install and update](docs/INSTALL_UPDATE.md)
 for the separately authorized offline flow, overlay preservation and no-hook rollback.
 No global hooks, model/auth or client security changes are part of this candidate.
@@ -34,6 +34,16 @@ Answer questions, search, inspect code and discover authorized API capabilities 
 No registration, answers file, profile interview, observe receipt or closeout is needed.
 Optional `agentos workflow route --kind audit` explains the route without reading overlay
 or changing files; calling it is not a prerequisite for answering a question.
+
+## Instruction routing
+
+Keep inherited project `AGENTS.md` short: define its scope, universal limits and
+links to the project documents or skills that explain each topic. Read detailed
+material only when the task requires it, and verify dated status against current
+source or runtime evidence. A size target such as 4 KiB is editorial guidance,
+not an entry or read-only gate. The public foundation stays host-neutral; owner
+and host details belong in the separate user overlay. See
+[architecture](docs/ARCHITECTURE.md) and [process](docs/PROCESS.md).
 
 ## Start a project task
 
@@ -65,6 +75,6 @@ python tools/demo_lifecycle.py
 python tools/verify_public.py
 ```
 
-Start with the [project dossier](docs/agentos/DOSSIER.md), [roadmap](docs/agentos/ROADMAP.md), [current stage](docs/agentos/STAGE-F08.md), [architecture](docs/ARCHITECTURE.md) and [developer onboarding](docs/ONBOARDING.md). The [changelog](CHANGELOG.md) and [release policy](docs/RELEASE.md) state the beta status and limits. GitHub Actions are not used.
+Start with the [project dossier](docs/agentos/DOSSIER.md), [roadmap](docs/agentos/ROADMAP.md), [current stage](docs/agentos/STAGE-F10.md), [architecture](docs/ARCHITECTURE.md) and [developer onboarding](docs/ONBOARDING.md). The [changelog](CHANGELOG.md) and [release policy](docs/RELEASE.md) state the beta status and limits. GitHub Actions are not used.
 
 Crystal AgentOS is Apache-2.0 software. Contributions and skeptical technical reviews are welcome; see [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), [Governance](GOVERNANCE.md) and the [AI Stewardship Charter](STEWARDSHIP.md). [Русская документация](docs/README.ru.md).

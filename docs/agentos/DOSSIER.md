@@ -1,8 +1,8 @@
-# Current candidate note — F09
+# Current candidate note — F10
 
-`0.5.0-beta.5` is a local source-only no-hook fix, not a published or installed release.
-Current workflow is defined by PROCESS/ARCHITECTURE and STAGE-F09. Earlier native-hook
-requirements and PASS claims below are historical evidence for earlier sources only.
+`0.5.0-beta.6` is a local source-only candidate for concise AGENTS routing.
+Current workflow is defined by PROCESS/ARCHITECTURE and STAGE-F10; F09 and earlier
+native-hook requirements below are historical evidence for earlier sources only.
 No Mac rollout, external service change or private settings installation is authorized here.
 
 # Crystal AgentOS Community Edition — project dossier

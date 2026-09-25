@@ -1,6 +1,6 @@
 # Политика выпуска
 
-Текущий локальный кандидат: 0.5.0-beta.5; Python packaging equivalent: 0.5.0b5.
+Текущий локальный кандидат: 0.5.0-beta.6; Python packaging equivalent: 0.5.0b6.
 Он не опубликован и не установлен этим review. Beta.4 ниже — исторический baseline.
 User overlay version независима от версии ядра; schema совместимость проверяется отдельно.
 В beta.4 добавлен опциональный `agentos.profile/v1` под user home. Выбор профилей

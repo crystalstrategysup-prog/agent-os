@@ -1,4 +1,12 @@
-# Candidate change: 0.5.0-beta.5 (unreleased)
+# Candidate change: 0.5.0-beta.6 (unreleased)
+
+- Add a concise inherited AGENTS.md routing norm in the public foundation,
+  packaged skills and managed integration text. Detailed knowledge is loaded
+  by task; dated claims require current evidence.
+- Keep size guidance advisory. No native hook, new Stop gate or read-only intake.
+- Source candidate only; installation and publication need separate verification.
+
+# Candidate change: 0.5.0-beta.5 (historical local candidate)
 
 - Direct read-only workflow; optional stateless declared-effects route.
 - Native hooks retired; integration manages AGENTS/skills only, never restores hooks/config.
