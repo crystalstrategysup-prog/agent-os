@@ -27,7 +27,7 @@ This work may change only the canonical public repository, its public release ar
 
 - The public source, release asset and tag have been read back; independent external review of beta behavior remains valuable, especially native hook trust and a real target installation.
 - Windows bootstrap and native Codex hook enforcement need actual supported runtime/client proof; unit fixtures alone do not establish either.
-- The public website source is pushed to its separate Git remote, but the live `/agent-os/` route still serves 0.4.0. Its service-host scope is not allowlisted in the installed host-mutation gate; source push alone is not deployment.
+- The public website source is pushed to its separate Git remote, but the live `/agent-os/` route still serves 0.4.0. The existing website deployment gate has no applicable scope; source push alone is not deployment.
 - Publishing to PyPI requires a real package account and upload receipt; until then GitHub source/wheel installation is the documented path.
 
 ## Sources and evidence
