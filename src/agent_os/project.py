@@ -440,7 +440,7 @@ def ready(root: Path, task_id: str, reviewer: str) -> dict:
     with lock(within(root, ".agentos/write.lock")):
         task = load_task(root, task_id)
         project = load_project(root)
-        if task["status"] not in {"INTAKE", "READY", "CHECKPOINT"}:
+        if task["status"] != "INTAKE":
             raise GateError("ready_invalid_state")
         _answers(task["answers"])
         docs = document_check(root, task)

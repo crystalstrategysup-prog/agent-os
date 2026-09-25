@@ -14,6 +14,7 @@ from agent_os import (
     integration,
     observation,
     overlay,
+    safeio,
 )
 from agent_os import (
     project as p,
@@ -218,6 +219,17 @@ def test_stale_source_invalidates_pass(setup):
     p.run_check(setup[0], task, "unit")
     (setup[0] / "code.py").write_text("x=2\n")
     assert p.assess(setup[0], task)["status"] == "BLOCKED"
+
+
+def test_ready_cannot_replace_approved_source_baseline(setup):
+    task = prepared(setup)
+    root = setup[0]
+    baseline = p.load_task(root, task)["ready"]
+    (root / "unapproved.py").write_text("changed\n")
+    with pytest.raises(GateError, match="ready_invalid_state"):
+        p.ready(root, task, "second reviewer")
+    assert p.load_task(root, task)["ready"] == baseline
+    assert p.assess(root, task)["status"] == "BLOCKED"
 
 
 def test_out_of_scope_even_with_fresh_check(setup):
@@ -559,6 +571,34 @@ def test_overlay_conflict_no_overwrite(tmp_path):
     )
 
 
+def test_create_only_publish_failure_leaves_no_partial_target(tmp_path, monkeypatch):
+    target = tmp_path / "user" / "config.json"
+
+    def fail_sync(_fd):
+        raise OSError("injected write failure")
+
+    monkeypatch.setattr(safeio.os, "fsync", fail_sync)
+    with pytest.raises(OSError, match="injected write failure"):
+        safeio.create_only_bytes(target, b"complete contents")
+    assert not target.exists()
+    assert list(target.parent.iterdir()) == []
+
+
+def test_create_only_publish_never_overwrites_raced_target(tmp_path, monkeypatch):
+    target = tmp_path / "user" / "config.json"
+    original_link = safeio.os.link
+
+    def concurrent_create(source, destination):
+        Path(destination).write_bytes(b"existing user bytes")
+        original_link(source, destination)
+
+    monkeypatch.setattr(safeio.os, "link", concurrent_create)
+    with pytest.raises(FileExistsError):
+        safeio.create_only_bytes(target, b"new bytes")
+    assert target.read_bytes() == b"existing user bytes"
+    assert list(target.parent.iterdir()) == [target]
+
+
 def test_overlay_bad_hash(tmp_path):
     src = overlay_source(tmp_path)
     (src / "config.json").write_text("{}")
@@ -815,7 +855,7 @@ def test_installer_root_separation_and_wheel_hash(tmp_path):
             "--sha256",
             "0" * 64,
             "--version",
-            "0.5.0-beta.1",
+            "0.5.0-beta.2",
             "--core-home",
             str(tmp_path / "core"),
             "--user-home",
@@ -825,6 +865,118 @@ def test_installer_root_separation_and_wheel_hash(tmp_path):
     with pytest.raises(ValueError):
         mod.execute(args)
     assert not (tmp_path / "core").exists()
+
+
+@pytest.mark.parametrize(
+    ("name", "contents"),
+    [
+        ("overlay.json", '{"schema":"agentos.user-overlay/v99"}'),
+        ("config.json", '{"schema":"agent-os.community-config/v99"}'),
+        (
+            "config.json",
+            '{"schema":"agent-os.community-config/v5","schema":"agent-os.community-config/v5"}',
+        ),
+    ],
+)
+def test_installer_refuses_incompatible_user_metadata_before_activation(
+    tmp_path, name, contents
+):
+    script = Path(__file__).resolve().parents[1] / "tools/install.py"
+    spec = importlib.util.spec_from_file_location("agentos_installer_fixture", script)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    core = tmp_path / "core"
+    user = tmp_path / "user"
+    user.mkdir()
+    (user / name).write_text(contents)
+    wheel = tmp_path / "synthetic.whl"
+    wheel.write_bytes(b"fixture wheel bytes")
+    release_dir = core / "releases" / "0.0.0-fixture"
+    release_dir.mkdir(parents=True)
+    (release_dir / wheel.name).write_bytes(wheel.read_bytes())
+    mod.write_json(
+        release_dir / "INSTALL.json",
+        {
+            "schema": "agentos.install/v1",
+            "version": "0.0.0-fixture",
+            "wheel_name": wheel.name,
+            "wheel_sha256": mod.digest(wheel),
+            "overlay_schema": 1,
+            "config_schema": "agent-os.community-config/v5",
+        },
+    )
+    (core / "current").symlink_to("releases/0.0.0-fixture")
+    original_pointer = os.readlink(core / "current")
+    install_args = mod.parser().parse_args(
+        [
+            "install",
+            "--wheel",
+            str(wheel),
+            "--sha256",
+            mod.digest(wheel),
+            "--version",
+            "0.5.0-beta.2",
+            "--core-home",
+            str(core),
+            "--user-home",
+            str(user),
+            "--apply",
+            "--expected-current",
+            "0.0.0-fixture",
+        ]
+    )
+    rollback_args = mod.parser().parse_args(
+        [
+            "rollback",
+            "--release-id",
+            "0.0.0-fixture",
+            "--core-home",
+            str(core),
+            "--user-home",
+            str(user),
+            "--apply",
+            "--expected-current",
+            "0.0.0-fixture",
+        ]
+    )
+    for args in (install_args, rollback_args):
+        with pytest.raises(
+            mod.InstallError,
+            match="user_.*schema_unsupported|user_metadata_duplicate_key",
+        ):
+            mod.execute(args)
+        assert os.readlink(core / "current") == original_pointer
+        assert not (core / ".install.lock").exists()
+
+
+def test_installer_accepts_legacy_config_without_mutation(tmp_path):
+    script = Path(__file__).resolve().parents[1] / "tools/install.py"
+    spec = importlib.util.spec_from_file_location("agentos_installer_fixture", script)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    user = tmp_path / "user"
+    user.mkdir()
+    config = user / "config.json"
+    config.write_bytes(b'{"schema":"agent-os.community-config/v4","owner_key":true}\n')
+    before = config.read_bytes()
+    mod.check_user_compatibility(
+        user, {"overlay_schema": 1, "config_schema": "agent-os.community-config/v5"}
+    )
+    assert config.read_bytes() == before
+
+
+def test_installer_refuses_symlinked_user_metadata(tmp_path):
+    script = Path(__file__).resolve().parents[1] / "tools/install.py"
+    spec = importlib.util.spec_from_file_location("agentos_installer_fixture", script)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    user = tmp_path / "user"
+    user.mkdir()
+    (user / "overlay.json").symlink_to(tmp_path / "absent")
+    with pytest.raises(mod.InstallError, match="user_metadata_symlink_refused"):
+        mod.check_user_compatibility(
+            user, {"overlay_schema": 1, "config_schema": "agent-os.community-config/v5"}
+        )
 
 
 def test_discovery_with_explicit_user_home():

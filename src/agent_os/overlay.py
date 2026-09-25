@@ -10,6 +10,7 @@ from .safeio import (
     GateError,
     atomic_bytes,
     atomic_json,
+    create_only_bytes,
     filemap,
     lock,
     now,
@@ -154,23 +155,15 @@ def import_overlay(source: Path, destination: Path, *, apply: bool = False) -> d
         plan = inspect_import(source, destination)
         if plan["status"] != "READY":
             return plan
-        # Copy only missing files. On a partial I/O failure, a rerun is idempotent;
-        # existing user files are never overwritten or rolled back.
+        # Publish complete files only. A failed write leaves no target to conflict
+        # with a later retry; existing user files are never overwritten.
         for rel in plan["create"]:
             src = within(source, rel, allow_missing=False)
             target = within(destination, rel)
-            target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
             data = src.read_bytes()
             if sha(data) != plan["files"][rel]:
                 raise GateError("overlay_changed_during_import")
-            flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
-            if hasattr(os, "O_NOFOLLOW"):
-                flags |= os.O_NOFOLLOW
-            fd = os.open(target, flags, 0o600)
-            with os.fdopen(fd, "wb") as f:
-                f.write(data)
-                f.flush()
-                os.fsync(f.fileno())
+            create_only_bytes(target, data)
         receipt = {
             "schema": "agentos.overlay-import-receipt/v1",
             "at": now(),

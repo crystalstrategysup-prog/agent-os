@@ -88,6 +88,51 @@ def read_manifest(path: Path) -> dict:
     return data
 
 
+def check_user_compatibility(user: Path, manifest: dict) -> None:
+    """Read only the schema headers that the selected release can consume."""
+    if (
+        manifest.get("overlay_schema") != 1
+        or manifest.get("config_schema") != "agent-os.community-config/v5"
+    ):
+        raise InstallError("release_user_schema_contract_unsupported")
+
+    def read_metadata(name: str) -> dict | None:
+        path = user / name
+        if path.is_symlink():
+            raise InstallError("user_metadata_symlink_refused:" + name)
+        if not path.exists():
+            return None
+        if not path.is_file() or path.stat().st_size > 4 * 1024 * 1024:
+            raise InstallError("user_metadata_not_bounded_file:" + name)
+
+        def unique(pairs: list[tuple[str, object]]) -> dict:
+            value = {}
+            for key, item in pairs:
+                if key in value:
+                    raise InstallError("user_metadata_duplicate_key:" + name)
+                value[key] = item
+            return value
+
+        try:
+            value = json.loads(
+                path.read_text(encoding="utf-8"), object_pairs_hook=unique
+            )
+        except (UnicodeError, json.JSONDecodeError) as exc:
+            raise InstallError("user_metadata_invalid_json:" + name) from exc
+        if not isinstance(value, dict):
+            raise InstallError("user_metadata_not_object:" + name)
+        return value
+
+    overlay = read_metadata("overlay.json")
+    if overlay is not None and overlay.get("schema") != "agentos.user-overlay/v1":
+        raise InstallError("user_overlay_schema_unsupported")
+    config = read_metadata("config.json")
+    if config is not None and config.get("schema") not in {
+        f"agent-os.community-config/v{version}" for version in range(1, 6)
+    }:
+        raise InstallError("user_config_schema_unsupported")
+
+
 def current_id(root: Path) -> str:
     current = root / "current"
     if not current.exists() and not current.is_symlink():
@@ -185,6 +230,7 @@ def execute(args: argparse.Namespace) -> dict:
             "overlay_schema": 1,
             "config_schema": "agent-os.community-config/v5",
         }
+    check_user_compatibility(user, manifest)
     plan = {
         "status": "PLANNED",
         "action": args.action,
@@ -250,6 +296,7 @@ def execute(args: argparse.Namespace) -> dict:
                 write_json(target / "INSTALL.json", manifest)
                 (target / "INCOMPLETE").unlink()
         evidence = probe(target, manifest["version"])
+        check_user_compatibility(user, manifest)
         activate(root, identifier, old)
         return {
             **plan,

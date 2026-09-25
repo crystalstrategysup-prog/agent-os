@@ -94,6 +94,24 @@ def atomic_bytes(path: Path, data: bytes, mode: int = 0o600) -> None:
             os.unlink(temp)
 
 
+def create_only_bytes(path: Path, data: bytes, mode: int = 0o600) -> None:
+    """Publish complete bytes only when the destination does not exist."""
+    if path.is_symlink():
+        raise GateError("symlink_destination_refused")
+    path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    fd, temp = tempfile.mkstemp(prefix=".agentos-tmp-", dir=path.parent)
+    try:
+        os.fchmod(fd, mode)
+        with os.fdopen(fd, "wb") as f:
+            f.write(data)
+            f.flush()
+            os.fsync(f.fileno())
+        # A same-directory hard link is an atomic no-replace publish on POSIX.
+        os.link(temp, path)
+    finally:
+        Path(temp).unlink(missing_ok=True)
+
+
 def atomic_json(path: Path, value: Any) -> None:
     atomic_bytes(
         path,

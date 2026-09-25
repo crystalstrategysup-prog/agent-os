@@ -2,10 +2,10 @@
 
 ## Установка из публичного исходника
 
-После публикации проверенного tag `v0.5.0-beta.1` на macOS или Linux с Python 3.11+:
+После публикации проверенного tag `v0.5.0-beta.2` на macOS или Linux с Python 3.11+:
 
 ```sh
-git clone --branch v0.5.0-beta.1 https://github.com/crystalstrategysup-prog/agent-os.git
+git clone --branch v0.5.0-beta.2 https://github.com/crystalstrategysup-prog/agent-os.git
 cd agent-os
 python3 -m venv .venv
 . .venv/bin/activate
@@ -30,8 +30,8 @@ agentos doctor
 
 ```sh
 python3 tools/install.py install \
- --wheel /absolute/crystal_agent_os-0.5.0b1-py3-none-any.whl \
- --sha256 ACTUAL_WHEEL_SHA256 --version 0.5.0-beta.1 \
+ --wheel /absolute/crystal_agent_os-0.5.0b2-py3-none-any.whl \
+ --sha256 ACTUAL_WHEEL_SHA256 --version 0.5.0-beta.2 \
  --core-home "$HOME/.local/share/agentos-foundation" --user-home "$HOME/.agentos-user"
 ```
 
@@ -39,8 +39,11 @@ Plan выводит expected_current (первый запуск `none`) и relea
 повторить **ту же команду** с `--apply --expected-current none` или exact observed release id.
 Wheel копируется с повторной проверкой SHA, venv создаётся по окончательному пути, pip работает
 --isolated --no-index --no-deps. Smoke проверяет реальную installed version/resources/MCP tools.
-Only after PASS меняется current symlink. Пользовательская папка не создаётся и не читается
-installer; import — отдельная команда. Установка не делает global PATH, service, auth changes.
+Only after PASS меняется current symlink. Installer не изменяет пользовательскую папку,
+но читает `overlay.json` и `config.json` для проверки совместимости схем перед планом и
+перед переключением версии. Неизвестная схема, повреждённый JSON или symlink блокируют
+установку и откат без изменения `current`; отсутствие файлов допустимо. Import — отдельная
+команда. Установка не делает global PATH, service, auth changes.
 
 ## Пользовательская надстройка
 
@@ -53,6 +56,8 @@ installer; import — отдельная команда. Установка не
 Для существующего community-config/v1..v4: `overlay migrate-config`, потом `--apply`.
 Незнакомые ключи сохраняются; config backup остаётся в user/backups. Partial private configs
 не интерпретируются как community-config автоматически: это отдельный on-host mapping.
+Import создаёт файл только после полной записи и fsync во временный файл в том же каталоге;
+при сбое записи целевой файл не появляется. Существующий файл никогда не заменяется.
 
 ## Подключение агента
 

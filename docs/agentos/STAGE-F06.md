@@ -1,6 +1,6 @@
 # F06 — beta hardening after external review
 
-Status: DOCUMENTED BEFORE IMPLEMENTATION. Baseline is the published `v0.5.0-beta.1` source plus F05 result on main. This stage fixes three independently confirmed local state boundary defects and publishes a new beta tag; the existing tag remains immutable.
+Status: LOCAL PASS, PUBLICATION READY. Baseline is the published `v0.5.0-beta.1` source plus F05 result on main. This stage fixes three independently confirmed local state boundary defects and publishes a new beta tag; the existing tag remains immutable.
 
 ## Defects and bounded fixes
 
@@ -18,3 +18,10 @@ Status: DOCUMENTED BEFORE IMPLEMENTATION. Baseline is the published `v0.5.0-beta
 ## Limits
 
 The host gates recorded in F05 remain separate. This stage does not activate the live site, install on the live Mac, or claim Windows/native hook proof. Publish a new beta pre-release and update source guidance; do not rewrite `v0.5.0-beta.1`.
+
+## Local result before publication
+
+- `161` pytest cases and Ruff passed. Failure injection covered an interrupted create-only write, a destination appearing before the atomic link, incompatible/duplicate/symlinked user metadata, and a second `ready` after a source change.
+- The public-tree validator and temporary lifecycle demo passed. The beta.2 wheel SHA-256 is `d3034d3f46d9b1582f518970bcfe9e50cab5ea398ff10947cfa316c2221ba615`.
+- A disposable Darwin arm64 Python 3.14 fixture passed offline install, update, rollback, reactivation, overlay preservation and packaged-resource checks. A Linux arm64 Python 3.12 container installed the wheel with network disabled and passed version, init, doctor and resources read-back.
+- These are synthetic/local checks. Public tag, release asset and site source read-back remain publication steps; the target host gates remain unresolved.

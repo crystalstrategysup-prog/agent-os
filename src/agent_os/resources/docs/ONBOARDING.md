@@ -3,7 +3,7 @@
 ## Чистая установка и исходники
 
 Канонический исходник — `https://github.com/crystalstrategysup-prog/agent-os`.
-Для beta используйте проверенный tag `v0.5.0-beta.1` после публикации. На macOS/Linux
+Для beta используйте проверенный tag `v0.5.0-beta.2` после публикации. На macOS/Linux
 нужен Python 3.11+: `python3 -m venv .venv`, затем `python -m pip install -e '.[dev]'`,
 `agentos init`, `agentos doctor`, `python -m pytest -q`. Это установка из исходника,
 не из PyPI: проект `crystal-agent-os` там пока даёт 404. Запуск `init` создаёт только

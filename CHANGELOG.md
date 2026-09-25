@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0-beta.2 — beta hardening, 2026-09-25
+
+- Publish imported overlay files atomically with create-only semantics, so an interrupted write cannot leave a partial user file.
+- Refuse managed install and rollback when the existing user overlay or config schema is incompatible, malformed or symlinked; legacy community config v1–v4 remains readable without implicit migration.
+- Require a fresh task entry before `ready` can take a new source baseline. Repeating `ready` on an already ready task no longer clears receipts or hides an out-of-scope change.
+- Keep the beta.1 tag immutable. This release is `v0.5.0-beta.2` (`0.5.0b2` in Python packaging). The existing target activation and platform verification limits remain documented.
+
 ## 0.5.0-beta.1 — community beta, 2026-09-25
 
 - Add documentation-first project entry, relevant document selection, stage readiness, current checks, semantic closeout and a read-only observation path.

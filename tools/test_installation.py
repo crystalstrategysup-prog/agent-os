@@ -106,7 +106,7 @@ def verify(wheel: Path, overlay: Path | None = None) -> dict:
         user = t / "user"
         user.mkdir()
         (user / "config.json").write_text(
-            '{"fixture": "retain me exactly", "custom": 17}\n'
+            '{"schema":"agent-os.community-config/v5","fixture":"retain me exactly","custom":17}\n'
         )
         (user / "knowledge").mkdir()
         (user / "knowledge/local.txt").write_text("Synthetic knowledge sentinel.\n")
