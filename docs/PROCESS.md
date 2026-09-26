@@ -151,3 +151,8 @@ separate observation in the user home and does not create or change a project
 task. Reusing the same session, turn, and root is rejected rather than silently
 overwritten. API or mail reading requires no such record. An observation does
 not prove external API completeness or that a disk never changed.
+
+For provider selection and target-policy diagnosis, follow
+[PROVIDER_INDEPENDENCE](PROVIDER_INDEPENDENCE.md). Public project work requires
+no private kernel, fleet controller or notification service. Preserve actual
+target controls; missing optional reporting does not block local completion.

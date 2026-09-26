@@ -1,6 +1,6 @@
 # Current AgentOS public project handoff
 
-Status: CURRENT; F17 completed on 2026-09-26.
+Status: CURRENT; F18 source and Mac guidance verified on 2026-09-26.
 
 ## Identity and primary documents
 
@@ -18,6 +18,12 @@ F15B verified authenticated SSH and RFB transport on one authorized macOS host.
 F15C deferred Screen Sharing/viewer login/frame; do not revive that requirement.
 
 ## Current work and limits
+
+F18 removes inherited private-runtime prerequisites from public documentation
+and scoped owner-Mac instruction/skill applicability. See STAGE-F18 and
+../PROVIDER_INDEPENDENCE.md. This correction is source-only for the next public
+package; installed and published stable remain immutable 0.5.4. No target loader
+or NEW application deployment was migrated.
 
 F17 repaired handoff lookup/routing and verified the public 0.5.4 release and
 managed Mac update. Other devices and a fresh Codex chat were not tested.

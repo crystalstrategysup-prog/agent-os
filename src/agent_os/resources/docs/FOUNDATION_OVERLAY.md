@@ -47,3 +47,11 @@ Partial sanitized exports are review evidence, not complete replacement profiles
 real profile edit, inventory and explicit re-selection refresh the exact hashes; schema-only
 selection evidence does not prove ACTIVE. Never use mode none to evade a required host identity.
 Core rollback must not restore native hooks or call a legacy integration generator.
+
+## Independent providers
+
+The public project workflow requires no former private kernel or fleet
+controller. Overlay knowledge cannot make a provider-specific gate universal.
+Choose the current authorized target contract and distinguish an enforced
+restriction from historical guidance. Optional reporting is separate from local
+completion. See [PROVIDER_INDEPENDENCE](PROVIDER_INDEPENDENCE.md).

@@ -1,3 +1,7 @@
+# Current correction — F18
+
+Inherited private-runtime prerequisites are removed from public source guidance and scoped Mac instructions/skills. See STAGE-F18.md. Installed and published stable remain immutable 0.5.4; public package guidance awaits the next release.
+
 # Current repair stage — F17
 
 Handoff discovery and selected Mac routing are repaired. Public and installed

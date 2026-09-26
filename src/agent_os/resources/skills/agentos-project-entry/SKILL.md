@@ -26,6 +26,12 @@ task ID. Use an explicit workflow session/turn and `next-turn` for continued CLI
 work; do not imitate native client events. External, production, database,
 credential, destructive, send, and deploy actions have separate target gates.
 
+Public project work requires no private kernel, fleet controller, RC pin or
+notification provider. Before applying a provider-specific rule, verify its
+current target applicability using `resources/docs/PROVIDER_INDEPENDENCE.md`.
+Preserve enforced target controls; a missing optional report never blocks local
+completion.
+
 The installed `resources/docs/PROCESS.md` and README are normative; locate them with
 `agentos resources`. Project gates apply to real changes. Reading requires no
 intake or observation. Native hooks remain excluded and must not be enabled or

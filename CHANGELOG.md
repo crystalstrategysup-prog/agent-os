@@ -1,3 +1,10 @@
+# Unreleased — provider independence
+
+- Clarify that public project governance requires no private kernel, fleet
+  controller, RC pin, signer or notification service.
+- Document current target-policy diagnosis and optional reporting without
+  weakening enforced target controls. Immutable 0.5.4 assets are unchanged.
+
 # 0.5.4 — current handoff discovery
 
 - Add a bounded read-only lookup procedure distinguishing current project

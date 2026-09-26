@@ -11,7 +11,7 @@ work: [ARCHITECTURE](ARCHITECTURE.md), [CONTRACTS](CONTRACTS.md),
 [QUALITY](QUALITY.md). [FOUNDATION_OVERLAY](FOUNDATION_OVERLAY.md) explains
 physical separation and [DOCUMENTATION_CATALOG](DOCUMENTATION_CATALOG.md)
 explains document selection. The current source stage is
-[STAGE-F17](agentos/STAGE-F17.md); earlier stages are historical. Stage records
+[STAGE-F18](agentos/STAGE-F18.md); earlier stages are historical. Stage records
 are not shipped as runtime resources; the installed process contract is the
 packaged `resources/docs/PROCESS.md`. See [COMPATIBILITY](COMPATIBILITY.md) for
 platforms and unverified target behavior.
@@ -22,3 +22,6 @@ cover capability setup; filled user passports and connection settings stay
 outside the public package.
 
 For current handoff lookup, follow [HANDOFF_DISCOVERY](HANDOFF_DISCOVERY.md).
+
+For external executor selection and inherited private-policy conflicts, follow
+[PROVIDER_INDEPENDENCE](PROVIDER_INDEPENDENCE.md).

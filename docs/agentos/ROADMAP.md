@@ -1,3 +1,7 @@
+# Active source stage — F18
+
+F18 source guidance and scoped Mac correction verified. Installed/public stable remain 0.5.4; new packaged guidance awaits the next release. Private target-policy migration and F16 discovery remain separate.
+
 # Active source stage — F17
 
 Public and installed owner-Mac stable are 0.5.4; see STAGE-F17 for

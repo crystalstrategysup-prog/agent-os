@@ -112,3 +112,12 @@ procedure; current handoffs belong to their selected projects and private
 cross-project indexes belong to the external overlay. Lifecycle results and
 archived packets are evidence with different roles. The managed bootstrap links
 to the packaged procedure and does not enroll a user's paths or change access.
+
+**ADR-017 (F18).** Public project governance has no dependency on a private
+kernel, fleet controller, release-candidate pin, signer, deployment profile or
+notification service. Select an external executor by the authorized target's
+current contract. An inherited private runbook is not proof that the target
+enforces its gate. An enforced target refusal still blocks that effect and
+requires its own scoped policy decision; public READY cannot override it.
+Optional notification failure does not prevent local project completion.
+See `docs/PROVIDER_INDEPENDENCE.md`.
