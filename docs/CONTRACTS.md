@@ -6,9 +6,20 @@ and the packaged schemas under `src/agent_os/resources/schemas/`. Tests compare
 MCP `inputSchema` and `outputSchema` with `tools/list` and returned
 `structuredContent`, and task/event schemas with actual local lifecycle records.
 
-CLI, Python, and MCP report version `0.5.2`; the stdio MCP protocol version is
+CLI, Python, and MCP report version `0.5.3`; the stdio MCP protocol version is
 `2025-06-18`. There is no HTTP API or OpenAPI specification. Project events are
 local JSONL with JSON Schema, not AsyncAPI.
+
+F15B adds `agentos setup probe ssh-vnc --host ALIAS [--vnc-port PORT]
+[--ssh-only] [--apply]`. Without `--apply` it returns a network-free plan. With it, the
+command returns `SSH_VERIFIED` or `TRANSPORT_VERIFIED` only for the requested
+SSH and optional RFB transport layers, `FAIL` for a bounded probe failure, and
+`BLOCKED` for invalid input or an unsupported environment. Output always leaves
+`vnc_authenticated` and `desktop_frame_verified` false. The current diagnostic
+implements no viewer path. This probe is an external read of the exact selected host, not
+part of the stateless `setup list/show` commands. Its argv and result shape
+are reviewed under STAGE-F15B before publication; the JSON result is defined by
+`schemas/ssh-vnc-probe-v1.schema.json` and its packaged copy.
 
 ## CLI
 

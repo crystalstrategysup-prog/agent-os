@@ -1,4 +1,4 @@
-"""Bounded, read-only discovery of packaged setup scenarios."""
+"""Bounded discovery of packaged scenarios and an opt-in SSH/VNC probe."""
 
 from __future__ import annotations
 
@@ -76,5 +76,19 @@ def command(argv: list[str]) -> dict[str, Any]:
     actions.add_parser("list", help="List published connection scenarios")
     selected = actions.add_parser("show", help="Read one published scenario")
     selected.add_argument("id")
+    probe_parser = actions.add_parser("probe", help="Plan or verify one SSH/VNC route")
+    probe_parser.add_argument("kind", choices=["ssh-vnc"])
+    probe_parser.add_argument("--host", required=True, help="Existing SSH alias")
+    probe_parser.add_argument("--vnc-port", type=int, default=5900)
+    probe_parser.add_argument("--ssh-only", action="store_true")
+    probe_parser.add_argument("--apply", action="store_true")
     args = parser.parse_args(argv)
-    return load_index() if args.action == "list" else show(args.id)
+    if args.action == "list":
+        return load_index()
+    if args.action == "show":
+        return show(args.id)
+    from .ssh_vnc_probe import probe
+
+    return probe(
+        args.host, vnc_port=args.vnc_port, ssh_only=args.ssh_only, apply=args.apply
+    )

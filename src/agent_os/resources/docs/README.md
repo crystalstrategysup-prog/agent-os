@@ -1,6 +1,6 @@
 # AgentOS documentation
 
-The public source declares `0.5.2`. Ordinary questions and read-only work need
+The public source declares `0.5.3`. Ordinary questions and read-only work need
 no project intake; real project changes follow a documentation-first stage.
 Native AgentOS hooks are excluded. Check publication and installation with
 separate readback.
@@ -11,7 +11,7 @@ work: [ARCHITECTURE](ARCHITECTURE.md), [CONTRACTS](CONTRACTS.md),
 [QUALITY](QUALITY.md). [FOUNDATION_OVERLAY](FOUNDATION_OVERLAY.md) explains
 physical separation and [DOCUMENTATION_CATALOG](DOCUMENTATION_CATALOG.md)
 explains document selection. The current source stage is
-[STAGE-F15](agentos/STAGE-F15.md); earlier stages are historical. Stage records
+[STAGE-F15B](agentos/STAGE-F15B.md); earlier stages are historical. Stage records
 are not shipped as runtime resources; the installed process contract is the
 packaged `resources/docs/PROCESS.md`. See [COMPATIBILITY](COMPATIBILITY.md) for
 platforms and unverified target behavior.

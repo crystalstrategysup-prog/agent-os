@@ -1,13 +1,13 @@
 {
   "schema": "agentos.setup-scenario/v1",
   "id": "ssh-vnc-tunnel",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "title": "Connect to a device with SSH or VNC over SSH",
   "goal": "Reach one authorized device quickly by reusing a verified SSH route, or set up the shortest suitable route; add a protected desktop connection only when needed.",
   "implementation_status": "guide_only",
   "evidence": {
-    "level": "documented",
-    "scope": "OpenSSH, Microsoft, Apple and RFB primary documentation was reviewed. A private reverse-tunnel implementation informed the proof layers, but no universal adapter or new device login was verified.",
+    "level": "live_verified",
+    "scope": "One authorized macOS host passed authenticated SSH and RFB transport through the bounded diagnostic on 2026-09-26. VNC login and a desktop frame were not verified. Direct and reverse setup guidance remains documented, not universally tested.",
     "reviewed_on": "2026-09-26",
     "sources": [
       "https://man.openbsd.org/ssh",
@@ -16,7 +16,9 @@
       "https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse",
       "https://support.apple.com/guide/mac-help/mchlp1066/mac",
       "https://support.apple.com/guide/mac-help/mh11848/mac",
-      "https://www.rfc-editor.org/info/rfc6143/"
+      "https://www.rfc-editor.org/info/rfc6143/",
+      "https://support.apple.com/guide/mac-help/mh14066/mac",
+      "https://support.apple.com/guide/mac-help/mchl67d5398b/mac"
     ]
   },
   "prerequisites": [
@@ -38,8 +40,8 @@
         {
           "id": "recheck",
           "actor": "agent",
-          "action": "Check the current host key and run a bounded authenticated SSH identity probe through that route. If desktop was requested, continue with the desktop flow.",
-          "proof": "Authentication succeeds and the response identifies the intended device. A TCP or SSH banner alone is insufficient."
+          "action": "Use the selected existing alias with agentos setup probe ssh-vnc --host ALIAS --apply; add --ssh-only when only shell access is requested. This checks strict host-key policy and bounded authenticated SSH command execution, then optional RFB transport. For an actual desktop, continue with the viewer flow.",
+          "proof": "Strict known-host checking and authenticated command execution succeed for the device identity already bound to the selected private route. A TCP or SSH banner alone is insufficient."
         }
       ]
     },
@@ -80,13 +82,13 @@
         {
           "id": "forward",
           "actor": "agent",
-          "action": "Create a local loopback-bound SSH forward from the viewer to the device's VNC endpoint through the verified SSH route, with forwarding failure detection.",
+          "action": "Follow the packaged docs/SSH_VNC_FIELD_GUIDE.md. Create a visible local loopback-bound SSH forward to the device VNC endpoint with ExitOnForwardFailure=yes and ClearAllForwardings=no. ExitOnForwardFailure proves binding only; separately require the RFB response.",
           "proof": "The local forwarded port answers with an RFB banner while the SSH tunnel is live. This proves transport only."
         },
         {
           "id": "view",
           "actor": "person",
-          "action": "Authenticate with the approved VNC or screen-sharing account and confirm a current desktop frame from the intended device.",
+          "action": "Use the approved native viewer (Standard Screen Sharing on a Mac for this RFB tunnel), authenticate with the approved account, and confirm a current frame of the intended device. Do not request a password in chat or infer success from the diagnostic transport status.",
           "proof": "Authentication and an actual desktop frame succeed; a banner, black frame or locked console is not reported as usable desktop access."
         }
       ]
@@ -103,7 +105,9 @@
     "If an old alias fails, revalidate the exact device and host key before changing the route; never suppress host-key warnings for speed.",
     "If a tunnel or banner works but SSH authentication fails, inspect the selected account and key without claiming device access.",
     "If SSH works but desktop does not, check the local desktop service, forward binding, viewer authentication and console state independently.",
-    "Stop temporary forwards when finished. Remove only access created for this connection and record how the owner can revoke the key, broker authorization or desktop permission."
+    "Stop temporary forwards when finished. Remove only access created for this connection and record how the owner can revoke the key, broker authorization or desktop permission.",
+    "ClearAllForwardings=yes suppresses explicit -L forwards while SSH can remain connected. The command-only probe uses yes; a requested VNC forward requires no.",
+    "A missing listener in an unprivileged process-table query does not prove that a socket-activated service is unavailable; use a bounded connection to the exact endpoint."
   ],
   "maintenance": {
     "owner": "AgentOS community maintainers",

@@ -3,7 +3,7 @@
   "schema": "agentos.mcp-tools/v1",
   "serverInfo": {
     "name": "crystal-agent-os",
-    "version": "0.5.2"
+    "version": "0.5.3"
   },
   "tools": [
     {

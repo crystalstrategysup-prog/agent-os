@@ -25,9 +25,9 @@ def test_public_catalog_matches_versioned_schemas_and_package_copies() -> None:
     scenario_schema = json.loads(
         (ROOT / "schemas/setup-scenario-v1.schema.json").read_text()
     )
-    assert (ROOT / "src/agent_os/resources/schemas/setup-index-v1.schema.json").read_bytes() == (
-        ROOT / "schemas/setup-index-v1.schema.json"
-    ).read_bytes()
+    assert (
+        ROOT / "src/agent_os/resources/schemas/setup-index-v1.schema.json"
+    ).read_bytes() == (ROOT / "schemas/setup-index-v1.schema.json").read_bytes()
     assert (
         ROOT / "src/agent_os/resources/schemas/setup-scenario-v1.schema.json"
     ).read_bytes() == (ROOT / "schemas/setup-scenario-v1.schema.json").read_bytes()
@@ -47,7 +47,10 @@ def test_public_catalog_matches_versioned_schemas_and_package_copies() -> None:
         assert scenario["title"] == entry["title"]
         assert scenario["implementation_status"] == entry["implementation_status"]
         assert scenario["implementation_status"] == "guide_only"
-        assert scenario["evidence"]["level"] == "documented"
+        expected_level = (
+            "live_verified" if entry["id"] == "ssh-vnc-tunnel" else "documented"
+        )
+        assert scenario["evidence"]["level"] == expected_level
         assert all(
             source.startswith(PRIMARY_SOURCE_PREFIXES)
             for source in scenario["evidence"]["sources"]
@@ -65,7 +68,9 @@ def test_public_catalog_matches_versioned_schemas_and_package_copies() -> None:
 
 def test_setup_cli_requires_no_user_home_or_update_check(monkeypatch, capsys) -> None:
     def forbidden(*_args, **_kwargs):
-        raise AssertionError("setup discovery must not touch user configuration or network")
+        raise AssertionError(
+            "setup discovery must not touch user configuration or network"
+        )
 
     monkeypatch.setattr("agent_os.config.AgentOSPaths.discover", forbidden)
     monkeypatch.setattr("agent_os.cli.update_advisory_check", forbidden)

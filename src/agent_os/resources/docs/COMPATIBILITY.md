@@ -1,8 +1,13 @@
 # Compatibility and known limits
 
-The source declares `0.5.2`; publication and installation require separate
+The source declares `0.5.3`; publication and installation require separate
 readback. A concise `AGENTS.md` is routing advice, not a new lifecycle gate.
 F01–F08 results describe their own source and wheel, not this change.
+
+The opt-in SSH/RFB probe requires a POSIX host with OpenSSH stdio forwarding.
+It was exercised on the owner Mac against one macOS SSH route.
+Windows probe execution, VNC authentication and desktop-frame capture are not
+implemented by this command. Stateless scenario discovery remains portable.
 
 | Surface | Source status | Limit |
 | --- | --- | --- |

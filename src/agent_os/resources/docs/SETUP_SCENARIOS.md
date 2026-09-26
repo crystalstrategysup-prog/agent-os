@@ -31,6 +31,14 @@ add VNC through SSH only if the person asks for a desktop. Keep device identity,
 transport, SSH authentication and desktop authentication as separate evidence.
 No public card contains a host inventory, grants access or executes a tunnel.
 
+For an exact existing SSH route, the separately invoked
+`agentos setup probe ssh-vnc --host ALIAS` returns a network-free plan;
+`--apply` performs the bounded SSH/RFB diagnostic. This does not change the
+read-only behavior of `setup list/show` or enable automatic setup. Follow the
+[SSH/VNC field procedure](SSH_VNC_FIELD_GUIDE.md) for tested commands, layered
+results, native viewer login and cleanup. A `TRANSPORT_VERIFIED` result leaves
+VNC authentication and a desktop frame unverified.
+
 ## Authoring a scenario
 
 1. State the goal in the user's language and choose a stable lowercase `id`.

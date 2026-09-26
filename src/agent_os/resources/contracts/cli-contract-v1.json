@@ -317,14 +317,26 @@
         "BLOCKED"
       ],
       "write_surfaces": []
+    },
+    {
+      "name": "setup probe ssh-vnc",
+      "effect": "plan_or_bounded_external_read",
+      "status_values": [
+        "PLANNED",
+        "SSH_VERIFIED",
+        "TRANSPORT_VERIFIED",
+        "FAIL",
+        "BLOCKED"
+      ],
+      "write_surfaces": []
     }
   ],
-  "distribution_version": "0.5.2",
+  "distribution_version": "0.5.3",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.5.2",
+  "release": "0.5.3",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",

@@ -75,6 +75,13 @@ fixture must keep user-overlay bytes and rollback anchors intact. Release and
 live Mac read-back remain separate target evidence beyond fixture tests.
 
 Linux checks do not prove macOS, Keychain, launchd, or Codex session behavior.
+
+F15B uses a fake SSH process to exercise fixed arguments, bounded output and
+timeouts, RFB protocol parsing, failed channels, cleanup and keyboard interrupt.
+A separate live exact-host invocation records authenticated SSH and RFB
+transport. Neither test is VNC login or framebuffer proof; that requires the
+approved viewer and a current frame on the selected device before claiming the
+owner's complete reference procedure.
 Mac acceptance needs exact source/runtime identity, disjoint roots, no AgentOS
 hooks, unchanged auth/config, fresh effective AGENTS, local lifecycle probes
 without external writes, and rollback/readback. Report unrun target checks as

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agentos.ssh-vnc-probe/v1",
+  "type": "object",
+  "required": [
+    "schema", "status", "proof_level", "requested_vnc", "ssh_authenticated",
+    "rfb_transport", "vnc_authenticated", "desktop_frame_verified",
+    "rfb_protocol", "security_types", "forward_closed", "host_key_policy"
+  ],
+  "properties": {
+    "schema": {"const": "agentos.ssh-vnc-probe/v1"},
+    "status": {"enum": ["PLANNED", "SSH_VERIFIED", "TRANSPORT_VERIFIED", "FAIL"]},
+    "proof_level": {"enum": ["not_run", "ssh_authenticated", "rfb_transport"]},
+    "requested_vnc": {"type": "boolean"},
+    "ssh_authenticated": {"type": "boolean"},
+    "rfb_transport": {"type": "boolean"},
+    "vnc_authenticated": {"const": false},
+    "desktop_frame_verified": {"const": false},
+    "rfb_protocol": {"type": ["string", "null"], "pattern": "^RFB [0-9]{3}\\.[0-9]{3}$"},
+    "security_types": {"type": "array", "maxItems": 255, "items": {"type": "integer", "minimum": 0, "maximum": 255}},
+    "forward_closed": {"type": "boolean"},
+    "host_key_policy": {"const": "strict"},
+    "error_code": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": false
+}

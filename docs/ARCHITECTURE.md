@@ -94,3 +94,14 @@ forwarded through authenticated SSH. The public card records proof layers and
 maintenance triggers but does not initiate connections, keep credentials, scan
 hosts or install a private Remote Access Helper. Per-device routes and current
 authorization remain external to the public core. See `docs/SETUP_SCENARIOS.md`.
+
+**ADR-015 (F15B).** A separate opt-in diagnostic may verify one existing SSH
+alias and optional VNC transport. It plans without network access by default;
+`--apply` performs bounded authenticated SSH command execution and a VNC stdio
+channel with OpenSSH `-W`, without a local listener. It returns layered JSON
+proof and closes the channel on supported normal, error and interrupt paths.
+The diagnostic accepts no raw host address, username, key path or
+arbitrary remote command, and never handles VNC credentials or infers a desktop
+frame from an RFB greeting. The setup card remains `guide_only`. The selected
+alias and host-specific results stay outside the public package. See
+`docs/agentos/STAGE-F15B.md` and `docs/SETUP_SCENARIOS.md`.

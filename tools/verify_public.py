@@ -100,7 +100,7 @@ def verify() -> dict:
     if counts["skills"] != 9:
         errors.append("expected_nine_skills")
     version_text = (ROOT / "pyproject.toml").read_text()
-    if 'version = "0.5.2"' not in version_text or __version__ != "0.5.2":
+    if 'version = "0.5.3"' not in version_text or __version__ != "0.5.3":
         errors.append("version_mismatch")
     return {
         "status": "PASS" if not errors else "FAIL",

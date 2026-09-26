@@ -1,4 +1,13 @@
-# Current stage note — F15
+# Current stage note — F15B
+
+The owner rejected `v0.5.2` as a reference SSH/VNC implementation until it is
+tested on an actual host. F15B validates the existing route on one authorized
+macOS host, adds a bounded opt-in diagnostic and corrects the public guide.
+SSH command execution and RFB transport have been observed; desktop login and
+a current frame have not. See [STAGE-F15B](STAGE-F15B.md). Private host routes
+and credentials remain outside public source.
+
+## F15 entry history
 
 On 2026-09-26 the owner requested a standard, fast, maintained SSH/VNC tunnel
 scenario for AgentOS. Remote Access Helper is an existing private implementation

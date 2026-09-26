@@ -41,7 +41,7 @@ def dispatch(argv: list[str]) -> int | None:
 
             result = command(rest[1:])
             print(json.dumps(result, ensure_ascii=False, indent=2))
-            return 0
+            return 1 if result.get("status") == "FAIL" else 0
         from .config import AgentOSPaths
 
         home = AgentOSPaths.discover(global_args.home).home
