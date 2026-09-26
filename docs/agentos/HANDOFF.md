@@ -1,6 +1,6 @@
 # Current AgentOS public project handoff
 
-Status: CURRENT; F19 public 0.5.5 release preparation, 2026-09-26.
+Status: CURRENT; F19 public 0.5.5 release and managed adoption verified, 2026-09-26.
 Canonical source: https://github.com/crystalstrategysup-prog/agent-os.
 Read AGENTS.md, README.md, DOSSIER.md, ROADMAP.md and STAGE-F19.md.
 
@@ -10,7 +10,9 @@ Actual target controls remain in force. 0.5.4 stays immutable; source/tag/assets
 and target install evidence are separate. Public package contains no user host
 facts, provider credentials or retirement archives.
 
-F19 verifies 0.5.5 and authorized managed installs; per-user rollout receipts
+F19 published stable Latest 0.5.5 with matching downloaded artifacts and verified
+five-host/nine-user adoption. Doctor and fresh installed-process workflows pass;
+existing long-running Codex clients may need reconnection. Per-user rollout receipts
 remain external and do not authorize unrelated effects. No hooks, app deploy,
 Telegram provider restoration, website or PyPI publication. Fresh installed
 processes are distinct from fresh Codex client sessions. F16 private-scenario

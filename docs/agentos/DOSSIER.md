@@ -1,6 +1,6 @@
 # Current stage — F19
 
-Verified public 0.5.5 release and managed host adoption authorized; see STAGE-F19.md. Previous public releases remain immutable and private retirement evidence stays external.
+Public 0.5.5 is published as stable Latest with verified download hashes. Five active hosts and nine user contours have managed 0.5.5 adoption, doctor and installed-process workflow proof; see STAGE-F19.md for evidence and client-session limitations. Previous releases remain immutable. Private host receipts stay external. Subsequent sections preserve earlier stage observations and do not override this current state.
 
 # Current correction — F18
 
