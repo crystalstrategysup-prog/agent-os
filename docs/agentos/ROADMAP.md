@@ -1,7 +1,6 @@
 # Active source stage — F15D
 
-The local F15B candidate declares 0.5.3; public and installed stable remains
-0.5.2. F12 added the
+Public stable is 0.5.3; the installed owner-Mac stable remains 0.5.2. F12 added the
 connection-scenario catalog and protocol; F14 published this source at `v0.5.1`
 and verified its managed Mac installation. See [STAGE-F14](STAGE-F14.md) for the
 separate publication and runtime receipts.
@@ -36,7 +35,7 @@ Every product stage follows: dossier and roadmap read-back → current stage con
 | F15 — remote-device tunnels | v0.5.1 public catalog; STAGE-F15 | Fast, generic SSH/VNC connection scenario with proof layers and maintenance triggers; reviewed versioned release and managed Mac update | RELEASE AND MAC READ-BACK PASS; live device and fresh Codex session not tested |
 | F15B — one-host field validation | v0.5.2 public card; STAGE-F15B | Reproducible exact-alias SSH/RFB probe, tested commands, honest desktop proof boundary, public patch and Mac read-back | TRANSPORT CHECKS PASS; viewer requirement deferred by owner in F15C; no release/update |
 | F15C — defer desktop viewer | Owner scope amendment; STAGE-F15C | Active SSH/RFB scenario without Screen Sharing or viewer-login requirement | SCOPED AMENDMENT IMPLEMENTED; documentation/catalog only; release/update pending |
-| F15D — stable 0.5.3 release | Reviewed F15B/F15C; STAGE-F15D | Rebuilt public artifacts, local verification, canonical main/tag/release and asset read-back | RELEASE PREPARATION; installed stable 0.5.2 |
+| F15D — stable 0.5.3 release | Reviewed F15B/F15C; STAGE-F15D | Rebuilt public artifacts, local verification, canonical main/tag/release and asset read-back | PUBLIC RELEASE AND ASSET READ-BACK PASS; installed stable 0.5.2 |
 | F16 — private scenarios | F15 public scenario contract | User-owned scenarios in the external overlay, isolated from public IDs and distribution, with explicit trust and maintenance rules | PLANNED; bounded design in STAGE-F15; separate entry required |
 
 ## Stage dependencies and stop rules

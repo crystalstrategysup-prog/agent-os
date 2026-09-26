@@ -2,7 +2,7 @@
 
 Task: `task-c68683d75a4e4186`
 
-Status: local release checks passed; publication pending.
+Status: PUBLIC RELEASE PASS; owner-Mac installation not requested.
 
 ## Objective and authority
 
@@ -57,3 +57,20 @@ install/update/rollback/reactivation and synthetic user preservation passed;
 receipt `6b9c2500ba1f4eb39e65a598e947ebc1`. This is an isolated fixture,
 not a managed owner-Mac update. The tagged source excludes local task receipts
 and untracked closeout reports. Download verification remains required.
+
+## Publication and download read-back
+
+Reviewed source `aaf33929db6e17b57a02cc750530bc53e0c1ebc9` was pushed directly
+to canonical public main and annotated tag `v0.5.3` without force. The tag object
+is `381825bd72c183b9900c13ea71a1db9ec31e5647` and peels to that exact source.
+The stable [GitHub release](https://github.com/crystalstrategysup-prog/agent-os/releases/tag/v0.5.3)
+was published by `crystalstrategysup-prog` at `2026-09-26T02:51:03Z`, release
+ID `397047878`, with Latest displayed, draft=false and prerelease=false.
+
+Downloaded source ZIP `agentos-0.5.3-source-aaf3392.zip`: 345051 bytes, SHA-256
+`939eddfa4469f137aaf39f01f25bd44ad9edb7321034c29da7dcb48bd2824fb7`.
+The downloaded wheel is 169252 bytes and matches the rebuilt hash above.
+Both assets match local bytes. GitHub-generated source links are separate from
+the reviewed uploaded ZIP. No Actions run or live installed-runtime change was
+used. Installed stable remains 0.5.2; Screen Sharing and viewer support remain
+deferred. Publication evidence is recorded after the immutable release source.

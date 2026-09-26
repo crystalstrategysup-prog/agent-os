@@ -1,7 +1,8 @@
 # Current release stage — F15D
 
-The owner authorized stable 0.5.3 publication on 2026-09-26. Screen Sharing
-remains deferred; no installed-runtime update is in this task. See
+Stable 0.5.3 is published and its downloaded source/wheel hashes match the
+reviewed local files. Screen Sharing remains deferred; installed owner-Mac
+stable remains 0.5.2. See
 [STAGE-F15D](STAGE-F15D.md).
 
 # Current scope amendment — F15C
