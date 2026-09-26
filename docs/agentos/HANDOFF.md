@@ -1,38 +1,21 @@
 # Current AgentOS public project handoff
 
-Status: CURRENT; F18 source and Mac guidance verified on 2026-09-26.
-
-## Identity and primary documents
-
+Status: CURRENT; F19 public 0.5.5 release preparation, 2026-09-26.
 Canonical source: https://github.com/crystalstrategysup-prog/agent-os.
-Start at AGENTS.md, README.md, docs/agentos/DOSSIER.md, ROADMAP.md and STAGE-F17.md.
-This is the framework development project's handoff, not a global index of
-user projects. The installed runtime is separate from this checkout.
+Read AGENTS.md, README.md, DOSSIER.md, ROADMAP.md and STAGE-F19.md.
 
-## Last verified result
+The source includes accepted F18 guidance: public development requires no
+former private kernel, fleet controller, RC, signer or notification provider.
+Actual target controls remain in force. 0.5.4 stays immutable; source/tag/assets
+and target install evidence are separate. Public package contains no user host
+facts, provider credentials or retirement archives.
 
-v0.5.4 was published from 2aacd7893f3b643223e194b13ab5689b62e9ae33;
-source/wheel downloads matched reviewed hashes. Managed owner-Mac core reads
-back 0.5.4; installed-process workflow smoke passed. See STAGE-F17.md.
-F15B verified authenticated SSH and RFB transport on one authorized macOS host.
-F15C deferred Screen Sharing/viewer login/frame; do not revive that requirement.
+F19 verifies 0.5.5 and authorized managed installs; per-user rollout receipts
+remain external and do not authorize unrelated effects. No hooks, app deploy,
+Telegram provider restoration, website or PyPI publication. Fresh installed
+processes are distinct from fresh Codex client sessions. F16 private-scenario
+support remains planned. Screen Sharing/viewer remains deferred.
 
-## Current work and limits
-
-F18 removes inherited private-runtime prerequisites from public documentation
-and scoped owner-Mac instruction/skill applicability. See STAGE-F18 and
-../PROVIDER_INDEPENDENCE.md. This correction is source-only for the next public
-package; installed and published stable remain immutable 0.5.4. No target loader
-or NEW application deployment was migrated.
-
-F17 repaired handoff lookup/routing and verified the public 0.5.4 release and
-managed Mac update. Other devices and a fresh Codex chat were not tested.
-F16 private scenario discovery remains planned, not implemented.
-No hooks, private Helper/provider migrations, website or PyPI publication.
-Per-user paths, account/host facts and service authority stay external.
-
-## Next safe step and rollback
-
-Read the current F17 evidence and exact source/runtime state before resuming.
-Do not infer task completion from an old result report. Preserve previous
-releases and the external user overlay; use verified managed rollback only.
+For current release/runtime proof see STAGE-F19 and live managed pointers.
+Preserve prior public releases and external overlays; never roll back to private
+kernels or restore hook trust. Future work requires its own exact owner scope.

@@ -1,3 +1,7 @@
+# Current stage — F19
+
+Verified public 0.5.5 release and managed host adoption authorized; see STAGE-F19.md. Previous public releases remain immutable and private retirement evidence stays external.
+
 # Active source stage — F18
 
 F18 source guidance and scoped Mac correction verified. Installed/public stable remain 0.5.4; new packaged guidance awaits the next release. Private target-policy migration and F16 discovery remain separate.

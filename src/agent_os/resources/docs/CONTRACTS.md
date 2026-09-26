@@ -6,7 +6,7 @@ and the packaged schemas under `src/agent_os/resources/schemas/`. Tests compare
 MCP `inputSchema` and `outputSchema` with `tools/list` and returned
 `structuredContent`, and task/event schemas with actual local lifecycle records.
 
-CLI, Python, and MCP report version `0.5.4`; the stdio MCP protocol version is
+CLI, Python, and MCP report version `0.5.5`; the stdio MCP protocol version is
 `2025-06-18`. There is no HTTP API or OpenAPI specification. Project events are
 local JSONL with JSON Schema, not AsyncAPI.
 

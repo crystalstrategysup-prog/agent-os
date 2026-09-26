@@ -1,6 +1,6 @@
 # AgentOS documentation
 
-The public source declares `0.5.4`. Ordinary questions and read-only work need
+The public source declares `0.5.5`. Ordinary questions and read-only work need
 no project intake; real project changes follow a documentation-first stage.
 Native AgentOS hooks are excluded. Check publication and installation with
 separate readback.

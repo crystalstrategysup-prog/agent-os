@@ -1,3 +1,7 @@
+# Current stage — F19
+
+Verified public 0.5.5 release and managed host adoption authorized; see STAGE-F19.md. Previous public releases remain immutable and private retirement evidence stays external.
+
 # Current correction — F18
 
 Inherited private-runtime prerequisites are removed from public source guidance and scoped Mac instructions/skills. See STAGE-F18.md. Installed and published stable remain immutable 0.5.4; public package guidance awaits the next release.
