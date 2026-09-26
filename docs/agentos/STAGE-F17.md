@@ -2,7 +2,7 @@
 
 Task: `task-c6506419f28d4cc2`
 
-Status: local candidate checks passed; public delivery and Mac activation pending.
+Status: PUBLIC RELEASE AND MAC READ-BACK PASS.
 
 ## Objective and verified problem
 
@@ -70,3 +70,37 @@ Three exact Mac instruction files were backed up before scoped fragment edits;
 a private pointer index was created. Legacy packets and unrelated instructions
 were preserved. The current selected profile inventory has no binding mismatch.
 Mac core activation still requires its separate plan/apply/read-back receipt.
+
+## Public delivery and target verification
+
+Source `2aacd7893f3b643223e194b13ab5689b62e9ae33` was pushed to canonical
+main and annotated `v0.5.4` (tag object
+`6b40cb859703aa3fe3e4e5d469016d0fc526abf2`). The stable Latest
+[release](https://github.com/crystalstrategysup-prog/agent-os/releases/tag/v0.5.4)
+was published by the canonical owner account at `2026-09-26T03:08:46Z`, release
+ID `397054110`. Downloaded source ZIP is 353741 bytes, SHA-256
+`dd64a44d92fbcb66aa638cf9c8d16aff231c0a1f64a9989fbec938ca75476cdc`.
+The downloaded wheel matches the hash above. Both match reviewed local bytes.
+
+The Mac installer planned and applied against exact prior release
+`0.5.2-44fd238dfbc0`. Current pointer and CLI read back
+`0.5.4-c2ae483ea890` / `0.5.4`; previous 0.5.2 remains intact.
+The 71-file external user tree had identical count and SHA-256
+`e238d891ef3facae87566b4e0aece982ad87695b99ad5724ea705c4df16d1ef6`
+before and after core activation. Separately authorized pointer-index edits
+preceded that measurement; managed integration backups and advisory refresh
+are separate scoped overlay changes after it.
+
+Managed Codex integration reported no conflicts, auth/model/trust changes or
+hook writes. Read-back verifies the new guide path, unchanged owner-adapter
+bytes outside the scoped edit, expected instruction hashes, maintained handoff
+skill and current private/project pointers. hooks.json remains absent.
+The active instruction context now names the 0.5.4 guide. Doctor is PASS.
+The first advisory refresh hit a transient URLError; bounded retry succeeded
+with CURRENT, installed/latest 0.5.4, checked `2026-09-26T03:12:46Z`.
+
+A new installed interpreter process from an isolated working directory verified
+resource reads without creating a project task, then initialize/entry/READY/
+check/close in a temporary synthetic project. This is installed-process proof,
+not a newly created Codex chat or a guarantee of agent behavior. The inspected
+chat was read only; no message was sent. Legacy handoffs remain untouched.

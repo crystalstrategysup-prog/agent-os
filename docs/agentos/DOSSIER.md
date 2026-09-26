@@ -1,7 +1,8 @@
 # Current repair stage — F17
 
-Handoff discovery and selected Mac instruction routing need a scoped repair.
-See [STAGE-F17](STAGE-F17.md); private locations remain external.
+Handoff discovery and selected Mac routing are repaired. Public and installed
+owner-Mac stable are 0.5.4; checks and download/activation evidence are in
+[STAGE-F17](STAGE-F17.md). Private locations remain external.
 
 # Current release stage — F15D
 
