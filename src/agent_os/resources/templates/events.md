@@ -1,19 +1,19 @@
-# Событийные контракты
+# Event contracts
 
-Статус: draft. Owner/source/review required.
+Status: draft. Owner, source, and review are required.
 
-## Каналы
+## Channels
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.
 
-## Схемы
+## Schemas
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.
 
-## Доставка
+## Delivery
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.
 
-## Совместимость
+## Compatibility
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.

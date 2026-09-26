@@ -28,58 +28,25 @@ FEATURES = (
 )
 # Document ID -> (title, required headings). Alternative tools/formats are in catalog.json.
 DOCS = {
-    "dossier": (
-        "Досье проекта",
-        ("Назначение", "Текущее состояние", "Границы", "Ограничения"),
-    ),
-    "roadmap": ("Дорожная карта", ("Этапы", "Зависимости", "Следующий этап")),
-    "stage": (
-        "Контракт текущего этапа",
-        ("Цель", "Область изменений", "Приёмка", "Откат"),
-    ),
-    "quality": ("Стратегия проверок", ("Проверки", "Доказательства", "Ограничения")),
-    "architecture": (
-        "Архитектура",
-        ("Контекст", "Компоненты", "Границы доверия", "Решения"),
-    ),
-    "requirements": (
-        "Требования",
-        ("Функции", "Нефункциональные требования", "Правила"),
-    ),
-    "contracts": (
-        "Интерфейсы и контракты",
-        ("Интерфейсы", "Схемы", "Совместимость", "Ошибки"),
-    ),
-    "http-api": ("HTTP API", ("Операции", "Авторизация", "OpenAPI", "Версионирование")),
-    "events": (
-        "Событийные контракты",
-        ("Каналы", "Схемы", "Доставка", "Совместимость"),
-    ),
-    "data": ("Модель данных", ("Сущности", "Хранение", "Миграции", "Удаление")),
-    "security": ("Безопасность", ("Активы", "Угрозы", "Полномочия", "Секреты")),
-    "privacy": ("Персональные данные", ("Категории", "Основания", "Сроки", "Доступ")),
-    "operations": (
-        "Эксплуатация",
-        ("Установка", "Проверка", "Обновление", "Откат", "Восстановление"),
-    ),
-    "release": ("Выпуск", ("Версии", "Состав", "Проверки", "Публикация")),
-    "onboarding": (
-        "Онбординг разработчика",
-        ("Начало", "Навигация", "Команды", "Неисправности"),
-    ),
-    "ux": (
-        "Пользовательские сценарии",
-        ("Пользователи", "Сценарии", "Доступность", "Приёмка"),
-    ),
-    "model-card": (
-        "Модель и данные ML",
-        ("Назначение", "Данные", "Оценка", "Ограничения"),
-    ),
-    "safety": (
-        "Анализ безопасности эксплуатации",
-        ("Опасности", "Контроли", "Проверка", "Ответственность"),
-    ),
-    "incident": ("Разбор инцидента", ("Влияние", "Хронология", "Причина", "Меры")),
+    "dossier": ("Project dossier", ("Purpose", "Current state", "Boundaries", "Constraints")),
+    "roadmap": ("Roadmap", ("Stages", "Dependencies", "Next stage")),
+    "stage": ("Current stage contract", ("Objective", "Change scope", "Acceptance", "Rollback")),
+    "quality": ("Verification strategy", ("Checks", "Evidence", "Limitations")),
+    "architecture": ("Architecture", ("Context", "Components", "Trust boundaries", "Decisions")),
+    "requirements": ("Requirements", ("Functions", "Nonfunctional requirements", "Rules")),
+    "contracts": ("Interfaces and contracts", ("Interfaces", "Schemas", "Compatibility", "Errors")),
+    "http-api": ("HTTP API", ("Operations", "Authorization", "OpenAPI", "Versioning")),
+    "events": ("Event contracts", ("Channels", "Schemas", "Delivery", "Compatibility")),
+    "data": ("Data model", ("Entities", "Storage", "Migrations", "Deletion")),
+    "security": ("Security", ("Assets", "Threats", "Authority", "Secrets")),
+    "privacy": ("Personal data", ("Categories", "Legal basis", "Retention", "Access")),
+    "operations": ("Operations", ("Installation", "Verification", "Update", "Rollback", "Recovery")),
+    "release": ("Release", ("Versions", "Contents", "Checks", "Publication")),
+    "onboarding": ("Developer onboarding", ("Getting started", "Navigation", "Commands", "Troubleshooting")),
+    "ux": ("User journeys", ("Users", "Scenarios", "Accessibility", "Acceptance")),
+    "model-card": ("ML model and data", ("Purpose", "Data", "Evaluation", "Limitations")),
+    "safety": ("Operational safety analysis", ("Hazards", "Controls", "Verification", "Responsibility")),
+    "incident": ("Incident review", ("Impact", "Timeline", "Cause", "Actions")),
 }
 BASE = {"dossier", "roadmap", "stage", "quality"}
 TYPE_DOCS = {

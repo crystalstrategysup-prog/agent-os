@@ -1,25 +1,25 @@
-# BUG
+# Bug report
 
-## Среда и версия
+## Date and version
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Воспроизведение
+## Reproduction
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Ожидание
+## Expected result
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Факт
+## Actual result
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Влияние
+## Impact
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Доказательства
+## Evidence
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.

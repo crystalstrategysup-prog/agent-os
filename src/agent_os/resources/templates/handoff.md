@@ -1,21 +1,21 @@
-# HANDOFF
+# Project handoff
 
-## Фактическое состояние
+## Current state
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Доказательства
+## Evidence
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Незавершённое
+## Incomplete work
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Следующий безопасный шаг
+## Next safe step
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Откат
+## Rollback
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.

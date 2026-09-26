@@ -1,29 +1,35 @@
-# Требования и проверяемая приёмка
+# Requirements and verifiable acceptance
 
-FR-01: вопрос/поиск/read-only аудит/API discovery выполняется без project init/intake,
-observe, активного профиля, answers-файла и closeout, включая unregistered cwd.
-FR-02: новое/продолжающееся реальное изменение требует актуальных документов и архитектуры
-до реализации. Catalog выбирает только применимые слои; draft/stale docs блокируют READY.
-FR-03: known facts используются повторно; same-scope resume сохраняет ответы, но требует
-текущий authority и сбрасывает readiness/evidence. Изменённый scope — полный новый entry.
-FR-04: context/answers/review можно подать через bounded JSON object stdin (`-`), сохраняя
-duplicate-key/size/path/symlink проверки. Bootstrap не зависит от callback.
-FR-05: current source/task/revision/policy/log + latest check + semantic review определяют
-closeout. Отдельная read-only verify-closeout выявляет устаревание после CLOSED.
-FR-06: native hooks исключены: integrate не создаёт/не восстанавливает/не меняет их,
-retired callbacks — no-op. Ошибка до entry не требует выдуманной задачи.
-FR-07: production/external-send/runtime/DB/credentials/destructive/deploy имеют отдельные
-операционные capability gates; route/READY/profile не выдают внешние полномочия.
-FR-08: core и пользовательские данные физически разделены. Update/rollback сохраняют
-overlay; частичные owner exports не применяются как полная замена настроек.
-FR-09: старые незавязанные prompt receipts не блокируют entry; конфликтующая реальная
-active task остаётся защищена. Optional audit receipts не перезаписывают task state.
+- **FR-01:** Questions, searches, read-only audits, and API discovery work under
+  existing read authority without project init/intake, observe, active profile,
+  answers file, or closeout, including in an unregistered directory.
+- **FR-02:** A real project change needs current architecture and applicable
+  documents before implementation. Draft or stale docs block READY.
+- **FR-03:** Verified facts are reused. Same-scope resume reuses answers but
+  requires fresh authority and resets READY/check evidence. New scope requires
+  full entry.
+- **FR-04:** Context, answers, and review accept bounded JSON object stdin via
+  `-` with duplicate-key, size, path, and symlink controls.
+- **FR-05:** Closeout binds current source, task, revision, policy, logs, latest
+  checks, and semantic review. Read-only `verify-closeout` detects later drift.
+- **FR-06:** Native hooks are excluded. Integration never creates, changes, or
+  restores them; retired callbacks are no-ops. Pre-entry failure creates no
+  fictional task.
+- **FR-07:** External send, production/runtime/database writes, credentials,
+  destructive actions, and deployment need separate target capabilities.
+  Routing, READY, and profiles grant none.
+- **FR-08:** Core and user data have separate roots. Update and rollback preserve
+  the overlay; partial owner exports are not complete settings replacements.
+- **FR-09:** Unbound old prompt receipts do not block entry, while a conflicting
+  active task remains protected. Optional audit receipts do not overwrite task
+  state.
 
-NFR: runtime stdlib; локальные bounded reads/locks; явные errors, exact hashes; без daemon,
-NLP intent engine или новой БД. Никаких секретов/личных настроек в public patch. Локальная
-приёмка не заменяет свежую Mac/Codex проверку и independent integration review.
+Nonfunctional requirements: standard-library runtime, bounded local reads,
+locks, explicit errors, and exact hashes. No daemon, natural-language intent
+engine, new database, public secrets, or personal settings. Local acceptance
+does not replace Mac/Codex readback or independent integration review.
 
-Трассировка: tests/test_workflow.py (A–F), test_foundation.py, test_contracts.py,
-tools/demo_lifecycle.py, PROCESS/QUALITY/COMPATIBILITY. Точные результаты — test logs
-конкретного кандидата. Full sandbox, private fleet parity, native hooks и Windows
-managed installer не заявлены возможностями этой итерации.
+Traceability: workflow, foundation, and contract tests; demo lifecycle;
+PROCESS, QUALITY, and COMPATIBILITY. Exact results belong in each candidate's
+check receipts. A universal sandbox, private fleet parity, native hooks, and
+Windows managed installer are not claimed features.

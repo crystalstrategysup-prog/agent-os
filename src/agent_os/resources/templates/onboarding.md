@@ -1,19 +1,19 @@
-# Онбординг разработчика
+# Developer onboarding
 
-Статус: draft. Owner/source/review required.
+Status: draft. Owner, source, and review are required.
 
-## Начало
+## Getting started
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.
 
-## Навигация
+## Navigation
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.
 
-## Команды
+## Commands
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.
 
-## Неисправности
+## Troubleshooting
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.

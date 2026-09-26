@@ -1,19 +1,19 @@
-# Модель и данные ML
+# ML model and data
 
-Статус: draft. Owner/source/review required.
+Status: draft. Owner, source, and review are required.
 
-## Назначение
+## Purpose
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.
 
-## Данные
+## Data
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.
 
-## Оценка
+## Evaluation
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.
 
-## Ограничения
+## Limitations
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.

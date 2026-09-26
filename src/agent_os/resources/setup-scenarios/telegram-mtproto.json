@@ -2,12 +2,12 @@
   "schema": "agentos.setup-scenario/v1",
   "id": "telegram-mtproto",
   "version": "1.0.0",
-  "title": "Подключить пользовательскую сессию Telegram",
-  "goal": "Авторизовать существующий Telegram-аккаунт в выбранном пользовательском provider и проверить его личность без передачи секрета в чат с агентом.",
+  "title": "Connect a Telegram user session",
+  "goal": "Authorize an existing Telegram account with a selected provider and verify the account identity without exposing login secrets in an agent chat.",
   "implementation_status": "guide_only",
   "evidence": {
     "level": "documented",
-    "scope": "Официальные Telegram API и QR auth; отдельный частный reference-путь прочитан, но публичный provider и новый сквозной вход не проверены.",
+    "scope": "Telegram authentication and QR login are documented by Telegram. A private reference implementation was inspected, but a general AgentOS provider and a new end-to-end login were not verified.",
     "reviewed_on": "2026-09-26",
     "sources": [
       "https://core.telegram.org/api/obtaining_api_id",
@@ -16,39 +16,85 @@
     ]
   },
   "prerequisites": [
-    "Существующий Telegram-аккаунт в официальном приложении.",
-    "Выбранный provider имеет собственные API ID и API hash либо предлагает защищённый ввод данных приложения для самостоятельной установки.",
-    "Пользователь видит, какой provider получит доступ к его сессии и как отключить этот доступ."
+    "An existing Telegram account in the official Telegram app.",
+    "A selected provider with its own Telegram API ID and API hash, or a trusted interface for entering application credentials in a self-hosted installation.",
+    "The user can identify the provider receiving session access and knows how to revoke it."
   ],
   "flows": [
     {
       "id": "phone-code",
-      "when": "Provider предлагает защищённый интерфейс ввода; код приходит в Telegram.",
+      "when": "The provider offers a trusted phone and code entry interface.",
       "steps": [
-        {"id": "prepare", "actor": "agent", "action": "Показать назначение доступа, provider и защищённую поверхность входа; не просить код в чате с ботом или агентом.", "proof": "Пользователь видит точный provider и адрес доверенной поверхности."},
-        {"id": "phone", "actor": "person", "action": "Ввести номер телефона на доверенной поверхности входа.", "proof": "Provider принял номер и запросил код у Telegram."},
-        {"id": "code", "actor": "person", "action": "Ввести полученный код и, если Telegram требует, пароль двухэтапной аутентификации на той же поверхности.", "proof": "Telegram подтвердил авторизацию конкретной сессии."},
-        {"id": "verify", "actor": "provider", "action": "Сверить авторизованный аккаунт с запросившим доступ человеком; сохранить сессию в защищённом пользовательском хранилище.", "proof": "Текущее подтверждение личности и состояния сессии без вывода её содержимого."}
+        {
+          "id": "prepare",
+          "actor": "agent",
+          "action": "Show the purpose of access, the exact provider, and the trusted login page. Do not request a login code in a bot or agent chat.",
+          "proof": "The user can identify the provider and the trusted login page."
+        },
+        {
+          "id": "phone",
+          "actor": "person",
+          "action": "Enter the phone number on the trusted login page.",
+          "proof": "The provider accepts the number and requests a Telegram login code."
+        },
+        {
+          "id": "code",
+          "actor": "person",
+          "action": "Enter the Telegram login code and, if requested, the two-step verification password on the same trusted page.",
+          "proof": "Telegram authorizes the requested session."
+        },
+        {
+          "id": "verify",
+          "actor": "provider",
+          "action": "Match the authorized Telegram account to the person requesting access; store the session in protected user storage.",
+          "proof": "A current identity and session-state receipt is available without exposing session contents."
+        }
       ]
     },
     {
       "id": "qr",
-      "when": "Пользователь предпочитает QR либо вход по коду недоступен.",
+      "when": "The user chooses QR login or phone-code login is unavailable.",
       "steps": [
-        {"id": "show-qr", "actor": "provider", "action": "Создать ограниченный по времени QR для выбранной сессии.", "proof": "QR привязан к ожидающему входу provider."},
-        {"id": "approve-qr", "actor": "person", "action": "Отсканировать и подтвердить вход в официальном Telegram; выполнить отдельное подтверждение 2FA, если требуется.", "proof": "Telegram подтвердил новую авторизацию."},
-        {"id": "verify-qr", "actor": "provider", "action": "Сверить аккаунт и сохранить сессию в защищённом пользовательском хранилище.", "proof": "Текущее подтверждение личности и состояния сессии без вывода её содержимого."}
+        {
+          "id": "show-qr",
+          "actor": "provider",
+          "action": "Create a time-limited QR login for the selected provider session.",
+          "proof": "The QR token is tied to the pending provider login."
+        },
+        {
+          "id": "approve-qr",
+          "actor": "person",
+          "action": "Scan and approve the login in the official Telegram app; complete two-step verification if Telegram requires it.",
+          "proof": "Telegram confirms the new authorization."
+        },
+        {
+          "id": "verify-qr",
+          "actor": "provider",
+          "action": "Match the authorized account and store the session in protected user storage.",
+          "proof": "A current identity and session-state receipt is available without exposing session contents."
+        }
       ]
     }
   ],
-  "sensitive_inputs": ["номер телефона", "код входа", "пароль 2FA", "API hash", "материал пользовательской сессии"],
+  "sensitive_inputs": [
+    "phone number",
+    "login code",
+    "two-step verification password",
+    "Telegram API hash",
+    "user session material"
+  ],
   "recovery": [
-    "Истёкший или неподтверждённый вход завершить без объявления успеха; создать новый запрос после проверки причины.",
-    "При несоответствии аккаунта запросившему пользователю не сохранять сессию.",
-    "Показать пользователю способ завершить авторизацию устройства в Telegram и удалить локальную сессию."
+    "Treat an expired or unconfirmed login as unsuccessful. Start a new request only after diagnosing the failure.",
+    "Do not store the session if the authorized account does not match the requester.",
+    "Explain how to revoke the Telegram device authorization and remove the local provider session."
   ],
   "maintenance": {
     "owner": "AgentOS community maintainers",
-    "review_triggers": ["изменение Telegram auth API", "изменение provider или доверенной поверхности", "неуспешная проверка личности", "плановый пересмотр источников"]
+    "review_triggers": [
+      "Telegram authentication API change",
+      "provider or trusted login page change",
+      "account identity check failure",
+      "scheduled source review"
+    ]
   }
 }

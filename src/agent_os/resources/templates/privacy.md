@@ -1,19 +1,19 @@
-# Персональные данные
+# Personal data
 
-Статус: draft. Owner/source/review required.
+Status: draft. Owner, source, and review are required.
 
-## Категории
+## Categories
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.
 
-## Основания
+## Legal basis
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.
 
-## Сроки
+## Retention
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.
 
-## Доступ
+## Access
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.

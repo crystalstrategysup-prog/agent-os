@@ -1,85 +1,82 @@
-# Каталог документарных слоёв
+# Documentation layer catalog
 
-Это каталог возможных артефактов, не список пакетов, которые AgentOS устанавливает.
-Выбирать по архитектуре и изменению; альтернативные форматы не дублировать без причины.
-Базовый gate проверяет смысловые document IDs, reviewer выбирает реальный формат.
-Один файл допустим для нескольких IDs, если его содержание действительно покрывает требования.
+This is a catalog of possible artifacts, not a list of packages that AgentOS installs. Choose by architecture and change; alternative formats do not duplicate without reason. The base gate checks the semantic document IDs, the reviewer selects the real format. A single file is acceptable for multiple IDs as long as its content does cover requirements.
 
-## 1. Продукт
+## 1. Product
 
-Варианты: Vision, PRD, BRD, MRD, Roadmap, User Stories / Use Cases, Personas / JTBD, Acceptance Criteria, Glossary, FAQ.
+Options: Vision, PRD, BRD, MRD, Roadmap, User Stories / Use Cases, Personas / JTBD, Acceptance Criteria, Glossary, FAQ.
 
-Базовые IDs: dossier, requirements, roadmap, ux. Нужные дополнительные документы перечислить в контракте этапа и проверить отдельным check.
+Basic IDs: dossier, requirements, roadmap, ux. The necessary additional documents are listed in the stage contract and checked by a separate check.
 
-## 2. Аналитика
+## 2. Analysis
 
-Варианты: SRS, FR, NFR, Business Rules, BPMN, Event Storming, Domain Model / Bounded Contexts, DFD.
+Options: SRS, FR, NFR, Business Rules, BPMN, Event Storming, Domain Model/Bounded Contexts, DFD.
 
-Базовые IDs: requirements, architecture. Нужные дополнительные документы перечислить в контракте этапа и проверить отдельным check.
+Basic IDs: requirements, architecture. The necessary additional documents are listed in the stage contract and checked by a separate check.
 
-## 3. Архитектура
+## 3. Architecture
 
-Варианты: C4, arc42, ADR, RFC / Design Doc / TDD, UML, Sequence / State / Activity, Structurizr DSL, Deployment / Integration diagrams, STRIDE / LINDDUN.
+Options: C4, arc42, ADR, RFC / Design Doc / TDD, UML, Sequence / State / Activity, Structurizr DSL, Deployment / Integration diagrams, STRIDE / LINDDUN.
 
-Базовые IDs: architecture, security. Нужные дополнительные документы перечислить в контракте этапа и проверить отдельным check.
+Basic IDs: architecture, security. The necessary additional documents are listed in the stage contract and checked by a separate check.
 
-## 4. API и контракты
+## 4. APIs and contracts
 
-Варианты: OpenAPI, AsyncAPI, GraphQL SDL, gRPC .proto / buf, RAML, API Blueprint, SOAP WSDL / WADL, JSON Schema, Avro / Protobuf, Postman / Insomnia, HAR, Webhooks, deprecation / style guides, Overlays / Spectral.
+Options: OpenAPI, AsyncAPI, GraphQL SDL, gRPC .proto / buf, RAML, API Blueprint, SOAP WSDL / WADL, JSON Schema, Avro / Protobuf, Postman / Insomnia, HAR, Webhooks, deprecation / style guides, Overlays / Spectral.
 
-Базовые IDs: contracts, http-api, events. Нужные дополнительные документы перечислить в контракте этапа и проверить отдельным check.
+Basic IDs: contracts, http-api, events. The necessary additional documents are listed in the stage contract and checked by a separate check.
 
-## 5. Данные
+## 5. Data
 
-Варианты: ERD, DBML, DDL comments, Dictionary / Catalog, Lineage, Master Data, migrations, dbt docs, retention / PII map.
+Options: ERD, DBML, DDL comments, Dictionary / Catalog, Lineage, Master Data, migrations, dbt docs, retention / PII map.
 
-Базовые IDs: data, privacy. Нужные дополнительные документы перечислить в контракте этапа и проверить отдельным check.
+Basic IDs: data, privacy. The necessary additional documents are listed in the stage contract and checked by a separate check.
 
-## 6. Код
+## 6. Code documentation
 
-Варианты: README, CONTRIBUTING, CODE_OF_CONDUCT, CHANGELOG, JSDoc / TSDoc, Javadoc, Doxygen, Sphinx, GoDoc, Rustdoc, XML-doc, docstrings, comments, fitness functions.
+Options: README, CONTRIBUTING, CODE OF CONDUCT, CHANGELOG, JSDoc / TSDoc, Javadoc, Doxygen, Sphinx, GoDoc, Rustdoc, XML-doc, docstrings, comments, fitness functions.
 
-Базовые IDs: onboarding, quality. Нужные дополнительные документы перечислить в контракте этапа и проверить отдельным check.
+Basic IDs: onboarding, quality. The necessary additional documents are listed in the stage contract and checked by a separate check.
 
-## 7. Эксплуатация
+## 7. Operations
 
-Варианты: IaC, Helm values, CRD, Docker / compose, Runbook, SLO / SLI / error budget, on-call, postmortem, capacity, DR, backup / restore, topology, CI/CD, environments.
+Options: IaC, Helm values, CRD, Docker / compose, Runbook, SLO / SLI / error budget, on-call, postmortem, capacity, DR, backup / restore, topology, CI / CD, environments.
 
-Базовые IDs: operations, incident, release. Нужные дополнительные документы перечислить в контракте этапа и проверить отдельным check.
+Basic IDs: operations, incident, release. The necessary additional documents are listed in the stage contract and checked by a separate check.
 
-## 8. Безопасность
+## 8. Security
 
-Варианты: SECURITY, threat model, SBOM SPDX/CycloneDX, VEX, disclosure, privacy / DPIA, access matrix, audit spec, compliance mapping, pen-test, secrets policy.
+Options: SECURITY, threat model, SBOM SPDX/CycloneDX, VEX, disclosure, privacy/DPIA, access matrix, audit spec, compliance mapping, pen-test, secrets policy.
 
-Базовые IDs: security, privacy, safety. Нужные дополнительные документы перечислить в контракте этапа и проверить отдельным check.
+Basic IDs: security, privacy, safety. The necessary additional documents are listed in the stage contract and checked by a separate check.
 
-## 9. Качество
+## 9. Quality
 
-Варианты: Test strategy/plan, cases/suites, BDD Gherkin, coverage, Pact contracts, performance/load, chaos, QA checklist, bug template.
+Options: Test strategy/plan, cases/suites, BDD Gherkin, coverage, Pact contracts, performance/load, chaos, QA checklist, bug template.
 
-Базовые IDs: quality. Нужные дополнительные документы перечислить в контракте этапа и проверить отдельным check.
+Basic IDs: quality. The necessary additional documents are listed in the stage contract and checked by a separate check.
 
-## 10. Процесс
+## 10. Process
 
-Варианты: SDLC, DoR/DoD, review, branching, release notes, SemVer, incident/RFC process, team charter/RACI, meetings/decision log.
+Options: SDLC, DoR/DoD, review, branching, release notes, SemVer, incident/RFC process, team charter/RACI, meetings/decision log.
 
-Базовые IDs: stage, release, incident. Нужные дополнительные документы перечислить в контракте этапа и проверить отдельным check.
+Basic IDs: stage, release, incident. The necessary additional documents are listed in the stage contract and checked by a separate check.
 
-## 11. Знания
+## 11. Knowledge
 
-Варианты: Wiki, onboarding, handbook, glossary, Diátaxis tutorial/how-to/reference/explanation, cookbook, migration/troubleshooting/known issues/demo.
+Options: Wiki, onboarding, handbook, glossary, Diátaxis tutorial/how-to/reference/explanation, cookbook, migration/troubleshooting/known issues/demo.
 
-Базовые IDs: onboarding, operations. Нужные дополнительные документы перечислить в контракте этапа и проверить отдельным check.
+Basic IDs: onboarding, operations. The necessary additional documents are listed in the stage contract and checked by a separate check.
 
-## 12. Метадокументация
+## 12. Documentation infrastructure
 
-Варианты: Docs-as-code MkDocs/Docusaurus/Antora/Sphinx, navigation/style, versioning, CI/link checks, Mermaid/PlantUML/D2/Excalidraw, templates, ownership/CODEOWNERS.
+Options: Docs-as-code MkDocs/Docusaurus/Antora/Sphinx, navigation/style, versioning, CI/link checks, Mermaid/PlantUML/D2/Excalidraw, templates, ownership/CODEOWNERS.
 
-Базовые IDs: quality, release, onboarding. Нужные дополнительные документы перечислить в контракте этапа и проверить отдельным check.
+Basic IDs: quality, release, onboarding. The necessary additional documents are listed in the stage contract and checked by a separate check.
 
-## Матрица выбора
+## The selection matrix
 
-Типы: general, backend, frontend, mobile, data-ml, platform, embedded, legacy. Допустимо несколько типов. Признаки: http-api, events, database, pii, public, deployment, ui, ml, external-send, safety-critical.
+Types: general, backend, frontend, mobile, data-ml, platform, embedded, legacy. Several types are allowed. Features: http-api, events, database, pii, public, deployment, ui, ml, external-send, safety-critical.
 
 - `general`: dossier, quality, roadmap, stage.
 - `backend`: architecture, contracts, dossier, quality, roadmap, security, stage.
@@ -90,9 +87,4 @@
 - `embedded`: architecture, contracts, dossier, operations, quality, requirements, roadmap, stage.
 - `legacy`: architecture, contracts, data, dossier, onboarding, operations, quality, requirements, roadmap, stage.
 
-Для не-IT проекта general даёт минимальный досье/roadmap/stage/quality комплект.
-Отсутствие feature database не повод создавать ERD, а отсутствие HTTP API — OpenAPI.
-ML проект дополнительно раскрывает Model Card/Datasheet, данные/оценку/ограничения.
-Правовые требования не выводятся по названию отрасли автоматически: фиксировать юрисдикцию,
-фактическое основание и квалифицированную проверку. Пользовательская надстройка может хранить
-дополнительные шаблоны, но не выключать обязательные базовые gate.
+For a non-IT project, general provides a minimum dossier/roadmap/stage/quality set. Without a database, do not create an ERD merely to satisfy a checklist. Without an HTTP API, do not create OpenAPI merely to satisfy a checklist. An ML project may additionally need a model card or datasheet covering data, evaluation, and limitations. Legal requirements are not automatically derived by the name of the industry: fix jurisdiction, actual basis and qualified verification. A user overlay may store additional templates; it does not disable applicable base gates.

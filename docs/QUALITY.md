@@ -1,8 +1,9 @@
-# Стратегия качества
+# Verification strategy
 
-Точные числа и среда — в evidence конкретного кандидата, не hard-coded обещание.
-Проверяются функции, negative cases, whole lifecycle в tmpdir, package resources/contracts,
-offline wheel build/smoke и затем отдельная actual Mac/Codex приёмка интегратором.
+Evidence for each candidate records exact counts and environment; this document
+does not promise a fixed count. Check functions and negative cases, a full
+lifecycle in temporary directories, packaged resources and contracts, offline
+wheel build and smoke tests. Verify the actual Mac/Codex target separately.
 
 ```sh
 PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider
@@ -11,55 +12,63 @@ PYTHONDONTWRITEBYTECODE=1 python3 tools/verify_public.py
 python3 tools/sync_resources.py
 ```
 
-A: direct/stateless read path без project/overlay; optional audit отдельно.
-B: новая задача, stdin bootstrap, docs/READY до реального кода, exact checks/close.
-C: существующий недокументированный проект не меняется до docs.
-D: same-scope resume без повторных вопросов, без наследования authority; gates reset.
-E: declared local effects идут в docs path, target effects BLOCKED; отрицательные
-scope/check/MCP/dispatch tests. Это не испытание универсального network sandbox.
-F: malformed/missing callbacks no-op, Stop не блокирует; integrate не создаёт hooks,
-сохраняет config/owner blocks; active tasks защищены, stale unbound receipts не мешают;
-нет fake closeout, verify-closeout выявляет tampering.
+The public-tree verifier refuses local `.agentos/` receipts. To check a working
+repository containing registered task state, run it against a clean export
+without that directory; never publish the receipts with core source.
 
-F10: managed AGENTS должен содержать короткий маршрут к тематическим docs/skills,
-при этом не добавлять размерный gate, hook или обязательную загрузку всей истории.
-Проверять сохранность owner text при integrate и читать effective instructions в
-новой сессии; synthetic test не доказывает отсутствие обрезки на любом клиенте.
+## Core acceptance paths
 
-F11: S1–S8 проверяются отдельными отрицательными случаями для выбора CODEX_HOME,
-пустого override, partial integration, CRLF/marker order, потомков check-процесса,
-FIFO/socket inventory, повреждённой installed payload и console pytest.
-Partial `project enter` проверяется отказом после создания черновика/turn receipt,
-восстановлением после прерывания и отказом при конкурентной правке владельца.
-Нужны оба способа запуска pytest, чистый Git export, wheel metadata/RECORD,
-изолированные Mac и Linux fixture, затем отдельная приёмка реальной конфигурации.
-Дополнительная независимая проверка stable-кандидата должна покрывать ST-01–ST-06:
-timestamp-valid подменённый `.pyc`, owner edit между двумя чтениями AGENTS,
-pending entry journal перед READY/check, отказ selector после Popen, отсутствующие
-entrypoint hashes в manifest и корректные shell launchers на длинном пути и пути
-с пробелами. Фиксировать полные platform receipts, не только итог PASS.
-Путь с пробелами проверять отдельно от длинного пути без пробелов: pip может
-создать quoted и unquoted shell trampoline соответственно. Проверка потомков
-должна дать достаточно времени на запуск Python в сценарии немедленного выхода
-родителя и отдельно сохранить короткий deadline для timeout-сценария.
-Для F12 дополнительно проверять отказ при symlink в цепочке каталогов пакета до
-удаления cache, реальный прерванный enter между предварительной проверкой ready
-и lock, точные старые шаблоны pip launcher для v1 rollback и сохранение кода
-потомка 125, когда cleanup пересёк execution deadline. В installer fixtures
-проверять сохранность owner-tree и current; запускать обе формы полного pytest
-на Linux x86_64 Python 3.13.
+- Direct stateless reading must work without project entry or overlay; optional
+  audit recording is separate.
+- A new task must support stdin bootstrap, current docs, READY, actual source
+  change, exact checks, and closeout. An unknown undocumented project must be
+  inspected before scaffolding.
+- Same-scope resume must reuse verified answers without inheriting authority;
+  readiness and evidence reset.
+- Declared local writes route to documentation, while external effects report
+  missing target authority. This is not a universal network sandbox test.
+- Negative cases must cover scope, check receipts, MCP, dispatch, paths,
+  symlinks, duplicate JSON keys, evidence hashes and age, versions, profiles,
+  import, and installer contracts.
+- Retired callbacks must remain no-ops, even with malformed input. Integration
+  must create no hooks and preserve unrelated config and owner text. Active task
+  bindings remain protected; old unbound receipts do not block entry. No fake
+  closeout is created before entry, and `verify-closeout` detects stale proof.
 
-Baseline native interception tests заменяются тестами retirement/no-install contract,
-а не сохраняются как скрытое обещание enforcement. Остальные critical negative lifecycle,
-path/symlink/duplicate JSON, evidence hash/age/version, profile/import/installer/MCP
-контракты должны остаться. Проверять diff и объяснять удалённые obsolete tests.
+## Stage-specific regressions
 
-Checks должны проверять acceptance criterion, не просто называться unit. Synthetic fixtures
-помечаются явно. Отдельные logs хранят argv, environment, source/wheel hash, rc и ограничения.
-Public-tree scanner — эвристика, не security certification. Нельзя публиковать `.agentos/`
-receipts или owner settings вместе с core. Package docs/schemas совпадают с maintained source.
+F10 verifies that managed AGENTS routes briefly to topical docs and skills
+without a length gate, hook, or mandatory history preload. Check merged owner
+text and read effective instructions in a fresh session; a fixture alone does
+not prove that every client displays the entire file.
 
-Linux tests/build не доказывают macOS/Keychain/launchd/Codex session behavior. На Mac нужны
-source/runtime identity, disjoint roots, отсутствие AgentOS hooks, неизменность config/auth,
-fresh effective AGENTS, A–F на локальных fixtures без внешних writes, rollback/readback.
-До реального выполнения target acceptance NOT_RUN. Hooks не часть этих проверок и не включаются.
+F11 covers reported S1–S8 failures: `CODEX_HOME`, empty override files, partial
+integration, CRLF and marker order, descendant cleanup, FIFO/socket installed
+inventory, damaged payload, and console pytest. Interrupted `project enter` is
+tested after draft or turn creation, on recovery, and against concurrent edits.
+Both supported pytest invocation forms, clean Git export, wheel metadata and
+RECORD, isolated Mac and Linux fixtures, and separate live configuration
+acceptance matter. Stable-candidate review also covers ST-01–ST-06: substituted
+`.pyc`, owner edits between AGENTS reads, pending entry journal before READY or
+check, selector failure after process launch, missing entrypoint hashes, and
+shell launchers under long or space-containing paths. These two path shapes
+have different pip launcher behavior and must be tested separately. Descendant
+checks allow enough time for Python startup while keeping timeout cases short.
+Additional F12 fixture cases include symlinks in package-directory ancestors,
+interrupted entry after readiness precheck, old pip launcher templates for v1
+rollback, and preserving exit code 125 if cleanup crosses the execution
+deadline. Check owner tree and current pointer in installer fixtures; Linux
+x86_64 Python 3.13 also needs both full pytest invocation forms.
+
+Native interception tests are replaced by no-op and no-installation tests; do
+not retain a hidden promise of enforcement. Tests should measure acceptance
+criteria, not merely mirror implementation. Mark synthetic fixtures clearly.
+Receipts record argv, environment, source and wheel hashes, return code, and
+limits. The public-tree scanner is heuristic, not a security certification.
+Source docs and packaged copies must match.
+
+Linux checks do not prove macOS, Keychain, launchd, or Codex session behavior.
+Mac acceptance needs exact source/runtime identity, disjoint roots, no AgentOS
+hooks, unchanged auth/config, fresh effective AGENTS, local lifecycle probes
+without external writes, and rollback/readback. Report unrun target checks as
+NOT_RUN; hooks are not part of acceptance.

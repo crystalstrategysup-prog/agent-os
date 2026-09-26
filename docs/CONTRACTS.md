@@ -1,111 +1,111 @@
-# Интерфейсы и совместимость
+# Interfaces and compatibility
 
-Машинные источники истины: `schemas/mcp-tools-v1.json` (точная копия в wheel:
-`agent_os/resources/contracts/mcp-tools-v1.json`), `schemas/cli-contract-v1.json`,
-`schemas/project-task-v1.schema.json`, `schemas/project-event-v1.schema.json` и
-`agent_os/resources/schemas/*.schema.json`. Тесты сверяют опубликованные MCP
-`inputSchema`/`outputSchema` с `tools/list` и фактическими `structuredContent`, а
-task/event schemas — с записями реального локального lifecycle.
+Machine-readable contracts are `schemas/mcp-tools-v1.json` (with an identical
+wheel copy), `schemas/cli-contract-v1.json`, the project task and event schemas,
+and the packaged schemas under `src/agent_os/resources/schemas/`. Tests compare
+MCP `inputSchema` and `outputSchema` with `tools/list` and returned
+`structuredContent`, and task/event schemas with actual local lifecycle records.
 
-Версия выпуска для человека и MCP: `0.5.0`; эквивалент Python packaging:
-`0.5.0`. `agentos --version`, `agent_os.__version__` и `serverInfo.version`
-совпадают буквально. Протокол stdio MCP остаётся `2025-06-18`. HTTP API нет, поэтому
-OpenAPI/Swagger здесь не существует; события пишутся локально в JSONL и описаны
-JSON Schema, а не AsyncAPI.
+CLI, Python, and MCP report version `0.5.0`; the stdio MCP protocol version is
+`2025-06-18`. There is no HTTP API or OpenAPI specification. Project events are
+local JSONL with JSON Schema, not AsyncAPI.
 
 ## CLI
 
-Все команды выводят JSON, кроме справки/интерактивных вопросов. Ошибка foundation gate:
-`{"status":"BLOCKED","error":"..."}`, exit 2. PASS/план/успешное выполнение: exit 0.
-`project check` возвращает FAIL+exit2 для ненулевого процесса или изменения snapshot.
-Проверка ограничивает вывод и завершает запущенную POSIX process group перед receipt;
-timeout, оставшиеся потомки и превышение лимита вывода дают FAIL. `project enter`
-использует recoverable journal: после прерывания следующий вход восстанавливает
-прежнее состояние и возвращает `entry_recovered_retry`; конкурентная правка даёт
-`entry_recovery_conflict` без перезаписи. Вручную удалять журнал нельзя.
-Оригинальные community-команды могут иметь прежние error shapes; callers не должны
-обрабатывать их как новый project contract. `--home`/`--user-home` задаются перед командой.
+Commands emit JSON except help and interactive questions. A foundation gate
+error is `{"status":"BLOCKED","error":"..."}` with exit code 2. A successful
+plan or execution exits 0. `project check` returns FAIL and exit 2 after a
+nonzero process result, timeout, output limit, lingering child, or changed
+source snapshot. The POSIX process group is complete before a PASS receipt.
 
-|Группа|Команды|Контракт записи|
-|---|---|---|
-|project|init, questions, enter, next-turn, document, ready, check, assess, verify-closeout, status, close, checkpoint, gate, snapshot|Только явные действия в указанном проекте; вопросы/чтение без product writes|
-|project observe|--root --answers --session --turn|Только user receipt, без .agentos в проекте|
-|overlay|status, index, import, migrate-config|import/migrate план по умолчанию; apply явно|
-|profiles|inventory, select, context, interview|Профили и выбор только в указанном user home; `select` — явная запись|
-|integrate codex|--codex-home --skills-home --apply|AGENTS/skills, backup; hooks/config/trust не меняются|
-|resources|--list|Путь к установленным схемам, шаблонам, навыкам, документации|
-|hook|Retired compatibility entrypoint|Пустой JSON, exit0; stdin/home не читаются, записи нет|
+`project enter` uses a recovery journal. After interruption, the next attempt
+restores the prior state and returns `entry_recovered_retry`. A concurrent edit
+returns `entry_recovery_conflict` without overwriting. Do not remove the journal
+to bypass recovery. Older community commands may have different error shapes;
+do not infer a new contract from them. Put global `--home`/`--user-home` before
+the command group.
 
-`profiles inventory` показывает хеши, bindings и конфликты заявленных полей.
-`profiles select --mode none|one|all` сохраняет выбор в `state/profile-selection.json`;
-для `one`/`all` нужен актуальный `--inventory-digest`, для `all` — все ID в порядке,
-заданном владельцем. Разные значения одного ключа требуют JSON `--decisions`
-с выбором ID для каждого такого ключа. `profiles context` выдаёт только выбранные
-поля или `STALE_SELECTION` при дрейфе; `profiles interview` добавляет живые факты
-устройства и вопросы по неизвестным полям. Поля профиля не дают новых полномочий.
+| Group | Operations | Boundary |
+| --- | --- | --- |
+| `project` | init, questions, enter, next-turn, document, ready, check, assess, verify-closeout, status, close, checkpoint, gate, snapshot | Explicit actions in the named project; questions and reads need no product write |
+| `project observe` | root, answers, session, turn | Optional user-home receipt; does not create a project task |
+| `overlay` | status, index, import, migrate-config | Import and migration plan by default; apply explicitly |
+| `profiles` | inventory, select, context, interview | Exact profiles and selection in the named user home |
+| `integrate codex` | target home, skills home, apply | Managed AGENTS and skills with backup; hooks/config/trust untouched |
+| `resources` | list | Paths to packaged schemas, templates, skills, and docs |
+| `setup` | list, show | Read-only discovery of published scenario cards |
+| `hook` | retired compatibility entrypoint | Empty JSON, exit 0, no input or state access |
 
-Session/turn предоставляются настоящим клиентом. При CLI-only испытании задаются явно;
-это не доказывает hook_seen. После checkpoint/close `project next-turn` с точным
-`--from-turn` обновляет только CLI receipt; native-hook receipt он не принимает. Совпадение
-session/turn/root обязательно. Request для legacy
-dispatch должен совпасть с objective и destination_session; receipt потребляется однократно,
-даже если downstream запуск упал. Для повторной попытки требуется новый проверенный turn.
+`profiles inventory` reports IDs, versions, hashes, host bindings, and conflicts.
+`profiles select --mode none|one|all` stores explicit selection. One or all needs
+the current inventory digest; all needs every exact ID in owner-chosen order.
+Conflicting values need JSON decisions naming the winning profile for each key.
+`profiles context` yields selected fields or `STALE_SELECTION` after drift;
+`profiles interview` presents verified facts and unanswered questions. Profiles
+grant no additional authority.
+
+The client provides session and turn identifiers. In a CLI-only workflow they
+are explicitly chosen; that does not prove a native hook event. After close or
+checkpoint, `project next-turn` records an exact transition. Legacy dispatch
+requires matching task objective and destination session; its one-time receipt
+is consumed even when downstream launch fails.
 
 ## MCP stdio
 
-Protocol version сохранён 2025-06-18; serverInfo version = package __version__.
-JSON-RPC initialize, tools/list, tools/call, ping. `tools/list` отдаёт входные и
-выходные схемы для шести tools:
-agentos_get_telegram_setup_plan; agentos_normalize_task; agentos_doctor;
-agentos_get_project_entry_plan; agentos_select_documents; agentos_get_foundation_status.
-Последние два получают types/features и metadata, без полного чтения знаний или secret bodies.
-Unknown argument/tool возвращает tool error. HTTP/OpenAPI здесь не применимы: сервер stdio.
-MCP не регистрирует автоматически AGENTS/hooks в любом клиенте.
+JSON-RPC supports initialize, tools/list, tools/call, and ping. `tools/list`
+provides versioned input/output schemas for six bounded tools: Telegram setup
+plan, task normalization, doctor, project entry plan, document selection, and
+foundation status. The planning tools accept project types, features, and
+metadata without loading private knowledge bodies. Unknown tools and arguments
+return tool errors. MCP does not register AGENTS or hooks in a client.
 
-## Retired native callbacks / explicit workflow
+## Retired callbacks and explicit workflow
 
-Native hooks исключены. `agentos hook` / `agentos-hook` — retired compatibility entrypoints:
-stdout `{}`, exit 0, не читают stdin/home/config и ничего не пишут, не возвращают allow/deny
-или COMPLETE. integrate не регистрирует их; hook input/output schema files сохранены лишь
-для исторической совместимости, не обозначают активный hook protocol.
+`agentos hook` and `agentos-hook` are retired no-op entrypoints: they output
+`{}`, exit 0, do not read stdin, home, or config, do not write state, and do
+not issue allow, deny, or COMPLETE. Historical hook schemas remain for
+compatibility evidence, not as an active protocol. Integration registers no
+AgentOS hooks.
 
-`workflow route --kind question|search|audit|discovery|project-change` необязателен и stateless.
-Повторяемый --effect: local-project-write, external-send, production-write, runtime-write,
-db-write, credentials, destructive, deploy. FAST_PATH/DOCUMENTATION_FIRST — exit0;
-TARGET_AUTHORITY_REQUIRED — BLOCKED/exit2. external_authority_granted=false всегда.
+Optional `workflow route --kind question|search|audit|discovery|project-change`
+classifies declared effects. Local project writes route to documentation;
+external send, production/runtime/database writes, credentials, destructive
+operations, and deploy report target authority required. It never grants
+external authority. JSON `--context`, `--answers`, and `--review` accept a
+bounded object via `-` stdin or a regular non-symlink file and reject duplicate
+keys. Same-scope resume reuses known answers without old authority and resets
+readiness and checks. `project verify-closeout` reads current evidence for a
+CLOSED result; it does not equate local closeout with deployment. Observations
+are optional and do not bind tasks.
 
-Все --context/--answers/--review принимают JSON object stdin через `-` (4 MiB,
-no duplicate keys), обычные пути — только regular files без symlink. questions --resume-task
-предлагает known answers без authority; enter --resume-task --reuse-answers требует текущий
-authority, допускает только прежний scope, сбрасывает readiness/check receipts. Новые поля
-questionnaire suggested_answers/reused_from_task/reuse_scope — additive.
+The MCP entry plan states that entry is required for project changes and that
+read-only intake is unnecessary; native hooks are disabled. The exact JSON
+shape and version are in the schemas and packaged copies.
 
-project verify-closeout — read-only current proof зарегистрированного CLOSED результата.
-Local CLOSED не означает remote deployed. project observe — optional state/observations
-receipt; не связывает и не перезаписывает task/turn. Abandoned unbound turn receipts
-заменяются лишь explicit enter; conflicting bound tasks остаются заблокированы.
+## Optional extensions
 
-MCP entry plan сохраняет deprecated entry_required_every_task=false и добавляет
-entry_required_for=project_changes, read_only_intake_required=false, native_hooks=DISABLED.
-Точные JSON shape/version — schemas и проверяемые copies в wheel.
+`extensions/registry.json` describes `agentos.extension-registry/v1` entries:
+provider kind, enabled flag, source, core API, data schema, authority, and
+verification status. The registry is descriptive; it never auto-executes code.
+A provider adapter needs bounded discovery and health, read-only capabilities,
+then separately authorized task-bound execution. Building it is a separate
+stage with threat review, contract, and tests. Knowledge cannot substitute for
+an executable private provider. An absent portable provider is a recorded gap,
+not a completed migration.
 
-## Пользовательские расширения
+## Connection scenarios
 
-`extensions/registry.json`: schema agentos.extension-registry/v1, entries с id,
-provider_kind, enabled, source, core_api, data_schema, authority и verification_status.
-В beta реестр описательный, код расширений **не исполняется автоматически**. Adapter должен
-реализовать discovery/health/read-only capabilities, затем explicit task-bound execution;
-написание такого adapter — самостоятельный stage с угрозами/контрактом/tests.
-Подмена knowledge файлом исполняемой private ветки запрещена. Отсутствие переносимого provider
-фиксируется как gap, старый runtime сохраняется, а не объявляется мигрированным.
+The packaged `resources/setup-scenarios/index.json` lists published
+`agentos.setup-scenario/v1` cards. `agentos setup list` returns the index;
+`agentos setup show <id>` returns one card. These commands read neither the
+overlay nor the network and run no provider. `guide_only` states that no general
+runnable adapter is available, even if a private installation works. See
+`docs/SETUP_SCENARIOS.md`.
 
-## Сценарии подключения
+## Public language contract
 
-Упакованный `resources/setup-scenarios/index.json` перечисляет только явно
-опубликованные карточки `agentos.setup-scenario/v1`; их структура проверяется
-`schemas/setup-scenario-v1.schema.json`. `agentos setup list` возвращает краткие
-метаданные, `agentos setup show <id>` — одну карточку. Это read-only discovery:
-команды не читают overlay, не делают запросов в сеть и не запускают provider.
-`implementation_status=guide_only` прямо сообщает, что рабочего общего адаптера нет;
-доказательства частной инсталляции не повышают этот статус. Порядок добавления,
-использования и проверки карточек описан в `docs/SETUP_SCENARIOS.md`.
+English is the language of human-facing public package text. Translation must
+not alter JSON keys, schema names, command names, status and error codes, paths,
+versions, or evidence semantics. Source docs under `docs/` must match their
+packaged copies under `src/agent_os/resources/docs/`. See
+`docs/LOCALIZATION.md`.

@@ -1,23 +1,23 @@
-# Эксплуатация
+# Operations
 
-Статус: draft. Owner/source/review required.
+Status: draft. Owner, source, and review are required.
 
-## Установка
+## Installation
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.
 
-## Проверка
+## Verification
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.
 
-## Обновление
+## Update
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.
 
-## Откат
+## Rollback
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.
 
-## Восстановление
+## Recovery
 
-[REQUIRED] Факты, источники, решения, ограничения.
+[REQUIRED] Provide facts, sources, decisions, and limitations.

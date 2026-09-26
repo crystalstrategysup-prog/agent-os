@@ -1,21 +1,21 @@
-# ADR
+# Architecture decision record
 
-## Контекст
+## Context
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Решение
+## Decision
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Альтернативы
+## Alternatives
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Последствия
+## Consequences
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Проверка
+## Verification
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.

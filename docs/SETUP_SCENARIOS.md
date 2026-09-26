@@ -1,70 +1,65 @@
-# Сценарии подключения
+# Connection scenarios
 
-Сценарий подключения — единица публичного знания AgentOS о том, как человек
-достигает конкретной возможности. Это версия маршрута для разговорного или
-графического мастера, а не разрешение исполнить шаг и не доказательство, что
-подключение уже работает у данного пользователя.
+A connection scenario is a versioned unit of public AgentOS knowledge describing
+how a person can enable a capability. It supplies a route for a conversational
+or graphical setup wizard. A scenario is neither permission to execute a step
+nor proof that the capability works for a particular user.
 
-## Где лежит знание
+## Storage and boundaries
 
-- `src/agent_os/resources/setup-scenarios/index.json` — краткий индекс. Он
-  перечисляет только опубликованные карточки и служит точкой входа для агента.
-- Рядом лежит один JSON-файл на сценарий с целью, вариантами, шагами, проверкой,
-  восстановлением и ссылками на источники. Структура определена
-  `schemas/setup-scenario-v1.schema.json` и упакованной копией схемы.
-- Этот документ описывает правила авторства и применения. Техническая справка
-  внешнего API остаётся по ссылке на официальный первоисточник, не копируется
-  целиком в карточку. Подробности частного deployment живут в его проекте.
-- Личные настройки, credentials, сессии, инстансы и их live receipts остаются
-  во внешнем пользовательском overlay. Исполняемый private adapter имеет
-  отдельный контракт и проверку полномочий.
+- `src/agent_os/resources/setup-scenarios/index.json` is the entry index. It
+  lists only published scenario cards.
+- Each card beside the index describes one goal, alternate flows, actions,
+  expected proof, recovery, and primary sources. Its structure is defined by
+  `schemas/setup-scenario-v1.schema.json` and the matching packaged schema.
+- This document defines how to author and use cards. Link to official external
+  API documentation instead of copying it wholesale. Keep deployment-specific
+  details in their own projects.
+- Personal configuration, credentials, sessions, instance details, and live
+  receipts belong in the external user overlay. An executable private provider
+  needs its own contract and authority check.
 
-`agentos setup list` показывает индекс; `agentos setup show <id>` возвращает
-одну карточку. Команды читают только опубликованные ресурсы, не запускают шаги
-и не делают сетевые проверки. GUI/MCP-мастер позднее может использовать те же
-данные без второго набора инструкций.
+`agentos setup list` reads the index; `agentos setup show <id>` reads one card.
+Neither command runs setup steps or performs network checks. A future GUI or
+conversational wizard can use the same data without a second instruction set.
 
-## Как добавлять сценарий
+## Authoring a scenario
 
-1. Назвать цель человеческим языком и выбрать стабильный `id` в нижнем регистре.
-   Не делать отдельную карточку для каждого хоста, человека или версии Telegram.
-2. Проверить первоисточники и реальный reference-путь. Записать дату и уровень
-   проверки: `documented`, `source_verified` или `live_verified`. Последние два
-   уровня относятся только к указанному evidence scope; частный успех не
-   становится утверждением о каждом пользователе.
-3. Описать варианты и минимальные действия человека. Для каждого шага указать
-   исполнителя, действие и ожидаемое подтверждение; нужный вход включить в
-   описание действия. Секреты обозначать типом и границей
-   хранения; никогда не помещать значения, номера, коды или session material в
-   публичную карточку.
-4. Описать отказ, повтор, отмену и отключение доступа. Указать, какие действия
-   требуют отдельного подтверждения пользователя или target authority.
-5. Добавить файл в индекс, проверить схему, ссылки, упаковку и `agentos setup`.
-   Обновить релевантные документы и локально проверить diff перед публикацией.
+1. State the goal in the user's language and choose a stable lowercase `id`.
+   Do not make separate public cards for each host, person, or provider version.
+2. Check primary sources and a reference implementation path. Record the review
+   date and evidence level: `documented`, `source_verified`, or `live_verified`.
+   Source or live proof applies only to its stated scope; one private success
+   does not establish universal support.
+3. Describe alternate flows and the minimum user actions. For each step record
+   the actor, action, required input, and expected proof. Name sensitive inputs
+   by type and storage boundary; never put actual phone numbers, login codes,
+   credentials, or session material in a public card.
+4. Describe failure, retry, cancellation, and access revocation. Identify steps
+   that require separate user confirmation or target authority.
+5. Add the card to the index; validate schema, links, packaging, and CLI output.
+   Update relevant docs and review the diff before publication.
 
-## Как агент использует сценарий
+## Using a scenario
 
-По намерению пользователя агент выбирает карточку из индекса и читает только её.
-Он сверяет предусловия с текущим состоянием. `guide_only` означает совет и
-проверяемый план; автоматический запуск запрещён до появления отдельно принятого
-adapter и его полномочий. Запрос на вход, выдачу прав или сообщение в Telegram
-проверяется на целевом исполнителе непосредственно перед действием. Агент
-не выводит готовность из наличия JSON или старого скриншота: нужны текущие
-identity/capability receipts и безопасный конечный тест в нужном инстансе.
+Choose a card from the index based on the user's goal, then read only that card.
+Check its prerequisites against current state. `guide_only` provides advice and
+a verifiable plan; it does not enable automatic execution. A runnable provider
+requires separate implementation, acceptance, and authority. Check the exact
+target before any login, rights grant, or message. A JSON card or old screenshot
+cannot establish readiness; current identity and capability receipts plus a safe
+end-to-end test are needed for the selected instance.
 
-## Как поддерживать актуальность
+## Keeping scenarios current
 
-Владелец карточки указан в её метаданных. При изменении исходного API,
-адаптера или пользовательского пути проверка может пометить сценарий к
-пересмотру; произвольный фоновый агент не переписывает
-карточки. Процедура сопровождения расследует отмеченный сценарий, сверяет
-официальную документацию и текущий provider, предлагает diff и обновляет
-уровень доказательства. Человек рассматривает изменения смысла, прав и
-передачи секретов. Отдельно назначенный аудит проверяет индекс и ссылки, а дорогой
-сквозной тест запускается для подходящей среды с отдельной авторизацией.
-Автоматический обход всех сценариев пока не реализован.
+Each card names its maintainer and review triggers. A change in an external API,
+provider, or user route can mark the card for review. The review procedure checks
+primary documentation and the current provider, proposes a diff, and adjusts the
+evidence level. A human reviews changes to meaning, permissions, and secret
+handling. A separately scheduled audit may check the index and links; an
+end-to-end test requires a suitable environment and authority. An automatic
+sweep across all scenarios is not implemented yet.
 
-Если обнаружен дрейф, агент сообщает его прямо и не называет старый маршрут
-актуальным. Дата `reviewed_on` — дата проверки текста и источников, а не дата
-живого успешного входа. Для конкретного пользователя состояние подключения
-хранится отдельно от публичной карточки.
+If drift is found, report it and stop describing the old route as current.
+`reviewed_on` records review of text and sources, not a successful live login.
+A specific user's connection state is stored separately from the public card.

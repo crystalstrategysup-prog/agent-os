@@ -1,38 +1,39 @@
-# Контракт текущего этапа
+# Stage F12 — connection scenario catalog
 
-Задача: `task-3b59bda36a0547a0`
+Task: `task-3b59bda36a0547a0`
 
-Статус: кандидат публичного этапа F12; приёмка исходного кода выполнена локально.
+Status: public source candidate; local source acceptance completed.
 
-## Цель
+## Objective
 
-Публичный AgentOS получает индексируемые «сценарии подключения», общий формат
-карточек и read-only discovery. Основание: запрос владельца 2026-09-26 и
-наблюдение `src/agent_os/onboarding.py`: старый Telegram-план не содержит
-проверяемых вариантов и уровня доказательства.
+Add indexed connection scenarios, a common card format, and read-only
+discovery to public AgentOS. The owner requested this on 2026-09-26. The earlier
+Telegram onboarding list in `src/agent_os/onboarding.py` had no verifiable
+alternate flows or evidence level.
 
-## Область изменений
+## Scope
 
-`docs/`, `schemas/`, `src/agent_os/`, `tests/`, `README.md` в каноническом
-публичном репозитории. Сначала формат/документация/индекс, затем маленький
-loader и CLI. Частная работающая реализация MTProto служит только проверенным
-источником паттерна. Секреты, live Telegram, пользовательский overlay и
-public release activation не входят в этот этап. Источники:
-`docs/ARCHITECTURE.md`, `docs/FOUNDATION_OVERLAY.md`, `docs/SETUP_SCENARIOS.md`.
+Changes cover public `docs/`, `schemas/`, `src/agent_os/`, `tests/`, and
+`README.md`. Format, documentation, and index precede a small loader and CLI.
+A working private MTProto route informed the generic pattern but its code,
+secrets, host data, live Telegram state, and the user overlay were excluded.
+Publishing or activating a release was a separate operation. See
+`docs/ARCHITECTURE.md`, `docs/FOUNDATION_OVERLAY.md`, and
+`docs/SETUP_SCENARIOS.md`.
 
-## Приёмка
+## Acceptance
 
-JSON Schema и индекс совпадают с упакованными ресурсами; CLI читает только
-зарегистрированные карточки, возвращает честный статус `guide_only` и не
-требует конфигурации/сети. Telegram MTProto и Business описаны без частных
-идентификаторов и без ложного обещания готового адаптера. Проверки:
-`tests/test_setup_scenarios.py` и `tests/test_cli.py`; перед поставкой diff review.
+Index and cards validate against the packaged schemas. CLI reads only
+registered cards, returns the truthful `guide_only` status, and needs neither
+configuration nor network access. MTProto and Business examples contain no
+private identifiers and make no claim of a ready adapter. Focused checks cover
+`tests/test_setup_scenarios.py` and `tests/test_cli.py`; final diff review is
+required.
 
-## Откат
+## Rollback and next stage
 
-До публикации вернуть branch к исходному `origin/main` и сохранить рабочую
-копию отдельно. После прямой публикации откат — обратный коммит или новый
-versioned patch; установленный публичный `v0.5.0` не меняется этой веткой.
-Никакие live listener и credentials не затронуты. Дальнейший этап:
-интерактивный мастер и private adapter с отдельной приёмкой; этот этап не
-подменяет их наличие.
+Before publication, revert the branch change while preserving work separately.
+After a direct source push, use a reverse commit or new versioned patch. The
+installed public `v0.5.0` is unaffected by this branch. No live listener or
+credentials were changed. An interactive wizard and private adapter need their
+own implementation and acceptance.

@@ -2,7 +2,7 @@
   "schema": "agentos.documentation-catalog/v1",
   "layers": [
     {
-      "name": "Продукт",
+      "name": "Product",
       "options": [
         "Vision",
         "PRD",
@@ -23,7 +23,7 @@
       ]
     },
     {
-      "name": "Аналитика",
+      "name": "Analysis",
       "options": [
         "SRS",
         "FR",
@@ -40,7 +40,7 @@
       ]
     },
     {
-      "name": "Архитектура",
+      "name": "Architecture",
       "options": [
         "C4",
         "arc42",
@@ -58,7 +58,7 @@
       ]
     },
     {
-      "name": "API и контракты",
+      "name": "APIs and contracts",
       "options": [
         "OpenAPI",
         "AsyncAPI",
@@ -82,7 +82,7 @@
       ]
     },
     {
-      "name": "Данные",
+      "name": "Data",
       "options": [
         "ERD",
         "DBML",
@@ -100,7 +100,7 @@
       ]
     },
     {
-      "name": "Код",
+      "name": "Code documentation",
       "options": [
         "README",
         "CONTRIBUTING",
@@ -123,7 +123,7 @@
       ]
     },
     {
-      "name": "Эксплуатация",
+      "name": "Operations",
       "options": [
         "IaC",
         "Helm values",
@@ -147,7 +147,7 @@
       ]
     },
     {
-      "name": "Безопасность",
+      "name": "Security",
       "options": [
         "SECURITY",
         "threat model",
@@ -168,7 +168,7 @@
       ]
     },
     {
-      "name": "Качество",
+      "name": "Quality",
       "options": [
         "Test strategy/plan",
         "cases/suites",
@@ -185,7 +185,7 @@
       ]
     },
     {
-      "name": "Процесс",
+      "name": "Process",
       "options": [
         "SDLC",
         "DoR/DoD",
@@ -204,7 +204,7 @@
       ]
     },
     {
-      "name": "Знания",
+      "name": "Knowledge",
       "options": [
         "Wiki",
         "onboarding",
@@ -220,7 +220,7 @@
       ]
     },
     {
-      "name": "Метадокументация",
+      "name": "Documentation infrastructure",
       "options": [
         "Docs-as-code MkDocs/Docusaurus/Antora/Sphinx",
         "navigation/style",
@@ -261,172 +261,172 @@
   ],
   "documents": {
     "dossier": {
-      "title": "Досье проекта",
+      "title": "Project dossier",
       "headings": [
-        "Назначение",
-        "Текущее состояние",
-        "Границы",
-        "Ограничения"
+        "Purpose",
+        "Current state",
+        "Boundaries",
+        "Constraints"
       ]
     },
     "roadmap": {
-      "title": "Дорожная карта",
+      "title": "Roadmap",
       "headings": [
-        "Этапы",
-        "Зависимости",
-        "Следующий этап"
+        "Stages",
+        "Dependencies",
+        "Next stage"
       ]
     },
     "stage": {
-      "title": "Контракт текущего этапа",
+      "title": "Current stage contract",
       "headings": [
-        "Цель",
-        "Область изменений",
-        "Приёмка",
-        "Откат"
+        "Objective",
+        "Change scope",
+        "Acceptance",
+        "Rollback"
       ]
     },
     "quality": {
-      "title": "Стратегия проверок",
+      "title": "Verification strategy",
       "headings": [
-        "Проверки",
-        "Доказательства",
-        "Ограничения"
+        "Checks",
+        "Evidence",
+        "Limitations"
       ]
     },
     "architecture": {
-      "title": "Архитектура",
+      "title": "Architecture",
       "headings": [
-        "Контекст",
-        "Компоненты",
-        "Границы доверия",
-        "Решения"
+        "Context",
+        "Components",
+        "Trust boundaries",
+        "Decisions"
       ]
     },
     "requirements": {
-      "title": "Требования",
+      "title": "Requirements",
       "headings": [
-        "Функции",
-        "Нефункциональные требования",
-        "Правила"
+        "Functions",
+        "Nonfunctional requirements",
+        "Rules"
       ]
     },
     "contracts": {
-      "title": "Интерфейсы и контракты",
+      "title": "Interfaces and contracts",
       "headings": [
-        "Интерфейсы",
-        "Схемы",
-        "Совместимость",
-        "Ошибки"
+        "Interfaces",
+        "Schemas",
+        "Compatibility",
+        "Errors"
       ]
     },
     "http-api": {
       "title": "HTTP API",
       "headings": [
-        "Операции",
-        "Авторизация",
+        "Operations",
+        "Authorization",
         "OpenAPI",
-        "Версионирование"
+        "Versioning"
       ]
     },
     "events": {
-      "title": "Событийные контракты",
+      "title": "Event contracts",
       "headings": [
-        "Каналы",
-        "Схемы",
-        "Доставка",
-        "Совместимость"
+        "Channels",
+        "Schemas",
+        "Delivery",
+        "Compatibility"
       ]
     },
     "data": {
-      "title": "Модель данных",
+      "title": "Data model",
       "headings": [
-        "Сущности",
-        "Хранение",
-        "Миграции",
-        "Удаление"
+        "Entities",
+        "Storage",
+        "Migrations",
+        "Deletion"
       ]
     },
     "security": {
-      "title": "Безопасность",
+      "title": "Security",
       "headings": [
-        "Активы",
-        "Угрозы",
-        "Полномочия",
-        "Секреты"
+        "Assets",
+        "Threats",
+        "Authority",
+        "Secrets"
       ]
     },
     "privacy": {
-      "title": "Персональные данные",
+      "title": "Personal data",
       "headings": [
-        "Категории",
-        "Основания",
-        "Сроки",
-        "Доступ"
+        "Categories",
+        "Legal basis",
+        "Retention",
+        "Access"
       ]
     },
     "operations": {
-      "title": "Эксплуатация",
+      "title": "Operations",
       "headings": [
-        "Установка",
-        "Проверка",
-        "Обновление",
-        "Откат",
-        "Восстановление"
+        "Installation",
+        "Verification",
+        "Update",
+        "Rollback",
+        "Recovery"
       ]
     },
     "release": {
-      "title": "Выпуск",
+      "title": "Release",
       "headings": [
-        "Версии",
-        "Состав",
-        "Проверки",
-        "Публикация"
+        "Versions",
+        "Contents",
+        "Checks",
+        "Publication"
       ]
     },
     "onboarding": {
-      "title": "Онбординг разработчика",
+      "title": "Developer onboarding",
       "headings": [
-        "Начало",
-        "Навигация",
-        "Команды",
-        "Неисправности"
+        "Getting started",
+        "Navigation",
+        "Commands",
+        "Troubleshooting"
       ]
     },
     "ux": {
-      "title": "Пользовательские сценарии",
+      "title": "User journeys",
       "headings": [
-        "Пользователи",
-        "Сценарии",
-        "Доступность",
-        "Приёмка"
+        "Users",
+        "Scenarios",
+        "Accessibility",
+        "Acceptance"
       ]
     },
     "model-card": {
-      "title": "Модель и данные ML",
+      "title": "ML model and data",
       "headings": [
-        "Назначение",
-        "Данные",
-        "Оценка",
-        "Ограничения"
+        "Purpose",
+        "Data",
+        "Evaluation",
+        "Limitations"
       ]
     },
     "safety": {
-      "title": "Анализ безопасности эксплуатации",
+      "title": "Operational safety analysis",
       "headings": [
-        "Опасности",
-        "Контроли",
-        "Проверка",
-        "Ответственность"
+        "Hazards",
+        "Controls",
+        "Verification",
+        "Responsibility"
       ]
     },
     "incident": {
-      "title": "Разбор инцидента",
+      "title": "Incident review",
       "headings": [
-        "Влияние",
-        "Хронология",
-        "Причина",
-        "Меры"
+        "Impact",
+        "Timeline",
+        "Cause",
+        "Actions"
       ]
     }
   }

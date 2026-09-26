@@ -1,12 +1,12 @@
-# F08 — внешний протокол профилей и Mac-first интервью
+# F08 External Profile Protocol and Mac-First Interview
 
 Task: `task-b7f82196dc0e45f1`. Status: PUBLIC_RELEASE_PASS, MAC_TARGET_BLOCKED. Baseline: immutable public `v0.5.0-beta.3` at `f6968c249f8bff1ce571cf92bbd960ba7cc2c1b2`; source worktree starts at `7203fbb86a316ce9ab9813d3ed7cd699fe35ef62`.
 
-## Цель и причина
+## Purpose and reason
 
 Public AgentOS currently has one selected user home (`AGENTOS_USER_HOME` / `--home`) with an overlay catalog and bounded knowledge index. It has no protocol for selecting zero, one or several independently removable profiles, no inventory of overlaps, and no verified owner/host context in task interviews. The owner requires immutable public releases plus an external adapter for user-owned profiles. Private Mac knowledge must remain outside public Git.
 
-## Область изменений
+## Scope of change
 
 Add a versioned, host-neutral profile protocol in the canonical public repository: profile schema, adapter and CLI, selected context for project intake/hook messages, a small interview skill, targeted tests and synchronized docs. The existing single-home overlay remains a supported storage root and compatibility path. External private Mac profile bytes stay in the owner workspace until separately validated and approved. No business host, secret store, private AgentOS runtime or existing beta tag is changed by the public patch.
 

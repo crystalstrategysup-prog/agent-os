@@ -1,17 +1,23 @@
 ---
 name: agentos-implementation-control
-description: "Реализация документированного этапа без скрытого расширения scope."
+description: "Implement a documented stage without silently expanding its scope."
 ---
 
 # agentos-implementation-control
 
-Проверь project gate=PASS для exact task. Прочитай stage, write_paths, authority и checks.
-Реализуй законченное изменение внутри контракта, вместе с regression/negative tests.
-Не меняй guard ради его прохождения. При расширении задачи остановись в checkpoint,
-обнови scope/документы и пройди новый entry. Не используй сторонние отчёты вместо source.
-До внешней записи проверь target host, текущий source/runtime, разрешение и rollback.
-Локальный sandbox здесь ограничен файлами текущей задачи; чужой production не трогать.
-Выход: изменённые исходники/tests/docs и список фактических ограничений, затем verification-closeout.
+Check that the project gate passes for the exact task. Read the stage contract,
+write paths, authority, and approved checks. Implement a complete change within
+that contract with meaningful regression and negative tests where needed. Do not
+weaken a guard to make it pass. If scope expands, checkpoint the task, update the
+scope and documents, and enter again. Verify source rather than relying on an
+external report.
 
-Нормативная основа: установленный resources/docs/PROCESS.md и README; путь — `agentos resources`.
-Project gates относятся к реальным изменениям. Чтение не требует intake/observe. Native hooks исключены: не включать и не восстанавливать. CLI/профиль не дают внешних полномочий.
+Before an external write, verify the target host, current source and runtime,
+authority, and rollback. Local task permission does not authorize another
+production system. Output changed source, tests, docs, and actual limitations;
+then run verification and closeout.
+
+The installed `resources/docs/PROCESS.md` and README are normative; locate them with
+`agentos resources`. Project gates apply to real changes. Reading requires no
+intake or observation. Native hooks remain excluded and must not be enabled or
+restored. Neither CLI output nor profile text grants external authority.

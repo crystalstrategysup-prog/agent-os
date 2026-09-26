@@ -1,25 +1,25 @@
-# RFC
+# Request for comments
 
-## Проблема
+## Problem
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Предложение
+## Proposal
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Совместимость
+## Compatibility
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Миграция
+## Migration
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Риски
+## Risks
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.
 
-## Критерии
+## Acceptance criteria
 
-[REQUIRED] Заполнить по фактам.
+[REQUIRED] Provide facts and sources.

@@ -65,14 +65,14 @@ KINDS = (
     "incident",
 )
 QUESTIONS = {
-    "objective": "Что нужно получить в этой задаче?",
-    "why": "Зачем это нужно и какую проблему решает?",
-    "outcome": "Как будет выглядеть проверяемый результат?",
-    "scope_in": "Какие изменения разрешены?",
-    "scope_out": "Что не входит в задачу?",
-    "constraints": "Какие ограничения, риски и правила нельзя нарушать?",
-    "operation": "Как это должно работать: основной путь и ошибки?",
-    "authority": "Какое текущее поручение разрешает эти действия?",
+    "objective": "What must this task achieve?",
+    "why": "Why is this needed, and what problem does it solve?",
+    "outcome": "What verifiable result will show completion?",
+    "scope_in": "Which changes are in scope?",
+    "scope_out": "Which changes are out of scope?",
+    "constraints": "Which constraints, risks, and rules must be preserved?",
+    "operation": "How should it work, including the main path and failures?",
+    "authority": "Which current owner instruction authorizes these actions?",
 }
 CONTEXT_KEYS = ("purpose", "current_state", "boundaries", "constraints")
 
@@ -170,10 +170,10 @@ def _draft_bytes(doc_id: str, task_id: str | None) -> bytes:
     title, headings = DOCS[doc_id]
     body = f"# {title}\n\n"
     if task_id and doc_id == "stage":
-        body += f"Задача: `{task_id}`\n\n"
-    body += "Статус: draft. Заполнить по фактам; шаблон не проходит gate.\n\n"
+        body += f"Task: `{task_id}`\n\n"
+    body += "Status: draft. Fill with verified facts; this template does not pass the gate.\n\n"
     for heading in headings:
-        body += f"## {heading}\n\n[REQUIRED] Укажите сведения и источник.\n\n"
+        body += f"## {heading}\n\n[REQUIRED] Provide the facts and their source.\n\n"
     return body.encode()
 
 
@@ -1058,11 +1058,11 @@ def close(root: Path, task_id: str, review: dict) -> dict:
         }
         atomic_json(task_path(root, task_id), task)
         report = (
-            f"# Результат {task_id}\n\nСтатус: CLOSED (локальный этап).\n\n"
+            f"# Result {task_id}\n\nStatus: CLOSED (local stage).\n\n"
             + review["summary"]
         )
-        report += "\n\n## Ограничения\n\n" + review["limitations"]
-        report += "\n\n## Следующий этап\n\n" + review["next_step"] + "\n"
+        report += "\n\n## Limitations\n\n" + review["limitations"]
+        report += "\n\n## Next stage\n\n" + review["next_step"] + "\n"
         atomic_bytes(
             within(root, f"docs/agentos/results/{task_id}.md"), report.encode(), 0o644
         )
