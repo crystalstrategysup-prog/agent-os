@@ -5,7 +5,9 @@ generic continuity guide/template on 2026-09-26. F12 and F13 source candidates
 are on `codex/connection-scenarios-20260926` at `c5f47ba`; their local checks
 passed, but no new tag, release object or managed Mac update resulted from
 those stages. At F14 entry, stable `v0.5.0` was the published and installed
-baseline.
+baseline. F14 is now published at `v0.5.1`, and the managed Mac pointer and
+installed CLI read back `0.5.1`; the exact release and runtime receipts are in
+[STAGE-F14](STAGE-F14.md). A fresh Codex session remains untested.
 F14 is defined in [STAGE-F14](STAGE-F14.md). The populated MacBook passport is
 external user knowledge, not public source or a backup of project data.
 

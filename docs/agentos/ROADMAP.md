@@ -1,16 +1,17 @@
 # Active source stage — F14
 
 The canonical public source now declares 0.5.1. F12 added the
-connection-scenario catalog and protocol as a source candidate; the F14 release
-and managed installation need separate proof.
+connection-scenario catalog and protocol; F14 published this source at `v0.5.1`
+and verified its managed Mac installation. See [STAGE-F14](STAGE-F14.md) for the
+separate publication and runtime receipts.
 See [STAGE-F12](STAGE-F12.md) for scope and local acceptance. Earlier F11
 release and activation history remains in [STAGE-F11](STAGE-F11.md).
 F09 no-hook direct-read behavior remains invariant.
 
 F13 translates all human-facing public text to English while preserving stable
 machine contracts and the external user overlay boundary. See [STAGE-F13](STAGE-F13.md).
-F14 adds reusable work-continuity guidance and targets a versioned public
-release and managed Mac update. See [STAGE-F14](STAGE-F14.md).
+F14 adds reusable work-continuity guidance, a versioned public release and a
+verified managed Mac update. See [STAGE-F14](STAGE-F14.md).
 
 # AgentOS foundation roadmap
 
@@ -26,9 +27,9 @@ Every product stage follows: dossier and roadmap read-back → current stage con
 | F06 — beta hardening | External review; STAGE-F06 | Atomic create-only overlay import, user schema compatibility before activation, immutable readiness baseline; new beta release | PUBLIC RELEASE PASS; result in STAGE-F06; CLI follow-up in F07 |
 | F07 — standalone CLI turn transition | Independent beta.1 review; STAGE-F07 | Exact CLI-only next-turn receipt after checkpoint/close, native-hook provenance preserved; next immutable beta | PUBLIC RELEASE PASS; result in STAGE-F07; target gates still pending |
 | F08 — optional external profiles | Owner 0 / 1 / N decision; STAGE-F08 | Versioned profile adapter, explicit conflict decisions, interview, packaged schema and public beta.4 | PUBLIC RELEASE PASS; 179 tests, wheel read-back; live Mac gate blocked |
-| F12 — connection scenarios | Stable 0.5.0 public source; STAGE-F12 | Versioned index and scenario cards, read-only discovery, authoring and maintenance protocol, local schema/CLI/package checks | SOURCE CANDIDATE; release and activation separate |
-| F13 — English public edition | F12 source candidate; STAGE-F13 | English docs, CLI text, catalog, templates, skills and setup scenarios with source/package parity | SOURCE CANDIDATE; local checks passed; release and activation separate |
-| F14 — continuity and public release | F12/F13 source candidates; STAGE-F14 | Generic continuity guide/template, versioned English release, verified managed Mac update | IN PROGRESS; target proofs pending |
+| F12 — connection scenarios | Stable 0.5.0 public source; STAGE-F12 | Versioned index and scenario cards, read-only discovery, authoring and maintenance protocol, local schema/CLI/package checks | INCLUDED IN v0.5.1; cards remain guide_only |
+| F13 — English public edition | F12 source candidate; STAGE-F13 | English docs, CLI text, catalog, templates, skills and setup scenarios with source/package parity | INCLUDED IN v0.5.1 |
+| F14 — continuity and public release | F12/F13 source candidates; STAGE-F14 | Generic continuity guide/template, versioned English release, verified managed Mac update | RELEASE AND MAC READ-BACK PASS; fresh Codex session not tested |
 
 ## Stage dependencies and stop rules
 

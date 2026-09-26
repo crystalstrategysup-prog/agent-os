@@ -2,7 +2,7 @@
 
 Task: `task-fb3cedad5b71486e`
 
-Status: local source candidate passed; publication and live Mac update pending.
+Status: public release published and managed Mac update verified on 2026-09-26.
 
 ## Objective
 
@@ -73,4 +73,33 @@ It contains the English docs, setup catalog, continuity guide and passport
 template. The Darwin arm64 Python 3.14.6 offline fixture passed install,
 update, rollback, reactivation, package integrity and unchanged synthetic user
 tree checks. The fixture did not use a real owner overlay or prove the live Mac
-target. Release and installation receipts will be recorded separately.
+target.
+
+## Publication and Mac read-back
+
+Canonical source `75ebbee2624e3ea6801873fea9da24f501cfe04f` was pushed to
+public `main` and immutable annotated tag `v0.5.1`. The [GitHub release](https://github.com/crystalstrategysup-prog/agent-os/releases/tag/v0.5.1)
+names that same commit. Its downloaded wheel is 157156 bytes and matches
+SHA-256 `b21325005ace0842103768de0744da53fdb61b987430dfa2fd94ad061941588a`;
+the downloaded tagged source archive is 311502 bytes and matches SHA-256
+`7c5e00bc70c0a5dd1141642857f08519784b9f9395e92e0a8f5f5ba5748ceb8a`.
+Both match the locally reviewed artifacts.
+
+The Mac installer planned release `0.5.1-b21325005ace` against observed current
+`0.5.0-eee81cc03774`, reported no user-data or service writes, then applied
+with that exact expected current ID. Live `current` now resolves to
+`releases/0.5.1-b21325005ace`; its CLI reports `0.5.1`, setup discovery lists
+the two English `guide_only` Telegram scenarios, and `doctor` reports PASS.
+The owner and MacBook profiles remain selected. The external overlay inventory
+had 49 files and SHA-256
+`e2366ace7c90c2b3f27f375dc1c561a1bea0bf29d09329de76840be34e0d4d59`
+before and after the core installer. The subsequent managed Codex integration
+reported no conflicts, installed nine namespaced skills and updated only its
+managed AGENTS block, with no auth, model or hook trust change. `hooks.json` is
+absent. The prior managed `0.5.0` release remains the rollback anchor.
+
+The installer and integration read-backs do not test behavior in a newly
+started Codex session. The public work-continuity guide is a template, not an
+independent backup or cloud-restore proof. Website and PyPI publication,
+Windows execution, private provider installation, and retirement of older
+private runtimes remain separate scopes.
