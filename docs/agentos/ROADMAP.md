@@ -1,4 +1,4 @@
-# Active source stage — F15B
+# Active source stage — F15C
 
 The local F15B candidate declares 0.5.3; public and installed stable remains
 0.5.2. F12 added the
@@ -34,7 +34,8 @@ Every product stage follows: dossier and roadmap read-back → current stage con
 | F13 — English public edition | F12 source candidate; STAGE-F13 | English docs, CLI text, catalog, templates, skills and setup scenarios with source/package parity | INCLUDED IN v0.5.1 |
 | F14 — continuity and public release | F12/F13 source candidates; STAGE-F14 | Generic continuity guide/template, versioned English release, verified managed Mac update | RELEASE AND MAC READ-BACK PASS; fresh Codex session not tested |
 | F15 — remote-device tunnels | v0.5.1 public catalog; STAGE-F15 | Fast, generic SSH/VNC connection scenario with proof layers and maintenance triggers; reviewed versioned release and managed Mac update | RELEASE AND MAC READ-BACK PASS; live device and fresh Codex session not tested |
-| F15B — one-host field validation | v0.5.2 public card; STAGE-F15B | Reproducible exact-alias SSH/RFB probe, tested commands, honest desktop proof boundary, public patch and Mac read-back | CANDIDATE CHECKS PASS; checkpoint for native viewer login/frame; no release/update |
+| F15B — one-host field validation | v0.5.2 public card; STAGE-F15B | Reproducible exact-alias SSH/RFB probe, tested commands, honest desktop proof boundary, public patch and Mac read-back | TRANSPORT CHECKS PASS; viewer requirement deferred by owner in F15C; no release/update |
+| F15C — defer desktop viewer | Owner scope amendment; STAGE-F15C | Active SSH/RFB scenario without Screen Sharing or viewer-login requirement | SCOPED AMENDMENT IMPLEMENTED; documentation/catalog only; release/update pending |
 | F16 — private scenarios | F15 public scenario contract | User-owned scenarios in the external overlay, isolated from public IDs and distribution, with explicit trust and maintenance rules | PLANNED; bounded design in STAGE-F15; separate entry required |
 
 ## Stage dependencies and stop rules

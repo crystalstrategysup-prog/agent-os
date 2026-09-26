@@ -1,3 +1,9 @@
+# Current scope amendment — F15C
+
+The owner deferred Screen Sharing on 2026-09-26. Active acceptance is
+authenticated SSH and optional RFB transport; viewer login/frame is future
+work and must not be inferred. See [STAGE-F15C](STAGE-F15C.md).
+
 # Current stage note — F15B
 
 The owner rejected `v0.5.2` as a reference SSH/VNC implementation until it is

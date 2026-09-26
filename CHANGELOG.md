@@ -4,8 +4,10 @@
   strict host-key policy, bounded reads and OpenSSH stdio forwarding.
 - Distinguish `SSH_VERIFIED` and `TRANSPORT_VERIFIED` from VNC authentication
   and a usable desktop; the diagnostic never claims those final layers.
-- Add tested viewer commands, cleanup and failure lessons. One macOS host
+- Add tested transport commands, cleanup and failure lessons. One macOS host
   passed SSH and RFB transport; desktop authentication/frame remains unverified.
+- Defer Screen Sharing and other desktop viewer integration; the active
+  scenario ends at SSH/RFB proof and requires no viewer login.
 - Keep private routes, credentials, Remote Access Helper and native hooks out
   of the public package. Version 0.5.2 remains the rollback anchor.
 

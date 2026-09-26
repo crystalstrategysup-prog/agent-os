@@ -49,11 +49,16 @@ and 2 invalid input or an unsupported environment. Result schema:
 `schemas/ssh-vnc-probe-v1.schema.json`. Windows execution is not implemented
 for this diagnostic; the connection guide itself remains platform-neutral.
 
-## Complete the desktop test
+## Scope: transport only
 
-After a transport pass, start one reviewed viewer forward. The following
-pattern was exercised against one existing macOS SSH route. Choose a free
-local port and leave the process visible so it can be stopped precisely.
+Screen Sharing and other desktop viewer integration are deferred. The active
+procedure ends after authenticated SSH and optional RFB transport verification.
+Do not enable desktop services, launch a viewer, request VNC credentials or
+require a person to sign in as part of this scenario.
+
+The following local-forward pattern was exercised for transport on one existing
+macOS route. It is optional for a separately authorized transport inspection;
+the normal diagnostic uses `-W` and does not need a listening port.
 
 ```sh
 ssh -N -T \
@@ -62,18 +67,13 @@ ssh -N -T \
   -L 127.0.0.1:45900:127.0.0.1:5900 MY_SSH_ALIAS
 ```
 
-Connect the approved VNC viewer to `127.0.0.1`, port `45900`. On a Mac, use
-Screen Sharing and a **Standard** connection for this single RFB tunnel; a High
-Performance connection may require additional transport and is not established
-by this procedure. Authenticate with the approved device account in the viewer,
-without sending its password to chat or putting it in a URL. Confirm a current
-desktop frame and the intended device. A login dialog, RFB banner, black frame
-or stale screenshot is not usable-desktop proof. Do not alter the remote
-workspace merely to obtain a screenshot. Record the result and date privately.
+Choose a free local port and keep the process visible. Stop this exact SSH
+process with Ctrl-C after the transport inspection and verify its listener is
+closed. Do not use broad `pkill ssh` or stop a shared master connection.
 
-Disconnect the viewer, then stop the exact SSH process with Ctrl-C. Verify that
-its local listener has closed. Do not use a broad `pkill ssh`, stop a shared
-master connection or remove someone else's access.
+VNC authentication and a current desktop frame remain unverified. A future
+viewer stage must prove them separately before claiming usable desktop access.
+Their absence is outside current acceptance and requires no user action now.
 
 ## Select a route only when the known one fails
 
@@ -95,7 +95,7 @@ retain separate authority; this probe creates none of them.
 
 - `ClearAllForwardings=yes` cancels explicit `-L` forwards too. SSH can remain
   connected while the requested listener is absent. Use it only for the
-  command-only or `-W` probe; a viewer's `-L` forward explicitly uses `no`.
+  command-only or `-W` probe; an optional `-L` forward explicitly uses `no`.
 - `ExitOnForwardFailure=yes` checks forward setup and binding. It does not prove
   that the final VNC endpoint accepts a connection; require the RFB response.
 - A process-table or `lsof` query without sufficient visibility can show no
@@ -105,7 +105,7 @@ retain separate authority; this probe creates none of them.
   trusted source; do not replace strict checking with `accept-new` or `no` to
   make the test green.
 - A transport pass does not establish VNC account permission or a desktop.
-  Finish the native viewer test and keep incomplete layers visible.
+  Keep those layers unverified; their validation belongs to a future viewer stage.
 
 ## Evidence and maintenance
 
@@ -122,6 +122,4 @@ for each layer, its date and its invalidation trigger in the user's record.
 Primary references: [OpenSSH client](https://man.openbsd.org/ssh),
 [client configuration](https://man.openbsd.org/ssh_config),
 [server configuration](https://man.openbsd.org/sshd_config),
-[RFB protocol](https://www.rfc-editor.org/info/rfc6143/),
-[Apple Screen Sharing](https://support.apple.com/guide/mac-help/mh14066/mac),
-and [Apple connection settings](https://support.apple.com/guide/mac-help/mchl67d5398b/mac).
+[RFB protocol](https://www.rfc-editor.org/info/rfc6143/).

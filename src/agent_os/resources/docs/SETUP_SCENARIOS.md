@@ -36,7 +36,7 @@ For an exact existing SSH route, the separately invoked
 `--apply` performs the bounded SSH/RFB diagnostic. This does not change the
 read-only behavior of `setup list/show` or enable automatic setup. Follow the
 [SSH/VNC field procedure](SSH_VNC_FIELD_GUIDE.md) for tested commands, layered
-results, native viewer login and cleanup. A `TRANSPORT_VERIFIED` result leaves
+results and cleanup. Desktop viewer integration is deferred. A `TRANSPORT_VERIFIED` result leaves
 VNC authentication and a desktop frame unverified.
 
 ## Authoring a scenario

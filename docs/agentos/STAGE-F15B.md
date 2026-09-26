@@ -2,7 +2,8 @@
 
 Task: `task-4e547aee82124ba2`
 
-Status: candidate checks passed; checkpoint pending native viewer login/frame.
+Status: transport candidate checks passed; original viewer requirement deferred
+by the owner in [STAGE-F15C](STAGE-F15C.md).
 This stage follows the published `v0.5.2` scenario and the
 owner's request to test and debug it on one actual host before calling it a
 reference procedure.
@@ -56,18 +57,13 @@ No Remote Access Helper change or private route publication is authorized.
 - A versioned release and Mac update are read back separately. No native hooks
   or private user data enter the public package.
 
-## Remaining target proof
+## Scope amendment — desktop proof deferred
 
-The Apple Screen Sharing viewer needs an authorized account login and an actual
-current frame. A protocol banner and security-method offer are transport proof
-only. If the viewer cannot be controlled in this session, record that limit and
-leave the host's Screen Sharing settings unchanged. Do not request a password in
-chat or extract one from storage to manufacture a pass.
-
-Do not call the owner's reference-quality goal complete or publish/activate the
-candidate as that completed result until this final viewer proof is obtained.
-Local candidate work may be checkpointed honestly while the owner completes
-the native login without sharing a password with the agent.
+On 2026-09-26 the owner requested removing Screen Sharing for now. F15C
+supersedes the original viewer requirement: current acceptance ends at SSH/RFB
+transport. VNC authentication and a frame remain unverified; they do not block
+this narrowed scope and no native login is required from the owner now.
+Public release and managed installation still need their own delivery proof.
 
 ## Rollback
 
@@ -95,7 +91,7 @@ performed. Stable public and installed 0.5.2 remains the current target.
 
 The owner was asked to complete the native viewer login without sharing a
 password in chat. The current session has no callable Mac-app control tool.
-This is an incomplete owner goal until a current authenticated frame is proven.
+The owner subsequently deferred this viewer step in F15C.
 
 Registered checks all passed against source inventory
 `37ea9d0d2022d71fcae9d6207e07db7219bcd69caca05bd7fc2247968d15cda3`:
@@ -104,4 +100,4 @@ probe tests `f973ee13f8f347c8809e4c5c1748d8ca`, live transport probe
 `b1fa811dbc994f27aa5f5ba1bdedbd52`, and installation fixture
 `e4deb51bc71f4ea38191487a588a996d`. These are local-process receipts;
 they do not establish VNC authentication or a frame. Final self-review found no
-blocking source defect; the target proof gap remains the reason not to close.
+blocking source defect. These receipts predate the F15C documentation amendment.

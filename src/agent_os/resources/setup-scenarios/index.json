@@ -1,6 +1,6 @@
 {
   "schema": "agentos.setup-index/v1",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "scenarios": [
     {
       "id": "telegram-mtproto",
@@ -16,8 +16,8 @@
     },
     {
       "id": "ssh-vnc-tunnel",
-      "title": "Connect to a device with SSH or VNC over SSH",
-      "summary": "Reuse a verified SSH route; otherwise choose direct, jump or reverse access, then add protected VNC only when needed.",
+      "title": "Connect with SSH and verify optional VNC transport",
+      "summary": "Reuse a verified SSH route or choose direct, jump or reverse access; optionally verify RFB transport. Desktop viewers are deferred.",
       "implementation_status": "guide_only"
     }
   ]
