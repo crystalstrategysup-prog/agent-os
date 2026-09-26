@@ -1,3 +1,9 @@
+# Current release stage — F15D
+
+The owner authorized stable 0.5.3 publication on 2026-09-26. Screen Sharing
+remains deferred; no installed-runtime update is in this task. See
+[STAGE-F15D](STAGE-F15D.md).
+
 # Current scope amendment — F15C
 
 The owner deferred Screen Sharing on 2026-09-26. Active acceptance is
