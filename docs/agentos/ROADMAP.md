@@ -32,8 +32,8 @@ Every product stage follows: dossier and roadmap read-back → current stage con
 | F12 — connection scenarios | Stable 0.5.0 public source; STAGE-F12 | Versioned index and scenario cards, read-only discovery, authoring and maintenance protocol, local schema/CLI/package checks | INCLUDED IN v0.5.1; cards remain guide_only |
 | F13 — English public edition | F12 source candidate; STAGE-F13 | English docs, CLI text, catalog, templates, skills and setup scenarios with source/package parity | INCLUDED IN v0.5.1 |
 | F14 — continuity and public release | F12/F13 source candidates; STAGE-F14 | Generic continuity guide/template, versioned English release, verified managed Mac update | RELEASE AND MAC READ-BACK PASS; fresh Codex session not tested |
-| F15 — remote-device tunnels | v0.5.1 public catalog; STAGE-F15 | Fast, generic SSH/VNC connection scenario with proof layers and maintenance triggers; reviewed versioned release and managed Mac update | IMPLEMENTING; target proofs pending |
-| F16 — private scenarios | F15 public scenario contract | User-owned scenarios in the external overlay, isolated from public IDs and distribution, with explicit trust and maintenance rules | PLANNED; separate design and entry |
+| F15 — remote-device tunnels | v0.5.1 public catalog; STAGE-F15 | Fast, generic SSH/VNC connection scenario with proof layers and maintenance triggers; reviewed versioned release and managed Mac update | RELEASE AND MAC READ-BACK PASS; live device and fresh Codex session not tested |
+| F16 — private scenarios | F15 public scenario contract | User-owned scenarios in the external overlay, isolated from public IDs and distribution, with explicit trust and maintenance rules | PLANNED; bounded design in STAGE-F15; separate entry required |
 
 ## Stage dependencies and stop rules
 
