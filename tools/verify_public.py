@@ -35,6 +35,7 @@ def verify() -> dict:
         "docs/SECURITY_MODEL.md",
         "docs/QUALITY.md",
         "docs/ONBOARDING.md",
+        "docs/WORK_CONTINUITY.md",
         "docs/RELEASE.md",
         "docs/DOCUMENTATION_CATALOG.md",
         "docs/agentos/DOSSIER.md",
@@ -99,7 +100,7 @@ def verify() -> dict:
     if counts["skills"] != 9:
         errors.append("expected_nine_skills")
     version_text = (ROOT / "pyproject.toml").read_text()
-    if 'version = "0.5.0"' not in version_text or __version__ != "0.5.0":
+    if 'version = "0.5.1"' not in version_text or __version__ != "0.5.1":
         errors.append("version_mismatch")
     return {
         "status": "PASS" if not errors else "FAIL",

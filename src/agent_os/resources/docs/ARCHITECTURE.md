@@ -77,3 +77,12 @@ packaged resources, templates, skills, and scenario content. Machine identifiers
 schema keys, commands, and historical facts remain stable. A user's language
 preference belongs in the external overlay. Source docs and their packaged
 copies must match. See `docs/LOCALIZATION.md`.
+
+**ADR-013 (F14).** Work continuity is a public guide and reusable passport
+template, not a connection scenario or an automatic backup service. The guide
+defines a small index of projects, current verified handoffs, source and data
+pointers, uncertainty and restore checks. A filled passport is user-owned
+knowledge in the external overlay; source repositories, databases, media and
+credentials remain in their own systems. The public package carries no user's
+paths or snapshots. A local file in a sync folder does not prove remote
+availability or restore. See `docs/WORK_CONTINUITY.md`.

@@ -1,4 +1,15 @@
-# Current stage note — F11
+# Current stage note — F14
+
+The owner authorized completion of the pending public English release and a
+generic continuity guide/template on 2026-09-26. F12 and F13 source candidates
+are on `codex/connection-scenarios-20260926` at `c5f47ba`; their local checks
+passed, but no new tag, release object or managed Mac update resulted from
+those stages. At F14 entry, stable `v0.5.0` was the published and installed
+baseline.
+F14 is defined in [STAGE-F14](STAGE-F14.md). The populated MacBook passport is
+external user knowledge, not public source or a backup of project data.
+
+## Historical F11 dossier notes
 
 F10 produced only a local beta.6 source candidate at `838b061`. The independent
 curator found additional reproducible defects S1–S8. F11 targets stable public

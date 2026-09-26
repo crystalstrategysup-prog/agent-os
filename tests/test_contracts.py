@@ -18,11 +18,11 @@ from agent_os.mcp_server import MCP_CONTRACT, response
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_release_and_mcp_versions_have_one_beta_identity():
+def test_release_and_mcp_versions_have_one_identity():
     package_version = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"][
         "version"
     ]
-    assert __version__ == "0.5.0"
+    assert __version__ == "0.5.1"
     assert package_version == __version__.replace("-beta.", "b")
     initialized = response({"jsonrpc": "2.0", "id": 1, "method": "initialize"})
     assert initialized["result"]["serverInfo"] == MCP_CONTRACT["serverInfo"]

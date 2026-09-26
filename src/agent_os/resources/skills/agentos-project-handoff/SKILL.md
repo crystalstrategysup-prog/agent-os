@@ -16,6 +16,11 @@ and does not treat the previous report as independent production proof. Expose
 missing capabilities and concurrent work. Output a packet with an acceptance
 contract.
 
+For a portable overview across several projects, use the packaged
+`resources/docs/WORK_CONTINUITY.md` guide and its passport template. Link each
+project's current handoff rather than copying entire histories. Record data
+recovery separately from knowledge continuity.
+
 The installed `resources/docs/PROCESS.md` and README are normative; locate them with
 `agentos resources`. Project gates apply to real changes. Reading requires no
 intake or observation. Native hooks remain excluded and must not be enabled or

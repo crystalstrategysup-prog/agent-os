@@ -6,7 +6,7 @@ and the packaged schemas under `src/agent_os/resources/schemas/`. Tests compare
 MCP `inputSchema` and `outputSchema` with `tools/list` and returned
 `structuredContent`, and task/event schemas with actual local lifecycle records.
 
-CLI, Python, and MCP report version `0.5.0`; the stdio MCP protocol version is
+CLI, Python, and MCP report version `0.5.1`; the stdio MCP protocol version is
 `2025-06-18`. There is no HTTP API or OpenAPI specification. Project events are
 local JSONL with JSON Schema, not AsyncAPI.
 
@@ -109,3 +109,13 @@ not alter JSON keys, schema names, command names, status and error codes, paths,
 versions, or evidence semantics. Source docs under `docs/` must match their
 packaged copies under `src/agent_os/resources/docs/`. See
 `docs/LOCALIZATION.md`.
+
+## Work-continuity guide
+
+`docs/WORK_CONTINUITY.md` and the packaged template
+`resources/templates/work-continuity-passport.md` are descriptive resources.
+They do not add a CLI command, a new setup-scenario schema, an automatic backup
+or an authority grant. A filled instance belongs outside public core. The
+template requires dated evidence, canonical pointers, known data exceptions,
+an independent-copy or restore check, and a next action. “Unknown” is a valid
+state; the presence of a path is never treated as proof that data is preserved.

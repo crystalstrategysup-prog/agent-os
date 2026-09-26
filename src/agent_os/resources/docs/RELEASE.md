@@ -1,12 +1,16 @@
 # Release policy
 
-The current source declares version `0.5.0`. Publication and installation need
-separate readback; historical beta.4 is not current source authority. The user
-overlay version is independent of core version and compatibility is checked
-separately. Optional `agentos.profile/v1` files remain in the user home; updating
+The current source declares `0.5.1`; `v0.5.0` is the previous stable release.
+Publication and installation need separate readback; historical beta.4 is not
+current source authority. The user overlay version is independent of core
+version and compatibility is checked separately. Optional `agentos.profile/v1`
+files remain in the user home; updating
 a core neither creates nor selects profiles. A changed public protocol needs a
 new versioned release. Release tag and package version must agree. Do not label
-a beta as v0.4.0 or replace an installed stable release implicitly.
+a beta as v0.4.0 or replace an installed stable release implicitly. The old
+`v0.5.0` tag and assets remain immutable. Confirm that `v0.5.1` is free and all
+version surfaces agree before tagging; then read back the canonical repository,
+annotated tag, release object and downloaded wheel.
 
 The release gate includes final diff review, current unit and integration
 checks, complete docs, reproducible source inventory, wheel hash, clean install

@@ -20,6 +20,8 @@ hooks does not disable unrelated client sandboxes or target access controls.
 | Unverified launcher or bytecode | Compare installed wheel payload and script hashes, clear package caches before probe | Same-user malicious races remain possible |
 | Interrupted entry accepted as READY | Entry journal blocks dependent lifecycle until recovery | Read-only questions continue |
 | Check leaves descendants | Own process group and cleanup after launch | Runner is not a sandbox for checked code |
+| Public guide leaks a user's continuity passport | Generic packaged template; filled passport in external overlay; public export review | A template does not make private files safe to publish |
+| Local sync path mistaken for a backup | Require independent read-back and sample restore before device clearance | Cloud server state cannot be inferred from a local directory |
 
 Read-only inspection and needed bootstrap/document preparation are permitted.
 Write paths are assessed, not enforced by an OS ACL. Registered `project check`

@@ -1,14 +1,16 @@
-# Active source stage — F13
+# Active source stage — F14
 
-The canonical public source currently declares stable 0.5.0. F12 adds the
-connection-scenario catalog and protocol as a source candidate; its branch
-does not itself publish a new release or activate a Mac installation.
+The canonical public source now declares 0.5.1. F12 added the
+connection-scenario catalog and protocol as a source candidate; the F14 release
+and managed installation need separate proof.
 See [STAGE-F12](STAGE-F12.md) for scope and local acceptance. Earlier F11
 release and activation history remains in [STAGE-F11](STAGE-F11.md).
 F09 no-hook direct-read behavior remains invariant.
 
 F13 translates all human-facing public text to English while preserving stable
 machine contracts and the external user overlay boundary. See [STAGE-F13](STAGE-F13.md).
+F14 adds reusable work-continuity guidance and targets a versioned public
+release and managed Mac update. See [STAGE-F14](STAGE-F14.md).
 
 # AgentOS foundation roadmap
 
@@ -26,6 +28,7 @@ Every product stage follows: dossier and roadmap read-back → current stage con
 | F08 — optional external profiles | Owner 0 / 1 / N decision; STAGE-F08 | Versioned profile adapter, explicit conflict decisions, interview, packaged schema and public beta.4 | PUBLIC RELEASE PASS; 179 tests, wheel read-back; live Mac gate blocked |
 | F12 — connection scenarios | Stable 0.5.0 public source; STAGE-F12 | Versioned index and scenario cards, read-only discovery, authoring and maintenance protocol, local schema/CLI/package checks | SOURCE CANDIDATE; release and activation separate |
 | F13 — English public edition | F12 source candidate; STAGE-F13 | English docs, CLI text, catalog, templates, skills and setup scenarios with source/package parity | SOURCE CANDIDATE; local checks passed; release and activation separate |
+| F14 — continuity and public release | F12/F13 source candidates; STAGE-F14 | Generic continuity guide/template, versioned English release, verified managed Mac update | IN PROGRESS; target proofs pending |
 
 ## Stage dependencies and stop rules
 

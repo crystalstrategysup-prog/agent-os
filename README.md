@@ -4,7 +4,7 @@
 
 AgentOS gives a project a repeatable path from its current state to a verified change: project dossier → roadmap → documented stage → implementation → checks → updated documentation. A short intake selects only the relevant document layers. The CLI keeps the task, source, documents and check evidence bound to the same stage; ordinary read-only questions bypass intake entirely. Native hooks are excluded; explicit CLI checks do not intercept arbitrary tools.
 
-This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). This source declares `0.5.0` (Python distribution version `0.5.0`). It is separate from any maintainer's private runtime, infrastructure and personal data.
+This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). This source declares `0.5.1` (Python distribution version `0.5.1`). It is separate from any maintainer's private runtime, infrastructure and personal data.
 
 Visit the [public project website](https://crystalstrategy.ru/agent-os/), read the [changelog](CHANGELOG.md), or open an [issue](https://github.com/crystalstrategysup-prog/agent-os/issues) with a bug or technical review. Verify tag, release asset and website deployment separately.
 
@@ -47,6 +47,14 @@ read user secrets. An interactive installer or provider adapter requires its
 own implementation and authority. See the [authoring and maintenance
 protocol](docs/SETUP_SCENARIOS.md) and the [index](src/agent_os/resources/setup-scenarios/index.json).
 
+## Work continuity
+
+The [work-continuity guide](docs/WORK_CONTINUITY.md) and packaged passport
+template help a user preserve a compact index of active projects, current
+handoffs, source and data locations, and recovery checks. A filled passport is
+private user knowledge. The template does not back up databases or prove that
+a cloud copy can be restored.
+
 ## Instruction routing
 
 Keep inherited project `AGENTS.md` short: define its scope, universal limits and
@@ -75,7 +83,7 @@ agentos project enter --root /absolute/path/to/project \
 - The stdio MCP server exposes six narrow planning/status tools. `tools/list` includes versioned input and output schemas; it does not expose arbitrary shell, SSH, file contents or credentials. See [MCP contract](schemas/mcp-tools-v1.json).
 - The [CLI contract](schemas/cli-contract-v1.json), [data schemas](src/agent_os/resources/schemas/) and [contracts guide](docs/CONTRACTS.md) describe the machine-readable surfaces. No HTTP server is provided, so OpenAPI is not applicable to this release.
 - Codex AGENTS and namespaced skills can be integrated while preserving other owners' content. **No native hooks are created or restored.** Read back effective instructions in a fresh client session; do not claim a universal tool sandbox.
-- The optional Telegram Session Hub remains owner-allowlisted and disabled by default. This beta changes its dispatch boundary; read [compatibility](docs/COMPATIBILITY.md) before replacing any existing connector.
+- The optional Telegram Session Hub remains owner-allowlisted and disabled by default. Read [compatibility](docs/COMPATIBILITY.md) before replacing any existing connector.
 - Existing model routing, current-evidence result assessment, Full Inventory and update advisory remain available through the CLI. Their contracts and limits are in [architecture](docs/ARCHITECTURE.md), [result evidence](docs/RESULT_EVIDENCE.md), [Full Inventory](docs/FULL_INVENTORY.md) and [update checks](docs/UPDATE_CHECK.md).
 - The Codex in-app Browser and Chrome remain separate documented surfaces; see [browser surfaces](docs/BROWSER_SURFACES.md). The optional [Telegram onboarding plan](docs/TELEGRAM_SESSION_HUB.md) does not require a website or transmit credentials to this repository.
 
@@ -88,6 +96,6 @@ python tools/demo_lifecycle.py
 python tools/verify_public.py
 ```
 
-Start with the [documentation index](docs/README.md), [project dossier](docs/agentos/DOSSIER.md), [roadmap](docs/agentos/ROADMAP.md), [current source stage](docs/agentos/STAGE-F13.md), [architecture](docs/ARCHITECTURE.md) and [developer onboarding](docs/ONBOARDING.md). The [changelog](CHANGELOG.md), [release policy](docs/RELEASE.md) and [public language policy](docs/LOCALIZATION.md) state the release status and limits. GitHub Actions are not used.
+Start with the [documentation index](docs/README.md), [project dossier](docs/agentos/DOSSIER.md), [roadmap](docs/agentos/ROADMAP.md), [current source stage](docs/agentos/STAGE-F14.md), [architecture](docs/ARCHITECTURE.md) and [developer onboarding](docs/ONBOARDING.md). The [changelog](CHANGELOG.md), [release policy](docs/RELEASE.md) and [public language policy](docs/LOCALIZATION.md) state the release status and limits. GitHub Actions are not used.
 
 Crystal AgentOS is Apache-2.0 software. Contributions and skeptical technical reviews are welcome; see [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), [Governance](GOVERNANCE.md) and the [AI Stewardship Charter](STEWARDSHIP.md).

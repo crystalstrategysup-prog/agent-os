@@ -67,6 +67,13 @@ Receipts record argv, environment, source and wheel hashes, return code, and
 limits. The public-tree scanner is heuristic, not a security certification.
 Source docs and packaged copies must match.
 
+F14 checks the generic continuity guide and template for required evidence and
+recovery boundaries, public/private separation, source/package parity and
+absence of personal data. A clean-export wheel must contain both resources.
+Version identity is checked in the package, CLI and MCP, and the installer
+fixture must keep user-overlay bytes and rollback anchors intact. Release and
+live Mac read-back remain separate target evidence beyond fixture tests.
+
 Linux checks do not prove macOS, Keychain, launchd, or Codex session behavior.
 Mac acceptance needs exact source/runtime identity, disjoint roots, no AgentOS
 hooks, unchanged auth/config, fresh effective AGENTS, local lifecycle probes

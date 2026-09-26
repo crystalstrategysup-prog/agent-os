@@ -1,3 +1,17 @@
+# 0.5.1 — English public edition and continuity guidance
+
+- Make English the canonical language of public documentation, CLI prompts,
+  templates, skills, catalogs and setup scenarios. Preserve stable machine
+  identifiers and the external user overlay.
+- Package a versioned connection-scenario index with Telegram MTProto and
+  Business guidance. Both cards are `guide_only`; no universal provider or
+  live connection is implied.
+- Add a generic work-continuity guide and passport template for verified
+  project handoffs, data-location exceptions and recovery checks. Filled
+  passports and backups remain user-owned and external to the public package.
+- Preserve the no-hook direct-read workflow and immutable `v0.5.0` rollback
+  anchor. Managed installation is a separate exact-target operation.
+
 # 0.5.0 — stable public foundation
 
 - Harden managed Codex integration with explicit target selection, owner-byte
