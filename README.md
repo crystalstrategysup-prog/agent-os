@@ -4,7 +4,7 @@
 
 AgentOS gives a project a repeatable path from its current state to a verified change: project dossier → roadmap → documented stage → implementation → checks → updated documentation. A short intake selects only the relevant document layers. The CLI keeps the task, source, documents and check evidence bound to the same stage; ordinary read-only questions bypass intake entirely. Native hooks are excluded; explicit CLI checks do not intercept arbitrary tools.
 
-This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). This source declares `0.5.3` (Python distribution version `0.5.3`). It is separate from any maintainer's private runtime, infrastructure and personal data.
+This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). This source declares `0.5.4` (Python distribution version `0.5.4`). It is separate from any maintainer's private runtime, infrastructure and personal data.
 
 Visit the [public project website](https://crystalstrategy.ru/agent-os/), read the [changelog](CHANGELOG.md), or open an [issue](https://github.com/crystalstrategysup-prog/agent-os/issues) with a bug or technical review. Verify tag, release asset and website deployment separately.
 
@@ -103,6 +103,8 @@ python tools/demo_lifecycle.py
 python tools/verify_public.py
 ```
 
-Start with the [documentation index](docs/README.md), [project dossier](docs/agentos/DOSSIER.md), [roadmap](docs/agentos/ROADMAP.md), [current source stage](docs/agentos/STAGE-F15B.md), [architecture](docs/ARCHITECTURE.md) and [developer onboarding](docs/ONBOARDING.md). The [changelog](CHANGELOG.md), [release policy](docs/RELEASE.md) and [public language policy](docs/LOCALIZATION.md) state the release status and limits. GitHub Actions are not used.
+Start with the [documentation index](docs/README.md), [project dossier](docs/agentos/DOSSIER.md), [roadmap](docs/agentos/ROADMAP.md), [current source stage](docs/agentos/STAGE-F17.md), [architecture](docs/ARCHITECTURE.md) and [developer onboarding](docs/ONBOARDING.md). The [changelog](CHANGELOG.md), [release policy](docs/RELEASE.md) and [public language policy](docs/LOCALIZATION.md) state the release status and limits. GitHub Actions are not used.
 
 Crystal AgentOS is Apache-2.0 software. Contributions and skeptical technical reviews are welcome; see [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), [Governance](GOVERNANCE.md) and the [AI Stewardship Charter](STEWARDSHIP.md).
+
+Current project handoff: [docs/agentos/HANDOFF.md](docs/agentos/HANDOFF.md).

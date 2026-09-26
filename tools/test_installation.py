@@ -437,6 +437,7 @@ cache.write_bytes(be._code_to_timestamp_pyc(compile(payload, str(module), 'exec'
         assert (
             "skills/agentos-project-entry/SKILL.md" in resources["files"]
             and "docs/PROCESS.md" in resources["files"]
+            and "docs/HANDOFF_DISCOVERY.md" in resources["files"]
         )
         # Use a separate no-space prefix: Linux pip emits an unquoted /bin/sh
         # trampoline for a long safe path, unlike the quoted space-path form.

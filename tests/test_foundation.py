@@ -633,6 +633,9 @@ def test_integration_preserves_user_content(tmp_path):
     r = integration.install(ch, sh, home, apply=True)
     assert r["hook_trust_changed"] is False
     assert "Existing owner policy." in (ch / "AGENTS.override.md").read_text()
+    guide = Path(integration.__file__).parent / "resources/docs/HANDOFF_DISCOVERY.md"
+    assert guide.is_file()
+    assert str(guide) in (ch / "AGENTS.override.md").read_text()
     assert not (ch / "AGENTS.md").exists()
     assert not (ch / "config.toml").exists()
     assert "existing-safe-hook" in (ch / "hooks.json").read_text()

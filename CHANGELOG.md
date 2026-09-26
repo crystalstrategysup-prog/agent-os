@@ -1,3 +1,14 @@
+# 0.5.4 — current handoff discovery
+
+- Add a bounded read-only lookup procedure distinguishing current project
+  handoffs, lifecycle results, installed resources and legacy archives.
+- Link the packaged procedure from managed bootstrap and the handoff skill;
+  improve the handoff template and the public project's current pointer.
+- Keep private indexes/paths outside public core; no global handoff scanner,
+  directory migration, new access grant or native hook is introduced.
+- Preserve previous releases; publication and installed-runtime update have
+  separate verification. Screen Sharing remains deferred.
+
 # 0.5.3 — bounded SSH/VNC field probe
 
 - Add an opt-in exact-alias SSH/RFB diagnostic with a network-free default plan,

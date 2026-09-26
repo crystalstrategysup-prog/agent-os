@@ -45,3 +45,5 @@ scope; rerun stale approved checks; revert unintended writes or agree a new
 stage; inspect a bound-turn mismatch before explicit checkpoint/next-turn; and
 report pre-entry failures directly without fake closeout. Never remove a lock
 blindly.
+
+For current handoff lookup, follow [HANDOFF_DISCOVERY](HANDOFF_DISCOVERY.md).

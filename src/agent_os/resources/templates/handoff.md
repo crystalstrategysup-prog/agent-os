@@ -1,5 +1,10 @@
 # Project handoff
 
+## Identity and source
+
+[REQUIRED] Name the project, date, canonical source/commit and primary documents.
+State installed runtime separately and identify this record as current or historical.
+
 ## Current state
 
 [REQUIRED] Provide facts and sources.

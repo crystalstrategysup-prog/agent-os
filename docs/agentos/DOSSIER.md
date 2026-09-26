@@ -1,3 +1,8 @@
+# Current repair stage — F17
+
+Handoff discovery and selected Mac instruction routing need a scoped repair.
+See [STAGE-F17](STAGE-F17.md); private locations remain external.
+
 # Current release stage — F15D
 
 Stable 0.5.3 is published and its downloaded source/wheel hashes match the

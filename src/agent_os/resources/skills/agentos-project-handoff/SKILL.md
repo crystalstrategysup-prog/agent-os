@@ -5,7 +5,13 @@ description: "Handoff a project without forcing the next agent to reconstruct in
 
 # agentos-project-handoff
 
-Update the dossier, roadmap, architecture, contracts, current stage, and known
+For a read-only handoff lookup, first follow the packaged
+`resources/docs/HANDOFF_DISCOVERY.md` guide: use the selected project/index,
+verify the record before opening its folder, and distinguish current handoffs
+from task results and archives. Do not guess a global directory or preload
+backups/history. Lookup needs no project entry.
+
+For an authorized handoff change, update the dossier, roadmap, architecture, contracts, current stage, and known
 issues. Record exact source and runtime separately, verified checks and limits,
 authority, active task or checkpoint, startup commands, and the next safe step.
 Create a self-contained packet with a manifest and publication boundary; keep

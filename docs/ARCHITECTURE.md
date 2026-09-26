@@ -105,3 +105,10 @@ arbitrary remote command, and never handles VNC credentials or infers a desktop
 frame from an RFB greeting. The setup card remains `guide_only`. The selected
 alias and host-specific results stay outside the public package. See
 `docs/agentos/STAGE-F15B.md` and `docs/SETUP_SCENARIOS.md`.
+
+**ADR-016 (F17).** Handoff discovery is a documented routing procedure, not a
+global handoff runtime or automatic scanner. Core resources describe the
+procedure; current handoffs belong to their selected projects and private
+cross-project indexes belong to the external overlay. Lifecycle results and
+archived packets are evidence with different roles. The managed bootstrap links
+to the packaged procedure and does not enroll a user's paths or change access.

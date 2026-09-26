@@ -2,7 +2,7 @@
 
 ## Version and proof
 
-The source declares `0.5.3`. Verify the published tag or release asset
+The source declares `0.5.4`. Verify the published tag or release asset
 separately; a version string does not prove publication. Review the exact
 source, patch, and manifest, run local checks, and read back the target runtime.
 Python 3.11+ and disjoint core and user roots are required. The commands below
@@ -17,8 +17,8 @@ existing AgentOS installation as the new core home.
 
 ```sh
 python3 tools/install.py install \
-  --wheel /absolute/crystal_agent_os-0.5.3-py3-none-any.whl \
-  --sha256 ACTUAL_WHEEL_SHA256 --version 0.5.3 \
+  --wheel /absolute/crystal_agent_os-0.5.4-py3-none-any.whl \
+  --sha256 ACTUAL_WHEEL_SHA256 --version 0.5.4 \
   --core-home "$HOME/.local/share/agentos-foundation" \
   --user-home "$HOME/.agentos-user"
 ```

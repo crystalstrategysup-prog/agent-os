@@ -63,3 +63,5 @@ The template's status vocabulary is `verified`, `documented`, `unknown` and
 `stale`. Use `verified` only for a dated read-back of the exact source or data;
 `documented` means a source claims it but no current read-back was made. This
 guide has no executable provider and grants no rights over an external host.
+
+For current handoff lookup, follow [HANDOFF_DISCOVERY](HANDOFF_DISCOVERY.md).

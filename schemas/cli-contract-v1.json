@@ -331,12 +331,12 @@
       "write_surfaces": []
     }
   ],
-  "distribution_version": "0.5.3",
+  "distribution_version": "0.5.4",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.5.3",
+  "release": "0.5.4",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",
