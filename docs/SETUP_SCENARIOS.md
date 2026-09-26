@@ -23,6 +23,14 @@ nor proof that the capability works for a particular user.
 Neither command runs setup steps or performs network checks. A future GUI or
 conversational wizard can use the same data without a second instruction set.
 
+For a remote-device request, select `ssh-vnc-tunnel` by goal, then check the
+exact user's existing verified device route before asking setup questions. Its
+short first flow covers that common case. Otherwise choose one route from the
+card: direct SSH, a trusted jump host, or a loopback-bound reverse forward;
+add VNC through SSH only if the person asks for a desktop. Keep device identity,
+transport, SSH authentication and desktop authentication as separate evidence.
+No public card contains a host inventory, grants access or executes a tunnel.
+
 ## Authoring a scenario
 
 1. State the goal in the user's language and choose a stable lowercase `id`.
@@ -63,3 +71,8 @@ sweep across all scenarios is not implemented yet.
 If drift is found, report it and stop describing the old route as current.
 `reviewed_on` records review of text and sources, not a successful live login.
 A specific user's connection state is stored separately from the public card.
+For SSH/VNC, a saved route also needs the exact target, source and date of the
+last authenticated check, requested capability, and a review trigger such as a
+changed host key, device, broker, user, credential or failed connection. Reuse
+that record for fast discovery, then verify it against current state before
+action. Do not copy its addresses or credentials into public source.

@@ -1,6 +1,6 @@
 # Compatibility and known limits
 
-The source declares `0.5.1`; publication and installation require separate
+The source declares `0.5.2`; publication and installation require separate
 readback. A concise `AGENTS.md` is routing advice, not a new lifecycle gate.
 F01–F08 results describe their own source and wheel, not this change.
 

@@ -1,3 +1,14 @@
+# 0.5.2 — standard SSH/VNC connection scenario
+
+- Add a host-neutral, indexed `guide_only` route for fast SSH connection and
+  optional VNC over SSH. Reuse a verified user route before choosing direct,
+  jump or reverse forwarding; distinguish transport from authenticated access.
+- Record primary-source review and maintenance triggers. Keep per-device routes,
+  credentials, Remote Access Helper implementations and access grants external
+  to the public package.
+- Preserve the English public surface, no-hook workflow, and v0.5.1 rollback
+  anchor. Publication and managed installation require separate read-back.
+
 # 0.5.1 — English public edition and continuity guidance
 
 - Make English the canonical language of public documentation, CLI prompts,

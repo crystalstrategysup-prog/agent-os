@@ -1,6 +1,6 @@
 {
   "schema": "agentos.setup-index/v1",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "scenarios": [
     {
       "id": "telegram-mtproto",
@@ -12,6 +12,12 @@
       "id": "telegram-business",
       "title": "Connect a Telegram Business bot",
       "summary": "Connect a bot to selected chats with explicit permissions and verify the resulting Business connection.",
+      "implementation_status": "guide_only"
+    },
+    {
+      "id": "ssh-vnc-tunnel",
+      "title": "Connect to a device with SSH or VNC over SSH",
+      "summary": "Reuse a verified SSH route; otherwise choose direct, jump or reverse access, then add protected VNC only when needed.",
       "implementation_status": "guide_only"
     }
   ]

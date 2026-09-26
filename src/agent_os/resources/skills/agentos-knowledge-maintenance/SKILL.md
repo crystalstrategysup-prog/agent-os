@@ -22,6 +22,12 @@ For device or workspace continuity, follow the packaged
 the external user overlay. A path, local sync folder or matching local hashes
 alone do not prove an independent backup or a successful restore.
 
+For an SSH or VNC device request, read only the indexed
+`ssh-vnc-tunnel` connection scenario and the exact selected user's verified
+device route. Reuse a current route before asking setup questions. Distinguish
+reachability, authenticated SSH and a usable desktop; a saved route grants no
+new access and must be rechecked when its identity or authority changes.
+
 The installed `resources/docs/PROCESS.md` and README are normative; locate them with
 `agentos resources`. Project gates apply to real changes. Reading requires no
 intake or observation. Native hooks remain excluded and must not be enabled or

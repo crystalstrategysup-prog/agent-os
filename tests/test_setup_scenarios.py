@@ -11,6 +11,13 @@ from agent_os import cli
 from agent_os.setup_scenarios import RESOURCE_ROOT, load_index, show
 
 ROOT = Path(__file__).resolve().parents[1]
+PRIMARY_SOURCE_PREFIXES = (
+    "https://core.telegram.org/",
+    "https://man.openbsd.org/",
+    "https://learn.microsoft.com/",
+    "https://support.apple.com/",
+    "https://www.rfc-editor.org/",
+)
 
 
 def test_public_catalog_matches_versioned_schemas_and_package_copies() -> None:
@@ -42,9 +49,18 @@ def test_public_catalog_matches_versioned_schemas_and_package_copies() -> None:
         assert scenario["implementation_status"] == "guide_only"
         assert scenario["evidence"]["level"] == "documented"
         assert all(
-            source.startswith("https://core.telegram.org/")
+            source.startswith(PRIMARY_SOURCE_PREFIXES)
             for source in scenario["evidence"]["sources"]
         )
+
+    tunnel = show("ssh-vnc-tunnel")
+    assert tunnel["flows"][0]["id"] == "known-route"
+    assert len(tunnel["flows"][0]["steps"]) <= 2
+    assert {flow["id"] for flow in tunnel["flows"]} == {
+        "known-route",
+        "new-ssh-route",
+        "desktop-over-ssh",
+    }
 
 
 def test_setup_cli_requires_no_user_home_or_update_check(monkeypatch, capsys) -> None:
@@ -58,10 +74,11 @@ def test_setup_cli_requires_no_user_home_or_update_check(monkeypatch, capsys) ->
     assert {row["id"] for row in listed["scenarios"]} == {
         "telegram-mtproto",
         "telegram-business",
+        "ssh-vnc-tunnel",
     }
-    assert cli.main(["setup", "show", "telegram-mtproto"]) == 0
+    assert cli.main(["setup", "show", "ssh-vnc-tunnel"]) == 0
     selected = json.loads(capsys.readouterr().out)
-    assert selected["id"] == "telegram-mtproto"
+    assert selected["id"] == "ssh-vnc-tunnel"
 
 
 def test_setup_cli_rejects_unknown_or_unsafe_id(capsys) -> None:

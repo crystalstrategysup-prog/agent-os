@@ -1,4 +1,9 @@
-# Current stage note — F14
+# Current stage note — F15
+
+On 2026-09-26 the owner requested a standard, fast, maintained SSH/VNC tunnel
+scenario for AgentOS. Remote Access Helper is an existing private implementation
+and is explicitly excluded from the new public scenario. The current public
+baseline is v0.5.1; the new scope is [STAGE-F15](STAGE-F15.md).
 
 The owner authorized completion of the pending public English release and a
 generic continuity guide/template on 2026-09-26. F12 and F13 source candidates

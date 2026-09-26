@@ -4,7 +4,7 @@
 
 AgentOS gives a project a repeatable path from its current state to a verified change: project dossier → roadmap → documented stage → implementation → checks → updated documentation. A short intake selects only the relevant document layers. The CLI keeps the task, source, documents and check evidence bound to the same stage; ordinary read-only questions bypass intake entirely. Native hooks are excluded; explicit CLI checks do not intercept arbitrary tools.
 
-This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). This source declares `0.5.1` (Python distribution version `0.5.1`). It is separate from any maintainer's private runtime, infrastructure and personal data.
+This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). This source declares `0.5.2` (Python distribution version `0.5.2`). It is separate from any maintainer's private runtime, infrastructure and personal data.
 
 Visit the [public project website](https://crystalstrategy.ru/agent-os/), read the [changelog](CHANGELOG.md), or open an [issue](https://github.com/crystalstrategysup-prog/agent-os/issues) with a bug or technical review. Verify tag, release asset and website deployment separately.
 
@@ -40,10 +40,12 @@ or changing files; calling it is not a prerequisite for answering a question.
 
 The public foundation includes an indexed catalog of versioned connection
 scenarios. `agentos setup list` shows the available scenarios and
-`agentos setup show telegram-mtproto` opens one card. The initial catalog
-covers Telegram MTProto and Telegram Business. Both are marked `guide_only`:
-the commands return guidance and do not log in, create bots, grant rights or
-read user secrets. An interactive installer or provider adapter requires its
+`agentos setup show ssh-vnc-tunnel` opens the remote-device card. The catalog
+covers Telegram MTProto, Telegram Business and SSH/VNC over SSH. All cards are
+`guide_only`: the commands return guidance and do not connect to devices,
+log in, create bots, grant rights or read user secrets. The SSH/VNC card starts
+with a known route and distinguishes transport from authenticated access. An
+interactive installer or provider adapter requires its
 own implementation and authority. See the [authoring and maintenance
 protocol](docs/SETUP_SCENARIOS.md) and the [index](src/agent_os/resources/setup-scenarios/index.json).
 
@@ -96,6 +98,6 @@ python tools/demo_lifecycle.py
 python tools/verify_public.py
 ```
 
-Start with the [documentation index](docs/README.md), [project dossier](docs/agentos/DOSSIER.md), [roadmap](docs/agentos/ROADMAP.md), [current source stage](docs/agentos/STAGE-F14.md), [architecture](docs/ARCHITECTURE.md) and [developer onboarding](docs/ONBOARDING.md). The [changelog](CHANGELOG.md), [release policy](docs/RELEASE.md) and [public language policy](docs/LOCALIZATION.md) state the release status and limits. GitHub Actions are not used.
+Start with the [documentation index](docs/README.md), [project dossier](docs/agentos/DOSSIER.md), [roadmap](docs/agentos/ROADMAP.md), [current source stage](docs/agentos/STAGE-F15.md), [architecture](docs/ARCHITECTURE.md) and [developer onboarding](docs/ONBOARDING.md). The [changelog](CHANGELOG.md), [release policy](docs/RELEASE.md) and [public language policy](docs/LOCALIZATION.md) state the release status and limits. GitHub Actions are not used.
 
 Crystal AgentOS is Apache-2.0 software. Contributions and skeptical technical reviews are welcome; see [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), [Governance](GOVERNANCE.md) and the [AI Stewardship Charter](STEWARDSHIP.md).

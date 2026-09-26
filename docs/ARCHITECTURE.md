@@ -86,3 +86,11 @@ knowledge in the external overlay; source repositories, databases, media and
 credentials remain in their own systems. The public package carries no user's
 paths or snapshots. A local file in a sync folder does not prove remote
 availability or restore. See `docs/WORK_CONTINUITY.md`.
+
+**ADR-014 (F15).** The public SSH/VNC card is a connection scenario under
+ADR-011. It first reuses an exact verified user route, then selects direct SSH,
+a trusted jump host or a loopback-bound reverse route. VNC is optional and
+forwarded through authenticated SSH. The public card records proof layers and
+maintenance triggers but does not initiate connections, keep credentials, scan
+hosts or install a private Remote Access Helper. Per-device routes and current
+authorization remain external to the public core. See `docs/SETUP_SCENARIOS.md`.

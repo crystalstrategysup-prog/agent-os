@@ -1,6 +1,6 @@
 # Process: direct reading, documented changes
 
-This describes the `0.5.1` foundation. Native AgentOS hooks are excluded: do not
+This describes the `0.5.2` foundation. Native AgentOS hooks are excluded: do not
 create, enable, trust again, or restore them during rollback. Older F01–F08
 stages are historical evidence, not permission to reintroduce prompt interception
 or a Stop hook.

@@ -1,9 +1,11 @@
-# Active source stage — F14
+# Active source stage — F15
 
-The canonical public source now declares 0.5.1. F12 added the
+The canonical public source now declares 0.5.2 as the F15 candidate. F12 added the
 connection-scenario catalog and protocol; F14 published this source at `v0.5.1`
 and verified its managed Mac installation. See [STAGE-F14](STAGE-F14.md) for the
 separate publication and runtime receipts.
+F15 adds a standard SSH and VNC tunnel scenario; see [STAGE-F15](STAGE-F15.md)
+for its bounded public scope and separate release/installation proof.
 See [STAGE-F12](STAGE-F12.md) for scope and local acceptance. Earlier F11
 release and activation history remains in [STAGE-F11](STAGE-F11.md).
 F09 no-hook direct-read behavior remains invariant.
@@ -30,6 +32,8 @@ Every product stage follows: dossier and roadmap read-back → current stage con
 | F12 — connection scenarios | Stable 0.5.0 public source; STAGE-F12 | Versioned index and scenario cards, read-only discovery, authoring and maintenance protocol, local schema/CLI/package checks | INCLUDED IN v0.5.1; cards remain guide_only |
 | F13 — English public edition | F12 source candidate; STAGE-F13 | English docs, CLI text, catalog, templates, skills and setup scenarios with source/package parity | INCLUDED IN v0.5.1 |
 | F14 — continuity and public release | F12/F13 source candidates; STAGE-F14 | Generic continuity guide/template, versioned English release, verified managed Mac update | RELEASE AND MAC READ-BACK PASS; fresh Codex session not tested |
+| F15 — remote-device tunnels | v0.5.1 public catalog; STAGE-F15 | Fast, generic SSH/VNC connection scenario with proof layers and maintenance triggers; reviewed versioned release and managed Mac update | IMPLEMENTING; target proofs pending |
+| F16 — private scenarios | F15 public scenario contract | User-owned scenarios in the external overlay, isolated from public IDs and distribution, with explicit trust and maintenance rules | PLANNED; separate design and entry |
 
 ## Stage dependencies and stop rules
 
