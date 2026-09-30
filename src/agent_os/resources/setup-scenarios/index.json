@@ -1,6 +1,6 @@
 {
   "schema": "agentos.setup-index/v1",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "scenarios": [
     {
       "id": "telegram-mtproto",
@@ -12,6 +12,12 @@
       "id": "telegram-business",
       "title": "Connect a Telegram Business bot",
       "summary": "Connect a bot to selected chats with explicit permissions and verify the resulting Business connection.",
+      "implementation_status": "guide_only"
+    },
+    {
+      "id": "telegram-owner-inbox",
+      "title": "Receive owner files through a Telegram bot",
+      "summary": "Configure one owner-only host bot and a separate supervised receiver that saves inert files and replies with their verified local paths.",
       "implementation_status": "guide_only"
     },
     {

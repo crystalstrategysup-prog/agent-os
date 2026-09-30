@@ -79,6 +79,7 @@ def test_setup_cli_requires_no_user_home_or_update_check(monkeypatch, capsys) ->
     assert {row["id"] for row in listed["scenarios"]} == {
         "telegram-mtproto",
         "telegram-business",
+        "telegram-owner-inbox",
         "ssh-vnc-tunnel",
     }
     assert cli.main(["setup", "show", "ssh-vnc-tunnel"]) == 0

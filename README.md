@@ -39,9 +39,9 @@ or changing files; calling it is not a prerequisite for answering a question.
 ## Connection scenarios
 
 The public foundation includes an indexed catalog of versioned connection
-scenarios. `agentos setup list` shows the available scenarios and
-`agentos setup show ssh-vnc-tunnel` opens the remote-device card. The catalog
-covers Telegram MTProto, Telegram Business and SSH/VNC over SSH. All cards are
+scenarios. `agentos setup list` shows the available scenarios;
+`agentos setup show telegram-owner-inbox` opens the owner file inbox card. The catalog
+covers Telegram MTProto, Telegram Business, owner file inbox and SSH/VNC over SSH. All cards are
 `guide_only`: the commands return guidance and do not connect to devices,
 log in, create bots, grant rights or read user secrets. The SSH/VNC card starts
 with a known route and distinguishes transport from authenticated access. An

@@ -1,0 +1,79 @@
+{
+  "schema": "agentos.setup-scenario/v1",
+  "id": "telegram-owner-inbox",
+  "version": "1.0.0",
+  "title": "Receive owner files through a Telegram bot",
+  "goal": "Let one authorized owner send a file to a host-specific Telegram bot, save it as an inert local file, and receive a verified path reply.",
+  "implementation_status": "guide_only",
+  "evidence": {
+    "level": "documented",
+    "scope": "Telegram Bot API documents polling, files and replies. A separately installed private receiver was verified on one host; the public foundation does not ship or activate that receiver.",
+    "reviewed_on": "2026-09-30",
+    "sources": [
+      "https://core.telegram.org/bots/api#getupdates",
+      "https://core.telegram.org/bots/api#getfile",
+      "https://core.telegram.org/bots/api#sendmessage"
+    ]
+  },
+  "prerequisites": [
+    "The owner has a host-specific bot and knows which private chat is authorized.",
+    "The selected bot has one update consumer: no competing poller and no active webhook when polling is chosen.",
+    "A separately reviewed provider can store files privately, send replies, keep durable receipts and recover after restart.",
+    "The canonical bot token and owner binding belong in the external user overlay; a provider may need a protected runtime projection with a verified rotation path."
+  ],
+  "flows": [
+    {
+      "id": "connect",
+      "when": "The owner wants to upload files to one host through that host's bot.",
+      "steps": [
+        {
+          "id": "identify-bot",
+          "actor": "agent",
+          "action": "Verify the selected bot and owner-private recipient against the saved host binding without displaying the token; inspect webhook and existing consumer state.",
+          "proof": "The bot and owner match the requested host, webhook is empty for polling, and one consumer will own updates."
+        },
+        {
+          "id": "configure-provider",
+          "actor": "provider",
+          "action": "Use the protected overlay token and owner binding to configure a standalone receiver, private file store, size limits, durable offsets and idempotent reply receipts.",
+          "proof": "Effective configuration and filesystem permissions match the reviewed provider contract; no token appears in public source or logs."
+        },
+        {
+          "id": "enable-recovery",
+          "actor": "provider",
+          "action": "Start the single receiver and enable supervised restart and boot activation for the exact host service.",
+          "proof": "The service is active and enabled, health shows a fresh successful poll, and no second consumer is present."
+        },
+        {
+          "id": "verify-file",
+          "actor": "person",
+          "action": "Send one harmless test document to the selected host bot.",
+          "proof": "The provider records a saved file with restricted access and a sent path-reply receipt; the owner sees the matching reply."
+        }
+      ]
+    }
+  ],
+  "sensitive_inputs": [
+    "bot token",
+    "owner chat identity",
+    "uploaded file contents and names",
+    "private local file paths"
+  ],
+  "recovery": [
+    "If the receiver is stopped, distinguish intentional disablement from a crash before enabling it; preserve durable offsets and files.",
+    "If webhook, competing polling, token mismatch or uncertain reply delivery is found, stop the cutover and reconcile the exact bot state without dropping updates or blindly resending.",
+    "A plain text message is not a file; text-to-Codex routing is a separate provider capability that requires an exact session binding.",
+    "On token rotation, update the overlay source and every protected provider projection together, then verify bot identity, fresh polling and an owner-private receipt.",
+    "To revoke access, stop the receiver, revoke the bot credential and handle retained private files under the owner's retention policy."
+  ],
+  "maintenance": {
+    "owner": "AgentOS community maintainers",
+    "review_triggers": [
+      "Telegram Bot API polling or file limit change",
+      "receiver provider change",
+      "host bot or owner identity change",
+      "failed health, file-save or reply receipt",
+      "scheduled source review"
+    ]
+  }
+}
