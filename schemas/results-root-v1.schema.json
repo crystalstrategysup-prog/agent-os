@@ -1,0 +1,204 @@
+{
+  "$id": "https://github.com/crystalstrategysup-prog/agent-os/schemas/results-root-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "access": {
+      "additionalProperties": false,
+      "properties": {
+        "owner": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "readers": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "writers": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "owner",
+        "readers",
+        "writers"
+      ],
+      "type": "object"
+    },
+    "committed_seq": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "created_at": {},
+    "durability_profile": {
+      "const": "posix-file-and-directory-fsync-cas/v1"
+    },
+    "generation": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "index_state": {
+      "const": "complete"
+    },
+    "library_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "previous_ref": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "locator": {
+              "pattern": "^aos://[^/]+/objects/sha256/[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "media_type": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "object_id": {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "size_bytes": {
+              "maximum": 16777216,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "object_id",
+            "locator",
+            "size_bytes",
+            "media_type"
+          ],
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "registry_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "locator": {
+          "pattern": "^aos://[^/]+/objects/sha256/[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "media_type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "object_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "size_bytes": {
+          "maximum": 16777216,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "object_id",
+        "locator",
+        "size_bytes",
+        "media_type"
+      ],
+      "type": "object"
+    },
+    "routes_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "locator": {
+          "pattern": "^aos://[^/]+/objects/sha256/[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "media_type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "object_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "size_bytes": {
+          "maximum": 16777216,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "object_id",
+        "locator",
+        "size_bytes",
+        "media_type"
+      ],
+      "type": "object"
+    },
+    "schema": {
+      "const": "agentos.results-root/v1"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "start_sha256": {},
+    "validation": {},
+    "validation_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "locator": {
+          "pattern": "^aos://[^/]+/objects/sha256/[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "media_type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "object_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "size_bytes": {
+          "maximum": 16777216,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "object_id",
+        "locator",
+        "size_bytes",
+        "media_type"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "schema_version",
+    "library_id",
+    "generation",
+    "created_at",
+    "routes_ref",
+    "registry_ref",
+    "committed_seq",
+    "index_state",
+    "previous_ref",
+    "validation_ref",
+    "validation",
+    "start_sha256",
+    "access",
+    "durability_profile"
+  ],
+  "type": "object"
+}

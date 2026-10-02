@@ -1,0 +1,48 @@
+{
+  "$id": "https://github.com/crystalstrategysup-prog/agent-os/schemas/persona-settings-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "addressing": {
+      "enum": [
+        "addressed_only",
+        "addressed_or_dialogue"
+      ]
+    },
+    "display_name": {
+      "pattern": "^[\\w .-]{1,40}$",
+      "type": "string"
+    },
+    "formality": {
+      "enum": [
+        "relaxed",
+        "neutral",
+        "formal"
+      ]
+    },
+    "identity": {
+      "const": "transparent_ai"
+    },
+    "interrupt_others": {
+      "const": false
+    },
+    "listen_first": {
+      "const": true
+    },
+    "tone": {
+      "enum": [
+        "plain",
+        "conversational",
+        "warm"
+      ]
+    },
+    "verbosity": {
+      "enum": [
+        "concise",
+        "normal",
+        "detailed"
+      ]
+    }
+  },
+  "type": "object"
+}

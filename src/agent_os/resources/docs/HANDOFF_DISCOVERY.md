@@ -1,5 +1,12 @@
 # Find the current handoff
 
+Current public version: `0.7.0`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+
+
+## Historical: Indexed handoff successor0.7.0rc1
+
+For an explicitly selected results root, read START/ROOT/same-generation ROUTES, query exact IDs/facets, verify selected manifest. Both coordinators and workers use this path; legacy lookup remains available. See [indexed handoff](INDEXED_HANDOFF.md).
+
 A request to show or resume a handoff is a read-only lookup. It needs no project
 intake or task creation. Identify the requested project from current context or
 the user's selected index before searching. Ask only if that identity is unknown.

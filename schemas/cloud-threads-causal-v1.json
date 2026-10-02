@@ -1,0 +1,17 @@
+{
+  "schema": "agentos.cloud-threads-causal-contract/v1",
+  "provider": "cloud_threads",
+  "send_method": "cloud_threads.send_message",
+  "send_result_fields": ["threadId", "turnId", "admissionOutcome"],
+  "read_method": "cloud_threads.read",
+  "read_item_fields": ["id", "turnId", "role", "text"],
+  "read_roles": ["user", "assistant"],
+  "read_order": "newest_first",
+  "required_owner_verified_property": "persistent immutable complete item identity and content",
+  "pagination": "owner bridge normalizes opaque cursor and nextCursor; no absence inference",
+  "evidence_kind": "causal_challenge",
+  "acceptance_scope": "received_only",
+  "producer_timestamps_required": false,
+  "generic_activity_acknowledges": false,
+  "non_delivery_contract": "not supplied; UNKNOWN never resends"
+}

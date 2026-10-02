@@ -1,35 +1,16 @@
 # Release policy
 
-The current source declares `0.5.5`; `v0.5.4` is the previous stable release.
-Publication and installation need separate readback; historical beta.4 is not
-current source authority. The user overlay version is independent of core
-version and compatibility is checked separately. Optional `agentos.profile/v1`
-files remain in the user home; updating
-a core neither creates nor selects profiles. A changed public protocol needs a
-new versioned release. Release tag and package version must agree. Do not label
-a beta as v0.4.0 or replace an installed stable release implicitly. The old
-`v0.5.4` tag and assets remain immutable. Confirm that `v0.5.5` is free and all
-version surfaces agree before tagging; then read back the canonical repository,
-annotated tag, release object and downloaded wheel.
+Current public version: `0.7.0`. RC-labelled sections below are retained historical records, not current installation or publication claims.
 
-The release gate includes final diff review, current unit and integration
-checks, complete docs, reproducible source inventory, wheel hash, clean install
-in a fresh venv, privacy review, and an exact publication allowlist. Publish
-only public core and intended artifacts; never a mixed private handoff or
-`.agentos/` runtime receipts. Authorized tag/signature and release actions
-require the exact account and host. A prepared archive is not a published
-release. Before push, verify remote, HEAD, and worktree state; reconcile
-concurrent work without force, reset, or stashing another person's changes.
-GitHub Actions is not a delivery gate: use local checks and recorded evidence.
 
-Release notes state behavior changes, breaking interfaces, config migration,
-tested platforms, known limits, source and wheel hashes, install and rollback
-route, and next stage. Exclude private host names and paths, personal knowledge,
-PII logs, and sensitive historical references.
+The current public source proposes stable `0.7.0`; `0.5.5` is the previously published public baseline. This local candidate has no publication receipt. The release tag must be `v0.7.0` and all current package, CLI, MCP and public documentation version surfaces must agree before tagging. Existing tags and assets, including RC evidence, remain immutable.
 
-Use verified source and wheel installation guidance. Do not claim PyPI
-availability without a publication receipt. Source archives may contain
-bootstrap and self-verification docs. Later project changes still require
-explicit entry; questions, searches, and read-only audits do not. Native hooks
-are excluded on release and rollback. Schemas and skills are bundled resources,
-inherited only after explicit integration; user overrides stay outside core.
+The release gate includes final diff review, current unit and integration checks, complete docs, reproducible source inventory, wheel hash, clean install in a fresh venv, privacy review, and an exact publication allowlist. Publish only public core and intended artifacts; never a mixed private handoff, user overlay, credential, host path or `.agentos/` runtime receipt. A prepared archive is not a published release.
+
+Release notes state behavior changes, breaking interfaces, config migration, tested platforms, known limits, source and wheel hashes, install and rollback route, and the next stage. The stable model policy is a proposal contract, not runtime enforcement. Hooks remain disabled, existing clients require manual reload after a later install, voice is unverified and API publication is not available to this local preparation.
+
+Before an authorized publication, verify canonical remote, exact source and clean worktree. Afterwards read back the annotated tag, GitHub release object, and independently downloaded wheel and source ZIP. Do not claim PyPI availability without a publication receipt. Native hooks remain excluded on release and rollback.
+
+## Historical candidates
+
+The `0.7.0rc1`, `0.7.0rc2` and `0.7.0rc3` source candidates are preserved as historical local evidence. They were not publication receipts, installation proof, live runtime adoption, voice verification or API availability proof.

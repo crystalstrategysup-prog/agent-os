@@ -3,7 +3,7 @@
   "schema": "agentos.mcp-tools/v1",
   "serverInfo": {
     "name": "crystal-agent-os",
-    "version": "0.5.5"
+    "version": "0.7.0"
   },
   "tools": [
     {
@@ -150,23 +150,23 @@
           "entry_required_every_task": {
             "const": false
           },
+          "entry_required_for": {
+            "const": "project_changes"
+          },
           "external_authority_granted": {
             "type": "boolean"
+          },
+          "native_hooks": {
+            "const": "DISABLED"
           },
           "questions": {
             "type": "object"
           },
-          "schema": {
-            "type": "string"
-          },
-          "entry_required_for": {
-            "const": "project_changes"
-          },
           "read_only_intake_required": {
             "const": false
           },
-          "native_hooks": {
-            "const": "DISABLED"
+          "schema": {
+            "type": "string"
           }
         },
         "required": [

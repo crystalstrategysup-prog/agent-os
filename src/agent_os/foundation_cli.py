@@ -22,10 +22,19 @@ def dispatch(argv: list[str]) -> int | None:
         "resources",
         "hook",
         "workflow",
+        "continuation",
         "setup",
+        "library",
+        "persona",
     }:
         return None
     try:
+        if rest[0] == "library":
+            from .handoff_cli import command
+
+            result = command(rest[1:])
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
         if rest[0] == "hook":
             from .hooks import main
 
@@ -46,7 +55,15 @@ def dispatch(argv: list[str]) -> int | None:
 
         home = AgentOSPaths.discover(global_args.home).home
         cmd = rest.pop(0)
-        if cmd == "project":
+        if cmd == "persona":
+            from .persona import command
+
+            result, code = command(rest, home)
+        elif cmd == "continuation":
+            from .continuation import command
+
+            result, code = command(rest, home)
+        elif cmd == "project":
             from .project import command
 
             result, code = command(rest, home)

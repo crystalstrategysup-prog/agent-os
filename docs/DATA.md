@@ -1,5 +1,12 @@
 # Data and documentation
 
+Current public version: `0.7.0`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+
+
+## Historical: Indexed handoff successor0.7.0rc1
+
+User-owned scope-private results libraries are separate from core and sessions. Capture approved result surfaces/current docs, record exact hashes/provenance and explicit baseline dependencies; do not import unrelated data. See [indexed handoff](INDEXED_HANDOFF.md).
+
 ## Project records
 
 `.agentos/project.json` stores identity, name, types, features, source-backed
@@ -22,6 +29,11 @@ check evidence. Old receipts remain history. Source snapshots exclude
 separate checks. Other registered documents remain part of the source snapshot.
 Snapshots are bounded by 20,000 files and 128 MiB; an oversized project needs
 an explicit scope decision, not silent truncation.
+
+The unpublished tracked-directory-alias source delta records an admitted Git
+symlink as exact metadata without following it. An optional `symlinks` map and
+its bound digest distinguish the alias from ordinary file hashes. Generic
+storage/import guards remain strict; see [source link contract](SOURCE_SYMLINKS.md).
 
 ## User overlay
 

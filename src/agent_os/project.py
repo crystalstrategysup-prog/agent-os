@@ -324,6 +324,8 @@ def questionnaire(
 def _answers(raw: dict) -> dict:
     if not isinstance(raw, dict):
         raise GateError("answers_must_be_object")
+    if "continuation_required" in raw and not isinstance(raw["continuation_required"], bool):
+        raise GateError("continuation_required_must_be_boolean")
     for key in QUESTIONS:
         nonempty(raw.get(key), key)
     if raw.get("change_kind") not in KINDS:
@@ -449,6 +451,8 @@ def enter(
                 "turn_id": turn_id,
                 "entered_at": now(),
                 "foundation_version": __version__,
+                "handoff_required": True,
+                "handoff_user_home": str(user_home.resolve()),
             }
         )
         task_file = task_path(root, task["id"])
@@ -642,7 +646,8 @@ def document_check(root: Path, task: dict) -> dict:
 
 def source_snapshot(root: Path) -> dict:
     load_project(root)
-    items = filemap(root, skip=SKIP)
+    links: dict[str, dict] = {}
+    items = filemap(root, skip=SKIP, tracked_directory_links=links)
     # Metadata/evidence and maintained document content have independent hashes.
     items = {
         p: h
@@ -652,7 +657,11 @@ def source_snapshot(root: Path) -> dict:
         and not p.endswith((".pyc", ".pyo"))
         and not any(x.endswith(".egg-info") for x in Path(p).parts)
     }
-    return {"files": items, "sha256": digest(items), "file_count": len(items)}
+    snapshot = {"files": items, "sha256": digest(items), "file_count": len(items)}
+    links = {rel: metadata for rel, metadata in links.items() if rel in items}
+    if links:
+        snapshot["symlinks"] = links
+    return snapshot
 
 
 def _policy_digest(project: dict, task: dict) -> str:
@@ -1018,14 +1027,22 @@ def verify_closeout(root: Path, task_id: str) -> dict:
     docs = document_check(root, task)
     if docs["documents_digest"] != task["closeout"]["documents"]["documents_digest"]:
         result["errors"].append("documentation_changed_after_close")
+    if task.get("handoff_required") or task["answers"].get("handoff_required"):
+        try:
+            from .handoff_lifecycle import verify
+
+            verify(task["closeout"]["handoff"])
+        except (ValueError, OSError, KeyError):
+            result["errors"].append("accepted_library_handoff_unverifiable")
     result["status"] = "BLOCKED" if result["errors"] else "PASS"
     return result
 
 
-def close(root: Path, task_id: str, review: dict) -> dict:
+def close(root: Path, task_id: str, review: dict, *, user_home: Path | None = None) -> dict:
     _require_entry_recovered(root_path(root))
     root = root_path(root)
     load_task(root, task_id)
+    continuation = None
     for key in ("reviewer", "summary", "next_step", "limitations"):
         nonempty(review.get(key), key)
     if review.get("scope_reviewed") is not True:
@@ -1033,6 +1050,10 @@ def close(root: Path, task_id: str, review: dict) -> dict:
     with lock(within(root, ".agentos/write.lock")):
         _require_entry_recovered(root)
         task = load_task(root, task_id)
+        if task["answers"].get("continuation_required") or "continuation" in review:
+            from .continuation import validate
+
+            continuation = validate(review.get("continuation"))
         assessment = assess(root, task_id)
         if assessment["status"] != "PASS":
             return assessment
@@ -1049,6 +1070,11 @@ def close(root: Path, task_id: str, review: dict) -> dict:
             "pending_target_verification",
         }:
             raise GateError("external_deployment_requires_separate_target_receipt")
+        handoff = None
+        if task.get("handoff_required") or task["answers"].get("handoff_required"):
+            from .handoff_lifecycle import deliver
+
+            handoff = deliver(root, task, review, assessment, profile="completion", user_home=user_home)
         task["status"] = "CLOSED"
         task["closed_at"] = now()
         task["closeout"] = {
@@ -1056,6 +1082,10 @@ def close(root: Path, task_id: str, review: dict) -> dict:
             "assessment": assessment,
             "documents": document_check(root, task),
         }
+        if continuation is not None:
+            task["closeout"]["continuation"] = continuation
+        if handoff is not None:
+            task["closeout"]["handoff"] = handoff
         atomic_json(task_path(root, task_id), task)
         report = (
             f"# Result {task_id}\n\nStatus: CLOSED (local stage).\n\n"
@@ -1077,10 +1107,12 @@ def close(root: Path, task_id: str, review: dict) -> dict:
         "task_id": task_id,
         "assessment": assessment,
         "deployment_status": review["deployment_status"],
+        **({"continuation": continuation} if continuation is not None else {}),
+        **({"handoff": handoff} if handoff is not None else {}),
     }
 
 
-def checkpoint(root: Path, task_id: str, reason: str, next_step: str) -> dict:
+def checkpoint(root: Path, task_id: str, reason: str, next_step: str, *, user_home: Path | None = None) -> dict:
     _require_entry_recovered(root_path(root))
     nonempty(reason, "checkpoint_reason")
     nonempty(next_step, "checkpoint_next_step")
@@ -1091,12 +1123,18 @@ def checkpoint(root: Path, task_id: str, reason: str, next_step: str) -> dict:
         task = load_task(root, task_id)
         if task["status"] == "CLOSED":
             raise GateError("closed_task_is_immutable")
+        handoff = None
+        if task.get("handoff_required") or task["answers"].get("handoff_required"):
+            from .handoff_lifecycle import deliver
+
+            handoff = deliver(root, task, {"summary": reason, "limitations": "Checkpoint is unfinished work, not a completion receipt.", "next_step": next_step}, {"status": "CHECKPOINT", "complete": False}, profile="checkpoint", user_home=user_home)
         task["status"] = "CHECKPOINT"
         task["checkpoint"] = {
             "at": now(),
             "reason": reason,
             "next_step": next_step,
             "complete": False,
+            **({"handoff": handoff} if handoff is not None else {}),
         }
         atomic_json(task_path(root, task_id), task)
         _event(root, task, "CHECKPOINT", task["checkpoint"])

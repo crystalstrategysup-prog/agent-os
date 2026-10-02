@@ -301,8 +301,8 @@
       "write_surfaces": []
     },
     {
+      "effect": "read_only",
       "name": "workflow route",
-      "effect": "read_only",
       "status_values": [
         "PASS",
         "BLOCKED"
@@ -310,8 +310,8 @@
       "write_surfaces": []
     },
     {
+      "effect": "read_only",
       "name": "project verify-closeout",
-      "effect": "read_only",
       "status_values": [
         "PASS",
         "BLOCKED"
@@ -319,8 +319,8 @@
       "write_surfaces": []
     },
     {
-      "name": "setup probe ssh-vnc",
       "effect": "plan_or_bounded_external_read",
+      "name": "setup probe ssh-vnc",
       "status_values": [
         "PLANNED",
         "SSH_VERIFIED",
@@ -329,14 +329,304 @@
         "BLOCKED"
       ],
       "write_surfaces": []
+    },
+    {
+      "effect": "explicit_local_library_write",
+      "name": "library init",
+      "principal": "authenticated local POSIX UID; no claimed principal argument",
+      "status_values": [
+        "BLOCKED",
+        "pass",
+        "accepted",
+        "complete",
+        "partial",
+        "draft",
+        "created"
+      ],
+      "write_surfaces": [
+        "explicit --root or --destination"
+      ]
+    },
+    {
+      "effect": "explicit_local_library_write",
+      "name": "library build",
+      "principal": "authenticated local POSIX UID; no claimed principal argument",
+      "status_values": [
+        "BLOCKED",
+        "pass",
+        "accepted",
+        "complete",
+        "partial",
+        "draft",
+        "created"
+      ],
+      "write_surfaces": [
+        "explicit --root or --destination"
+      ]
+    },
+    {
+      "effect": "explicit_local_library_write",
+      "name": "library validate",
+      "principal": "authenticated local POSIX UID; no claimed principal argument",
+      "status_values": [
+        "BLOCKED",
+        "pass",
+        "accepted",
+        "complete",
+        "partial",
+        "draft",
+        "created"
+      ],
+      "write_surfaces": [
+        "explicit --root or --destination"
+      ]
+    },
+    {
+      "effect": "explicit_local_library_write",
+      "name": "library publish",
+      "principal": "authenticated local POSIX UID; no claimed principal argument",
+      "status_values": [
+        "BLOCKED",
+        "pass",
+        "accepted",
+        "complete",
+        "partial",
+        "draft",
+        "created"
+      ],
+      "write_surfaces": [
+        "explicit --root or --destination"
+      ]
+    },
+    {
+      "effect": "read_only",
+      "name": "library search",
+      "principal": "authenticated local POSIX UID; no claimed principal argument",
+      "status_values": [
+        "BLOCKED",
+        "pass",
+        "accepted",
+        "complete",
+        "partial",
+        "draft",
+        "created"
+      ],
+      "write_surfaces": []
+    },
+    {
+      "effect": "read_only",
+      "name": "library resolve",
+      "principal": "authenticated local POSIX UID; no claimed principal argument",
+      "status_values": [
+        "BLOCKED",
+        "pass",
+        "accepted",
+        "complete",
+        "partial",
+        "draft",
+        "created"
+      ],
+      "write_surfaces": []
+    },
+    {
+      "effect": "read_only",
+      "name": "library evidence",
+      "principal": "authenticated local POSIX UID; no claimed principal argument",
+      "status_values": [
+        "BLOCKED",
+        "pass",
+        "accepted",
+        "complete",
+        "partial",
+        "draft",
+        "created"
+      ],
+      "write_surfaces": []
+    },
+    {
+      "effect": "explicit_local_library_write",
+      "name": "library restore",
+      "principal": "authenticated local POSIX UID; no claimed principal argument",
+      "status_values": [
+        "BLOCKED",
+        "pass",
+        "accepted",
+        "complete",
+        "partial",
+        "draft",
+        "created"
+      ],
+      "write_surfaces": [
+        "explicit --root or --destination"
+      ]
+    },
+    {
+      "effect": "explicit_local_library_write",
+      "name": "library rebuild",
+      "principal": "authenticated local POSIX UID; no claimed principal argument",
+      "status_values": [
+        "BLOCKED",
+        "pass",
+        "accepted",
+        "complete",
+        "partial",
+        "draft",
+        "created"
+      ],
+      "write_surfaces": [
+        "explicit --root or --destination"
+      ]
+    },
+    {
+      "effect": "explicit_local_library_write",
+      "name": "library publish-rebuild",
+      "principal": "authenticated local POSIX UID; no claimed principal argument",
+      "status_values": [
+        "BLOCKED",
+        "pass",
+        "accepted",
+        "complete",
+        "partial",
+        "draft",
+        "created"
+      ],
+      "write_surfaces": [
+        "explicit --root or --destination"
+      ]
+    },
+    {
+      "effect": "read_only",
+      "name": "library reconcile",
+      "principal": "authenticated local POSIX UID; no claimed principal argument",
+      "status_values": [
+        "BLOCKED",
+        "pass",
+        "accepted",
+        "complete",
+        "partial",
+        "draft",
+        "created"
+      ],
+      "write_surfaces": []
+    },
+    {
+      "effect": "explicit_local_library_write",
+      "name": "library retract",
+      "principal": "authenticated local POSIX UID; no claimed principal argument",
+      "status_values": [
+        "BLOCKED",
+        "pass",
+        "accepted",
+        "complete",
+        "partial",
+        "draft",
+        "created"
+      ],
+      "write_surfaces": [
+        "explicit --root or --destination"
+      ]
+    },
+    {
+      "effect": "read_only",
+      "name": "library retirement",
+      "principal": "authenticated local POSIX UID; no claimed principal argument",
+      "status_values": [
+        "BLOCKED",
+        "pass",
+        "accepted",
+        "complete",
+        "partial",
+        "draft",
+        "created"
+      ],
+      "write_surfaces": []
+    },
+    {
+      "effect": "explicit_local_library_write",
+      "name": "library topics",
+      "principal": "authenticated local POSIX UID; no claimed principal argument",
+      "status_values": [
+        "BLOCKED",
+        "pass",
+        "accepted",
+        "complete",
+        "partial",
+        "draft",
+        "created"
+      ],
+      "write_surfaces": [
+        "explicit --root or --destination"
+      ]
+    },
+    {
+      "effect": "explicit_local_library_write",
+      "name": "library task",
+      "principal": "authenticated local POSIX UID; no claimed principal argument",
+      "status_values": [
+        "BLOCKED",
+        "pass",
+        "accepted",
+        "complete",
+        "partial",
+        "draft",
+        "created"
+      ],
+      "write_surfaces": [
+        "explicit --root or --destination"
+      ]
+    },
+    {
+      "authority": "No external authority or live behavior proof.",
+      "effect": "owner_overlay_write",
+      "name": "persona configure",
+      "status_values": [
+        "CONFIGURED_REQUIRES_SELECTION",
+        "ACTIVE",
+        "DEFAULTS",
+        "STALE_SELECTION",
+        "PLANNED",
+        "BLOCKED"
+      ],
+      "write_surfaces": [
+        "profiles/persona/profile.json",
+        "backups/persona/"
+      ]
+    },
+    {
+      "authority": "No external authority or live behavior proof.",
+      "effect": "read_only_plan",
+      "name": "persona context",
+      "status_values": [
+        "CONFIGURED_REQUIRES_SELECTION",
+        "ACTIVE",
+        "DEFAULTS",
+        "STALE_SELECTION",
+        "PLANNED",
+        "BLOCKED"
+      ],
+      "write_surfaces": []
+    },
+    {
+      "authority": "No external authority or live behavior proof.",
+      "effect": "read_only_plan",
+      "name": "persona plan",
+      "status_values": [
+        "CONFIGURED_REQUIRES_SELECTION",
+        "ACTIVE",
+        "DEFAULTS",
+        "STALE_SELECTION",
+        "PLANNED",
+        "BLOCKED"
+      ],
+      "write_surfaces": []
     }
   ],
-  "distribution_version": "0.5.5",
+  "distribution_version": "0.7.0",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.5.5",
+  "release": "0.7.0",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",

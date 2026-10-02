@@ -1,3 +1,52 @@
+# 0.7.0 — public stable release candidate
+
+- Consolidate the reviewed RC1, RC2 and RC3 public source contracts into a stable
+  public release candidate. Current metadata, CLI and MCP contracts identify
+  `0.7.0`; prior RC records remain historical and immutable evidence.
+- Model selection remains a proposal-only contract. It does not enforce a runtime
+  model setting, authenticate an API, reload clients, activate hooks or prove
+  voice behavior. Existing clients require manual reload after a separately
+  authorized installation.
+- The candidate has local artifact evidence only. GitHub API publication is not
+  available in this preparation; a later publication requires canonical tag,
+  release and downloaded-asset readback.
+
+# Historical 0.7.0rc3 — model policy source candidate, unpublished
+
+- Replace fixed automatic family routing with current catalog-bound latest Sol proposal and explicit nonSol agreement. Minimum supported sufficient effort, quality/escalation/benefit checks and mandatory-constraint preservation; L/M/H/E and separate max.
+- Preserve requested/assigned/actual provenance and UNKNOWN; no discovery/launcher/runtime mutation or live enforcement. Legacy saved values remain inert; private report/profile artifacts excluded. Exact independent review gates any adoption.
+
+# 0.7.0rc2 — main coordinator source candidate, unpublished
+
+- Add universal nine-step coordination, original parent-goal acceptance, compact indexed handoff and reconnect boundaries; one versioned generic knowledge index and managed AGENTS/skill routing. Private display name/preferences remain external.
+- Add opt-in synchronous durable local receipt/review/remainder/assignment ledger, hash-bound snapshots/HEAD under kernel lock, CAS/dedup, dependency/write-set/capacity checks and missed partial/final result reconciliation. Preserve independent work and reject orphaned parent work or premature goal completion.
+- Persist unknown action outcome before external I/O; captured exact provider action evidence and consumed event IDs control bounded retry. No command launcher, scheduler, live root/voice adoption, system-instruction change, exactly-once external guarantee or physical session cleanup. Independent source/package review and target delivery remain separate.
+
+# 0.7.0rc1 — indexed handoff source successor, unpublished
+
+- Repair independent HOLD P1s: mandatory handoff captures tracked directory aliases only as attested metadata with explicit partial recovery; embedded dependencies require exact captured asset/ref binding and actual restored bytes. Preserve original reviewed artifacts and evidence; same candidate version receives new content hashes and independent delta review before adoption/publication.
+- Add isolated owner-owned immutable results, bounded three-file discovery, paged exact/lexical indexes, current-scope ACL, conditional fsync publication/idempotency, revision/retraction/task continuity and no-execution clean recovery/accepted-only repair.
+- Require accepted searchable handoff before new/resumed project terminal status; preserve old closed history. Synthetic fixtures cover fault/corruption/ACL/oracle/lifecycle and100k actual packages. Exact execution evidence and independent review are separate from these source claims.
+- Logical retirement retains historical bytes and reclaims zero. No session cleanup API, live coordinator adoption, installed-runtime change, credentials/hooks/policy or external publication. Universal personality settings are included; private overlay and live adoption remain separate target proofs.
+
+# 0.6.0rc3 — unsigned, unpublished package candidate; review pending
+
+- Package the exact metadata-only tracked internal directory-symlink source fix from the233-file source predecessor. Project snapshots attest Git stage0/mode120000 and target identity, never follow the alias, and detect ordinary substitutions. Generic storage/path/import guards remain strict.
+- Keep all tested fix modules and behavior, installer, queue/config/overlay/provider semantics and source tests byte-inherited; change distribution/CLI/MCP version bindings and release documentation only.
+- Preserve127 source regression/foundation tests as predecessor evidence; do not repeat or relabel them as rc3 execution. Fresh offline wheel/source manifests and extracted-wheel smoke are packaging proof only.
+- Independent source and final package review remain pending. Existing RC2 stays immutable. Host installation/activation, production promotion, owner policy/integration, signing and external publication are not performed or authorized.
+
+# 0.6.0rc2 — unpublished successor release candidate
+
+- Package the reviewed native RPC/provider, causal revision/precommit and separate observed-input adapters added after rc1. These opt-in APIs retain actual provider/owner boundaries; they do not start a scheduler or supply a persistent connected bridge.
+- Add exact source-bound codex_delegation tool-ingress observation. Same-admitted-turn invalid/conflicting ACK candidates retain UNKNOWN without resend; an accepted historical input receipt never means work or project completion.
+- Preserve coordinator, CLI argument surfaces, queue/config/overlay schemas and installer behavior. Version metadata is0.6.0rc2; external owner policy and adoption remain separate.
+- Local preparation builds exact wheel/source archives and performs extracted-wheel smoke without installation. Prior source tests and one bounded real receipt-only canary remain separate evidence, with parent-relay provenance limits. Fresh host installation, connected client adoption, signing and publication are NOT_RUN.
+
+# 0.6.0rc1 — continuation release candidate
+
+Opt-in durable stage continuation with per-delivery generation/nonce, consumed receipts, recovery after source drift/aged checks, safe untouched-PENDING legacy promotion and incompatible-queue rollback HOLD. Parent/provider binding checks are structural; no dispatcher, scheduler or external delivery is implemented. New item/receipt v2 requires reviewed provider integration. Existing unknown/ACK is retained; no guessed legacy migration. Candidate publication and real host adoption are separate gates.
+
 # 0.5.5 — public foundation independence
 
 - Clarify that public project governance requires no private kernel, fleet

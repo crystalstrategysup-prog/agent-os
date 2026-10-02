@@ -1,8 +1,15 @@
 # Install, update, rollback, and recovery
 
+Current public version: `0.7.0`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+
+
+## Historical: Indexed handoff successor0.7.0rc1
+
+Candidate0.7.0rc1 introduces mandatory accepted terminal handoff for new/resumed entries; old closed records and owner data remain preserved. No installation/activation follows from source implementation. See [indexed handoff](INDEXED_HANDOFF.md).
+
 ## Version and proof
 
-The source declares `0.5.5`. Verify the published tag or release asset
+The source declares stable `0.7.0`. Verify the published tag or release asset
 separately; a version string does not prove publication. Review the exact
 source, patch, and manifest, run local checks, and read back the target runtime.
 Python 3.11+ and disjoint core and user roots are required. The commands below
@@ -17,8 +24,8 @@ existing AgentOS installation as the new core home.
 
 ```sh
 python3 tools/install.py install \
-  --wheel /absolute/crystal_agent_os-0.5.5-py3-none-any.whl \
-  --sha256 ACTUAL_WHEEL_SHA256 --version 0.5.5 \
+  --wheel /absolute/crystal_agent_os-0.7.0-py3-none-any.whl \
+  --sha256 ACTUAL_WHEEL_SHA256 --version 0.7.0 \
   --core-home "$HOME/.local/share/agentos-foundation" \
   --user-home "$HOME/.agentos-user"
 ```
@@ -131,3 +138,14 @@ age alone: verify the owning process has ended and inspect the log and integrity
 A foreign or unmanaged `current` blocks automatic changes. Restore config from
 backup only after comparing it with the current file and reading back the result.
 Neither installer nor migration automatically deletes history.
+
+## Continuation queue compatibility
+
+For this candidate, the verified wheel declares supported queue-reader schemas.
+Install/rollback checks bounded user queue metadata before switching and holds
+on unknown/incompatible schemas. A temporary existing-state continuation lock
+serializes compliant writers during the final check/switch; user payloads remain
+unchanged. Quiesce the real parent under its target lease before activation.
+Read `CONTINUATION_RELEASE.md` before migrating legacy items or downgrading.
+Unsupported rollback never resets unknown/ACK; retain the capable reader and
+use HOLD or a separately reviewed forward repair.

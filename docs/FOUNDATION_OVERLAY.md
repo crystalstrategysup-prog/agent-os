@@ -1,5 +1,8 @@
 # Foundation ↔ user overlay contract
 
+Current public version: `0.7.0`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+
+
 Contract version: `agentos.foundation-overlay/v1` with optional `agentos.profile/v1` adapter.
 
 ## Physical boundary
@@ -55,3 +58,11 @@ controller. Overlay knowledge cannot make a provider-specific gate universal.
 Choose the current authorized target contract and distinguish an enforced
 restriction from historical guidance. Optional reporting is separate from local
 completion. See [PROVIDER_INDEPENDENCE](PROVIDER_INDEPENDENCE.md).
+
+## Universal persona preferences
+
+Candidate0.7.0rc1 adds controlled style/name preferences through existing owner profiles with expected-hash updates and backups. No automatic selection or personal values enter core. An executable addressed/listening gate returns a plan; connected runtime adoption requires its own proof. See [persona](PERSONA.md).
+
+## Historical: Main coordination successor0.7.0rc2
+
+Main-coordinator rules and one versioned knowledge index belong to public core; name/style and a hash/version-bound index pointer belong to a separate private profile/knowledge index. Profile transport does not load linked files or modify model system instructions. Supported root readback and voice/tool availability need their own live evidence. See [WORK_COORDINATION](WORK_COORDINATION.md).

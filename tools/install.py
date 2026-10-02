@@ -18,6 +18,7 @@ import subprocess
 import sys
 import time
 import uuid
+from contextlib import contextmanager
 from pathlib import Path
 from zipfile import BadZipFile, ZipFile
 
@@ -61,6 +62,38 @@ def separate(a: Path, b: Path) -> None:
     a, b = a.resolve(), b.resolve()
     if a == b or a in b.parents or b in a.parents:
         raise InstallError("core_and_user_paths_must_be_disjoint")
+
+
+def wheel_continuation_schemas(wheel: Path) -> list[str]:
+    """Use the hash-verified wheel's bounded declaration, never version guessing."""
+    name = "agent_os/resources/contracts/continuation-capabilities-v1.json"
+    try:
+        with ZipFile(wheel) as archive:
+            if 'agent_os/resources/contracts/continuation-capabilities-v2.json' in archive.namelist():
+                name = 'agent_os/resources/contracts/continuation-capabilities-v2.json'
+            if name not in archive.namelist():
+                return []
+            if archive.namelist().count(name) != 1 or archive.getinfo(name).file_size > 4096:
+                raise InstallError("wheel_continuation_capabilities_invalid")
+            value = json.loads(archive.read(name))
+    except (BadZipFile, UnicodeError, json.JSONDecodeError) as exc:
+        raise InstallError("wheel_continuation_capabilities_invalid") from exc
+    if isinstance(value, dict) and value.get('schema') == 'agentos.continuation-capabilities/v2':
+        expected = {'schema': 'agentos.continuation-capabilities/v2',
+                    'readable_item_schemas': ['agentos.continuation-item/v1', 'agentos.continuation-item/v2', 'agentos.continuation-item/v3'],
+                    'transition_item_schemas': ['agentos.continuation-item/v2', 'agentos.continuation-item/v3'],
+                    'receipt_schemas': ['agentos.continuation-delivery-receipt/v2', 'agentos.continuation-delivery-receipt/v3'],
+                    'causal_acceptance_scope': 'received_only', 'legacy_promotion': 'untouched_pending_only', 'provider_io': False}
+        if value != expected:
+            raise InstallError('wheel_continuation_capabilities_invalid')
+        return value['readable_item_schemas']
+    if (not isinstance(value, dict) or value.get("schema") != "agentos.continuation-capabilities/v1"
+            or value.get("readable_item_schemas") != ["agentos.continuation-item/v1", "agentos.continuation-item/v2"]
+            or value.get("transition_item_schemas") != ["agentos.continuation-item/v2"]
+            or value.get("receipt_schema") != "agentos.continuation-delivery-receipt/v2"
+            or value.get("legacy_promotion") != "untouched_pending_only" or value.get("provider_io") is not False):
+        raise InstallError("wheel_continuation_capabilities_invalid")
+    return value["readable_item_schemas"]
 
 
 def release(root: Path, identifier: str) -> Path:
@@ -117,6 +150,8 @@ def read_manifest(
     elif not re.fullmatch(r"0\.5\.0-beta\.[1-5]", version):
         raise InstallError("legacy_manifest_version_unsupported")
     if verify_payload:
+        if data.get("continuation_schemas", []) != wheel_continuation_schemas(wheel):
+            raise InstallError("release_continuation_capabilities_mismatch")
         _verify_owned_payload(
             path,
             wheel,
@@ -277,7 +312,7 @@ def _verify_owned_payload(
     return scripts
 
 
-def check_user_compatibility(user: Path, manifest: dict) -> None:
+def check_user_compatibility(user: Path, manifest: dict, *, check_continuations: bool = True) -> None:
     """Read only the schema headers that the selected release can consume."""
     if (
         manifest.get("overlay_schema") != 1
@@ -320,6 +355,54 @@ def check_user_compatibility(user: Path, manifest: dict) -> None:
         f"agent-os.community-config/v{version}" for version in range(1, 6)
     }:
         raise InstallError("user_config_schema_unsupported")
+    if not check_continuations:
+        return
+    for path in [user / "state", user / "state/continuations"]:
+        if path.is_symlink():
+            raise InstallError("user_continuation_directory_symlink_refused")
+    queue = user / "state/continuations"
+    if not queue.exists():
+        return
+    if not queue.is_dir():
+        raise InstallError("user_continuation_directory_invalid")
+    paths = sorted(queue.glob("*.json"))
+    if len(paths) > 1000 or sum(x.stat().st_size for x in paths if not x.is_symlink()) > 32 * 1024 * 1024:
+        raise InstallError("user_continuation_inventory_limit")
+    supported = manifest.get("continuation_schemas", [])
+    for path in paths:
+        if not re.fullmatch(r"[0-9a-f]{64}\.json", path.name):
+            raise InstallError("user_continuation_filename_invalid")
+        item = read_metadata("state/continuations/" + path.name)
+        states = ({'PENDING', 'CLAIMED', 'DELIVERY_UNKNOWN', 'RECEIVED', 'RECEIVED_REFUSED'}
+                  if item and item.get('schema') == 'agentos.continuation-item/v3'
+                  else {"PENDING", "CLAIMED", "DELIVERY_UNKNOWN", "ACKNOWLEDGED"})
+        if (item is None or item.get("id") != path.stem or item.get('state') not in states
+                or item.get("schema") not in {"agentos.continuation-item/v1", "agentos.continuation-item/v2", 'agentos.continuation-item/v3'}):
+            raise InstallError("user_continuation_metadata_invalid")
+        if item["schema"] not in supported:
+            raise InstallError("continuation_queue_incompatible_preserve_and_hold")
+
+
+@contextmanager
+def continuation_lock(user: Path):
+    """Serialize compliant queue writers during the final compatibility/switch."""
+    state = user / "state"
+    if not state.exists():
+        # First install has no owner state to lock. The host activation contract
+        # still requires a quiesced authorized parent and its target lease.
+        yield
+        return
+    if state.is_symlink() or not state.is_dir():
+        raise InstallError("user_continuation_state_invalid")
+    marker = state / "continuations.lock"
+    try:
+        marker.mkdir(mode=0o700)
+    except FileExistsError as exc:
+        raise InstallError("continuation_lock_exists_manual_review_required") from exc
+    try:
+        yield
+    finally:
+        marker.rmdir()
 
 
 def current_id(root: Path) -> str:
@@ -408,7 +491,7 @@ def execute(args: argparse.Namespace) -> dict:
         expected = args.sha256.lower()
         if not re.fullmatch("[0-9a-f]{64}", expected) or digest(wheel) != expected:
             raise InstallError("wheel_sha256_mismatch")
-        if not re.fullmatch(r"\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?", args.version):
+        if not re.fullmatch(r"\d+\.\d+\.\d+(?:(?:a|b|rc)\d+|-[A-Za-z0-9.-]+)?", args.version):
             raise InstallError("invalid_version")
         identifier = args.version + "-" + expected[:12]
         target = release(root, identifier)
@@ -420,6 +503,8 @@ def execute(args: argparse.Namespace) -> dict:
             "overlay_schema": 1,
             "config_schema": "agent-os.community-config/v5",
         }
+        check_user_compatibility(user, manifest, check_continuations=False)
+        manifest["continuation_schemas"] = wheel_continuation_schemas(wheel)
     check_user_compatibility(user, manifest)
     if args.action == "rollback":
         read_manifest(target)
@@ -493,8 +578,9 @@ def execute(args: argparse.Namespace) -> dict:
                 write_json(target / "INSTALL.json", manifest)
                 (target / "INCOMPLETE").unlink()
         evidence = probe(target, manifest["version"])
-        check_user_compatibility(user, manifest)
-        activate(root, identifier, old)
+        with continuation_lock(user):
+            check_user_compatibility(user, manifest)
+            activate(root, identifier, old)
         return {
             **plan,
             "status": "INSTALLED" if args.action == "install" else "ROLLED_BACK",

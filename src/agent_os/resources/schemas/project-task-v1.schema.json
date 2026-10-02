@@ -17,6 +17,12 @@
     "foundation_version": {
       "type": "string"
     },
+    "handoff_required": {
+      "type": "boolean"
+    },
+    "handoff_user_home": {
+      "type": "string"
+    },
     "id": {
       "pattern": "^task-[0-9a-f]{16}$",
       "type": "string"

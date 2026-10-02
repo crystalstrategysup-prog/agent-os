@@ -152,6 +152,7 @@ def install(
         "For handoff lookup read " + str(resources / "docs/HANDOFF_DISCOVERY.md") + ". Use the selected project/user index; verify before opening. Task results and archives are not current handoffs.\n"
         "For project changes read " + method + ". Use `agentos project questions`, then `enter`, "
         "register required documents, `ready`, approved checks and `close` or `checkpoint`.\n"
+        "For coordination read " + str(resources / "docs/COORDINATOR_KNOWLEDGE_INDEX.json") + ". Verify selected references; keep parent open until checked user result and record remainder/next owner. This routing does not launch sessions or prove live adoption.\n"
         "Core resources: " + str(resources) + "\n"
         "Private user overlay: " + str(user_home) + "\n"
         "Load only relevant verified overlay knowledge; absent/stale profiles do not block unrelated reads. Never preload history.\n"

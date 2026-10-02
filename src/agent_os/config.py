@@ -105,12 +105,12 @@ def default_config() -> dict[str, object]:
         "model_routing": {
             "enabled": True,
             "delegate_by_default": False,
+            "selection_policy": "latest-available-sol/minimum-sufficient-v1",
+            "catalog": None,
+            "environment": None,
             "profiles": {
-                "coordinator": {"model": "gpt-5.6-sol", "reasoning_effort": "high"},
-                "worker": {"model": "gpt-5.6-terra", "reasoning_effort": "medium"},
-                "fast": {"model": "gpt-5.6-luna", "reasoning_effort": "low"},
-                "reviewer": {"model": "gpt-5.6-sol", "reasoning_effort": "high"},
-                "critical": {"model": "gpt-6-astra", "reasoning_effort": "high"},
+                role: {"model_family": "sol", "reasoning_effort": "minimum-sufficient"}
+                for role in ("coordinator", "worker", "fast", "reviewer", "critical")
             },
         },
         "codex": {

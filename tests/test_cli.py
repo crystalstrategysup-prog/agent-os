@@ -20,13 +20,20 @@ def test_cli_routes_model_and_blocks_incomplete_result(tmp_path, capsys):
     capsys.readouterr()
     assert main(["--home", str(home), "route-task", "--mode", "implementation"]) == 0
     route = json.loads(capsys.readouterr().out)
-    assert route["model"] == "gpt-5.6-sol"
+    assert route["status"] == "BLOCKED"
+    assert route["selection_reason"] == "CURRENT_CATALOG_REQUIRED"
+    assert route["model"] is None and route["actual"]["status"] == "UNKNOWN"
     payload = tmp_path / "result.json"
-    payload.write_text(json.dumps({
-        "acceptance": ["user-flow"],
-        "evidence": [],
-        "now": "2026-09-18T00:00:00Z",
-    }), encoding="utf-8")
+    payload.write_text(
+        json.dumps(
+            {
+                "acceptance": ["user-flow"],
+                "evidence": [],
+                "now": "2026-09-18T00:00:00Z",
+            }
+        ),
+        encoding="utf-8",
+    )
     assert main(["--home", str(home), "assess-result", "--file", str(payload)]) == 2
     result = json.loads(capsys.readouterr().out)
     assert result["status"] == "BLOCKED"

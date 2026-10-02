@@ -17,3 +17,7 @@
 - A queued Screen keystroke is not proof that Codex accepted a message; require a durable user event followed by a non-user event.
 - Keep Windows behavior explicit: Codex session folders are supported, GNU Screen is not.
 - Run local tests and review the diff before direct Git delivery. GitHub Actions are not used.
+
+- For coordination, use the versioned `docs/COORDINATOR_KNOWLEDGE_INDEX.json` and `docs/WORK_COORDINATION.md`: retain the original parent goal; verified result → remainder → owned next action. Preserve independent work, typed session/subagent ownership and unknown-outcome reconciliation. Source instructions are not live adoption or external authority.
+
+- Model selection follows `docs/MODEL_SELECTION.md`: current catalog latest available Sol, minimum sufficient supported effort, scoped alternate-model agreement, explicit escalation/quality evidence and higher-priority constraints. Requested/assigned never prove actual runtime. No automatic model or settings change.

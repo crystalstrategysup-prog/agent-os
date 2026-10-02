@@ -23,7 +23,8 @@ def test_v1_config_is_upgraded_in_memory_without_losing_values(tmp_path):
     assert loaded["schema"] == "agent-os.community-config/v5"
     assert loaded["name"] == "Existing"
     assert loaded["telegram_session_hub"]["enabled"] is False
-    assert loaded["model_routing"]["profiles"]["coordinator"]["model"] == "gpt-5.6-sol"
+    assert loaded["model_routing"]["profiles"]["coordinator"]["model_family"] == "sol"
+    assert loaded["model_routing"]["catalog"] is None
 
 
 def test_v2_nested_values_are_preserved_when_v3_defaults_are_added(tmp_path):
@@ -59,6 +60,6 @@ def test_v3_partial_config_is_completed_without_overwriting_values(tmp_path):
     loaded = load_config(paths)
     assert loaded["schema"] == "agent-os.community-config/v5"
     assert loaded["model_routing"]["delegate_by_default"] is True
-    assert loaded["model_routing"]["profiles"]["worker"]["model"] == "gpt-5.6-terra"
+    assert loaded["model_routing"]["profiles"]["worker"]["model_family"] == "sol"
     assert loaded["update_advisory"]["interval_seconds"] == 172800
     assert loaded["update_advisory"]["automatic_install"] is False

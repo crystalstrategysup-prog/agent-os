@@ -1,5 +1,12 @@
 # Verification strategy
 
+Current public version: `0.7.0`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+
+
+## Historical: Indexed handoff successor0.7.0rc1
+
+Run synthetic indexed handoff, lifecycle and100k actual accepted-package tests. Required claim evidence includes exact oracle matches, clean process recovery, corruption/ACL/CAS negatives and measured page/disk metrics. See [indexed handoff](INDEXED_HANDOFF.md).
+
 Evidence for each candidate records exact counts and environment; this document
 does not promise a fixed count. Check functions and negative cases, a full
 lifecycle in temporary directories, packaged resources and contracts, offline
@@ -86,3 +93,24 @@ Mac acceptance needs exact source/runtime identity, disjoint roots, no AgentOS
 hooks, unchanged auth/config, fresh effective AGENTS, local lifecycle probes
 without external writes, and rollback/readback. Report unrun target checks as
 NOT_RUN; hooks are not part of acceptance.
+
+## Historical: Narrow independent HOLD delta in0.7.0rc1
+
+Affected checks include link-containing approved scopes for close and checkpoint, metadata recovery/no alias read, link identity and Git index drift before acceptance, absent/unbound/unavailable/mismatched/corrupt dependency captures, complete-positive restored bytes and legacy unbound dependency PARTIAL behavior. Run indexed/source-link/lifecycle/foundation/contract/persona/profile regression plus mirrored document/schema parity, lint and offline package checks. Independent exact source/package delta review still gates adoption/publication.
+
+The prior100k run is evidence for its recorded original source hash. A narrow lifecycle/dependency-validation repair may inherit it only with unchanged exact store/index and scale-test hashes and an explicit applicability statement; it must not be reported as a new-source100k execution. Logical retirement still reclaims0 bytes, physical session cleanup remains NOT_IMPLEMENTED and real session deletion NOT_RUN.
+
+## Historical: Main coordination successor0.7.0rc2
+
+Candidate0.7.0rc2 verifies indexed completion→original-goal review→remaining→owned next action, orphan/partial negatives, selected missed-notice recovery, immutable/CAS decisions and registry recovery, independent checkpoints, actor/dependency/resource/capacity boundaries and three isolated disconnect windows. No real network/VPN disruption. Exact counts belong to source-bound execution receipts; inherited100k metrics retain predecessor SHA and are NOT_RUN on this successor unless explicitly repeated.
+
+The isolated rc2 independent P1 repair additionally checks late partial and
+completed reports awaiting review, supersession/retraction between receipt,
+review and parent verification without a notification, out-of-order historical
+notices/reviews and effect receipts, exact retry idempotence, immutable closed
+state and successful original-goal closure only after current accepted review.
+Preserve the original rc2 HOLD and bind new receipts/packages to the new source.
+
+## Historical: Model-selection successor0.7.0rc3
+
+Check current/unknown catalog, latest available Sol without alias, no automatic Luna/Astra fallback, exact scoped exception, unsupported effort/model/environment intersections, conservative task basis and explicit escalation/quality acceptance. E/max require complete referenced comparative quality/latency/cost claims. Preserve fixed/unknown mandatory constraints and independent bound runtime metadata; requested/assigned never become actual. Config upgrade keeps stored owner values without granting agreement. Run routing/CLI/config plus inherited coordinator/indexed/source-link/lifecycle/foundation/contracts/persona/profiles/continuation gate, parity/lint, exact package and isolated proposal smoke. Tests are synthetic; benefit/capability/authority records are trusted adapter inputs, not remote authentication.

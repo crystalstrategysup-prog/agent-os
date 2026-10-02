@@ -23,6 +23,15 @@ nor proof that the capability works for a particular user.
 Neither command runs setup steps or performs network checks. A future GUI or
 conversational wizard can use the same data without a second instruction set.
 
+For a private owner-to-host file inbox, select `telegram-owner-inbox`. Keep the
+host bot token and owner binding in the external user overlay. A separately
+reviewed provider may project those credentials into a protected service config;
+verify that projection on rotation. The public card does not install a listener.
+Prove single update-consumer ownership, a fresh supervised poll, a restricted
+saved file and a durable path-reply receipt on the exact host. Plain text is
+handled only when the selected private provider has a separately verified
+session route.
+
 For a remote-device request, select `ssh-vnc-tunnel` by goal, then check the
 exact user's existing verified device route before asking setup questions. Its
 short first flow covers that common case. Otherwise choose one route from the

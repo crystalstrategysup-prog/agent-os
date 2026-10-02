@@ -1,0 +1,738 @@
+{
+  "$id": "https://github.com/crystalstrategysup-prog/agent-os/schemas/indexed-handoff-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "decisions": {
+      "additionalProperties": false,
+      "properties": {
+        "checked": {
+          "const": true
+        },
+        "items": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "checked",
+        "items"
+      ],
+      "type": "object"
+    },
+    "deliverables": {
+      "items": {
+        "properties": {
+          "asset_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "media_type": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "preservation": {
+            "enum": [
+              "embedded",
+              "external_pinned",
+              "external_live",
+              "unavailable"
+            ]
+          },
+          "ref": {
+            "additionalProperties": false,
+            "properties": {
+              "locator": {
+                "pattern": "^aos://[^/]+/objects/sha256/[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "media_type": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "object_id": {
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "size_bytes": {
+                "maximum": 16777216,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "object_id",
+              "locator",
+              "size_bytes",
+              "media_type"
+            ],
+            "type": "object"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "source_ref": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "asset_id",
+          "path",
+          "preservation",
+          "required",
+          "media_type"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "entity": {
+      "additionalProperties": false,
+      "properties": {
+        "approval": {
+          "additionalProperties": false,
+          "properties": {
+            "agent_checked": {
+              "const": true
+            },
+            "evidence_ids": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "required": {
+              "type": "boolean"
+            },
+            "user_confirmed": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "required",
+            "agent_checked",
+            "user_confirmed",
+            "evidence_ids"
+          ],
+          "type": "object"
+        },
+        "entity_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "work",
+            "stage",
+            "project"
+          ]
+        },
+        "parent_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "required_children": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "scope_revision": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "state": {
+          "enum": [
+            "active",
+            "blocked",
+            "verifying",
+            "completed",
+            "cancelled"
+          ]
+        }
+      },
+      "required": [
+        "entity_id",
+        "kind",
+        "parent_id",
+        "state",
+        "scope_revision",
+        "required_children",
+        "approval"
+      ],
+      "type": "object"
+    },
+    "evidence": {
+      "items": {
+        "properties": {
+          "asset_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "media_type": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "preservation": {
+            "enum": [
+              "embedded",
+              "external_pinned",
+              "external_live",
+              "unavailable"
+            ]
+          },
+          "ref": {
+            "additionalProperties": false,
+            "properties": {
+              "locator": {
+                "pattern": "^aos://[^/]+/objects/sha256/[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "media_type": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "object_id": {
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "size_bytes": {
+                "maximum": 16777216,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "object_id",
+              "locator",
+              "size_bytes",
+              "media_type"
+            ],
+            "type": "object"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "source_ref": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "asset_id",
+          "path",
+          "preservation",
+          "required",
+          "media_type"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "facets": {
+      "additionalProperties": false,
+      "properties": {
+        "aliases": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "language": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "project_id": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "related_entity_id": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "result_type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "stage_id": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "summary": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "topic_id": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 2,
+          "type": "array"
+        }
+      },
+      "required": [
+        "title",
+        "summary",
+        "result_type",
+        "language",
+        "project_id",
+        "stage_id",
+        "topic_id",
+        "related_entity_id",
+        "aliases"
+      ],
+      "type": "object"
+    },
+    "handoff_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "handoff_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "locator": {
+          "pattern": "^aos://[^/]+/objects/sha256/[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "media_type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "object_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "size_bytes": {
+          "maximum": 16777216,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "object_id",
+        "locator",
+        "size_bytes",
+        "media_type"
+      ],
+      "type": "object"
+    },
+    "library_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "limitations": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "open_items": {
+      "additionalProperties": false,
+      "properties": {
+        "checked": {
+          "const": true
+        },
+        "items": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "checked",
+        "items"
+      ],
+      "type": "object"
+    },
+    "permissions": {
+      "additionalProperties": false,
+      "properties": {
+        "checked": {
+          "const": true
+        },
+        "items": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "checked",
+        "items"
+      ],
+      "type": "object"
+    },
+    "privacy": {
+      "additionalProperties": false,
+      "properties": {
+        "classification": {
+          "const": "scope_private"
+        },
+        "redaction": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "retention": {
+          "const": "owner_policy_no_automatic_deletion"
+        },
+        "scope_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "scope_id",
+        "classification",
+        "retention",
+        "redaction"
+      ],
+      "type": "object"
+    },
+    "producer": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "recovery": {
+      "additionalProperties": false,
+      "properties": {
+        "dependencies": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "dependency_id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "status": {
+                "enum": [
+                  "embedded",
+                  "unknown",
+                  "unavailable"
+                ]
+              },
+              "asset_id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "ref": {
+                "additionalProperties": false,
+                "properties": {
+                  "locator": {
+                    "pattern": "^aos://[^/]+/objects/sha256/[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "media_type": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "object_id": {
+                    "pattern": "^sha256:[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "size_bytes": {
+                    "maximum": 16777216,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "object_id",
+                  "locator",
+                  "size_bytes",
+                  "media_type"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "dependency_id",
+              "required",
+              "status"
+            ],
+            "type": "object",
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "status": {
+                      "const": "embedded"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "asset_id",
+                    "ref"
+                  ]
+                },
+                "else": {
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "asset_id"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "ref"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "first_assets": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "level": {
+          "enum": [
+            "self_contained",
+            "external_required",
+            "summary_only"
+          ]
+        },
+        "next_step": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "not_restored": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "read_only_checks": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "asset_id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "kind": {
+                "const": "sha256"
+              }
+            },
+            "required": [
+              "asset_id",
+              "kind"
+            ],
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "required_access": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "level",
+        "first_assets",
+        "dependencies",
+        "required_access",
+        "not_restored",
+        "next_step",
+        "read_only_checks"
+      ],
+      "type": "object"
+    },
+    "results": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "criterion_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "deliverable_ids": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "evidence_ids": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "pass",
+              "fail",
+              "unknown",
+              "not_applicable"
+            ]
+          }
+        },
+        "required": [
+          "criterion_id",
+          "status",
+          "evidence_ids",
+          "deliverable_ids"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "schema": {
+      "const": "agentos.indexed-handoff/v1"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "scope": {
+      "additionalProperties": false,
+      "properties": {
+        "boundaries": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "change_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "criteria": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "criterion_id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "description": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "criterion_id",
+              "description"
+            ],
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "objective": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "request_evidence_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "objective",
+        "boundaries",
+        "criteria",
+        "request_evidence_ids",
+        "change_refs"
+      ],
+      "type": "object"
+    },
+    "serializer": {
+      "const": "utf8-sorted-keys-integer-json/v1"
+    },
+    "supersedes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "schema",
+    "schema_version",
+    "serializer",
+    "library_id",
+    "handoff_id",
+    "created_at",
+    "supersedes",
+    "producer",
+    "entity",
+    "scope",
+    "facets",
+    "deliverables",
+    "results",
+    "decisions",
+    "permissions",
+    "open_items",
+    "evidence",
+    "recovery",
+    "privacy",
+    "limitations",
+    "handoff_ref"
+  ],
+  "type": "object"
+}

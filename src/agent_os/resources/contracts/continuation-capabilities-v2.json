@@ -1,0 +1,9 @@
+{
+  "schema": "agentos.continuation-capabilities/v2",
+  "readable_item_schemas": ["agentos.continuation-item/v1", "agentos.continuation-item/v2", "agentos.continuation-item/v3"],
+  "transition_item_schemas": ["agentos.continuation-item/v2", "agentos.continuation-item/v3"],
+  "receipt_schemas": ["agentos.continuation-delivery-receipt/v2", "agentos.continuation-delivery-receipt/v3"],
+  "causal_acceptance_scope": "received_only",
+  "legacy_promotion": "untouched_pending_only",
+  "provider_io": false
+}

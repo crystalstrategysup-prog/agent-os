@@ -1,6 +1,13 @@
 # Process: direct reading, documented changes
 
-This describes the `0.5.5` foundation. Native AgentOS hooks are excluded: do not
+Current public version: `0.7.0`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+
+
+## Historical indexed handoff successor0.7.0rc1
+
+Every new/resumed mutable entry requires an accepted library handoff before CLOSED/CHECKPOINT. Checkpoints record unfinished work; legacy closed history is preserved. See [indexed handoff](INDEXED_HANDOFF.md).
+
+This describes the stable `0.7.0` foundation. Native AgentOS hooks are excluded: do not
 create, enable, trust again, or restore them during rollback. Older F01–F08
 stages are historical evidence, not permission to reintroduce prompt interception
 or a Stop hook.
@@ -156,3 +163,7 @@ For provider selection and target-policy diagnosis, follow
 [PROVIDER_INDEPENDENCE](PROVIDER_INDEPENDENCE.md). Public project work requires
 no private kernel, fleet controller or notification service. Preserve actual
 target controls; missing optional reporting does not block local completion.
+
+## Historical: Main coordination successor0.7.0rc2
+
+For continuing work, follow [WORK_COORDINATION](WORK_COORDINATION.md): child/session completion never closes the original parent goal. Record each verified result, remainder and owned next action; preserve independent work during checkpoints and reconcile unknown effects before retry. The optional synchronous ledger does not supply an always-running client.

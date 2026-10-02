@@ -1,5 +1,12 @@
 # Foundation architecture
 
+Current public version: `0.7.0`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+
+
+## Historical: Indexed handoff successor0.7.0rc1
+
+Indexed library is isolated POSIX storage/index/API/lifecycle/CLI modules. One kernel publisher lock and ROOT CAS commit immutable generations; no scheduler, arbitrary command surface or native hook. See [indexed handoff](INDEXED_HANDOFF.md).
+
 ## Context and boundaries
 
 An ordinary authorized read leads directly to an answer. A real project change

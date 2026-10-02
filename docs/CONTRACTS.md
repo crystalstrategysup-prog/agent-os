@@ -1,13 +1,20 @@
 # Interfaces and compatibility
 
+Current public version: `0.7.0`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+
+
+## Historical: Indexed handoff successor0.7.0rc1
+
+Library Python/CLI APIs and v1 manifest/root schemas are defined in INDEXED_HANDOFF.md. The six MCP tools remain unchanged; no library MCP bridge is claimed. See [indexed handoff](INDEXED_HANDOFF.md).
+
 Machine-readable contracts are `schemas/mcp-tools-v1.json` (with an identical
 wheel copy), `schemas/cli-contract-v1.json`, the project task and event schemas,
 and the packaged schemas under `src/agent_os/resources/schemas/`. Tests compare
 MCP `inputSchema` and `outputSchema` with `tools/list` and returned
 `structuredContent`, and task/event schemas with actual local lifecycle records.
 
-CLI, Python, and MCP report version `0.5.5`; the stdio MCP protocol version is
-`2025-06-18`. There is no HTTP API or OpenAPI specification. Project events are
+CLI, Python, and MCP report stable version `0.7.0`; the RC1 background in this
+document is historical. The stdio MCP protocol version is `2025-06-18`. There is no HTTP API or OpenAPI specification. Project events are
 local JSONL with JSON Schema, not AsyncAPI.
 
 F15B adds `agentos setup probe ssh-vnc --host ALIAS [--vnc-port PORT]

@@ -1,6 +1,13 @@
 # Compatibility and known limits
 
-The source declares `0.5.5`; publication and installation require separate
+Current public version: `0.7.0`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+
+
+## Historical indexed handoff successor0.7.0rc1
+
+Results v1 libraries are separate from legacy project records and core release directories. POSIX publisher adapter only; incompatible/unsupported readers fail explicitly, never delete library bytes. See [indexed handoff](INDEXED_HANDOFF.md).
+
+The stable source declares `0.7.0`; publication and installation require separate
 readback. A concise `AGENTS.md` is routing advice, not a new lifecycle gate.
 F01–F08 results describe their own source and wheel, not this change.
 

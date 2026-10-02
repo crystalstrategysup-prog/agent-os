@@ -192,14 +192,31 @@ def filemap(
     skip: set[str] | None = None,
     limit: int = 20000,
     max_bytes: int = 128 * 1024 * 1024,
+    tracked_directory_links: dict[str, dict] | None = None,
 ) -> dict[str, str]:
     result: dict[str, str] = {}
     total = 0
+    rechecks = []
     for parent, dirs, files in os.walk(root, followlinks=False):
         dirs[:] = sorted(d for d in dirs if d not in (skip or set()))
-        for d in dirs:
+        for d in dirs[:]:
             if (Path(parent) / d).is_symlink():
-                raise GateError("symlink_directory_refused")
+                if tracked_directory_links is None:
+                    raise GateError("symlink_directory_refused")
+                from .source_links import attest_directory_link
+
+                path = Path(parent) / d
+                rel = path.relative_to(root).as_posix()
+                metadata, recheck = attest_directory_link(root, path, skip or set())
+                total += len(metadata["target"].encode("utf-8"))
+                if len(result) >= limit or total > max_bytes:
+                    raise GateError("tree_inventory_limit")
+                tracked_directory_links[rel] = metadata
+                result[rel] = digest(metadata)
+                rechecks.append(recheck)
+                dirs.remove(
+                    d
+                )  # The alias itself is inventory; never walk its referent.
         for name in sorted(files):
             path = Path(parent) / name
             if path.is_symlink():
@@ -213,4 +230,6 @@ def filemap(
             if len(result) >= limit or total > max_bytes:
                 raise GateError("tree_inventory_limit")
             result[rel] = sha(path.read_bytes())
+    for recheck in rechecks:
+        recheck()
     return result
