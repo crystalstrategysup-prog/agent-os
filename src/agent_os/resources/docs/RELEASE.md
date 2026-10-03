@@ -1,9 +1,9 @@
 # Release policy
 
-Current public version: `0.7.0`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current public version: `0.7.1`. RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
-The current public source proposes stable `0.7.0`; `0.5.5` is the previously published public baseline. This local candidate has no publication receipt. The release tag must be `v0.7.0` and all current package, CLI, MCP and public documentation version surfaces must agree before tagging. Existing tags and assets, including RC evidence, remain immutable.
+The current source proposes patch release `0.7.1` after the published canonical `0.7.0` baseline. The release tag must be `v0.7.1`; package, CLI, MCP and current documentation surfaces must agree. Earlier tags/assets remain immutable. This source document is not a publication or target-adoption receipt.
 
 The release gate includes final diff review, current unit and integration checks, complete docs, reproducible source inventory, wheel hash, clean install in a fresh venv, privacy review, and an exact publication allowlist. Publish only public core and intended artifacts; never a mixed private handoff, user overlay, credential, host path or `.agentos/` runtime receipt. A prepared archive is not a published release.
 

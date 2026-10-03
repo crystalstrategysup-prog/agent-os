@@ -1,6 +1,6 @@
 # Data and documentation
 
-Current public version: `0.7.0`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current public version: `0.7.1`. RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
 ## Historical: Indexed handoff successor0.7.0rc1

@@ -359,6 +359,8 @@ def context(home: Path) -> dict:
             "schema": "agentos.profile-context/v1",
             "status": "ACTIVE",
             "selected_ids": ids,
+            "selection_digest": digest(selection),
+            "profile_hashes": dict(selection["profile_hashes"]),
             "entries": list(entries.values()),
             "profile_authority": False,
         }

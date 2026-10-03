@@ -1,6 +1,6 @@
 # Universal personality and owner preferences
 
-Stable source `0.7.0` includes an optional bounded persona adapter using existing
+Stable source `0.7.1` includes an optional bounded persona adapter using existing
 agentos.profile/v1 owner storage, SHA selection and explicit conflict decisions.
 The public foundation contains generic schemas/defaults/validators/gate only.
 Names, personal settings and source evidence belong to the private owner overlay.

@@ -26,6 +26,7 @@ def dispatch(argv: list[str]) -> int | None:
         "setup",
         "library",
         "persona",
+        "context",
     }:
         return None
     try:
@@ -51,6 +52,12 @@ def dispatch(argv: list[str]) -> int | None:
             result = command(rest[1:])
             print(json.dumps(result, ensure_ascii=False, indent=2))
             return 1 if result.get("status") == "FAIL" else 0
+        if rest[0] == "context":
+            from .context_gate import command
+
+            result, code = command(rest[1:], global_args.home)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return code
         from .config import AgentOSPaths
 
         home = AgentOSPaths.discover(global_args.home).home

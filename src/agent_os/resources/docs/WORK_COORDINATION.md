@@ -1,10 +1,10 @@
 # Main coordinator knowledge and execution contract
 
-Current public version: `0.7.0`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current public version: `0.7.1`. RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
 Contract: `agentos.work-coordination/v1`, knowledge revision `1.1.1`.
-Stable source: **0.7.0 — NOT_INSTALLED, NOT_PUBLISHED, NOT_LIVE_ADOPTED**.
+Stable source: **0.7.1 — NOT_INSTALLED, NOT_PUBLISHED, NOT_LIVE_ADOPTED**.
 This approved universal work-management contract governs the prepared public
 source. The installed predecessor retains its own version. Source
 rules never change model system instructions, start a scheduler, authorize a

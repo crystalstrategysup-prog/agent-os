@@ -73,8 +73,7 @@ def test_thread_started_is_parsed_from_codex_jsonl():
 
 
 def test_runner_preserves_thread_id_before_bounding_output(monkeypatch):
-    # This test isolates output framing. The one-shot gate is covered separately.
-    monkeypatch.setattr("agent_os.dispatch_gate.claim", lambda *a, **k: None)
+    # Isolate legacy output framing; new creation admission has separate tests.
 
     class Completed:
         returncode = 0
@@ -88,7 +87,7 @@ def test_runner_preserves_thread_id_before_bounding_output(monkeypatch):
     monkeypatch.setattr(
         "agent_os.session_hub.subprocess.run", lambda *args, **kwargs: Completed()
     )
-    result = CodexRunner(default_config()).create_session("hello")
+    result = CodexRunner(default_config())._run(["fixture-output-only"], "hello")
     assert result.session_id == SESSION_ID
     assert len(result.output) == 8_000
 

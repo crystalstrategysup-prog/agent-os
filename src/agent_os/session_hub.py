@@ -166,13 +166,19 @@ def discover_screens() -> list[ScreenSession]:
         socket = match.group("socket")
         pid_text, name = socket.split(".", 1)
         pid = int(pid_text)
+        session_id = _codex_descendant_session(pid, processes)
+        if session_id is None:
+            from .config import AgentOSPaths
+            from .screen_launch import registry_session
+
+            session_id = registry_session(AgentOSPaths.discover().home, socket)
         result.append(
             ScreenSession(
                 socket=socket,
                 name=name,
                 state=match.group("state"),
                 pid=pid,
-                codex_session_id=_codex_descendant_session(pid, processes),
+                codex_session_id=session_id,
             )
         )
     return result
@@ -248,62 +254,90 @@ class CodexRunner:
         return self._run(command, prompt)
 
     def create_session(
-        self, prompt: str, workspace: str | Path | None = None
+        self, prompt: str, workspace: str | Path | None = None, *,
+        launch_request: dict | None = None, target_guard=None,
     ) -> DispatchResult:
-        selected = validate_workspace(self.config, workspace)
-        from .dispatch_gate import claim
+        """New workers use inherited-mode admission before receiving their task.
 
-        claim(prompt, workspace=selected)
-        command = [
-            self.executable,
-            "exec",
-            "--skip-git-repo-check",
-            "-C",
-            str(selected),
-            "--json",
-            "-",
-        ]
-        result = self._run(command, prompt)
-        return result
+        Missing launch metadata is UNKNOWN, never an implicit unsafe fallback
+        to the historical immediate `codex exec` path. Existing metadata reads
+        and current-session read-only operations do not call this boundary.
+        """
+        selected = validate_workspace(self.config, workspace)
+        from .codex_launch import CodexLaunchProvider, StdioRpc
+        from .config import AgentOSPaths
+        from .dispatch_gate import claim
+        from .session_launch import LaunchError, LaunchJournal, launch, validate_request
+
+        request = launch_request or self.config.get("codex", {}).get("launch_request")
+        validate_request(request)
+        if request["original_goal"].strip() != prompt.strip() or request["workspace"] != str(selected):
+            raise LaunchError("request_does_not_match_dispatch")
+        binary = shutil.which(self.executable)
+        if binary is None:
+            raise LaunchError("codex_binary_unavailable", status="UNAVAILABLE")
+        journal = LaunchJournal(AgentOSPaths.discover().home, request["launch_id"])
+        rpc = StdioRpc(Path(binary).resolve(), selected, self._environment(),
+                       request["executor"].get("approved_version", ""))
+        try:
+            receipt = launch(request, CodexLaunchProvider(rpc, work_timeout=min(self.timeout, 1800)),
+                             target_guard=target_guard,
+                             dispatch_claim=lambda: claim(prompt, workspace=selected), journal=journal)
+        finally:
+            rpc.close()
+        work = receipt.get("work", {})
+        # Runtime completion is distinct from semantic result acceptance.
+        return DispatchResult("turn_completed_unaccepted" if work.get("status") == "completed" else "turn_failed_or_unknown",
+                              receipt.get("session_id"), _bounded_output(json.dumps(receipt, ensure_ascii=False)),
+                              0 if work.get("status") == "completed" else 3)
 
     def create_screen(
-        self, name: str, prompt: str, workspace: str | Path | None = None
+        self, name: str, prompt: str, workspace: str | Path | None = None, *,
+        launch_request: dict | None = None, target_guard=None,
     ) -> DispatchResult:
-        if os.name == "nt" or not shutil.which("screen"):
-            raise RuntimeError("screen_not_supported")
         if not _SCREEN_NAME.fullmatch(name):
             raise ValueError("screen_name_invalid")
-        if any(item.name == name for item in discover_screens()):
-            raise ValueError("screen_name_exists")
-        created = self.create_session(prompt, workspace)
-        if created.return_code != 0 or not created.session_id:
-            return created
-        selected = validate_workspace(self.config, workspace)
-        completed = subprocess.run(
-            [
-                "screen",
-                "-dmS",
-                name,
-                self.executable,
-                "resume",
-                "--no-alt-screen",
-                "-C",
-                str(selected),
-                created.session_id,
-            ],
-            capture_output=True,
-            text=True,
-            timeout=10,
-            check=False,
-            env=self._environment(),
-        )
-        status = (
-            "screen_started" if completed.returncode == 0 else "screen_start_failed"
-        )
-        output = _bounded_output(created.output + "\n" + completed.stderr)
-        return DispatchResult(status, created.session_id, output, completed.returncode)
+        from .config import AgentOSPaths
+        from .dispatch_gate import claim
+        from .screen_launch import create_screen
+        from .session_launch import LaunchError, validate_request
 
-    def continue_screen(self, screen: ScreenSession, prompt: str) -> DispatchResult:
+        request = launch_request or self.config.get("codex", {}).get("launch_request")
+        validate_request(request)
+        selected = validate_workspace(self.config, workspace)
+        if request["original_goal"].strip() != prompt.strip() or request["workspace"] != str(selected):
+            raise LaunchError("request_does_not_match_dispatch")
+        screen_binary, codex_binary = shutil.which("screen"), shutil.which(self.executable)
+        if os.name == "nt" or not screen_binary or not codex_binary:
+            raise LaunchError("screen_or_codex_binary_unavailable", status="UNAVAILABLE")
+        receipt = create_screen(AgentOSPaths.discover().home, name, request,
+                                screen_binary=Path(screen_binary).resolve(), codex_binary=Path(codex_binary).resolve(),
+                                environment=self._environment(), target_guard=target_guard,
+                                dispatch_claim=lambda: claim(prompt, workspace=selected),
+                                work_timeout=min(self.timeout, 1800))
+        completed = receipt.get("work", {}).get("status") == "completed"
+        return DispatchResult("turn_completed_unaccepted" if completed else "turn_failed_or_unknown",
+                              receipt.get("session_id"), _bounded_output(json.dumps(receipt, ensure_ascii=False)),
+                              0 if completed else 3)
+
+    def continue_screen(self, screen: ScreenSession, prompt: str, *, target_guard=None,
+                        continuation_id: str | None = None) -> DispatchResult:
+        from .config import AgentOSPaths
+        from .dispatch_gate import claim
+        from .screen_launch import continue_managed
+
+        managed = continue_managed(AgentOSPaths.discover().home, screen.socket, prompt,
+                                  screen_binary=Path(shutil.which("screen") or "screen"),
+                                  environment=self._environment(), target_guard=target_guard,
+                                  continuation_id=continuation_id,
+                                  dispatch_claim=lambda request, session_id: claim(
+                                      prompt, workspace=Path(request["workspace"]), destination_session=session_id))
+        if managed is not None:
+            work = managed.get("work", {})
+            delivered = work.get("delivery") == "accepted"
+            return DispatchResult("accepted" if delivered else "delivery_not_proven",
+                                  managed.get("session_id"), _bounded_output(json.dumps(managed, ensure_ascii=False)),
+                                  0 if delivered else 3)
         if not screen.codex_session_id:
             raise RuntimeError("screen_codex_session_unknown")
         record = next(

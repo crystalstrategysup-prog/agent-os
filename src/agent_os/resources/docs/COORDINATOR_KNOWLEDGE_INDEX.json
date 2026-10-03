@@ -1,56 +1,74 @@
 {
-  "core_version": "0.7.0",
+  "core_version": "0.7.1",
   "documents": [
     {
       "id": "work_coordination",
       "path": "WORK_COORDINATION.md",
-      "sha256": "3dc1dca5481d661d2c657ce69bf55e96fd87aeb2dcda5326856334ca4a784436",
+      "sha256": "e26832db37ee7ff12bf12143a3324beca512791dc72b4f0b8d9bf686e708382e",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "process",
       "path": "PROCESS.md",
-      "sha256": "ac216d3fe30d9333c1f65219f4d77119dd14da3f3708642bcdd93b7796de36a2",
+      "sha256": "afdde2f3c16df28574389033700f72e8101cdf17eb6eee0c4f79028782717b99",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "work_continuation",
       "path": "WORK_CONTINUATION.md",
-      "sha256": "c2f72ad9320bf565ca460acdba41239fd3c10fb822981dd1759a8c0d93a1d3ae",
+      "sha256": "56aefc1e933560ecde64e9f9fc6128ff8faeabc048622841770ec25d46b6beb7",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "indexed_handoff",
       "path": "INDEXED_HANDOFF.md",
-      "sha256": "35452a1b5f496503af4b5adeffa7f18e520ee5990280d345fa827ca5975b466f",
+      "sha256": "b0320a8bb4b66cada5d68f14032984cc7affa1f62f3732f37ace0fa198a5b3b9",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "foundation_overlay",
       "path": "FOUNDATION_OVERLAY.md",
-      "sha256": "70f5fd12308e400609522940c107c0146f39263e450622b3b3b4302bac2efd1a",
+      "sha256": "3620e88c8f4f3dddcd8727b40f775571e0e08dca8e40181ca79ae1da63185315",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "quality",
       "path": "QUALITY.md",
-      "sha256": "8eb3bb53011b8f4637db560e03ae068193b2fe3a0a1e43503397e028def28778",
+      "sha256": "5f7b14102fac5c95f38fb2c4622ecdce85c5a005b704522c66e2a3eabe7ffd8e",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "handoff_discovery",
       "path": "HANDOFF_DISCOVERY.md",
-      "sha256": "b5fdcb07c4efb4003361ec378d83d5ec2f9b91bca83fecd34c94336cb11c4816",
+      "sha256": "93d1364b08f24d446422bb6fc8e7f6aef738c57b456750f8784ff660b95b2162",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "model_selection",
       "path": "MODEL_SELECTION.md",
-      "sha256": "87c48bf620f726083518b62f37630b671a91d5ac20b1c784f1ef20c2f291ad67",
+      "sha256": "1b3730a5d17a4e7e5d458673c045b366e22efd814effe7fdc17bafff42ef7f91",
+      "status": "SOURCE_CONTRACT"
+    },
+    {
+      "id": "session_launch",
+      "path": "SESSION_LAUNCH.md",
+      "sha256": "7d77681e983a3249da39227b53abbe6f90154f084ea9b5325a961aa6b95d5b10",
+      "status": "SOURCE_CONTRACT"
+    },
+    {
+      "id": "screen_launch",
+      "path": "SCREEN_LAUNCH.md",
+      "sha256": "a1abc5f35ed8b5a2749f8415d84d47630e2723bb2e1cfc9232c604580185b092",
+      "status": "SOURCE_CONTRACT"
+    },
+    {
+      "id": "context_binding",
+      "path": "CONTEXT_BINDING.md",
+      "sha256": "2ab647f19b9bbfe05c6992021463edb92205bb68b9069ed92409b49c5fd56f97",
       "status": "SOURCE_CONTRACT"
     }
   ],
-  "knowledge_version": "1.1.1",
+  "knowledge_version": "1.2.0",
   "live_adoption_proven": false,
   "profile_authority": false,
   "reading": "Resolve only these relative names against this index directory; verify exact bytes before relying on relevant facts. No automatic history, profile dereference or system instruction change.",

@@ -1,4 +1,16 @@
-# 0.7.0 — public stable release candidate
+# 0.7.1 — guarded launch and context binding candidate
+
+- Qualify the existing executor, inherited model catalog and actual startup on
+  the same connection before harmless capability probes and original work.
+  Preserve configured null provider values and resolve identity from startup.
+- Add persistent GNU Screen workers, same-thread continuation and bounded
+  context materialization. Preserve existing session discovery and controls.
+- Publish versioned contracts, coordinator index 1.2.0 and exact resource
+  mirrors. Private presentation, host bindings and credentials remain external.
+- Source, artifacts, publication, installation and observed rule compliance
+  require separate evidence. Native hooks remain disabled.
+
+# Historical 0.7.0 — public stable release candidate
 
 - Consolidate the reviewed RC1, RC2 and RC3 public source contracts into a stable
   public release candidate. Current metadata, CLI and MCP contracts identify

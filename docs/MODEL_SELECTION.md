@@ -1,11 +1,11 @@
 # Model selection and minimum sufficient reasoning
 
-Contract: agentos.model-selection/v1. Stable source `0.7.0`; not installed or
+Contract: agentos.model-selection/v1. Stable source `0.7.1`; not installed or
 published by this preparation, with no current runtime/model/settings changes. The policy is routed by
 COORDINATOR_KNOWLEDGE_INDEX.json. This document contains generic rules, no private
 presentation template, name, owner profile or session data.
 
-The new index is knowledge1.1.0 for core0.7.0. Inherited coordinator documents
+The new index is knowledge1.2.0 for core0.7.1. Inherited coordinator documents
 retain their historical1.0.0/rc2 contract labels and exact accepted bytes; they do
 not claim new runtime adoption. Existing private indices remain pinned to their
 accepted rc2 index; this source never refreshes them automatically.
@@ -111,5 +111,22 @@ agreement, executed model or permission to delegate.
 The unchanged CLI argument surface can emit BLOCKED when required context is
 absent; complete proposals use the explicit Python API or a future supported
 adapter. There is no CLI flag/MCP bridge that collects current quality/agreements,
-no live catalog adapter and no deployment enforcement. No source/package test
-proves actual root/voice consumption. Review and apply/adoption remain separate.
+no live catalog bridge into this proposal validator and no deployment enforcement.
+No source/package test proves actual root/voice consumption. Review and
+apply/adoption remain separate.
+
+The separate [session launch adapter](SESSION_LAUNCH.md#inherited-model-admission-and-actual-startup)
+performs bounded, same-connection `config/read` and `model/list` before creating
+a thread with inherited settings. This narrow admission check does not implement
+latest-family selection, choose an effort, collect routing agreements or apply a
+proposal. A catalog candidate/default is provisional; actual startup metadata and
+successful capability probes remain independent checks. A null/absent configured
+provider is supported without an explicit override; preserve that input and its
+presence separately from the required actual `thread/start.modelProvider`. The
+same inherited connection must supply the actual identity before probes/work,
+and any explicit configured provider must match it. Continuation retains that
+actual identity. An omitted/null optional `nextCursor` is terminal; non-null
+cursors are followed within the shared bounds. Missing actual provider binding,
+incomplete pagination or unresolved aliases remain `UNKNOWN`. The adapter never
+guesses a provider name, changes model/auth/policy settings or substitutes another
+executable to pass.

@@ -1,6 +1,6 @@
 # Foundation ↔ user overlay contract
 
-Current public version: `0.7.0`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current public version: `0.7.1`. RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
 Contract version: `agentos.foundation-overlay/v1` with optional `agentos.profile/v1` adapter.

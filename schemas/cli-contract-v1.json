@@ -2,6 +2,26 @@
   "commands": [
     {
       "effect": "read_only",
+      "name": "context build",
+      "status_values": [
+        "FAST_PATH",
+        "MATERIALIZED",
+        "BLOCKED"
+      ],
+      "write_surfaces": []
+    },
+    {
+      "effect": "read_only",
+      "name": "context verify",
+      "status_values": [
+        "FAST_PATH",
+        "CURRENT_BINDING_MATCH",
+        "BLOCKED"
+      ],
+      "write_surfaces": []
+    },
+    {
+      "effect": "read_only",
       "name": "doctor",
       "status_values": [
         "PASS",
@@ -621,12 +641,12 @@
       "write_surfaces": []
     }
   ],
-  "distribution_version": "0.7.0",
+  "distribution_version": "0.7.1",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.7.0",
+  "release": "0.7.1",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",

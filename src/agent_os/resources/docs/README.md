@@ -1,13 +1,13 @@
 # AgentOS documentation
 
-Current public version: `0.7.0`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current public version: `0.7.1`. RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
-## Stable 0.7.0 public source
+## Stable 0.7.1 public source
 
-Stable 0.7.0 carries the reviewed indexed results, coordinator and model-policy source contracts. Live adoption and physical session cleanup are separate/unimplemented boundaries. See [indexed handoff](INDEXED_HANDOFF.md).
+Stable 0.7.1 carries the reviewed indexed results, coordinator and model-policy source contracts. Live adoption and physical session cleanup are separate/unimplemented boundaries. See [indexed handoff](INDEXED_HANDOFF.md).
 
-The public source declares `0.7.0`; publication, installation and target verification remain separate. Ordinary questions and read-only work need
+The public source declares `0.7.1`; publication, installation and target verification remain separate. Ordinary questions and read-only work need
 no project intake; real project changes follow a documentation-first stage.
 Native AgentOS hooks are excluded. Check publication and installation with
 separate readback.
@@ -17,9 +17,10 @@ work: [ARCHITECTURE](ARCHITECTURE.md), [CONTRACTS](CONTRACTS.md),
 [SECURITY_MODEL](SECURITY_MODEL.md), [INSTALL_UPDATE](INSTALL_UPDATE.md), or
 [QUALITY](QUALITY.md). [FOUNDATION_OVERLAY](FOUNDATION_OVERLAY.md) explains
 physical separation and [DOCUMENTATION_CATALOG](DOCUMENTATION_CATALOG.md)
-explains document selection. The current source stage is
-[STAGE](agentos/STAGE.md); earlier stages are historical. Stage records
-are not shipped as runtime resources; the installed process contract is the
+explains document selection. The current public workflow is
+[PROCESS](PROCESS.md); [the source release contract](agentos/RELEASE.md)
+records candidate boundaries. Local task and stage records are excluded from
+public exports and runtime resources; the installed process contract is the
 packaged `resources/docs/PROCESS.md`. See [COMPATIBILITY](COMPATIBILITY.md) for
 platforms and unverified target behavior.
 

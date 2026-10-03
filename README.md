@@ -4,13 +4,13 @@
 
 AgentOS gives a project a repeatable path from its current state to a verified change: project dossier → roadmap → documented stage → implementation → checks → updated documentation. A short intake selects only the relevant document layers. The CLI keeps the task, source, documents and check evidence bound to the same stage; ordinary read-only questions bypass intake entirely. Native hooks are excluded; explicit CLI checks do not intercept arbitrary tools.
 
-This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). This source declares stable `0.7.0` (Python distribution version `0.7.0`). It is a local publication candidate until the canonical tag, release object and uploaded assets are independently read back. It is separate from any maintainer's private runtime, infrastructure and personal data.
+This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). This source declares stable `0.7.1` (Python distribution version `0.7.1`). It is a local publication candidate until the canonical tag, release object and uploaded assets are independently read back. It is separate from any maintainer's private runtime, infrastructure and personal data.
 
 Visit the [public project website](https://crystalstrategy.ru/agent-os/), read the [changelog](CHANGELOG.md), or open an [issue](https://github.com/crystalstrategysup-prog/agent-os/issues) with a bug or technical review. Verify tag, release asset and website deployment separately.
 
 ## Indexed results library
 
-Stable 0.7.0 includes the reviewed indexed results, coordinator and model-policy source contracts. Read [the indexed results format and limits](docs/INDEXED_HANDOFF.md). Source implementation is separate from live installation; physical session cleanup is not implemented.
+Stable 0.7.1 includes the reviewed indexed results, coordinator and model-policy source contracts. Read [the indexed results format and limits](docs/INDEXED_HANDOFF.md). Source implementation is separate from live installation; physical session cleanup is not implemented.
 
 ## Two physical layers
 
@@ -107,16 +107,20 @@ python tools/demo_lifecycle.py
 python tools/verify_public.py
 ```
 
-Start with the [documentation index](docs/README.md), [project dossier](docs/agentos/DOSSIER.md), [roadmap](docs/agentos/ROADMAP.md), [current source stage](docs/agentos/STAGE.md), [architecture](docs/ARCHITECTURE.md) and [developer onboarding](docs/ONBOARDING.md). The [changelog](CHANGELOG.md), [release policy](docs/RELEASE.md) and [public language policy](docs/LOCALIZATION.md) state the release status and limits. GitHub Actions are not used.
+Start with the [documentation index](docs/README.md), [project dossier](docs/agentos/DOSSIER.md), [roadmap](docs/agentos/ROADMAP.md), [public workflow](docs/PROCESS.md), [source release contract](docs/agentos/RELEASE.md), [architecture](docs/ARCHITECTURE.md) and [developer onboarding](docs/ONBOARDING.md). The [changelog](CHANGELOG.md), [release policy](docs/RELEASE.md) and [public language policy](docs/LOCALIZATION.md) state the release status and limits. GitHub Actions are not used.
 
 Crystal AgentOS is Apache-2.0 software. Contributions and skeptical technical reviews are welcome; see [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), [Governance](GOVERNANCE.md) and the [AI Stewardship Charter](STEWARDSHIP.md).
 
-Current project handoff: [docs/agentos/HANDOFF.md](docs/agentos/HANDOFF.md).
+For current project handoff lookup, follow [the handoff discovery contract](docs/HANDOFF_DISCOVERY.md) and verify the selected index. Filled task handoffs remain outside the public source.
 
-The [0.7.0 release package](docs/RELEASE_PACKAGE.md) includes reviewed opt-in adapters and operator gates. It provides no running scheduler or persistent connected bridge. Host activation, manual client reload, voice validation and owner-policy adoption remain separate authorized stages.
+The [0.7.1 release package](docs/RELEASE_PACKAGE.md) includes reviewed opt-in adapters and operator gates. It provides no running scheduler or persistent connected bridge. Host activation, manual client reload, voice validation and owner-policy adoption remain separate authorized stages.
 
 The historical RC3 candidate packages [metadata-only tracked directory aliases](docs/SOURCE_SYMLINKS.md). Its inherited behavior has bounded predecessor coverage; the final stable artifact must be reviewed independently. This candidate does not claim an installed, running or published runtime.
 
 ## Historical main coordinator candidate 0.7.0rc2
 
 Use the [single coordination knowledge index](docs/COORDINATOR_KNOWLEDGE_INDEX.json) and [work-management contract](docs/WORK_COORDINATION.md). The optional synchronous Python ledger records verified receipt/review/remainder/next ownership, protects original parent acceptance and reconciles missed results/unknown effects. It launches nothing. Private persona/owner knowledge stay outside core; live adoption, publication and session cleanup remain separate.
+
+## Guarded session launch in 0.7.1
+
+Qualified creation now reads the exact approved Codex binary's inherited configuration and bounded model catalog before creating a thread. Actual startup metadata and harmless tool probes precede original work. [Persistent GNU Screen](docs/SCREEN_LAUNCH.md) retains the same worker, connection and thread after its caller exits. [Selected context materialization](docs/CONTEXT_BINDING.md) returns verified document bodies; it does not prove compliance. Existing clients and private owner instructions require separate adoption. No model, provider, auth, sandbox, approval or native-hook setting is changed.

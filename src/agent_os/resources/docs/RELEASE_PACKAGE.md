@@ -1,9 +1,9 @@
-# 0.7.0 public stable release candidate
+# 0.7.1 guarded-launch release candidate
 
-Current public version: `0.7.0`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current public version: `0.7.1`. RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
-Local, unpublished and uninstalled successor of the exact reviewed RC3 public source.
+Public-only patch successor of the published 0.7.0 baseline and reviewed curator launch/context source. Actual artifact hashes, publication and target adoption require separate receipts.
 Public source contains isolated library storage/index/API/lifecycle/CLI modules,
 synthetic tests, versioned schemas and mirrored normative docs. Private results,
 spec transfer material, task journals and check receipts are excluded from exports.

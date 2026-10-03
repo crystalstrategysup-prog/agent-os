@@ -1,6 +1,6 @@
 # Completed stages and unfinished projects
 
-Current public version: `0.7.0`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current public version: `0.7.1`. RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
 A CLOSED result proves one local stage, not completion of the whole project or
