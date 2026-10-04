@@ -18,7 +18,7 @@ import subprocess
 import sys
 import time
 import uuid
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 from pathlib import Path
 from zipfile import BadZipFile, ZipFile
 
@@ -96,6 +96,29 @@ def wheel_continuation_schemas(wheel: Path) -> list[str]:
     return value["readable_item_schemas"]
 
 
+def wheel_coordination_schemas(wheel: Path) -> list[str]:
+    """A missing completion declaration never authorizes the new v2 store."""
+    name = "agent_os/resources/contracts/completion-install-v1.json"
+    try:
+        with ZipFile(wheel) as archive:
+            if name not in archive.namelist():
+                return ["agentos.work-coordination/v1"]
+            if archive.namelist().count(name) != 1 or archive.getinfo(name).file_size > 4096:
+                raise InstallError("wheel_completion_capabilities_invalid")
+            value = json.loads(archive.read(name))
+    except (BadZipFile, UnicodeError, json.JSONDecodeError) as exc:
+        raise InstallError("wheel_completion_capabilities_invalid") from exc
+    expected = {
+        "schema": "agentos.completion-install/v1",
+        "readable_coordination_schemas": ["agentos.work-coordination/v1", "agentos.work-coordination/v2"],
+        "implicit_activation": False,
+        "unsupported_downgrade": "preserve_and_hold",
+    }
+    if value != expected:
+        raise InstallError("wheel_completion_capabilities_invalid")
+    return value["readable_coordination_schemas"]
+
+
 def release(root: Path, identifier: str) -> Path:
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,119}", identifier):
         raise InstallError("invalid_release_id")
@@ -138,6 +161,10 @@ def read_manifest(
         raise InstallError("installed_wheel_hash_mismatch")
     if path.name != version + "-" + wheel_hash[:12]:
         raise InstallError("release_identity_mismatch")
+    supported_coordination = wheel_coordination_schemas(wheel)
+    if data.get("coordination_schemas", supported_coordination) != supported_coordination:
+        raise InstallError("release_completion_capabilities_mismatch")
+    data["coordination_schemas"] = supported_coordination
     if schema == "agentos.install/v2":
         hashes = data.get("script_sha256")
         if not isinstance(hashes, dict) or not hashes or any(
@@ -357,6 +384,44 @@ def check_user_compatibility(user: Path, manifest: dict, *, check_continuations:
         raise InstallError("user_config_schema_unsupported")
     if not check_continuations:
         return
+    # Verify actual immutable HEAD/snapshot bytes, not a version label. No
+    # migration or payload rewrite is performed, even during rollback planning.
+    for directory in [user / "state", user / "state/work-coordination"]:
+        if directory.is_symlink():
+            raise InstallError("user_coordination_directory_symlink_refused")
+    queue_root = user / "state/work-coordination"
+    if queue_root.exists():
+        if not queue_root.is_dir():
+            raise InstallError("user_coordination_directory_invalid")
+        streams = sorted(queue_root.iterdir())
+        if len(streams) > 1000:
+            raise InstallError("user_coordination_inventory_limit")
+        supported = manifest.get("coordination_schemas", ["agentos.work-coordination/v1"])
+        for stream in streams:
+            if stream.is_symlink() or not stream.is_dir() or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,79}", stream.name):
+                raise InstallError("user_coordination_stream_invalid")
+            prefix = "state/work-coordination/" + stream.name + "/"
+            head = read_metadata(prefix + "HEAD.json")
+            if (head is None or set(head) != {"schema", "revision", "snapshot_sha256", "size_bytes"}
+                    or type(head["revision"]) is not int
+                    or type(head["size_bytes"]) is not int or not 0 < head["size_bytes"] <= 1024 * 1024
+                    or not isinstance(head["snapshot_sha256"], str)
+                    or not re.fullmatch(r"[0-9a-f]{64}", head["snapshot_sha256"])):
+                raise InstallError("user_coordination_head_invalid")
+            if head["schema"] not in supported:
+                raise InstallError("coordination_store_incompatible_preserve_and_hold")
+            if (stream / "snapshots").is_symlink():
+                raise InstallError("user_coordination_snapshot_symlink_refused")
+            relative = prefix + "snapshots/" + head["snapshot_sha256"] + ".json"
+            state = read_metadata(relative)
+            snapshot = user / relative
+            if (state is None or snapshot.stat().st_size != head["size_bytes"]
+                    or digest(snapshot) != head["snapshot_sha256"]
+                    or state.get("schema") != head["schema"] or state.get("revision") != head["revision"]
+                    or (head["schema"] == "agentos.work-coordination/v2"
+                        and (not isinstance(state.get("completion"), dict)
+                             or state["completion"].get("schema") != "agentos.completion/v1"))):
+                raise InstallError("user_coordination_snapshot_invalid")
     for path in [user / "state", user / "state/continuations"]:
         if path.is_symlink():
             raise InstallError("user_continuation_directory_symlink_refused")
@@ -381,6 +446,40 @@ def check_user_compatibility(user: Path, manifest: dict, *, check_continuations:
             raise InstallError("user_continuation_metadata_invalid")
         if item["schema"] not in supported:
             raise InstallError("continuation_queue_incompatible_preserve_and_hold")
+
+
+@contextmanager
+def coordination_locks(user: Path):
+    """Use existing Coordinator publisher locks for final check/switch.
+
+    The selecting host must still prove quiescence/target authority; this is not
+    a replacement for fencing an executor or preventing new stream creation.
+    """
+    import fcntl
+
+    directory = user / "state/work-coordination"
+    if not directory.exists():
+        yield
+        return
+    if directory.is_symlink() or not directory.is_dir():
+        raise InstallError("user_coordination_directory_invalid")
+    streams = sorted(directory.iterdir())
+    if len(streams) > 1000:
+        raise InstallError("user_coordination_inventory_limit")
+    with ExitStack() as stack:
+        for stream in streams:
+            lock = stream / "publisher.lock"
+            if stream.is_symlink() or lock.is_symlink() or not lock.is_file():
+                raise InstallError("user_coordination_lock_invalid")
+            handle = stack.enter_context(lock.open("rb"))
+            try:
+                fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError as exc:
+                raise InstallError("coordination_writer_active_preserve_and_hold") from exc
+            stack.callback(fcntl.flock, handle, fcntl.LOCK_UN)
+        if sorted(directory.iterdir()) != streams:
+            raise InstallError("coordination_inventory_changed_preserve_and_hold")
+        yield
 
 
 @contextmanager
@@ -505,6 +604,7 @@ def execute(args: argparse.Namespace) -> dict:
         }
         check_user_compatibility(user, manifest, check_continuations=False)
         manifest["continuation_schemas"] = wheel_continuation_schemas(wheel)
+        manifest["coordination_schemas"] = wheel_coordination_schemas(wheel)
     check_user_compatibility(user, manifest)
     if args.action == "rollback":
         read_manifest(target)
@@ -578,7 +678,7 @@ def execute(args: argparse.Namespace) -> dict:
                 write_json(target / "INSTALL.json", manifest)
                 (target / "INCOMPLETE").unlink()
         evidence = probe(target, manifest["version"])
-        with continuation_lock(user):
+        with continuation_lock(user), coordination_locks(user):
             check_user_compatibility(user, manifest)
             activate(root, identifier, old)
         return {

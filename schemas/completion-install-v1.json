@@ -1,0 +1,9 @@
+{
+  "schema": "agentos.completion-install/v1",
+  "readable_coordination_schemas": [
+    "agentos.work-coordination/v1",
+    "agentos.work-coordination/v2"
+  ],
+  "implicit_activation": false,
+  "unsupported_downgrade": "preserve_and_hold"
+}
