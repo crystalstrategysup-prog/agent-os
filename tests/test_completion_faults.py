@@ -285,8 +285,11 @@ def test_source_change_invalidates_results_and_preserves_original_receipt(comple
     assert len(co.completion_status(NOW)["remaining"]) == 3
     assert co.read()["work"]["work-demo-001"]["state"] == "pending"
     assert co._completion_store().get(result["receipt_ref"])
-    with pytest.raises(HandoffError, match="CURRENT_SOURCE_MISMATCH"):
-        runner.run(co, OWNER, NOW)
+    before = len(co.read()["completion"]["operations"])
+    stopped = runner.run(co, OWNER, NOW)
+    assert stopped["operation"] is None
+    assert stopped["reason"] == "FAILED_RECIPE_REQUIRES_REPLAN"
+    assert len(co.read()["completion"]["operations"]) == before
 
 
 def test_duplicate_and_out_of_order_events_do_not_regress_generation(completion):
@@ -733,3 +736,58 @@ def test_event_apply_crash_reopens_and_duplicate_never_reapplies(completion):
     before = reopened.read()
     reopened.completion_event(OWNER, 0, notice, NOW)
     assert reopened.read() == before
+
+
+def test_restored_old_completed_effect_is_not_replayed_after_reconciliation(
+    completion, tmp_path
+):
+    co, runner, *_ = completion
+    original = co._fault
+
+    def crash_after_effect(point):
+        if point == "after_completion_local_effect":
+            raise RuntimeError("owned effect response lost")
+
+    co._fault = crash_after_effect
+    with pytest.raises(RuntimeError):
+        runner.run(co, OWNER, NOW)
+    co._fault = original
+    identity = co.read()["completion"]["operations"][0]["identity"]
+    workspace, paths, target = checkpoint_source(completion)
+    cp = co.completion_checkpoint(
+        OWNER, co.read()["revision"], NOW, workspace, paths, lambda *_: target
+    )
+    rehearsal = co.completion_rehearse_restore(
+        cp["checkpoint_ref"], tmp_path / "old-effect-restore"
+    )
+    target_proof = {
+        k: target[k] for k in ("target_ref", "environment", "source_commit")
+    }
+    target_proof.update(
+        old_writer_quiescent=True,
+        receiver_fence_verified=True,
+        reconciled_operation_ids=[],
+        current_authority=True,
+        restored_artifact_hashes=rehearsal["artifact_hashes"],
+    )
+    co.completion_restore(
+        OWNER,
+        co.read()["revision"],
+        NOW,
+        cp["checkpoint_ref"],
+        co._completion_store().put_json(rehearsal),
+        lambda *_: target_proof,
+    )
+    assert co.completion_status(NOW)["unknown_operations"]
+    co.completion_reconcile(
+        OWNER,
+        co.read()["revision"],
+        identity["operation_id"],
+        NOW,
+        lambda _: proof(co, identity, "COMPLETED"),
+    )
+    before = len(co.read()["completion"]["operations"])
+    result = runner.run_bounded(co, OWNER, clock=lambda: NOW)
+    assert not result["runs"]
+    assert result["status"]["blocker"] == "FAILED_RECIPE_REQUIRES_REPLAN"
+    assert len(co.read()["completion"]["operations"]) == before

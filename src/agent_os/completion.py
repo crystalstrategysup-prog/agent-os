@@ -262,6 +262,37 @@ def budget_available(c, checked_at):
     )
 
 
+def attempted_recipes(c, row):
+    """Never replay an already completed identical effect after reinitialization.
+
+    An old receipt may be insufficient for current semantic acceptance while
+    its effect remains real. Use an explicitly approved alternative verification
+    recipe or changed exact scope; a new generation alone is not permission.
+    """
+    recipes = [row] + row.get("alternatives", [])
+    return {
+        op["recipe_id"]
+        for op in c["operations"]
+        if op["criterion_id"] == row["criterion_id"]
+        and op["state"] in {"COMPLETED", "RECONCILED"}
+        and (
+            op["generation"] == c["generation"]
+            or (
+                (op.get("identity") or {}).get("environment_fingerprint")
+                == c["contract"]["environment_fingerprint"]
+                and any(
+                    op["recipe_id"] == recipe["recipe_id"]
+                    and all(
+                        op[k] == recipe.get(k, row[k])
+                        for k in ("operation", "target", "receiver", "data_hash")
+                    )
+                    for recipe in recipes
+                )
+            )
+        )
+    }
+
+
 def projection(c, checked_at):
     if c["state"] in TERMINAL:
         return c["state"], c["blocker"]
@@ -291,13 +322,7 @@ def projection(c, checked_at):
     for row in c["contract"]["criteria"]:
         if current_result(c, row["criterion_id"]):
             continue
-        attempted = {
-            o["recipe_id"]
-            for o in c["operations"]
-            if o["criterion_id"] == row["criterion_id"]
-            and o["generation"] == c["generation"]
-            and o["state"] in {"COMPLETED", "RECONCILED"}
-        }
+        attempted = attempted_recipes(c, row)
         candidates = {row["recipe_id"]} | {
             v["recipe_id"] for v in row.get("alternatives", [])
         }
@@ -743,13 +768,7 @@ class CompletionMixin:
                     if not current_result(c, r["criterion_id"])
                 )
             )
-            attempted = {
-                o["recipe_id"]
-                for o in c["operations"]
-                if o["criterion_id"] == row["criterion_id"]
-                and o["generation"] == c["generation"]
-                and o["state"] in {"COMPLETED", "RECONCILED"}
-            }
+            attempted = attempted_recipes(c, row)
             if row["recipe_id"] in attempted:
                 alternative = next(
                     (

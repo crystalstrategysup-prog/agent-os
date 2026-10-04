@@ -44,4 +44,6 @@ Execution receipt ingestion requires an authenticated exact-execution verifier a
 
 `evaluate_completion_release` extends the existing result gate. It reads current candidate bytes and dependency-bound G0–G4/T22/T27/T32 receipts, then separately checks exact current publication authority. PREPUBLISH can return READY_TO_PUBLISH only; POSTPUBLISH requires independently retrieved actual published bytes and install evidence. It performs no external effect. A synthetic evaluator PASS grants no real authority.
 
+A restored generation never authorizes replay of a completed or authoritatively reconciled identical prior effect. If its old result cannot establish current semantic acceptance, planning requires an explicitly preapproved alternative verification recipe or a newly authorized changed exact scope; incrementing generation alone is insufficient.
+
 Declared release scope: [support matrix](completion/SUPPORT_MATRIX.json). Actual qualification belongs to separate candidate-bound receipts.
