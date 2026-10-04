@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from agent_os import __version__
 from agent_os.doc_catalog import DOCS
+from agent_os.handoff_store import HandoffError, scan_secrets
 
 
 def runtime_receipts_present(root: Path) -> bool:
@@ -63,6 +64,10 @@ def verify() -> dict:
             continue
         if not path.is_file():
             continue
+        try:
+            scan_secrets(path.read_bytes())
+        except HandoffError:
+            errors.append("secret_shape:" + str(rel))
         if path.name in {".env", "auth.json"} or path.suffix in {".pem", ".key"}:
             errors.append("forbidden_file:" + str(rel))
         if path.suffix not in {
@@ -80,7 +85,7 @@ def verify() -> dict:
         if path != Path(__file__).resolve():
             for token in forbidden:
                 if token in text:
-                    errors.append("private_marker:" + str(rel) + ":" + token)
+                    errors.append("private_marker:" + str(rel))
         if path.suffix == ".py":
             ast.parse(text, filename=str(rel))
             counts["python"] += 1
@@ -101,7 +106,7 @@ def verify() -> dict:
     if counts["skills"] != 9:
         errors.append("expected_nine_skills")
     version_text = (ROOT / "pyproject.toml").read_text()
-    if 'version = "0.7.1"' not in version_text or __version__ != "0.7.1":
+    if 'version = "0.8.0rc1"' not in version_text or __version__ != "0.8.0rc1":
         errors.append("version_mismatch")
     return {
         "status": "PASS" if not errors else "FAIL",

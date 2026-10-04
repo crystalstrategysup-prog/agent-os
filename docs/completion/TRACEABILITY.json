@@ -1,0 +1,894 @@
+{
+  "schema": "agentos.completion-traceability/v1",
+  "version": "0.8.0rc1",
+  "original_spec_sha256": "91efdac60531afc3000585bd714f97d005441d07399e5a68a3ce96e01a860c11",
+  "requirements": {
+    "R01": {
+      "test_ids": [
+        "T01",
+        "T32"
+      ],
+      "implementation_gate": "G0",
+      "acceptance_gate": "G5"
+    },
+    "R02": {
+      "test_ids": [
+        "T02",
+        "T23",
+        "T28",
+        "T33"
+      ],
+      "implementation_gate": "G1",
+      "acceptance_gate": "G4"
+    },
+    "R03": {
+      "test_ids": [
+        "T02",
+        "T13",
+        "T17",
+        "T33"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G4"
+    },
+    "R04": {
+      "test_ids": [
+        "T05",
+        "T06",
+        "T09"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G3"
+    },
+    "R05": {
+      "test_ids": [
+        "T10",
+        "T21"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G4"
+    },
+    "R06": {
+      "test_ids": [
+        "T02",
+        "T03",
+        "T13",
+        "T14",
+        "T25",
+        "T33"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G4"
+    },
+    "R07": {
+      "test_ids": [
+        "T13",
+        "T14"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G3"
+    },
+    "R08": {
+      "test_ids": [
+        "T07",
+        "T15",
+        "T16",
+        "T24",
+        "T34"
+      ],
+      "implementation_gate": "G1",
+      "acceptance_gate": "G4"
+    },
+    "R09": {
+      "test_ids": [
+        "T07",
+        "T15"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G4"
+    },
+    "R10": {
+      "test_ids": [
+        "T07",
+        "T09",
+        "T10",
+        "T12",
+        "T17"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G3"
+    },
+    "R11": {
+      "test_ids": [
+        "T08",
+        "T11",
+        "T17",
+        "T33"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G4"
+    },
+    "R12": {
+      "test_ids": [
+        "T06",
+        "T09"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G3"
+    },
+    "R13": {
+      "test_ids": [
+        "T11",
+        "T18",
+        "T22",
+        "T28"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G5"
+    },
+    "R14": {
+      "test_ids": [
+        "T10",
+        "T11",
+        "T17",
+        "T33"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G4"
+    },
+    "R15": {
+      "test_ids": [
+        "T04",
+        "T18",
+        "T19",
+        "T24",
+        "T33"
+      ],
+      "implementation_gate": "G4",
+      "acceptance_gate": "G4"
+    },
+    "R16": {
+      "test_ids": [
+        "T02",
+        "T03",
+        "T23",
+        "T32",
+        "T33"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G5"
+    },
+    "R17": {
+      "test_ids": [
+        "T01",
+        "T23",
+        "T28",
+        "T32"
+      ],
+      "implementation_gate": "G2",
+      "acceptance_gate": "G5"
+    },
+    "R18": {
+      "test_ids": [
+        "T12",
+        "T20",
+        "T26",
+        "T34"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G4"
+    },
+    "R19": {
+      "test_ids": [
+        "T04",
+        "T18",
+        "T19"
+      ],
+      "implementation_gate": "G4",
+      "acceptance_gate": "G4"
+    },
+    "R20": {
+      "test_ids": [
+        "T16",
+        "T24"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G3"
+    },
+    "R21": {
+      "test_ids": [
+        "T19",
+        "T21",
+        "T27"
+      ],
+      "implementation_gate": "G4",
+      "acceptance_gate": "G5"
+    },
+    "R22": {
+      "test_ids": [
+        "T05",
+        "T09",
+        "T19",
+        "T21",
+        "T27"
+      ],
+      "implementation_gate": "G4",
+      "acceptance_gate": "G5"
+    },
+    "R23": {
+      "test_ids": [
+        "T19",
+        "T27"
+      ],
+      "implementation_gate": "G5",
+      "acceptance_gate": "G5"
+    },
+    "R24": {
+      "test_ids": [
+        "T15",
+        "T26",
+        "T34"
+      ],
+      "implementation_gate": "G4",
+      "acceptance_gate": "G4"
+    },
+    "R25": {
+      "test_ids": [
+        "T08",
+        "T22",
+        "T24"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G5"
+    },
+    "R26": {
+      "test_ids": [
+        "T17",
+        "T20"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G3"
+    },
+    "R27": {
+      "test_ids": [
+        "T08",
+        "T23",
+        "T28"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G3"
+    },
+    "R28": {
+      "test_ids": [
+        "T22"
+      ],
+      "implementation_gate": "G5",
+      "acceptance_gate": "G5"
+    },
+    "R29": {
+      "test_ids": [
+        "T19",
+        "T27",
+        "T29",
+        "T32"
+      ],
+      "implementation_gate": "G5",
+      "acceptance_gate": "G5"
+    },
+    "R30": {
+      "test_ids": [
+        "T13",
+        "T14",
+        "T16",
+        "T24",
+        "T29"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G5"
+    },
+    "R31": {
+      "test_ids": [
+        "T07",
+        "T15",
+        "T16",
+        "T29",
+        "T34"
+      ],
+      "implementation_gate": "G5",
+      "acceptance_gate": "G5"
+    },
+    "R32": {
+      "test_ids": [
+        "T05",
+        "T06",
+        "T09",
+        "T10",
+        "T17",
+        "T21"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G4"
+    },
+    "R33": {
+      "test_ids": [
+        "T03",
+        "T18",
+        "T23",
+        "T28",
+        "T33"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G4"
+    },
+    "R34": {
+      "test_ids": [
+        "T04",
+        "T14",
+        "T25"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G4"
+    },
+    "R35": {
+      "test_ids": [
+        "T21",
+        "T25",
+        "T29"
+      ],
+      "implementation_gate": "G2",
+      "acceptance_gate": "G5"
+    },
+    "R36": {
+      "test_ids": [
+        "T11",
+        "T30"
+      ],
+      "implementation_gate": "G1",
+      "acceptance_gate": "G3"
+    },
+    "R37": {
+      "test_ids": [
+        "T07",
+        "T31"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G3"
+    },
+    "R38": {
+      "test_ids": [
+        "T06",
+        "T17",
+        "T25"
+      ],
+      "implementation_gate": "G3",
+      "acceptance_gate": "G3"
+    }
+  },
+  "scenarios": {
+    "T01": {
+      "requirement_ids": [
+        "R01",
+        "R17"
+      ],
+      "level": "review",
+      "gate": "G0",
+      "recipes": [
+        "tools/verify_completion.py::verify"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T02": {
+      "requirement_ids": [
+        "R02",
+        "R03",
+        "R06",
+        "R16"
+      ],
+      "level": "integration",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion.py::test_turn_completion_never_accepts_and_duplicate_is_a_read"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T03": {
+      "requirement_ids": [
+        "R06",
+        "R16",
+        "R33"
+      ],
+      "level": "integration",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_faults.py::test_one_preapproved_strategy_change_keeps_failed_receipt_and_succeeds"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T04": {
+      "requirement_ids": [
+        "R15",
+        "R19",
+        "R34"
+      ],
+      "level": "host",
+      "gate": "G4",
+      "recipes": [
+        "tools/completion_canary.py::recover",
+        "tests/test_completion_faults.py::test_process_crash_boundaries_reopen_without_duplicate_effect"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T05": {
+      "requirement_ids": [
+        "R04",
+        "R22",
+        "R32"
+      ],
+      "level": "fault",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_faults.py::test_process_crash_boundaries_reopen_without_duplicate_effect"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T06": {
+      "requirement_ids": [
+        "R04",
+        "R12",
+        "R32",
+        "R38"
+      ],
+      "level": "fault",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_faults.py::test_event_apply_crash_reopens_and_duplicate_never_reapplies",
+        "tests/test_completion_faults.py::test_archived_event_id_is_still_deduplicated_and_conflicts_rejected"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T07": {
+      "requirement_ids": [
+        "R08",
+        "R09",
+        "R10",
+        "R31",
+        "R37"
+      ],
+      "level": "integration",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_faults.py::test_error_is_scoped_to_operation_and_preserves_read_capability"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T08": {
+      "requirement_ids": [
+        "R11",
+        "R25",
+        "R27"
+      ],
+      "level": "integration",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_acceptance.py::test_stale_wrong_and_future_ack_never_delivers"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T09": {
+      "requirement_ids": [
+        "R04",
+        "R10",
+        "R12",
+        "R22",
+        "R32"
+      ],
+      "level": "fault",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_faults.py::test_authoritative_non_admission_retry_keeps_key_and_is_bounded",
+        "tests/test_completion_faults.py::test_independent_effect_reconciliation_never_replays_or_accepts_business_result"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T10": {
+      "requirement_ids": [
+        "R05",
+        "R10",
+        "R14",
+        "R32"
+      ],
+      "level": "fault",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_faults.py::test_two_real_process_writers_have_one_cas_winner",
+        "tests/test_completion_faults.py::test_new_epoch_fences_paused_old_sender_at_spawn",
+        "tests/test_completion_faults.py::test_old_epoch_execution_result_is_audit_only_after_takeover"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T11": {
+      "requirement_ids": [
+        "R11",
+        "R13",
+        "R14",
+        "R36"
+      ],
+      "level": "integration",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_acceptance.py::test_receiver_missing_or_changed_actual_bytes_cannot_ack",
+        "tests/test_completion_acceptance.py::test_ack_transfer_changes_owner_only_with_verified_fence_and_new_policy"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T12": {
+      "requirement_ids": [
+        "R10",
+        "R18"
+      ],
+      "level": "security",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion.py::test_policy_revoked_after_discovery_before_effect"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T13": {
+      "requirement_ids": [
+        "R03",
+        "R06",
+        "R07",
+        "R30"
+      ],
+      "level": "integration",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_faults.py::test_each_budget_dimension_stops_without_erasing_progress"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T14": {
+      "requirement_ids": [
+        "R06",
+        "R07",
+        "R30",
+        "R34"
+      ],
+      "level": "integration",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_faults.py::test_waiting_user_health_flood_is_coalesced_and_cancel_wins"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T15": {
+      "requirement_ids": [
+        "R08",
+        "R09",
+        "R24",
+        "R31"
+      ],
+      "level": "host",
+      "gate": "G4",
+      "recipes": [
+        "tests/test_completion_faults.py::test_optional_goals_never_auto_enable_and_no_goals_supervisor_runs"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T16": {
+      "requirement_ids": [
+        "R08",
+        "R20",
+        "R30",
+        "R31"
+      ],
+      "level": "integration",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_faults.py::test_public_status_is_stale_honest_and_contains_no_private_identity"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T17": {
+      "requirement_ids": [
+        "R03",
+        "R10",
+        "R11",
+        "R14",
+        "R26",
+        "R32",
+        "R38"
+      ],
+      "level": "fault",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_acceptance.py::test_cancel_before_late_ack_is_audit_only",
+        "tests/test_completion.py::test_cancel_or_revoke_at_actual_spawn_boundary_has_zero_effect"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T18": {
+      "requirement_ids": [
+        "R13",
+        "R15",
+        "R19",
+        "R33"
+      ],
+      "level": "host",
+      "gate": "G4",
+      "recipes": [
+        "tests/test_completion_faults.py::test_source_only_execution_claim_is_not_host_evidence",
+        "tools/completion_canary.py::prepare"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T19": {
+      "requirement_ids": [
+        "R15",
+        "R19",
+        "R21",
+        "R22",
+        "R23",
+        "R29"
+      ],
+      "level": "host",
+      "gate": "G4",
+      "recipes": [
+        "tools/completion_canary.py::recover",
+        "tests/test_completion_acceptance.py::test_checkpoint_captures_untracked_patch_and_preserves_cancel_on_restore"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T20": {
+      "requirement_ids": [
+        "R18",
+        "R26"
+      ],
+      "level": "security",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_faults.py::test_changed_exact_policy_scope_prevents_effect",
+        "tests/test_completion_faults.py::test_expiry_is_rechecked_at_actual_spawn_not_original_plan_time"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T21": {
+      "requirement_ids": [
+        "R05",
+        "R21",
+        "R22",
+        "R32",
+        "R35"
+      ],
+      "level": "fault",
+      "gate": "G4",
+      "recipes": [
+        "tests/test_completion_faults.py::test_clock_skew_and_unsafe_quiescence_cannot_reinitialize",
+        "tests/test_completion_faults.py::test_interrupted_checkpoint_has_no_verified_receipt_and_stays_paused",
+        "tools/completion_canary.py::recover"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T22": {
+      "requirement_ids": [
+        "R13",
+        "R25",
+        "R28"
+      ],
+      "level": "security",
+      "gate": "G5",
+      "recipes": [
+        "tests/test_completion_privacy.py::test_actual_public_tree_scanner_blocks_synthetic_contamination",
+        "tools/verify_public.py::verify"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T23": {
+      "requirement_ids": [
+        "R02",
+        "R16",
+        "R17",
+        "R27",
+        "R33"
+      ],
+      "level": "integration",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_faults.py::test_source_change_invalidates_results_and_preserves_original_receipt"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T24": {
+      "requirement_ids": [
+        "R08",
+        "R15",
+        "R20",
+        "R25",
+        "R30"
+      ],
+      "level": "integration",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_faults.py::test_public_status_is_stale_honest_and_contains_no_private_identity"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T25": {
+      "requirement_ids": [
+        "R06",
+        "R34",
+        "R35",
+        "R38"
+      ],
+      "level": "fault",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_faults.py::test_waiting_user_health_flood_is_coalesced_and_cancel_wins",
+        "tests/test_completion_faults.py::test_cancel_index_has_one_reserved_slot_and_terminal_flood_is_read_only"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T26": {
+      "requirement_ids": [
+        "R18",
+        "R24"
+      ],
+      "level": "security",
+      "gate": "G4",
+      "recipes": [
+        "tests/test_completion_faults.py::test_goals_policy_migration_preserves_deny_and_explicit_opt_in_scope"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T27": {
+      "requirement_ids": [
+        "R21",
+        "R22",
+        "R23",
+        "R29"
+      ],
+      "level": "host",
+      "gate": "G5",
+      "recipes": [
+        "tests/test_completion_acceptance.py::test_unsupported_downgrade_is_no_write",
+        "tools/test_installation.py::verify"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T28": {
+      "requirement_ids": [
+        "R02",
+        "R13",
+        "R17",
+        "R27",
+        "R33"
+      ],
+      "level": "integration",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_release.py::test_changed_source_test_or_build_never_accepts_old_receipt",
+        "tests/test_completion_release.py::test_unknown_target_unverified_authority_and_missing_file_block"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T29": {
+      "requirement_ids": [
+        "R29",
+        "R30",
+        "R31",
+        "R35"
+      ],
+      "level": "host",
+      "gate": "G5",
+      "recipes": [
+        "tests/test_completion_release.py::test_missing_scope_blocks_and_synthetic_prepublish_never_claims_released",
+        "tests/test_completion_release.py::test_postpublish_requires_independent_retrieved_bytes_and_install"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T30": {
+      "requirement_ids": [
+        "R36"
+      ],
+      "level": "integration",
+      "gate": "G1",
+      "recipes": [
+        "tests/test_completion_acceptance.py::test_stale_wrong_and_future_ack_never_delivers"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T31": {
+      "requirement_ids": [
+        "R37"
+      ],
+      "level": "integration",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion.py::test_separate_transfer_operations_do_not_claim_native_handoff"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T32": {
+      "requirement_ids": [
+        "R01",
+        "R16",
+        "R17",
+        "R29"
+      ],
+      "level": "review",
+      "gate": "G5",
+      "recipes": [
+        "tests/test_completion_release.py::test_changed_source_test_or_build_never_accepts_old_receipt"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T33": {
+      "requirement_ids": [
+        "R02",
+        "R03",
+        "R06",
+        "R11",
+        "R14",
+        "R15",
+        "R16",
+        "R33"
+      ],
+      "level": "host",
+      "gate": "G4",
+      "recipes": [
+        "tools/completion_canary.py::prepare",
+        "tools/completion_canary.py::finalize"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    },
+    "T34": {
+      "requirement_ids": [
+        "R08",
+        "R18",
+        "R24",
+        "R31"
+      ],
+      "level": "integration",
+      "gate": "G3",
+      "recipes": [
+        "tests/test_completion_faults.py::test_optional_goals_never_auto_enable_and_no_goals_supervisor_runs"
+      ],
+      "status": "NOT_RUN",
+      "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
+    }
+  },
+  "support_scope": "Local POSIX registered start/resume argv only. T15 host Goal activation not qualified; T26/T34 policy safety mandatory. T29 synthetic decision is not real publication; T32 still requires independent final candidate review."
+}

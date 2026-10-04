@@ -1,6 +1,6 @@
 # Verification strategy
 
-Current public version: `0.7.1`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current source candidate: `0.8.0rc1` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
 ## Historical: Indexed handoff successor0.7.0rc1
@@ -114,3 +114,7 @@ Preserve the original rc2 HOLD and bind new receipts/packages to the new source.
 ## Historical: Model-selection successor0.7.0rc3
 
 Check current/unknown catalog, latest available Sol without alias, no automatic Luna/Astra fallback, exact scoped exception, unsupported effort/model/environment intersections, conservative task basis and explicit escalation/quality acceptance. E/max require complete referenced comparative quality/latency/cost claims. Preserve fixed/unknown mandatory constraints and independent bound runtime metadata; requested/assigned never become actual. Config upgrade keeps stored owner values without granting agreement. Run routing/CLI/config plus inherited coordinator/indexed/source-link/lifecycle/foundation/contracts/persona/profiles/continuation gate, parity/lint, exact package and isolated proposal smoke. Tests are synthetic; benefit/capability/authority records are trusted adapter inputs, not remote authentication.
+
+## Explicit completion and recovery
+
+Follow [the completion contract](COMPLETION.md) for bounded continuation, current target scope, confirmed handoff and safe recovery. Turn completion leaves the project open until independent current evidence satisfies the original goal. Source implementation and documentary checks do not establish host adoption or publication. The local validation chain includes `python3 tools/verify_completion.py`; GitHub Actions remain unused.

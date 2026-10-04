@@ -788,6 +788,11 @@ def _bounded_check_process(argv: list[str], root: Path, env: dict, timeout: int)
         )
     except OSError as exc:
         return 127, "CHECK LAUNCH FAILED: " + type(exc).__name__ + "\n"
+    return _capture_check_process(process, timeout)
+
+
+def _capture_check_process(process: subprocess.Popen, timeout: int) -> tuple[int, str]:
+    """Drain only an already owned process; creation may be receiver-fenced."""
     selector = None
     try:
         if process.stdout is None:

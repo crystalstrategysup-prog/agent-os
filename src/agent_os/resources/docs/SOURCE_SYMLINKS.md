@@ -1,6 +1,6 @@
 # Tracked directory aliases in project source snapshots
 
-Current public version: `0.7.1`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current source candidate: `0.8.0rc1` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
 The historical `0.6.0rc3` package candidate includes the exact tracked-directory-link fix

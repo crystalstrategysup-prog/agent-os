@@ -1,0 +1,699 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/crystalstrategysup-prog/agent-os/completion-v1",
+  "title": "Coordinator embedded completion contracts",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/event"
+    },
+    {
+      "$ref": "#/$defs/admission"
+    },
+    {
+      "$ref": "#/$defs/reconciliation"
+    }
+  ],
+  "$defs": {
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "event_id",
+        "kind",
+        "generation",
+        "causal_sequence",
+        "observed_at",
+        "payload"
+      ],
+      "properties": {
+        "schema": {
+          "const": "agentos.completion-event/v1"
+        },
+        "event_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "kind": {
+          "enum": [
+            "TASK_CREATED",
+            "CONTRACT_CHANGED",
+            "TURN_FINISHED",
+            "TEST_FINISHED",
+            "EXECUTOR_DISCONNECTED",
+            "EXECUTOR_RECONNECTED",
+            "APPROVAL_CHANGED",
+            "BUDGET_CHANGED",
+            "HANDOFF_ACK",
+            "USER_CANCELLED",
+            "CHECKPOINT_VERIFIED",
+            "COORDINATOR_RESTARTED",
+            "RECONCILIATION_FINISHED"
+          ]
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "causal_sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "observed_at": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "payload": {
+          "type": "object"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "TASK_CREATED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "contract_hash": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "contract_hash"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "CONTRACT_CHANGED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "contract_hash": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "source_commit": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{40,64}$"
+                  }
+                },
+                "required": [
+                  "contract_hash",
+                  "source_commit"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "TURN_FINISHED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "turn_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "executor_ref": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "status": {
+                    "enum": [
+                      "COMPLETED",
+                      "FAILED",
+                      "CANCELLED"
+                    ]
+                  }
+                },
+                "required": [
+                  "turn_id",
+                  "executor_ref",
+                  "status"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "TEST_FINISHED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "operation_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "run_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "outcome": {
+                    "enum": [
+                      "PASS",
+                      "FAIL",
+                      "BLOCKED"
+                    ]
+                  }
+                },
+                "required": [
+                  "operation_id",
+                  "run_id",
+                  "outcome"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "EXECUTOR_DISCONNECTED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "executor_ref": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  }
+                },
+                "required": [
+                  "executor_ref"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "EXECUTOR_RECONNECTED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "executor_ref": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  }
+                },
+                "required": [
+                  "executor_ref"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "APPROVAL_CHANGED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "policy_revision": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "policy_scope_hash": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "policy_revision",
+                  "policy_scope_hash"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "BUDGET_CHANGED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "budget_hash": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "budget_hash"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "HANDOFF_ACK"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "handoff_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "operation_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "ack_hash": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "handoff_id",
+                  "operation_id",
+                  "ack_hash"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "USER_CANCELLED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "source_ref": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  }
+                },
+                "required": [
+                  "reason",
+                  "source_ref"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "CHECKPOINT_VERIFIED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "checkpoint_hash": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "checkpoint_hash"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "COORDINATOR_RESTARTED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "previous_epoch": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "required": [
+                  "previous_epoch"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "RECONCILIATION_FINISHED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "operation_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "receipt_hash": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "operation_id",
+                  "receipt_hash"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "task_id",
+        "operation_id",
+        "idempotency_key",
+        "generation",
+        "ownership_epoch",
+        "cancel_fence",
+        "attempt",
+        "nonce",
+        "operation",
+        "target",
+        "receiver",
+        "data_hash",
+        "environment_fingerprint",
+        "policy_revision",
+        "source_commit",
+        "contract_hash",
+        "build_hash",
+        "configuration_hash",
+        "capability_snapshot_hash",
+        "capability_checked_at",
+        "capability_expires_at",
+        "policy_scope_hash",
+        "policy_expires_at",
+        "checked_at"
+      ],
+      "properties": {
+        "schema": {
+          "const": "agentos.completion-admission/v1"
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "operation_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "idempotency_key": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "ownership_epoch": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cancel_fence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "operation": {
+          "enum": [
+            "read",
+            "send",
+            "start",
+            "resume",
+            "artifact_transfer",
+            "native_handoff",
+            "goals"
+          ]
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "receiver": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "data_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "environment_fingerprint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "policy_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40,64}$"
+        },
+        "contract_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "build_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "configuration_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "capability_snapshot_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "capability_checked_at": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "capability_expires_at": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "policy_scope_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "policy_expires_at": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "checked_at": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "reconciliation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "operation_id",
+        "nonce",
+        "generation",
+        "ownership_epoch",
+        "outcome",
+        "evidence_hash",
+        "checked_at",
+        "provider",
+        "authoritative",
+        "dedup_valid_until",
+        "processing_horizon"
+      ],
+      "properties": {
+        "schema": {
+          "const": "agentos.completion-reconciliation/v1"
+        },
+        "operation_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "ownership_epoch": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "outcome": {
+          "enum": [
+            "COMPLETED",
+            "RUNNING",
+            "ADMITTED",
+            "UNKNOWN",
+            "CONFIRMED_NOT_ADMITTED"
+          ]
+        },
+        "evidence_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "checked_at": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "provider": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "authoritative": {
+          "type": "boolean"
+        },
+        "dedup_valid_until": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "processing_horizon": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

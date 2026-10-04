@@ -1,13 +1,13 @@
 # Process: direct reading, documented changes
 
-Current public version: `0.7.1`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current source candidate: `0.8.0rc1` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
 ## Historical indexed handoff successor0.7.0rc1
 
 Every new/resumed mutable entry requires an accepted library handoff before CLOSED/CHECKPOINT. Checkpoints record unfinished work; legacy closed history is preserved. See [indexed handoff](INDEXED_HANDOFF.md).
 
-This describes the stable `0.7.1` foundation. Native AgentOS hooks are excluded: do not
+This describes the candidate `0.8.0rc1` foundation. Native AgentOS hooks are excluded: do not
 create, enable, trust again, or restore them during rollback. Older F01–F08
 stages are historical evidence, not permission to reintroduce prompt interception
 or a Stop hook.
@@ -167,3 +167,7 @@ target controls; missing optional reporting does not block local completion.
 ## Historical: Main coordination successor0.7.0rc2
 
 For continuing work, follow [WORK_COORDINATION](WORK_COORDINATION.md): child/session completion never closes the original parent goal. Record each verified result, remainder and owned next action; preserve independent work during checkpoints and reconcile unknown effects before retry. The optional synchronous ledger does not supply an always-running client.
+
+## Explicit completion and recovery
+
+Follow [the completion contract](COMPLETION.md) for bounded continuation, current target scope, confirmed handoff and safe recovery. Turn completion leaves the project open until independent current evidence satisfies the original goal. Source implementation and documentary checks do not establish host adoption or publication. The local validation chain includes `python3 tools/verify_completion.py`; GitHub Actions remain unused.

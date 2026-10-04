@@ -1,46 +1,46 @@
 {
-  "core_version": "0.7.1",
+  "core_version": "0.8.0rc1",
   "documents": [
     {
       "id": "work_coordination",
       "path": "WORK_COORDINATION.md",
-      "sha256": "e26832db37ee7ff12bf12143a3324beca512791dc72b4f0b8d9bf686e708382e",
+      "sha256": "141946aca8e91df67ae9ca7ba023fe17b602fb6a26692d0157b45f8f1d26a17e",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "process",
       "path": "PROCESS.md",
-      "sha256": "afdde2f3c16df28574389033700f72e8101cdf17eb6eee0c4f79028782717b99",
+      "sha256": "dcb03e73814906f3e5e1de62dd54af44a48cd7cb5f4c65f9eb3e25e6d97f7ff9",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "work_continuation",
       "path": "WORK_CONTINUATION.md",
-      "sha256": "56aefc1e933560ecde64e9f9fc6128ff8faeabc048622841770ec25d46b6beb7",
+      "sha256": "a7134764f39295689249fd1850f4816a7380533a8f9fc7a149273a31eb3fd20a",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "indexed_handoff",
       "path": "INDEXED_HANDOFF.md",
-      "sha256": "b0320a8bb4b66cada5d68f14032984cc7affa1f62f3732f37ace0fa198a5b3b9",
+      "sha256": "dc71ddc85361f9f353e58c590559bd6a5aefde141d3d5e055ee681cee0c84193",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "foundation_overlay",
       "path": "FOUNDATION_OVERLAY.md",
-      "sha256": "3620e88c8f4f3dddcd8727b40f775571e0e08dca8e40181ca79ae1da63185315",
+      "sha256": "dae3e3b3789c7c3b025c519aa0ae0fbcea3592c94a3a35c4293b67ca871fcf2e",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "quality",
       "path": "QUALITY.md",
-      "sha256": "5f7b14102fac5c95f38fb2c4622ecdce85c5a005b704522c66e2a3eabe7ffd8e",
+      "sha256": "d2394695772e02b960260b35407d8741650e428342114441743ec626addf3b25",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "handoff_discovery",
       "path": "HANDOFF_DISCOVERY.md",
-      "sha256": "93d1364b08f24d446422bb6fc8e7f6aef738c57b456750f8784ff660b95b2162",
+      "sha256": "47e951614d424e0e3356bcdc9b55830d365cae14b4b9f1a94fdb9b0fe5fab974",
       "status": "SOURCE_CONTRACT"
     },
     {
@@ -66,9 +66,15 @@
       "path": "CONTEXT_BINDING.md",
       "sha256": "2ab647f19b9bbfe05c6992021463edb92205bb68b9069ed92409b49c5fd56f97",
       "status": "SOURCE_CONTRACT"
+    },
+    {
+      "id": "completion",
+      "path": "COMPLETION.md",
+      "sha256": "15f5aa0f66f40f6bfd3c25706c5a73ff36e676e92a0e35eca6be63f2657a65a9",
+      "status": "SOURCE_CONTRACT"
     }
   ],
-  "knowledge_version": "1.2.0",
+  "knowledge_version": "1.3.0",
   "live_adoption_proven": false,
   "profile_authority": false,
   "reading": "Resolve only these relative names against this index directory; verify exact bytes before relying on relevant facts. No automatic history, profile dereference or system instruction change.",

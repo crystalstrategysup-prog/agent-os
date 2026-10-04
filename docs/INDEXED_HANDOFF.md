@@ -1,6 +1,6 @@
 # Indexed results and verified terminal handoff
 
-Current public version: `0.7.1`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current source candidate: `0.8.0rc1` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
 Stable source `0.7.1`. This POSIX local adapter implements the provider-neutral

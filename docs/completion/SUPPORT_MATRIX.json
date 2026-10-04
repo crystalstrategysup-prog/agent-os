@@ -1,0 +1,40 @@
+{
+  "schema": "agentos.completion-support-matrix/v1",
+  "version": "0.8.0rc1",
+  "adapter": "local-completion/v1",
+  "state_backend": "existing Coordinator POSIX immutable snapshot and atomic HEAD",
+  "operations": {
+    "start": "registered local argv only; current source tests, installed qualification required",
+    "resume": "registered local argv only; current source tests, installed qualification required",
+    "read": "operation-local capability; does not grant effect access",
+    "send": "not implemented by this local adapter",
+    "native_handoff": "not implemented by this local adapter",
+    "artifact_transfer": "owned local byte-copy/receiver verification only; no remote qualification",
+    "goals": "UNSUPPORTED actual activation; explicit opt-in metadata is inert"
+  },
+  "goals_scope": {
+    "automatic_enable": false,
+    "supported_actual_goal_adapter": false,
+    "T15": "NOT_APPLICABLE only for actual Goal activation in this local release; independent scope review required",
+    "T26": "mandatory policy migration/refusal/explicit scoped opt-in checks",
+    "T34": "mandatory complete no-Goals path"
+  },
+  "qualification": {
+    "POSIX_local_installed_candidate": "NOT_RUN; receipts belong to exact release candidate, not this static scope file",
+    "Windows_completion_effects": "NOT_QUALIFIED",
+    "remote_or_cloud_completion_effects": "NOT_QUALIFIED",
+    "live_session_adoption": "NOT_PROVEN"
+  },
+  "bounds": {
+    "admitted_commands": 1,
+    "attempts": 3,
+    "no_progress_strategies": 2,
+    "default_lease_seconds": 60,
+    "default_ack_timeout_seconds": 120,
+    "default_backoff_seconds": [5, 20, 60],
+    "bounded_invocation_steps": [1, 64],
+    "native_hooks": "DISABLED",
+    "background_scheduler": false
+  },
+  "acceptance": "A finished turn, source test, metadata opt-in or static support claim never accepts a project or proves an installed/remote runtime. Independent current evidence, semantic review and actual delivery ACK remain required."
+}

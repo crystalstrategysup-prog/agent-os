@@ -1,6 +1,6 @@
 # Completed stages and unfinished projects
 
-Current public version: `0.7.1`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current source candidate: `0.8.0rc1` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
 A CLOSED result proves one local stage, not completion of the whole project or
@@ -123,3 +123,7 @@ reviewed owner/provider reconciliation.
 ## Historical: Main coordination successor0.7.0rc2
 
 The universal [coordination contract](WORK_COORDINATION.md) adds original-goal retention and an opt-in local receipt/review/next-action ledger. Existing continuation schemas/transitions remain byte-inherited; ACK/RECEIVED still means receipt, not semantic acceptance or project completion. Selected active partial handoffs can use Coordinator.recover_notice without pretending CLOSED-only continuation accepts them.
+
+## Explicit completion and recovery
+
+Follow [the completion contract](COMPLETION.md) for bounded continuation, current target scope, confirmed handoff and safe recovery. Turn completion leaves the project open until independent current evidence satisfies the original goal. Source implementation and documentary checks do not establish host adoption or publication. The local validation chain includes `python3 tools/verify_completion.py`; GitHub Actions remain unused.

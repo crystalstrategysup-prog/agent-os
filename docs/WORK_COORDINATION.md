@@ -1,6 +1,6 @@
 # Main coordinator knowledge and execution contract
 
-Current public version: `0.7.1`. RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current source candidate: `0.8.0rc1` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
 Contract: `agentos.work-coordination/v1`, knowledge revision `1.1.1`.
@@ -247,3 +247,7 @@ compact indexed evidence/recovery first. Logical retraction retains history and
 reclaims0 bytes. Physical session deletion remains a separate exact approved
 operation with loss boundary, restore proof and apparent/allocated-space
 measurement; this candidate implements no session cleanup API.
+
+## Explicit completion and recovery
+
+Follow [the completion contract](COMPLETION.md) for bounded continuation, current target scope, confirmed handoff and safe recovery. Turn completion leaves the project open until independent current evidence satisfies the original goal. Source implementation and documentary checks do not establish host adoption or publication. The local validation chain includes `python3 tools/verify_completion.py`; GitHub Actions remain unused.

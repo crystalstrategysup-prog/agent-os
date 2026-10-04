@@ -23,3 +23,5 @@ The installed `resources/docs/PROCESS.md` and README are normative; locate them 
 `agentos resources`. Project gates apply to real changes. Reading requires no
 intake or observation. Native hooks remain excluded and must not be enabled or
 restored. Neither CLI output nor profile text grants external authority.
+
+For completion-enabled coordination, read `docs/COMPLETION.md`. Preserve the original goal and unfinished work through a turn or handoff. Require current exact receiver ACK and protected ownership transition; unknown effect outcomes require reconciliation before retry. A local stage checkpoint or completed chat cannot accept the parent project.

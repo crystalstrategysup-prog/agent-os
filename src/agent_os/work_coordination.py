@@ -13,6 +13,7 @@ import uuid
 from datetime import UTC, datetime, timedelta
 from pathlib import PurePosixPath
 
+from .completion import CompletionMixin
 from .handoff_store import (
     HandoffError,
     bounded,
@@ -29,6 +30,7 @@ from .overlay import validate_roots
 from .safeio import identifier, now, within
 
 SCHEMA = "agentos.work-coordination/v1"
+COMPLETION_HEAD_SCHEMA = "agentos.work-coordination/v2"
 LIMIT = 1024 * 1024
 ACTION_KINDS = {
     "continue",
@@ -105,7 +107,7 @@ def overlaps(left, right):
     )
 
 
-class Coordinator:
+class Coordinator(CompletionMixin):
     def __init__(self, home, stream_id):
         validate_roots(home)
         self.root = within(home, "state/work-coordination/" + identifier(stream_id))
@@ -247,7 +249,7 @@ class Coordinator:
         head = parse(bounded(within(self.root, "HEAD.json"), 4096))
         require(
             set(head) == {"schema", "revision", "snapshot_sha256", "size_bytes"}
-            and head["schema"] == SCHEMA
+            and head["schema"] in {SCHEMA, COMPLETION_HEAD_SCHEMA}
             and type(head["revision"]) is int,
             "INTEGRITY_FAILED",
         )
@@ -264,7 +266,8 @@ class Coordinator:
         )
         state = parse(raw)
         require(
-            state["schema"] == SCHEMA and state["revision"] == head["revision"],
+            state["schema"] == head["schema"] and state["revision"] == head["revision"]
+            and (state["schema"] != COMPLETION_HEAD_SCHEMA or "completion" in state),
             "INTEGRITY_FAILED",
         )
         return state
@@ -289,7 +292,7 @@ class Coordinator:
             within(self.root, "HEAD.json"),
             encoded(
                 {
-                    "schema": SCHEMA,
+                    "schema": state["schema"],
                     "revision": state["revision"],
                     "snapshot_sha256": digest,
                     "size_bytes": len(data),
@@ -339,6 +342,7 @@ class Coordinator:
         require(origin in {"provider", "reconciled"}, "INVALID_INPUT")
         with publisher_lock(self.root / "publisher.lock"):
             s = self.read()
+            require('completion' not in s, 'VERSIONED_COMPLETION_MUTATION_REQUIRED')
             self._owner(s, actor)
             require(
                 work_id in s["work"] and s["parent_state"] == "open", "INVALID_WORK"
@@ -430,6 +434,7 @@ class Coordinator:
             text(item)
         with publisher_lock(self.root / "publisher.lock"):
             s = self.read()
+            require('completion' not in s, 'VERSIONED_COMPLETION_MUTATION_REQUIRED')
             self._owner(s, actor)
             require(
                 s["parent_state"] == "open" and review["original_goal"] == s["goal"],
@@ -597,6 +602,7 @@ class Coordinator:
         text(reason)
         with publisher_lock(self.root / "publisher.lock"):
             s = self.read()
+            require('completion' not in s, 'VERSIONED_COMPLETION_MUTATION_REQUIRED')
             self._owner(s, actor)
             self._cas(s, expected_revision)
             s["checkpoints"].append(
@@ -618,6 +624,7 @@ class Coordinator:
     def begin_action(self, actor, action_id, expected_revision):
         with publisher_lock(self.root / "publisher.lock"):
             s = self.read()
+            require('completion' not in s, 'VERSIONED_COMPLETION_DISPATCH_REQUIRED')
             self._owner(s, actor)
             self._cas(s, expected_revision)
             require(s["parent_state"] == "open", "PARENT_ALREADY_COMPLETED")
@@ -695,6 +702,7 @@ class Coordinator:
             raise HandoffError("UNPROVEN_OUTCOME") from exc
         with publisher_lock(self.root / "publisher.lock"):
             s = self.read()
+            require('completion' not in s, 'VERSIONED_COMPLETION_MUTATION_REQUIRED')
             self._owner(s, actor)
             items = [a for a in s["actions"] if a["action_id"] == action_id]
             require(len(items) == 1, "NOT_FOUND")
@@ -741,6 +749,7 @@ class Coordinator:
         m = self._accepted(library, principal, handoff_id, manifest_ref)
         with publisher_lock(self.root / "publisher.lock"):
             s = self.read()
+            require('completion' not in s, 'VERSIONED_COMPLETION_ACCEPTANCE_REQUIRED')
             self._owner(s, actor)
             self._cas(s, expected_revision)
             require(

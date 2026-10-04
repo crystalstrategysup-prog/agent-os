@@ -64,6 +64,51 @@ def timestamp():
     return datetime.now(UTC).isoformat()
 
 
+def verify_completion_inventory(root, manifest):
+    """Independent actual-byte inventory, not sender metadata or authentication."""
+    from pathlib import PurePosixPath
+
+    from .safeio import within
+
+    require(isinstance(manifest, dict) and set(manifest) == {
+        'schema_version', 'task_id', 'generation', 'source_commit', 'contract_hash',
+        'artifacts', 'integrity', 'signature_ref',
+    } and manifest['schema_version'] == '1.0.0', 'INVALID_ARTIFACT_MANIFEST')
+    require(manifest['integrity'] == 'HASH_VERIFIED' and manifest['signature_ref'] is None,
+            'SIGNATURE_ADAPTER_REQUIRED')
+    raw_root = Path(root).absolute()
+    require(raw_root.is_dir() and not raw_root.is_symlink(), 'INVALID_ARTIFACT_ROOT')
+    rows = manifest['artifacts']
+    require(isinstance(rows, list) and 0 < len(rows) <= 256, 'INVALID_ARTIFACT_MANIFEST')
+    names, hashes = set(), []
+    total = 0
+    for row in rows:
+        require(isinstance(row, dict) and set(row) == {'path', 'size_bytes', 'sha256'}, 'INVALID_ARTIFACT')
+        name = row['path']
+        require(isinstance(name, str) and name and '\x00' not in name and '\\' not in name
+                and not re.match(r'^[A-Za-z]:', name) and str(PurePosixPath(name)) == name
+                and not name.startswith('/') and '..' not in PurePosixPath(name).parts
+                and name not in names, 'UNSAFE_ARTIFACT_PATH')
+        names.add(name)
+        require(type(row['size_bytes']) is int and 0 <= row['size_bytes'] <= 16 * 1024 * 1024
+                and re.fullmatch('[0-9a-f]{64}', str(row['sha256'])), 'INVALID_ARTIFACT')
+        data = bounded(within(raw_root, name, allow_missing=False))
+        total += len(data)
+        require(total <= 64 * 1024 * 1024, 'SIZE_LIMIT')
+        require(len(data) == row['size_bytes'] and sha(data) == row['sha256'], 'ARTIFACT_BYTES_MISMATCH')
+        hashes.append(sha(data))
+    actual = set()
+    for folder, dirs, files in os.walk(raw_root, followlinks=False):
+        require(len(actual) + len(dirs) + len(files) <= 1024, 'SIZE_LIMIT')
+        for name in dirs + files:
+            require(not (Path(folder) / name).is_symlink(), 'SYMLINK_ARTIFACT_REFUSED')
+        for name in files:
+            actual.add((Path(folder) / name).relative_to(raw_root).as_posix())
+    require(actual == names, 'ARTIFACT_INVENTORY_MISMATCH')
+    return {'status': 'HASH_VERIFIED', 'manifest_hash': sha(encoded(manifest)),
+            'artifact_hashes': hashes, 'authentication_proven': False}
+
+
 def utc(value):
     try:
         parsed = datetime.fromisoformat(value)
