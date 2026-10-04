@@ -717,9 +717,11 @@ def finalize(root, review_path):
     co.completion_ack(
         OWNER, co.read()["revision"], store.put_json(ack), now(), verify_receiver
     )
-    co.completion_accept(
-        OWNER, co.read()["revision"], now(), lambda _: verify_receiver(ack)
-    )
+    def verify_acceptance(_):
+        verify_receiver(ack)
+        return True
+
+    co.completion_accept(OWNER, co.read()["revision"], now(), verify_acceptance)
     before = co.read()
     require(
         not runner(data).run_bounded(co, OWNER, clock=now)["runs"],
