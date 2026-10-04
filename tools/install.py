@@ -161,10 +161,6 @@ def read_manifest(
         raise InstallError("installed_wheel_hash_mismatch")
     if path.name != version + "-" + wheel_hash[:12]:
         raise InstallError("release_identity_mismatch")
-    supported_coordination = wheel_coordination_schemas(wheel)
-    if data.get("coordination_schemas", supported_coordination) != supported_coordination:
-        raise InstallError("release_completion_capabilities_mismatch")
-    data["coordination_schemas"] = supported_coordination
     if schema == "agentos.install/v2":
         hashes = data.get("script_sha256")
         if not isinstance(hashes, dict) or not hashes or any(
@@ -177,6 +173,10 @@ def read_manifest(
     elif not re.fullmatch(r"0\.5\.0-beta\.[1-5]", version):
         raise InstallError("legacy_manifest_version_unsupported")
     if verify_payload:
+        supported_coordination = wheel_coordination_schemas(wheel)
+        if data.get("coordination_schemas", supported_coordination) != supported_coordination:
+            raise InstallError("release_completion_capabilities_mismatch")
+        data["coordination_schemas"] = supported_coordination
         if data.get("continuation_schemas", []) != wheel_continuation_schemas(wheel):
             raise InstallError("release_continuation_capabilities_mismatch")
         _verify_owned_payload(
@@ -583,6 +583,14 @@ def execute(args: argparse.Namespace) -> dict:
         target = release(root, args.release_id)
         manifest = read_manifest(target, verify_payload=False)
         identifier = target.name
+        # Preserve the existing bounded user-metadata preflight priority. Only
+        # after it passes derive reader capabilities from the actual wheel;
+        # stored manifest labels are never trusted for the complete store check.
+        check_user_compatibility(user, manifest, check_continuations=False)
+        supported = wheel_coordination_schemas(target / manifest["wheel_name"])
+        if manifest.get("coordination_schemas", supported) != supported:
+            raise InstallError("release_completion_capabilities_mismatch")
+        manifest["coordination_schemas"] = supported
     else:
         wheel = args.wheel.expanduser().absolute()
         if wheel.is_symlink() or not wheel.is_file() or wheel.suffix != ".whl":
