@@ -128,3 +128,6 @@ Use explicit CLI project entry and documentation readiness, then registered chec
 
 ## Troubleshooting
 Report concrete operation-local blocker and next owner. Reconcile unknown outcomes; do not retry by elapsed time, fabricate model/runtime identity or close the parent because a turn ended.
+
+## Systemic mutation re-review
+Read [MUTATION_SURFACES.md](MUTATION_SURFACES.md) and its executable inventory for all public mutations, pure audit versus ledger resolution, and owner/lease/policy/terminal/replay matrix. Prior candidate acceptance does not cover new changed bytes. G2 re-review needs the full current systematic regressions and independent final-byte review.

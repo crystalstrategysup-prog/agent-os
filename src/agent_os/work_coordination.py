@@ -338,6 +338,10 @@ class Coordinator(CompletionMixin):
         *,
         origin="provider",
     ):
+        # Reject an activated extension before any external Library callback.
+        prior = self.read()
+        require("completion" not in prior, "VERSIONED_COMPLETION_MUTATION_REQUIRED")
+        self._owner(prior, actor)
         valid_id(notification_id)
         require(origin in {"provider", "reconciled"}, "INVALID_INPUT")
         with publisher_lock(self.root / "publisher.lock"):
@@ -390,6 +394,10 @@ class Coordinator(CompletionMixin):
             return notice
 
     def recover_notice(self, actor, work_id, library, principal, expected_revision):
+        # Reject an activated extension before any external Library callback.
+        prior = self.read()
+        require("completion" not in prior, "VERSIONED_COMPLETION_MUTATION_REQUIRED")
+        self._owner(prior, actor)
         s = self.read()
         self._owner(s, actor)
         require(work_id in s["work"], "INVALID_WORK")
@@ -409,6 +417,10 @@ class Coordinator(CompletionMixin):
     def review(
         self, actor, notification_id, review, library, principal, expected_revision
     ):
+        # Reject an activated extension before any external Library callback.
+        prior = self.read()
+        require("completion" not in prior, "VERSIONED_COMPLETION_MUTATION_REQUIRED")
+        self._owner(prior, actor)
         require(
             set(review)
             == {
@@ -599,6 +611,10 @@ class Coordinator(CompletionMixin):
             return s
 
     def checkpoint(self, actor, reason, expected_revision):
+        # Reject an activated extension before any external Library callback.
+        prior = self.read()
+        require("completion" not in prior, "VERSIONED_COMPLETION_MUTATION_REQUIRED")
+        self._owner(prior, actor)
         text(reason)
         with publisher_lock(self.root / "publisher.lock"):
             s = self.read()
@@ -622,6 +638,10 @@ class Coordinator(CompletionMixin):
             return s
 
     def begin_action(self, actor, action_id, expected_revision):
+        # Reject an activated extension before any external Library callback.
+        prior = self.read()
+        require("completion" not in prior, "VERSIONED_COMPLETION_DISPATCH_REQUIRED")
+        self._owner(prior, actor)
         with publisher_lock(self.root / "publisher.lock"):
             s = self.read()
             require('completion' not in s, 'VERSIONED_COMPLETION_DISPATCH_REQUIRED')
@@ -669,6 +689,10 @@ class Coordinator(CompletionMixin):
     def record_outcome(
         self, actor, action_id, library, principal, proof_ref, expected_revision
     ):
+        # Reject an activated extension before any external Library callback.
+        prior = self.read()
+        require("completion" not in prior, "VERSIONED_COMPLETION_MUTATION_REQUIRED")
+        self._owner(prior, actor)
         library._authorize(principal)
         proof = parse(library.store.get(proof_ref))
         require(
@@ -745,6 +769,10 @@ class Coordinator(CompletionMixin):
         summary,
         expected_revision,
     ):
+        # Reject an activated extension before any external Library callback.
+        prior = self.read()
+        require("completion" not in prior, "VERSIONED_COMPLETION_MUTATION_REQUIRED")
+        self._owner(prior, actor)
         text(summary)
         m = self._accepted(library, principal, handoff_id, manifest_ref)
         with publisher_lock(self.root / "publisher.lock"):

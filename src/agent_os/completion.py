@@ -346,9 +346,16 @@ class CompletionMixin:
     def _completion_store(self):
         return Store(self.root, "completion-evidence")
 
+    @staticmethod
+    def _completion_verified(result, code):
+        # Existing authenticated adapters raise on failure and return None.
+        # Boolean adapters may return True; explicit rejection or arbitrary
+        # truthy values must never count as authentication/authority evidence.
+        require(result is None or result is True, code)
+
     @contextmanager
     def _completion_transaction(
-        self, actor, expected_revision, checked_at, *, lease=True
+        self, actor, expected_revision, checked_at, *, lease=True, mode="control"
     ):
         clock(checked_at)
         with publisher_lock(self.root / "publisher.lock"):
@@ -363,7 +370,41 @@ class CompletionMixin:
             require(checked_at >= c["checked_at"], "CLOCK_REVERSED")
             if lease:
                 require(checked_at < c["lease_expires_at"], "OWNERSHIP_LEASE_EXPIRED")
+            require(
+                mode in {"control", "execution", "ledger", "audit", "recovery"},
+                "INVALID_MUTATION_CLASS",
+            )
+            if mode in {"control", "execution"}:
+                require(c["state"] not in TERMINAL, "TERMINAL_TASK")
+            if mode == "recovery":
+                require(c["state"] != "ACCEPTED", "TERMINAL_TASK")
+            if mode == "execution":
+                require(
+                    not c["policy"]["revoked"]
+                    and checked_at < c["policy"]["expires_at"]
+                    and c["policy"]["actor"] == actor,
+                    "POLICY_DENIED",
+                )
+            # Pure audit is mechanically separated from safety ledger resolution.
+            protected = copy.deepcopy(s) if mode == "audit" else None
             yield s, c
+            if protected is not None:
+
+                def execution_view(value):
+                    value = copy.deepcopy(value)
+                    for key in (
+                        "audit",
+                        "audit_archive_ref",
+                        "terminal_event_id_index",
+                        "late_ack_refs",
+                    ):
+                        value["completion"].pop(key, None)
+                    return value
+
+                require(
+                    execution_view(s) == execution_view(protected),
+                    "AUDIT_EXECUTION_MUTATION",
+                )
             require(c["state"] in STATES, "INVALID_PROJECT_STATE")
             require(
                 len(c["events"]) <= 1024
@@ -372,33 +413,53 @@ class CompletionMixin:
                 "SIZE_LIMIT",
             )
             c["checked_at"] = checked_at
-            c["state"], c["blocker"] = projection(c, checked_at)
-            c["audit"].append(
-                {
-                    "kind": "STATE_COMMIT",
-                    "revision": s["revision"] + 1,
-                    "generation": c["generation"],
-                    "ownership_epoch": c["ownership_epoch"],
-                    "project_state": c["state"],
-                    "at": checked_at,
-                }
-            )
-            if len(c["audit"]) > 512:
-                prior = c.get("audit_archive_ref")
-                c["audit_archive_ref"] = self._completion_store().put_json(
-                    {"previous": prior, "records": c["audit"][:256]}
+            if mode != "audit":
+                c["state"], c["blocker"] = projection(c, checked_at)
+            self._completion_commit_audit(c, s["revision"] + 1, checked_at)
+            if mode != "audit":
+                s["parent_state"] = (
+                    "completed"
+                    if c["state"] == "ACCEPTED"
+                    else "cancelled"
+                    if c["state"] == "CANCELLED"
+                    else "open"
                 )
-                c["audit"] = c["audit"][256:]
-            s["parent_state"] = (
-                "completed"
-                if c["state"] == "ACCEPTED"
-                else "cancelled"
-                if c["state"] == "CANCELLED"
-                else "open"
-            )
             s["revision"] += 1
             self._save(s)
             self._fault("after_completion_commit")
+
+    @staticmethod
+    def _completion_ledger_view(state):
+        value = copy.deepcopy(state)
+        for key in ("revision", "parent_state"):
+            value.pop(key, None)
+        for key in (
+            "operations",
+            "audit",
+            "audit_archive_ref",
+            "state",
+            "blocker",
+            "checked_at",
+        ):
+            value["completion"].pop(key, None)
+        return value
+
+    def _completion_commit_audit(self, c, revision, checked_at):
+        c["audit"].append(
+            {
+                "kind": "STATE_COMMIT",
+                "revision": revision,
+                "generation": c["generation"],
+                "ownership_epoch": c["ownership_epoch"],
+                "project_state": c["state"],
+                "at": checked_at,
+            }
+        )
+        if len(c["audit"]) > 512:
+            c["audit_archive_ref"] = self._completion_store().put_json(
+                {"previous": c.get("audit_archive_ref"), "records": c["audit"][:256]}
+            )
+            c["audit"] = c["audit"][256:]
 
     def activate_completion(
         self, actor, expected_revision, contract, policy, checked_at, *, dry_run=False
@@ -490,6 +551,7 @@ class CompletionMixin:
             _,
             c,
         ):
+            require(not c["policy"]["revoked"], "POLICY_REAUTHORIZATION_REQUIRED")
             if capabilities is not None:
                 require(
                     isinstance(capabilities, dict) and len(capabilities) <= 7,
@@ -596,7 +658,9 @@ class CompletionMixin:
             verify_authority("goals-opt-in", copy.deepcopy(request)) is True,
             "EXPLICIT_GOALS_OPT_IN_REQUIRED",
         )
-        with self._completion_transaction(actor, expected_revision, checked_at) as (
+        with self._completion_transaction(
+            actor, expected_revision, checked_at, mode="execution"
+        ) as (
             _,
             c,
         ):
@@ -686,7 +750,10 @@ class CompletionMixin:
         s = self.read()
         self._owner(s, actor)
         digest = sha(encoded(event))
-        consumed = s.get("completion", {}).get("event_id_index", {})
+        consumed = {
+            **s.get("completion", {}).get("event_id_index", {}),
+            **s.get("completion", {}).get("terminal_event_id_index", {}),
+        }
         if event["event_id"] in consumed:
             require(consumed[event["event_id"]] == digest, "EVENT_ID_CONFLICT")
             return self.completion_status(checked_at)
@@ -695,6 +762,15 @@ class CompletionMixin:
                 require(old["event"] == event, "EVENT_ID_CONFLICT")
                 return self.completion_status(checked_at)
         if s["completion"]["state"] in TERMINAL:
+            with self._completion_transaction(
+                actor, expected_revision, checked_at, mode="audit"
+            ) as (_, c):
+                index = c.setdefault("terminal_event_id_index", {})
+                require(len(index) < 256, "TERMINAL_EVENT_INDEX_LIMIT")
+                index[event["event_id"]] = digest
+                c["audit"].append(
+                    {"kind": "TERMINAL_EVENT_AUDIT_ONLY", "event": copy.deepcopy(event)}
+                )
             return self.completion_status(checked_at)
         with self._completion_transaction(actor, expected_revision, checked_at) as (
             _,
@@ -703,6 +779,13 @@ class CompletionMixin:
             actionable = (
                 event["generation"] == c["generation"]
                 and c["state"] not in TERMINAL
+                and (
+                    event["kind"] == "USER_CANCELLED"
+                    or (
+                        not c["policy"]["revoked"]
+                        and checked_at < c["policy"]["expires_at"]
+                    )
+                )
                 and (
                     event["causal_sequence"] > c["last_sequence"]
                     or event["kind"] == "USER_CANCELLED"
@@ -735,6 +818,9 @@ class CompletionMixin:
                 if kind == "USER_CANCELLED":
                     c["state"], c["blocker"] = "CANCELLED", "OWNER_CANCELLED"
                     c["cancel_fence"] += 1
+                    c["review"], c["delivery"] = None, "NOT_DELIVERED"
+                    if c["handoff"]:
+                        c["handoff"]["state"] = "CANCELLED"
                     for op in c["operations"]:
                         if op["state"] == "PREPARED":
                             op["state"] = "CANCELLED"
@@ -754,6 +840,14 @@ class CompletionMixin:
         return self.completion_status(checked_at)
 
     def completion_plan(self, actor, expected_revision, checked_at):
+        prior = self.read()
+        self._owner(prior, actor)
+        if prior["completion"]["state"] in TERMINAL:
+            return {
+                "status": prior["completion"]["state"],
+                "operation": None,
+                "reason": prior["completion"]["blocker"],
+            }
         with self._completion_transaction(actor, expected_revision, checked_at) as (
             _,
             c,
@@ -863,7 +957,9 @@ class CompletionMixin:
     def completion_begin_dispatch(
         self, actor, expected_revision, operation_id, checked_at
     ):
-        with self._completion_transaction(actor, expected_revision, checked_at) as (
+        with self._completion_transaction(
+            actor, expected_revision, checked_at, mode="execution"
+        ) as (
             _,
             c,
         ):
@@ -946,7 +1042,9 @@ class CompletionMixin:
         return copy.deepcopy(identity)
 
     def completion_receiver_admit(self, actor, expected_revision, identity, checked_at):
-        with self._completion_transaction(actor, expected_revision, checked_at) as (
+        with self._completion_transaction(
+            actor, expected_revision, checked_at, mode="execution"
+        ) as (
             _,
             c,
         ):
@@ -1007,7 +1105,9 @@ class CompletionMixin:
 
     def completion_wait(self, actor, expected_revision, checked_at, *, waiting_user):
         require(type(waiting_user) is bool, "INVALID_WAIT_STATE")
-        with self._completion_transaction(actor, expected_revision, checked_at) as (
+        with self._completion_transaction(
+            actor, expected_revision, checked_at, mode="execution"
+        ) as (
             _,
             c,
         ):
@@ -1031,7 +1131,9 @@ class CompletionMixin:
 
         process = None
         try:
-            with self._completion_transaction(actor, expected_revision, checked_at) as (
+            with self._completion_transaction(
+                actor, expected_revision, checked_at, mode="execution"
+            ) as (
                 s,
                 c,
             ):
@@ -1109,8 +1211,12 @@ class CompletionMixin:
         store = self._completion_store()
         review = store.json(review_ref)
         # Actual reviewer authentication/semantic observation is adapter-owned.
-        verify_reviewer(copy.deepcopy(review))
-        with self._completion_transaction(actor, expected_revision, checked_at) as (
+        self._completion_verified(
+            verify_reviewer(copy.deepcopy(review)), "AUTHENTICATED_REVIEWER_REQUIRED"
+        )
+        with self._completion_transaction(
+            actor, expected_revision, checked_at, mode="execution"
+        ) as (
             s,
             c,
         ):
@@ -1200,7 +1306,10 @@ class CompletionMixin:
         from .handoff import verify_completion_inventory
 
         require(callable(verify_authority), "CURRENT_HANDOFF_AUTHORITY_REQUIRED")
-        verify_authority("artifact_transfer", copy.deepcopy(envelope))
+        self._completion_verified(
+            verify_authority("artifact_transfer", copy.deepcopy(envelope)),
+            "CURRENT_HANDOFF_AUTHORITY_REQUIRED",
+        )
         require(
             isinstance(envelope, dict)
             and set(envelope)
@@ -1251,7 +1360,9 @@ class CompletionMixin:
             and 0 < len(envelope["next_step"]) <= 4000,
             "NEXT_STEP_REQUIRED",
         )
-        with self._completion_transaction(actor, expected_revision, checked_at) as (
+        with self._completion_transaction(
+            actor, expected_revision, checked_at, mode="execution"
+        ) as (
             _,
             c,
         ):
@@ -1296,7 +1407,9 @@ class CompletionMixin:
         return self.completion_status(checked_at)
 
     def completion_handoff_sent(self, actor, expected_revision, checked_at):
-        with self._completion_transaction(actor, expected_revision, checked_at) as (
+        with self._completion_transaction(
+            actor, expected_revision, checked_at, mode="execution"
+        ) as (
             _,
             c,
         ):
@@ -1364,9 +1477,25 @@ class CompletionMixin:
             and prior_handoff["state"] in {"ACKED", "ACK_VERIFIED_PENDING_TRANSFER"}
         ):
             return self.completion_status(checked_at)
+        late_key = sha(
+            encoded(
+                {k: ack.get(k) for k in ("handoff_id", "operation_id", "generation")}
+            )
+        )
+        known = prior["completion"].get("late_ack_refs", {}).get(late_key)
+        if known is not None:
+            require(known == ack_ref, "ACK_CONFLICT")
+            return self.completion_status(checked_at)
         # The actual receiver reads target bytes/checkout/dependencies via its route.
         receiver_evidence = verify_receiver(copy.deepcopy(ack))
-        with self._completion_transaction(actor, expected_revision, checked_at) as (
+        late = (
+            prior["completion"]["state"] in TERMINAL
+            or prior["completion"]["policy"]["revoked"]
+            or checked_at >= prior["completion"]["policy"]["expires_at"]
+        )
+        with self._completion_transaction(
+            actor, expected_revision, checked_at, mode="audit" if late else "execution"
+        ) as (
             _,
             c,
         ):
@@ -1377,9 +1506,27 @@ class CompletionMixin:
                 h["prepared_at"] <= received_at <= checked_at,
                 "ACK_TIME_OUTSIDE_HANDOFF",
             )
-            if c["state"] == "CANCELLED":
-                c["audit"].append({"kind": "LATE_ACK_AFTER_CANCEL", "ack_ref": ack_ref})
-                return {"status": "AUDIT_ONLY", "delivery_status": "NOT_DELIVERED"}
+            require(
+                all(
+                    ack.get(k) == e[k]
+                    for k in ("handoff_id", "operation_id", "task_id", "generation")
+                )
+                and ack.get("receiver_ref") == e["to_ref"],
+                "ACK_BINDING_MISMATCH",
+            )
+            if late:
+                index = c.setdefault("late_ack_refs", {})
+                require(len(index) < 256, "LATE_ACK_INDEX_LIMIT")
+                index[late_key] = copy.deepcopy(ack_ref)
+                c["audit"].append(
+                    {
+                        "kind": "LATE_ACK_AFTER_CANCEL"
+                        if c["state"] == "CANCELLED"
+                        else "LATE_ACK_AUDIT_ONLY",
+                        "ack_ref": ack_ref,
+                    }
+                )
+                return {"status": "AUDIT_ONLY", "delivery_status": c["delivery"]}
             require(c["state"] not in TERMINAL, "TERMINAL_TASK")
             require(h["state"] == "SENT_UNCONFIRMED", "HANDOFF_TRANSPORT_NOT_RECORDED")
             require(ack.get("status") in {"ACKED", "REJECTED"}, "INVALID_RECEIVER_ACK")
@@ -1454,8 +1601,13 @@ class CompletionMixin:
     ):
         store = self._completion_store()
         require(callable(verify_acceptance), "CURRENT_ACCEPTANCE_VERIFIER_REQUIRED")
-        verify_acceptance(copy.deepcopy(self.read()["completion"]))
-        with self._completion_transaction(actor, expected_revision, checked_at) as (
+        self._completion_verified(
+            verify_acceptance(copy.deepcopy(self.read()["completion"])),
+            "CURRENT_ACCEPTANCE_VERIFIER_REQUIRED",
+        )
+        with self._completion_transaction(
+            actor, expected_revision, checked_at, mode="execution"
+        ) as (
             s,
             c,
         ):
@@ -1509,7 +1661,10 @@ class CompletionMixin:
         self, actor, expected_revision, contract, checked_at, verify_authority
     ):
         require(callable(verify_authority), "CURRENT_CONTRACT_AUTHORITY_REQUIRED")
-        verify_authority("contract-change", copy.deepcopy(contract))
+        self._completion_verified(
+            verify_authority("contract-change", copy.deepcopy(contract)),
+            "CURRENT_CONTRACT_AUTHORITY_REQUIRED",
+        )
         with self._completion_transaction(actor, expected_revision, checked_at) as (
             s,
             c,
@@ -1554,9 +1709,10 @@ class CompletionMixin:
         valid_id(new_actor)
         store = self._completion_store()
         proof = store.json(proof_ref)
-        verify_target(
-            copy.deepcopy(proof)
-        )  # Authenticate target and current scope outside lock.
+        # Authenticate target and current scope outside lock.
+        self._completion_verified(
+            verify_target(copy.deepcopy(proof)), "CURRENT_TARGET_VERIFIER_REQUIRED"
+        )
         clock(checked_at)
         with publisher_lock(self.root / "publisher.lock"):
             s = self.read()
@@ -1668,6 +1824,7 @@ class CompletionMixin:
                 {"kind": "VERIFIED_TAKEOVER", "proof_ref": proof_ref, "at": checked_at}
             )
             c["state"], c["blocker"] = projection(c, checked_at)
+            self._completion_commit_audit(c, s["revision"] + 1, checked_at)
             s["revision"] += 1
             self._save(s)
         return self.completion_status(checked_at)
@@ -1753,7 +1910,9 @@ class CompletionMixin:
         require(
             shutil.disk_usage(store.root).free >= needed, "CHECKPOINT_SPACE_REQUIRED"
         )
-        with self._completion_transaction(actor, expected_revision, checked_at) as (
+        with self._completion_transaction(
+            actor, expected_revision, checked_at, mode="recovery"
+        ) as (
             _,
             c,
         ):
@@ -1801,7 +1960,16 @@ class CompletionMixin:
             "generation": state["completion"]["generation"],
             "ownership_epoch": state["completion"]["ownership_epoch"],
         }
-        reference = store.put_json(checkpoint)
+        with publisher_lock(self.root / "publisher.lock"):
+            current = self.read()
+            self._owner(current, actor)
+            self._cas(current, state["revision"])
+            require(
+                checked_at < current["completion"]["lease_expires_at"]
+                and current["completion"]["paused"],
+                "CHECKPOINT_OWNERSHIP_CHANGED",
+            )
+            reference = store.put_json(checkpoint)
         # Immediately read every captured byte; a saved pointer is not a verified backup.
         self.completion_verify_checkpoint(reference)
         return {
@@ -1987,7 +2155,9 @@ class CompletionMixin:
             },
             "INVALID_RESTORE_TARGET",
         )
-        with self._completion_transaction(actor, expected_revision, checked_at) as (
+        with self._completion_transaction(
+            actor, expected_revision, checked_at, mode="recovery"
+        ) as (
             _s,
             c,
         ):
@@ -2070,10 +2240,29 @@ class CompletionMixin:
         )
         from .result_gate import verify_completion_execution
 
-        with self._completion_transaction(actor, expected_revision, checked_at) as (
-            _,
+        prior = self.read()
+        self._owner(prior, actor)
+        old = next(
+            (
+                o
+                for o in prior["completion"]["operations"]
+                if o["operation_id"] == identity["operation_id"]
+            ),
+            None,
+        )
+        require(
+            old and old["identity"] == identity and old["admitted"],
+            "RESULT_IDENTITY_MISMATCH",
+        )
+        if old["result_ref"] == receipt_ref:
+            return self.completion_status(checked_at)
+        with self._completion_transaction(
+            actor, expected_revision, checked_at, mode="ledger"
+        ) as (
+            s,
             c,
         ):
+            protected = self._completion_ledger_view(s)
             op = next(
                 (
                     o
@@ -2100,6 +2289,10 @@ class CompletionMixin:
                 identity["generation"] == c["generation"]
                 and identity["ownership_epoch"] == c["ownership_epoch"]
                 and identity["cancel_fence"] == c["cancel_fence"]
+                and identity["policy_revision"] == c["policy"]["revision"]
+                and identity["policy_scope_hash"] == sha(encoded(c["policy"]["scope"]))
+                and not c["policy"]["revoked"]
+                and checked_at < c["policy"]["expires_at"]
                 and c["state"] not in TERMINAL
                 and all(identity[k] == c["contract"][k] for k in DEPENDENCIES)
             )
@@ -2139,6 +2332,11 @@ class CompletionMixin:
                         "operation_id": op["operation_id"],
                     }
                 )
+            if not current:
+                require(
+                    self._completion_ledger_view(s) == protected,
+                    "LATE_RESULT_EXECUTION_MUTATION",
+                )
         self._fault("after_completion_result_commit")
         return self.completion_status(checked_at)
 
@@ -2156,11 +2354,14 @@ class CompletionMixin:
             ),
             None,
         )
-        require(op and op["state"] == "UNKNOWN", "NO_UNKNOWN_OPERATION")
+        require(op and op["identity"], "NO_UNKNOWN_OPERATION")
         identity = copy.deepcopy(op["identity"])
         proof_ref = verify_operation(identity)  # External query outside the state lock.
         if proof_ref is None:
             return {"status": "UNKNOWN", "operation_id": operation_id}
+        if op.get("reconciliation_ref") == proof_ref:
+            return self.completion_status(checked_at)
+        require(op["state"] == "UNKNOWN", "RECONCILIATION_CONFLICT")
         proof = self._completion_store().json(proof_ref)
         require(
             proof.get("schema") == "agentos.completion-reconciliation/v1"
@@ -2218,15 +2419,19 @@ class CompletionMixin:
             },
             "INVALID_RECONCILIATION",
         )
-        with self._completion_transaction(actor, expected_revision, checked_at) as (
-            _,
+        with self._completion_transaction(
+            actor, expected_revision, checked_at, mode="ledger"
+        ) as (
+            s,
             c,
         ):
+            protected = self._completion_ledger_view(s)
             live = next(o for o in c["operations"] if o["operation_id"] == operation_id)
             require(
                 live["identity"] == identity and live["state"] == "UNKNOWN",
                 "RECONCILIATION_CONFLICT",
             )
+            live["reconciliation_ref"] = copy.deepcopy(proof_ref)
             c["audit"].append(
                 {"kind": "RECONCILIATION", "proof_ref": proof_ref, "at": checked_at}
             )
@@ -2249,6 +2454,10 @@ class CompletionMixin:
             elif proof["outcome"] == "COMPLETED" and proof["authoritative"] is True:
                 # A terminal operation fact is not a test result or goal acceptance.
                 live.update(state="RECONCILED", reconciliation_ref=proof_ref)
+            require(
+                self._completion_ledger_view(s) == protected,
+                "RECONCILIATION_EXECUTION_MUTATION",
+            )
         return self.completion_status(checked_at)
 
     def completion_status(self, checked_at):

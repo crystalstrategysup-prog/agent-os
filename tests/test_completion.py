@@ -210,7 +210,7 @@ def test_receiver_deduplicates_and_cancel_fences_old_sender(completion):
         ),
         NOW,
     )
-    with pytest.raises(HandoffError, match="EFFECT_FENCED"):
+    with pytest.raises(HandoffError, match="EFFECT_FENCED|TERMINAL_TASK"):
         co.completion_receiver_admit(OWNER, co.read()["revision"], ident, NOW)
     assert co.completion_status(NOW)["project_state"] == "CANCELLED"
     assert co.completion_status(NOW)["unknown_operations"] == [ident["operation_id"]]
@@ -377,7 +377,7 @@ def test_cancel_or_revoke_at_actual_spawn_boundary_has_zero_effect(completion, c
                 )
 
     co._fault = fault
-    with pytest.raises(HandoffError, match="EFFECT_FENCED|POLICY_DENIED"):
+    with pytest.raises(HandoffError, match="EFFECT_FENCED|POLICY_DENIED|TERMINAL_TASK"):
         runner.run(co, OWNER, NOW)
     op = co.read()["completion"]["operations"][0]
     assert op["state"] == "UNKNOWN" and not op.get("process")

@@ -648,36 +648,26 @@ def test_all_expired_owner_mutation_paths_are_fenced(completion, tmp_path):
         assert co.read() == before
 
 
-def test_cancel_index_has_one_reserved_slot_and_terminal_flood_is_read_only(completion):
+def test_cancel_index_has_one_reserved_slot_and_terminal_flood_is_bounded(completion):
     co, *_ = completion
     state = co.read()
-    state["completion"]["event_id_index"] = {
-        f"synthetic-{i}": "f" * 64 for i in range(4096)
-    }
+    state["completion"]["event_id_index"] = {f"synthetic-{i}": "f" * 64 for i in range(4096)}
     co._save(state)
-    co.completion_event(
-        OWNER,
-        co.read()["revision"],
-        event(
-            "USER_CANCELLED",
-            event_id="last-cancel",
-            payload={"reason": "owner cancel", "source_ref": "owner-demo"},
-        ),
-        NOW,
-    )
+    co.completion_event(OWNER, co.read()["revision"], event("USER_CANCELLED", event_id="last-cancel", payload={"reason":"owner cancel","source_ref":"owner-demo"}), NOW)
     before = co.read()
-    for i in range(20):
-        co.completion_event(
-            OWNER,
-            before["revision"],
-            event(
-                "USER_CANCELLED",
-                event_id=f"cancel-{i}",
-                payload={"reason": "owner cancel", "source_ref": "owner-demo"},
-            ),
-            NOW,
-        )
-    assert co.read() == before and len(before["completion"]["event_id_index"]) == 4097
+    for i in range(256):
+        co.completion_event(OWNER, co.read()["revision"], event("USER_CANCELLED", event_id=f"cancel-{i}", payload={"reason":"owner cancel","source_ref":"owner-demo"}), NOW)
+    after = co.read()
+    assert after["completion"]["cancel_fence"] == before["completion"]["cancel_fence"]
+    assert len(after["completion"]["event_id_index"]) == 4097
+    assert len(after["completion"]["terminal_event_id_index"]) == 256
+    with pytest.raises(HandoffError, match="TERMINAL_EVENT_INDEX_LIMIT"):
+        co.completion_event(OWNER, co.read()["revision"], event(event_id="terminal-overflow"), NOW)
+    co.completion_event(OWNER, 0, event("USER_CANCELLED", event_id="cancel-0", payload={"reason":"owner cancel","source_ref":"owner-demo"}), NOW+100)
+    assert co.read() == after
+    with pytest.raises(HandoffError, match="EVENT_ID_CONFLICT"):
+        co.completion_event(OWNER, 0, event("USER_CANCELLED", event_id="cancel-0", payload={"reason":"conflicting cancel","source_ref":"owner-demo"}), NOW)
+    assert co.read() == after
 
 
 def test_goals_policy_migration_preserves_deny_and_explicit_opt_in_scope(completion):

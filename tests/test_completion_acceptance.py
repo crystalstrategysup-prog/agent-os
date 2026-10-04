@@ -149,7 +149,12 @@ def test_end_to_end_three_real_steps_independent_review_receiver_bytes_acceptanc
     co.completion_handoff_sent(OWNER, co.read()["revision"], NOW)
     assert co.completion_status(NOW)["delivery_status"] == "NOT_DELIVERED"
     co.completion_ack(OWNER, co.read()["revision"], ref, NOW, verifier)
-    co.completion_accept(OWNER, co.read()["revision"], NOW, lambda c: verifier(ack))
+
+    def verify_acceptance(_):
+        verifier(ack)  # Independently read and verify the actual receiver bytes.
+        return True
+
+    co.completion_accept(OWNER, co.read()["revision"], NOW, verify_acceptance)
     assert co.completion_status(NOW)["project_state"] == "ACCEPTED"
     assert co.read()["parent_state"] == "completed"
     co.completion_event(OWNER, co.read()["revision"], event(seq=100), NOW + 1)

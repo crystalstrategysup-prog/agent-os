@@ -748,7 +748,7 @@
       "gate": "G3",
       "recipes": [
         "tests/test_completion_faults.py::test_waiting_user_health_flood_is_coalesced_and_cancel_wins",
-        "tests/test_completion_faults.py::test_cancel_index_has_one_reserved_slot_and_terminal_flood_is_read_only"
+        "tests/test_completion_faults.py::test_cancel_index_has_one_reserved_slot_and_terminal_flood_is_bounded"
       ],
       "status": "NOT_RUN",
       "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
@@ -890,5 +890,25 @@
       "evidence_note": "Recipe existence is not runtime evidence; actual final commit/build/host/review receipts are separate."
     }
   },
-  "support_scope": "Local POSIX registered start/resume argv only. T15 host Goal activation not qualified; T26/T34 policy safety mandatory. T29 synthetic decision is not real publication; T32 still requires independent final candidate review."
+  "support_scope": "Local POSIX registered start/resume argv only. T15 host Goal activation not qualified; T26/T34 policy safety mandatory. T29 synthetic decision is not real publication; T32 still requires independent final candidate review.",
+  "systemic_guard_regressions": {
+    "inventory": "docs/completion/MUTATION_SURFACES.json",
+    "suite": "tests/test_completion_mutation_matrix.py",
+    "properties": [
+      "current/stale owner",
+      "live/expired lease",
+      "cancelled/un-cancelled",
+      "revoked/unrevoked",
+      "duplicate/conflicting event",
+      "per-command replay CAS",
+      "ACK/result/reconciliation exact duplicate and conflict",
+      "initialization/passive export N/A dimensions",
+      "late dependency/policy evidence immutability",
+      "checkpoint post-capture ownership race",
+      "bounded terminal retention",
+      "explicit verifier rejection",
+      "reproducible mixed interleavings"
+    ],
+    "acceptance": "Independent review of final changed bytes and fresh full regressions required; prior candidate receipts remain historical."
+  }
 }
