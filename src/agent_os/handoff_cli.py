@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import argparse
 import base64
-import sys
 from pathlib import Path
 
 from .handoff import Library, local_principal
-from .handoff_store import bounded, parse
+from .handoff_store import HandoffError, bounded
+from .safeio import GateError, read_json_input
 
 
 def command(argv):
@@ -17,26 +17,38 @@ def command(argv):
     s = p.add_subparsers(dest="action", required=True)
     s.add_parser("init")
     build = s.add_parser("build")
-    build.add_argument("--input", required=True)
-    build.add_argument("--assets", required=True)
+    build.add_argument(
+        "--input", required=True, help="JSON document file, or - for stdin"
+    )
+    build.add_argument(
+        "--assets", required=True, help="JSON document file, or - for stdin"
+    )
     build.add_argument("--expected-revision")
     build.add_argument(
         "--profile", choices=["completion", "checkpoint"], default="completion"
     )
     validate = s.add_parser("validate")
-    validate.add_argument("--ref", required=True)
+    validate.add_argument(
+        "--ref", required=True, help="JSON document file, or - for stdin"
+    )
     validate.add_argument(
         "--profile", choices=["completion", "checkpoint"], default="completion"
     )
     publish = s.add_parser("publish")
-    publish.add_argument("--ref", required=True)
+    publish.add_argument(
+        "--ref", required=True, help="JSON document file, or - for stdin"
+    )
     publish.add_argument("--expected-generation", type=int, required=True)
     publish.add_argument("--idempotency-key", required=True)
     publish.add_argument(
         "--profile", choices=["completion", "checkpoint"], default="completion"
     )
     search = s.add_parser("search")
-    search.add_argument("--query", required=True)
+    search.add_argument(
+        "--query",
+        required=True,
+        help="JSON query document file, or - for stdin; not a JSON literal",
+    )
     search.add_argument("--cursor")
     for action in ["resolve", "restore", "evidence"]:
         parser = s.add_parser(action)
@@ -47,9 +59,13 @@ def command(argv):
         if action == "evidence":
             parser.add_argument("--evidence-id", required=True)
     rebuild = s.add_parser("rebuild")
-    rebuild.add_argument("--registry-ref", required=True)
+    rebuild.add_argument(
+        "--registry-ref", required=True, help="JSON document file, or - for stdin"
+    )
     repair = s.add_parser("publish-rebuild")
-    repair.add_argument("--ref", required=True)
+    repair.add_argument(
+        "--ref", required=True, help="JSON document file, or - for stdin"
+    )
     repair.add_argument("--expected-generation", type=int, required=True)
     reconcile = s.add_parser("reconcile")
     reconcile.add_argument("--idempotency-key", required=True)
@@ -57,20 +73,25 @@ def command(argv):
     retract.add_argument("--id", required=True)
     retract.add_argument("--reason", required=True)
     topics = s.add_parser("topics")
-    topics.add_argument("--input", required=True)
+    topics.add_argument(
+        "--input", required=True, help="JSON document file, or - for stdin"
+    )
     task = s.add_parser("task")
-    task.add_argument("--input", required=True)
+    task.add_argument(
+        "--input", required=True, help="JSON document file, or - for stdin"
+    )
     task.add_argument("--expected-revision", type=int, required=True)
     s.add_parser("retirement")
     args = p.parse_args(argv)
     principal = local_principal()
 
     def data(path):
-        return (
-            parse(sys.stdin.buffer.read(16 * 1024 * 1024 + 1))
-            if path == "-"
-            else parse(bounded(Path(path)))
-        )
+        # Caller documents are not immutable library objects. Never turn a
+        # malformed argument into a diagnosis of library corruption.
+        try:
+            return read_json_input(Path(path))
+        except (GateError, OSError, ValueError):
+            raise HandoffError("INVALID_JSON_INPUT") from None
 
     if args.action == "init":
         library = Library.create(args.root, principal)

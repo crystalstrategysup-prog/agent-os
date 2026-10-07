@@ -1,9 +1,9 @@
 # Release policy
 
-Current source candidate: `0.8.0rc1` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
-The current source proposes feature candidate `0.8.0rc1` on the verified 0.7.1 baseline. The candidate tag would be `v0.8.0rc1`; package, CLI, MCP and current documentation must agree. [Completion](COMPLETION.md) uses explicit activation, reviewed local support and protected recovery. No publication or target adoption is claimed. Earlier tags/assets remain immutable.
+The current source proposes feature candidate `0.8.0rc2` on the verified 0.7.1 baseline. The candidate tag would be `v0.8.0rc2`; package, CLI, MCP and current documentation must agree. [Completion](COMPLETION.md) uses explicit activation, reviewed local support and protected recovery. No publication or target adoption is claimed. Earlier tags/assets remain immutable.
 
 The release gate includes final diff review, current unit and integration checks, complete docs, reproducible source inventory, wheel hash, clean install in a fresh venv, privacy review, and an exact publication allowlist. Publish only public core and intended artifacts; never a mixed private handoff, user overlay, credential, host path or `.agentos/` runtime receipt. A prepared archive is not a published release.
 

@@ -1,3 +1,17 @@
+# 0.8.0rc2 — handoff scanner and CLI input correction
+
+- Preserve real credential rejection while recognizing a bounded Python dynamic
+  Bearer prefix and the complete JavaScript password/text input-type ternary.
+  No filename, vendor hash, media type or whole-file privacy exemption is used.
+- Library CLI JSON arguments are document paths or stdin. Invalid documents
+  return INVALID_JSON_INPUT; authenticated library integrity failures remain
+  distinct. Input parsing uses the existing bounded, duplicate-safe JSON reader.
+- Preserve terminal handoff, accepted registry, immutable assets, current
+  continuation and native-hooks-disabled contracts. No library rebuild or
+  historical acceptance rewrite is required by this source correction.
+- Publication, installed bytes and original project continuation require
+  separate current evidence. This version remains a release candidate.
+
 # 0.7.1 — guarded launch and context binding candidate
 
 - Qualify the existing executor, inherited model catalog and actual startup on

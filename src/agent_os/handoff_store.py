@@ -6,6 +6,7 @@ does not claim isolation from a malicious process with the same UID.
 
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 import os
@@ -85,17 +86,382 @@ def valid_id(value):
     return value
 
 
+_UNKNOWN_LITERAL = object()
+_SENSITIVE_FIELDS = {
+    "password",
+    "access_token",
+    "refresh_token",
+    "api_key",
+    "cookie",
+    "authorization",
+}
+
+
+def _literal_value(node, bindings, seen=frozenset(), depth=0, budget=None):
+    """Conservative static origin check; never execute source or resolve calls."""
+    if budget is None:
+        budget = [4096]
+    budget[0] -= 1
+    require(budget[0] >= 0, "SECRET_DETECTED")
+    if depth > 64:
+        return _UNKNOWN_LITERAL
+    if isinstance(node, ast.Name):
+        if node.id in seen:
+            return _UNKNOWN_LITERAL
+        for value in bindings.get(node.id, []):
+            found = _literal_value(value, bindings, seen | {node.id}, depth + 1, budget)
+            if found is not _UNKNOWN_LITERAL:
+                return found
+        return _UNKNOWN_LITERAL
+    if isinstance(node, ast.JoinedStr) and all(
+        isinstance(item, ast.Constant) and isinstance(item.value, str)
+        for item in node.values
+    ):
+        return "".join(item.value for item in node.values)
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
+        left = _literal_value(node.left, bindings, seen, depth + 1, budget)
+        right = _literal_value(node.right, bindings, seen, depth + 1, budget)
+        if isinstance(left, str) and isinstance(right, str):
+            require(len(left) + len(right) <= 2 * 1024 * 1024, "SECRET_DETECTED")
+            return left + right
+        return _UNKNOWN_LITERAL
+    if isinstance(node, ast.Subscript):
+        value = _literal_value(node.value, bindings, seen, depth + 1, budget)
+        key = _literal_value(node.slice, bindings, seen, depth + 1, budget)
+        if isinstance(value, dict) and isinstance(key, (str, int)):
+            return value.get(key, _UNKNOWN_LITERAL)
+        return _UNKNOWN_LITERAL
+    try:
+        return ast.literal_eval(node)
+    except (ValueError, TypeError, RecursionError):
+        return _UNKNOWN_LITERAL
+
+
+def _expression_path(node, depth=0):
+    if depth > 64:
+        return None
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        base = _expression_path(node.value, depth + 1)
+        return base + "." + node.attr if base else None
+    if isinstance(node, ast.Subscript) and isinstance(node.slice, ast.Constant):
+        base = _expression_path(node.value, depth + 1)
+        if base and isinstance(node.slice.value, (str, int)):
+            return base + "[" + repr(node.slice.value) + "]"
+    return None
+
+
+def _dynamic_credential_expression(
+    node,
+    bindings,
+    assigned_paths,
+    runtime_unpack,
+    seen=frozenset(),
+    depth=0,
+    budget=None,
+):
+    """Bounded lookup grammar; calls/literals and ambiguous local origins fail."""
+    if budget is None:
+        budget = [4096]
+    budget[0] -= 1
+    if budget[0] < 0 or depth > 64:
+        return False
+    if isinstance(node, ast.Name):
+        if node.id in seen:
+            return False
+        values = bindings.get(node.id, [])
+        if node.id in runtime_unpack:
+            return not values
+        return all(
+            _dynamic_credential_expression(
+                value,
+                bindings,
+                assigned_paths,
+                runtime_unpack,
+                seen | {node.id},
+                depth + 1,
+                budget,
+            )
+            for value in values
+        )
+    if isinstance(node, ast.Attribute):
+        return _expression_path(
+            node
+        ) not in assigned_paths and _dynamic_credential_expression(
+            node.value,
+            bindings,
+            assigned_paths,
+            runtime_unpack,
+            seen,
+            depth + 1,
+            budget,
+        )
+    if isinstance(node, ast.Subscript):
+        key = node.slice
+        return (
+            _expression_path(node) not in assigned_paths
+            and _dynamic_credential_expression(
+                node.value,
+                bindings,
+                assigned_paths,
+                runtime_unpack,
+                seen,
+                depth + 1,
+                budget,
+            )
+            and (
+                isinstance(key, ast.Name)
+                or isinstance(key, ast.Constant)
+                and isinstance(key.value, (str, int))
+            )
+        )
+    return False
+
+
+def _source_literal_spans(data: bytes) -> set[tuple[int, int]]:
+    """Prove two non-credential source forms, never exempt a file or field."""
+    spans = set()
+    # A type ternary contains the words password/text as input-type enums.
+    # Require the complete same-identifier conditional; mask only its operands.
+    identifier = rb"[A-Za-z_$][A-Za-z0-9_$]*"
+    enum = re.compile(
+        rb"\btype\s*:\s*(?P<name>"
+        + identifier
+        + rb")\s*&&\s*([\"'])password\2\s*===\s*(?P=name)\s*\?\s*"
+        + rb"(?P<choice>([\"'])password\4\s*:\s*([\"'])text\5)"
+        + rb"(?=\s*[,}])"
+    )
+    spans.update(match.span("choice") for match in enum.finditer(data))
+    # Python source must parse, and only the exact empty Bearer prefix in a
+    # dynamic dict value qualifies. Literal payloads anywhere in the RHS do not.
+    if len(data) > 2 * 1024 * 1024:
+        return spans
+    try:
+        tree = ast.parse(data)
+    except (SyntaxError, ValueError, UnicodeError, RecursionError):
+        return spans
+    lines = data.splitlines(keepends=True)
+    offsets = [0]
+    for line in lines:
+        offsets.append(offsets[-1] + len(line))
+    scopes = []
+    functions = {}
+    nodes = []
+    stack = [(tree, None)]
+    while stack:
+        node, scope = stack.pop()
+        if len(nodes) >= 100_000:
+            return spans
+        if isinstance(
+            node,
+            (
+                ast.Module,
+                ast.ClassDef,
+                ast.FunctionDef,
+                ast.AsyncFunctionDef,
+                ast.Lambda,
+            ),
+        ):
+            parent = scope
+            scope = {"parent": parent, "bindings": {}, "paths": set(), "unpack": {}}
+            scopes.append(scope)
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                functions.setdefault(node.name, []).append((node, scope))
+        nodes.append((node, scope))
+        stack.extend((child, scope) for child in ast.iter_child_nodes(node))
+        if isinstance(node, (ast.Assign, ast.AnnAssign, ast.NamedExpr, ast.AugAssign)):
+            targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+            for target in targets:
+                path = _expression_path(target)
+                if isinstance(target, ast.Name) and node.value is not None:
+                    scope["bindings"].setdefault(target.id, []).append(node.value)
+                elif path:
+                    scope["paths"].add(path)
+                elif isinstance(target, (ast.Tuple, ast.List)):
+                    for position, item in enumerate(target.elts):
+                        named = [
+                            child.id
+                            for child in ast.walk(item)
+                            if isinstance(child, ast.Name)
+                        ]
+                        if (
+                            isinstance(item, ast.Name)
+                            and isinstance(node.value, ast.Call)
+                            and isinstance(node.value.func, ast.Attribute)
+                        ):
+                            scope["unpack"].setdefault(item.id, []).append(
+                                (node.value, position)
+                            )
+                        else:
+                            for name in named:
+                                scope["bindings"].setdefault(name, []).append(
+                                    ast.Constant(value=None)
+                                )
+
+    def visible(scope, kind):
+        chain = []
+        while scope is not None:
+            require(len(chain) < 64, "SECRET_DETECTED")
+            chain.append(scope)
+            scope = scope["parent"]
+        result = {} if kind != "paths" else set()
+        for ancestor in reversed(chain):
+            if kind == "paths":
+                result.update(ancestor[kind])
+            else:
+                result.update(ancestor[kind])
+        return result
+
+    def local_output_safe(
+        expression, bindings, assigned_paths, seen=frozenset(), depth=0, budget=None
+    ):
+        if budget is None:
+            budget = [4096]
+        budget[0] -= 1
+        if budget[0] < 0 or depth > 64:
+            return False
+        if isinstance(expression, ast.Constant):
+            return not isinstance(expression.value, str)
+        if isinstance(expression, ast.Call):
+            # Only external method-call data remains opaque. Local callables,
+            # bare calls and literal receivers cannot certify a return origin.
+            return (
+                isinstance(expression.func, ast.Attribute)
+                and expression.func.attr not in functions
+                and _expression_path(expression.func) not in assigned_paths
+                and _expression_path(expression.func.value) is not None
+                and _dynamic_credential_expression(
+                    expression.func.value, bindings, assigned_paths, set()
+                )
+            )
+        if isinstance(expression, ast.Name):
+            if expression.id in seen:
+                return False
+            return all(
+                local_output_safe(
+                    value,
+                    bindings,
+                    assigned_paths,
+                    seen | {expression.id},
+                    depth + 1,
+                    budget,
+                )
+                for value in bindings.get(expression.id, [])
+            )
+        if isinstance(expression, (ast.Attribute, ast.Subscript)):
+            return _expression_path(
+                expression
+            ) not in assigned_paths and local_output_safe(
+                expression.value, bindings, assigned_paths, seen, depth + 1, budget
+            )
+        return all(
+            local_output_safe(child, bindings, assigned_paths, seen, depth + 1, budget)
+            for child in ast.iter_child_nodes(expression)
+        )
+
+    for scope in scopes:
+        bindings = visible(scope, "bindings")
+        assigned_paths = visible(scope, "paths")
+        runtime_unpack = set()
+        for name, calls in scope["unpack"].items():
+            safe = True
+            for call, position in calls:
+                if _expression_path(call.func) in assigned_paths:
+                    safe = False
+                for function, function_scope in functions.get(call.func.attr, []):
+                    outputs = [
+                        item
+                        for item in ast.walk(function)
+                        if isinstance(item, (ast.Return, ast.Yield, ast.YieldFrom))
+                        and item.value is not None
+                    ]
+                    if not outputs:
+                        safe = False
+                    for item in outputs:
+                        expression = item.value
+                        if isinstance(item, ast.Return) and isinstance(
+                            expression, (ast.Tuple, ast.List)
+                        ):
+                            if position >= len(expression.elts):
+                                safe = False
+                                continue
+                            expression = expression.elts[position]
+                        if not local_output_safe(
+                            expression,
+                            visible(function_scope, "bindings"),
+                            visible(function_scope, "paths"),
+                        ):
+                            safe = False
+            if safe:
+                runtime_unpack.add(name)
+            else:
+                scope["bindings"].setdefault(name, []).append(ast.Constant(value=None))
+        scope["runtime_unpack"] = runtime_unpack
+    for node, scope in nodes:
+        bindings = visible(scope, "bindings")
+        assigned_paths = visible(scope, "paths")
+        runtime_unpack = scope["runtime_unpack"]
+        if not isinstance(node, ast.Dict):
+            continue
+        for key, value in zip(node.keys, node.values):
+            if (
+                isinstance(key, ast.Constant)
+                and isinstance(key.value, str)
+                and key.value.casefold() in _SENSITIVE_FIELDS
+            ):
+                literal = _literal_value(value, bindings)
+                require(not isinstance(literal, str) or not literal, "SECRET_DETECTED")
+            if not (
+                isinstance(key, ast.Constant)
+                and isinstance(key.value, str)
+                and key.value.casefold() == "authorization"
+                and isinstance(value, ast.BinOp)
+                and isinstance(value.op, ast.Add)
+                and isinstance(value.left, ast.Constant)
+                and value.left.value == "Bearer "
+                and _dynamic_credential_expression(
+                    value.right, bindings, assigned_paths, runtime_unpack
+                )
+            ):
+                continue
+            left = value.left
+            spans.add(
+                (
+                    offsets[left.lineno - 1] + left.col_offset,
+                    offsets[left.end_lineno - 1] + left.end_col_offset,
+                )
+            )
+    return spans
+
+
 def scan_secrets(data: bytes):
-    # Known sensitive fields and recognizable keys are refused, without echoing
-    # the data. Classification/ACL and semantic review remain independent.
+    # Recognizable keys always scan the original bytes, including source forms.
     patterns = [
         rb"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----",
         rb"\b(?:sk-[A-Za-z0-9_-]{20,}|AKIA[A-Z0-9]{16}|ghp_[A-Za-z0-9]{30,})",
-        rb'(?i)["\'](?:password|access_token|refresh_token|api_key|cookie|authorization)["\']\s*[:=]\s*["\'][^"\']+["\']',
     ]
     require(
         not any(re.search(pattern, data) for pattern in patterns), "SECRET_DETECTED"
     )
+    field = re.compile(
+        rb'(?i)["\'](?:password|access_token|refresh_token|api_key|cookie|authorization)["\']\s*[:=]\s*(?:\(\s*)*(?P<value>["\'][^"\']+["\'])'
+    )
+    findings = list(field.finditer(data))
+    if not findings and not re.search(
+        rb'(?i)["\'](?:password|access_token|refresh_token|api_key|cookie|authorization)["\']',
+        data,
+    ):
+        return
+    spans = _source_literal_spans(data)
+    for match in findings:
+        # Dynamic Bearer spans cover only the matched value, not the key. The
+        # proven UI ternary covers the entire false field-shaped match.
+        value_start = match.start("value")
+        require(
+            any(start <= value_start and match.end() <= end for start, end in spans),
+            "SECRET_DETECTED",
+        )
 
 
 def sync_directory(path: Path):

@@ -1,13 +1,13 @@
 # AgentOS documentation
 
-Current source candidate: `0.8.0rc1` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
-## 0.8.0rc1 public source candidate
+## 0.8.0rc2 public source candidate
 
 Stable 0.7.1 carries the reviewed indexed results, coordinator and model-policy source contracts. Live adoption and physical session cleanup are separate/unimplemented boundaries. See [indexed handoff](INDEXED_HANDOFF.md).
 
-The public source declares `0.8.0rc1`; publication, installation and target verification remain separate. Ordinary questions and read-only work need
+The public source declares `0.8.0rc2`; publication, installation and target verification remain separate. Ordinary questions and read-only work need
 no project intake; real project changes follow a documentation-first stage.
 Native AgentOS hooks are excluded. Check publication and installation with
 separate readback.

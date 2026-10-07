@@ -1,6 +1,6 @@
 {
   "schema": "agentos.completion-traceability/v1",
-  "version": "0.8.0rc1",
+  "version": "0.8.0rc2",
   "original_spec_sha256": "91efdac60531afc3000585bd714f97d005441d07399e5a68a3ce96e01a860c11",
   "requirements": {
     "R01": {

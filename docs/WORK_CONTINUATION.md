@@ -1,6 +1,6 @@
 # Completed stages and unfinished projects
 
-Current source candidate: `0.8.0rc1` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
 A CLOSED result proves one local stage, not completion of the whole project or

@@ -1,12 +1,35 @@
 # Indexed results and verified terminal handoff
 
-Current source candidate: `0.8.0rc1` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
 Stable source `0.7.1`. This POSIX local adapter implements the provider-neutral
 format; live installation, coordinator adoption and external publication require
 their own evidence. Private library objects and project receipts are not public
 package inputs. No hooks, credentials or policy changes are required.
+
+## Source literals and CLI input documents
+
+The secret scanner always rejects recognizable key/private-key patterns in the
+original bytes. It exempts only a proven empty Python Bearer prefix inside a
+parsed dynamic dict expression, and the complete JavaScript input-type ternary
+whose branches are the password/text enums. Static payloads and ambiguous syntax
+remain refused within the bounded lookup grammar. Direct calls, conflicting local
+assignments and unknown local expressions fail closed. Opaque runtime tuple
+method-call outputs are supported; their arbitrary execution/data flow is not
+interpreted or certified. This heuristic is defense in depth, not a semantic
+security audit.
+No filename, vendor hash or whole-file exemption grants trust.
+
+Library CLI input options such as `search --query` take a regular JSON document
+file or `-` for stdin. They do not accept an inline JSON string. The existing
+4 MiB JSON input reader refuses symlinks, duplicate keys and nonobject JSON;
+malformed caller input returns `INVALID_JSON_INPUT` without echoing the payload.
+Errors from authenticated library reads retain their existing integrity codes.
+
+For example, pipe a document with `filters.entity_id` to
+`agentos library --root OWNER_LIBRARY search --query -`. An empty result means
+no matching accepted handoff; it does not prove library corruption.
 
 ## Owner library and entry protocol
 

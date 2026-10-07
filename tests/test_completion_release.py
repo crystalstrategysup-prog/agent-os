@@ -37,7 +37,7 @@ def release(tmp_path):
         "phase": "PREPUBLISH",
         "candidate": {
             **deps,
-            "version": "0.8.0rc1",
+            "version": "0.8.0rc2",
             "target": "public-demo",
             "artifact_ref": store.put(artifact),
         },
@@ -87,7 +87,7 @@ def test_postpublish_requires_independent_retrieved_bytes_and_install(release):
     install = store.put_json(
         {
             "status": "PASS",
-            "version": "0.8.0rc1",
+            "version": "0.8.0rc2",
             "build_hash": deps["build_hash"],
             "evidence_refs": [store.put(b"fixture installed runtime readback")],
         }
@@ -95,7 +95,7 @@ def test_postpublish_requires_independent_retrieved_bytes_and_install(release):
     proof = {
         "schema": "agentos.completion-publication/v1",
         "target": "public-demo",
-        "version": "0.8.0rc1",
+        "version": "0.8.0rc2",
         "build_hash": deps["build_hash"],
         "checked_at": 100,
         "retrieved_artifact_ref": s["candidate"]["artifact_ref"],

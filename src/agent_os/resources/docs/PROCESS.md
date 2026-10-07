@@ -1,13 +1,13 @@
 # Process: direct reading, documented changes
 
-Current source candidate: `0.8.0rc1` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
 ## Historical indexed handoff successor0.7.0rc1
 
 Every new/resumed mutable entry requires an accepted library handoff before CLOSED/CHECKPOINT. Checkpoints record unfinished work; legacy closed history is preserved. See [indexed handoff](INDEXED_HANDOFF.md).
 
-This describes the candidate `0.8.0rc1` foundation. Native AgentOS hooks are excluded: do not
+This describes the candidate `0.8.0rc2` foundation. Native AgentOS hooks are excluded: do not
 create, enable, trust again, or restore them during rollback. Older F01–F08
 stages are historical evidence, not permission to reintroduce prompt interception
 or a Stop hook.

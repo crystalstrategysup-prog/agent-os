@@ -1,6 +1,6 @@
 # Find the current handoff
 
-Current source candidate: `0.8.0rc1` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
 ## Historical: Indexed handoff successor0.7.0rc1

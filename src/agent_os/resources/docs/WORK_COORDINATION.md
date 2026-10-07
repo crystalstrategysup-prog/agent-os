@@ -1,6 +1,6 @@
 # Main coordinator knowledge and execution contract
 
-Current source candidate: `0.8.0rc1` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
 Contract: `agentos.work-coordination/v1`, knowledge revision `1.1.1`.

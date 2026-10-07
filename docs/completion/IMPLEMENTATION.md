@@ -109,7 +109,7 @@ No automatic installation into the owner's managed pointer. Candidate update exe
 Crash recovery reloads the atomic HEAD; pending intent remains owned, unknown effects require reconciliation, cancellation and expired authority remain effective. Reinitialization increments generation/epoch only after checkpoint, policy and safe takeover verification.
 
 ## Versions
-Predecessor 0.7.1; this source candidate is 0.8.0rc1. No publication or installed owner runtime is claimed.
+Predecessor 0.7.1; this source candidate is 0.8.0rc2. No publication or installed owner runtime is claimed.
 
 ## Contents
 Public core, mirrored public docs/contracts, preserved sanitized specification and synthetic tests. No working state or private operational receipts in candidate.

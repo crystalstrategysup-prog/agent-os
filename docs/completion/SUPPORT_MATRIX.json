@@ -1,6 +1,6 @@
 {
   "schema": "agentos.completion-support-matrix/v1",
-  "version": "0.8.0rc1",
+  "version": "0.8.0rc2",
   "adapter": "local-completion/v1",
   "state_backend": "existing Coordinator POSIX immutable snapshot and atomic HEAD",
   "operations": {

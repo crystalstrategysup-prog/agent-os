@@ -1,6 +1,6 @@
 # Interfaces and compatibility
 
-Current source candidate: `0.8.0rc1` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
 ## Historical: Indexed handoff successor0.7.0rc1
@@ -13,7 +13,7 @@ and the packaged schemas under `src/agent_os/resources/schemas/`. Tests compare
 MCP `inputSchema` and `outputSchema` with `tools/list` and returned
 `structuredContent`, and task/event schemas with actual local lifecycle records.
 
-CLI, Python, and MCP report candidate version `0.8.0rc1`; the RC1 background in this
+CLI, Python, and MCP report candidate version `0.8.0rc2`; the RC1 background in this
 document is historical. The stdio MCP protocol version is `2025-06-18`. There is no HTTP API or OpenAPI specification. Project events are
 local JSONL with JSON Schema, not AsyncAPI.
 

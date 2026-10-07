@@ -1,46 +1,46 @@
 {
-  "core_version": "0.8.0rc1",
+  "core_version": "0.8.0rc2",
   "documents": [
     {
       "id": "work_coordination",
       "path": "WORK_COORDINATION.md",
-      "sha256": "141946aca8e91df67ae9ca7ba023fe17b602fb6a26692d0157b45f8f1d26a17e",
+      "sha256": "6652270b28418e85da8e373713b54b7824a4665c84ff34375f22d527a3e9f2af",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "process",
       "path": "PROCESS.md",
-      "sha256": "dcb03e73814906f3e5e1de62dd54af44a48cd7cb5f4c65f9eb3e25e6d97f7ff9",
+      "sha256": "ee588fe3b7a4a75d36262126d216c7806a699eb1ed7ca2f6e938efeb309be4fd",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "work_continuation",
       "path": "WORK_CONTINUATION.md",
-      "sha256": "a7134764f39295689249fd1850f4816a7380533a8f9fc7a149273a31eb3fd20a",
+      "sha256": "c4e1d083f4e182f1a3e52d0485c060e3931aa982b7cca32d095b6dfcc5dea113",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "indexed_handoff",
       "path": "INDEXED_HANDOFF.md",
-      "sha256": "dc71ddc85361f9f353e58c590559bd6a5aefde141d3d5e055ee681cee0c84193",
+      "sha256": "9ed0fe3133d98d8647bdcf6a509a8f7d7438b3e30a21add1e0731ed148c8180a",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "foundation_overlay",
       "path": "FOUNDATION_OVERLAY.md",
-      "sha256": "dae3e3b3789c7c3b025c519aa0ae0fbcea3592c94a3a35c4293b67ca871fcf2e",
+      "sha256": "39ce90646f2013d675d31891b16cc21f8357394f5d714e3e2b2937743fedc892",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "quality",
       "path": "QUALITY.md",
-      "sha256": "d2394695772e02b960260b35407d8741650e428342114441743ec626addf3b25",
+      "sha256": "846fb2e3e6a61a56e51c9a8d4bd2a711be487c59a41df1cf417310cbdda7ab66",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "handoff_discovery",
       "path": "HANDOFF_DISCOVERY.md",
-      "sha256": "47e951614d424e0e3356bcdc9b55830d365cae14b4b9f1a94fdb9b0fe5fab974",
+      "sha256": "190b6862c3a1a77325099a4af4082b75d9753204dedbf9b49337ff30fb59bd8f",
       "status": "SOURCE_CONTRACT"
     },
     {
@@ -74,7 +74,7 @@
       "status": "SOURCE_CONTRACT"
     }
   ],
-  "knowledge_version": "1.3.0",
+  "knowledge_version": "1.3.1",
   "live_adoption_proven": false,
   "profile_authority": false,
   "reading": "Resolve only these relative names against this index directory; verify exact bytes before relying on relevant facts. No automatic history, profile dereference or system instruction change.",
