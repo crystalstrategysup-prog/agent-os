@@ -1,5 +1,10 @@
 # Indexed results and verified terminal handoff
 
+Source inventory and terminal archives share the versioned generated-cache
+classification described in [SOURCE_ARCHIVES.md](SOURCE_ARCHIVES.md). Recognized
+cache omission is not a scanner exemption. Canonical conflicts fail closed;
+historical refused payloads and receipts are never rewritten or replayed.
+
 Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
@@ -142,3 +147,20 @@ Session deletion remains excluded.
 Every `embedded` dependency must name `asset_id` and exact scoped `ref` of an embedded deliverable or evidence asset. A caller can derive the ref with `library.store.reference(bytes, media_type)` before building; build writes and validates the actual asset. An embedded label alone, missing asset, unavailable preservation, wrong ref/scope/size or corrupt object refuses acceptance. Restore reports a dependency missing until its matching asset bytes have actually been verified and restored. Old unbound embedded labels remain readable as PARTIAL, never COMPLETE. The schema condition requires both binding fields only for embedded dependencies.
 
 Approved tracked directory aliases are captured as typed JSON metadata at separate `source-links/` paths. No alias is followed or reconstructed. Exact original path/target/Git metadata is preserved; a required unknown `source-link:` dependency and `not_restored` entry make recovery PARTIAL/external_required. Capture and journal retries recheck the same admitted link/index identities, source snapshot and document hashes before publication. Generic path guards remain strict.
+
+
+## Owner-local bounded failure metadata successor
+
+See [HANDOFF_FAILURE_DIAGNOSTICS.md](HANDOFF_FAILURE_DIAGNOSTICS.md) for additive
+rc2006 safe failure metadata and the read-only `project handoff-diagnostic` route.
+Original scanner/acceptance/terminal error semantics are preserved. Missing old
+metadata remains unavailable; no scan, capture, retry or guard waiver is implied.
+
+
+## Nonaccepting workflow recovery
+
+An explicit owner-attested protective-refusal disposition is separately described
+in [REFUSAL_RECOVERY.md](REFUSAL_RECOVERY.md). It is not accepted handoff or
+checkpoint; RECOVERY_REQUIRED blocks oldREADY. Separate guarded A/B then ordinary
+fullanswers C admission do not authorize source capture or real effect replay.
+Normal terminal handoff acceptance remains mandatory; no metadata reader unblocks it.

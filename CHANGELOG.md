@@ -1,5 +1,11 @@
 # 0.8.0rc2 — handoff scanner and CLI input correction
 
+## 0.8.0rc2033 source publication candidate
+
+- Publish the exact managed distribution source for review, retaining package file hashes.
+- Add agent improvement policy and PR template for bug fixes, performance, quality, loops and bottlenecks.
+- This branch is not a merged release or full FE/CE/platform acceptance.
+
 - Preserve real credential rejection while recognizing a bounded Python dynamic
   Bearer prefix and the complete JavaScript password/text input-type ternary.
   No filename, vendor hash, media type or whole-file privacy exemption is used.

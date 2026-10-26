@@ -1,0 +1,300 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "atlas.project.schema.json",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "atlas.project/v1",
+      "type": "string"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "pattern": "[A-Za-z0-9][A-Za-z0-9_.:@-]{0,99}"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20000
+    },
+    "scope_note": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20000
+    },
+    "authority_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20000
+    },
+    "writer": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "native",
+        "projection"
+      ]
+    },
+    "source_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20000
+    },
+    "documents": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8388608
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "bytes"
+      ],
+      "additionalProperties": false
+    },
+    "work_files": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1000
+      },
+      "minItems": 1,
+      "maxItems": 1000
+    },
+    "coverage": {
+      "type": "object",
+      "properties": {
+        "inventory": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1000
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "[0-9a-f]{64}",
+              "minLength": 64,
+              "maxLength": 64
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 8388608
+            }
+          },
+          "required": [
+            "path",
+            "sha256",
+            "bytes"
+          ],
+          "additionalProperties": false
+        },
+        "bindings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "domain_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100,
+                "pattern": "[A-Za-z0-9][A-Za-z0-9_.:@-]{0,99}"
+              },
+              "item_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100,
+                "pattern": "[A-Za-z0-9][A-Za-z0-9_.:@-]{0,99}"
+              },
+              "entity_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100,
+                  "pattern": "[A-Za-z0-9][A-Za-z0-9_.:@-]{0,99}"
+                },
+                "minItems": 0,
+                "maxItems": 2000
+              },
+              "work_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100,
+                  "pattern": "[A-Za-z0-9][A-Za-z0-9_.:@-]{0,99}"
+                },
+                "minItems": 0,
+                "maxItems": 2000
+              }
+            },
+            "required": [
+              "domain_id",
+              "item_id",
+              "entity_ids",
+              "work_ids"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 4000
+        }
+      },
+      "required": [
+        "inventory",
+        "bindings"
+      ],
+      "additionalProperties": false
+    },
+    "matrix_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "[A-Za-z0-9][A-Za-z0-9_.:@-]{0,99}"
+          },
+          "at": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "source_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "FULL_MATRIX",
+              "REFS_ONLY"
+            ]
+          },
+          "file": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "[0-9a-f]{64}",
+                "minLength": 64,
+                "maxLength": 64
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8388608
+              }
+            },
+            "required": [
+              "path",
+              "sha256",
+              "bytes"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "at",
+          "source_ref",
+          "kind",
+          "file"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 2000
+    },
+    "projection_archive": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "type": "string",
+          "const": "atlas.projection-archive/v1"
+        },
+        "output": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "previous_release": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "[A-Za-z0-9][A-Za-z0-9_.:@-]{0,99}"
+        },
+        "previous_manifest_sha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "[0-9a-f]{64}"
+        },
+        "matrix_history_total": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "schema",
+        "output",
+        "previous_release",
+        "previous_manifest_sha256",
+        "matrix_history_total"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema",
+    "id",
+    "title",
+    "objective",
+    "scope_note",
+    "authority_ref",
+    "writer",
+    "mode",
+    "source_ref",
+    "documents",
+    "work_files"
+  ],
+  "additionalProperties": false
+}

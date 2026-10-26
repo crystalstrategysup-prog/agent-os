@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "reviewer",
+    "summary",
+    "next_step",
+    "limitations",
+    "scope_reviewed",
+    "accepted_criteria",
+    "reviewed_documents",
+    "deployment_status"
+  ],
+  "properties": {
+    "reviewer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "next_step": {
+      "type": "string",
+      "minLength": 1
+    },
+    "limitations": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope_reviewed": {
+      "const": true
+    },
+    "accepted_criteria": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "reviewed_documents": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "dossier",
+          "roadmap",
+          "stage",
+          "quality",
+          "architecture",
+          "requirements",
+          "contracts",
+          "http-api",
+          "events",
+          "data",
+          "security",
+          "privacy",
+          "operations",
+          "release",
+          "onboarding",
+          "ux",
+          "model-card",
+          "safety",
+          "incident"
+        ]
+      }
+    },
+    "deployment_status": {
+      "enum": [
+        "not_requested",
+        "pending_target_verification"
+      ]
+    }
+  }
+}

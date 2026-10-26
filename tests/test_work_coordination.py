@@ -7,6 +7,7 @@ import hashlib
 import json
 import subprocess
 import sys
+from dataclasses import asdict, replace
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -23,7 +24,11 @@ from agent_os.handoff import Library, local_principal
 from agent_os.handoff_lifecycle import TOPICS
 from agent_os.handoff_store import HandoffError
 from agent_os.safeio import GateError, atomic_json, filemap
-from agent_os.work_coordination import Coordinator
+from agent_os.work_coordination import (
+    Coordinator,
+    NativeSessionObservation,
+    native_session_next_action,
+)
 
 setup = foundation_setup
 
@@ -110,7 +115,7 @@ def test_generic_index_pins_contract_and_inherited_documents():
     index = json.loads(src.read_text())
     assert index["status"] == "PUBLIC_RELEASE_CANDIDATE_NOT_ADOPTED"
     assert index["core_version"] == "0.8.0rc2"
-    assert index["knowledge_version"] == "1.3.1"
+    assert index["knowledge_version"] == "1.3.3"
     assert index["role_id"] == "main-coordinator"
     for item in index["documents"]:
         assert Path(item["path"]).name == item["path"]
@@ -1025,3 +1030,240 @@ def test_legacy_completed_rows_without_acceptance_binding_fail_closed(registry):
             co.read()["revision"],
         )
     assert filemap(co.root) == before and co.status()["parent_state"] == "open"
+
+
+NATIVE_TIME = "2026-01-01T12:00:00+00:00"
+
+
+def native_observation(**changes):
+    return replace(
+        NativeSessionObservation(
+            work_id="work:fixture", session_id="session:worker",
+            observed_at=NATIVE_TIME, evidence_ref="native:observation",
+            activity="completed", work_authority="current",
+            message_authority="current",
+        ),
+        **changes,
+    )
+
+
+def native_decision(observation):
+    before = asdict(observation)
+    decision = native_session_next_action(observation, checked_at=NATIVE_TIME)
+    assert asdict(observation) == before
+    assert decision.original_goal_state == "OPEN"
+    assert decision.delegator_responsible and decision.preserve_final
+    assert not decision.effects_performed and not decision.authority_granted
+    return decision
+
+
+def test_native_complete_return_separates_preparation_attempt_receipt_and_review():
+    o = native_observation()
+    assert native_decision(o).action == "request-result"
+    o = replace(o, result_stage="prepared", result_ref="result:revision-1")
+    assert native_decision(o).action == "save-final"
+    o = replace(o, final_ref="final:revision-1")
+    assert native_decision(o).action == "return-result"
+    o = replace(o, result_stage="send_unknown")
+    assert native_decision(o).action == "reconcile-report"
+    o = replace(o, result_stage="received", receipt_ref="receipt:exact-result")
+    assert native_decision(o).action == "review-result"
+    o = replace(o, result_stage="reviewed", review_ref="review:exact-result")
+    assert native_decision(o).action == "report-review"
+
+
+def test_native_delegated_wait_receive_review_return_preserves_real_parent(registry):
+    co, lib = registry
+    snapshot = co.read()
+    assert native_decision(native_observation(activity="active")).action == "wait"
+    assert co.read() == snapshot  # Planner cannot change the existing ledger.
+    notice = receive_first(co, lib)
+    o = native_observation(
+        result_stage="received", result_ref=notice["manifest_ref"]["locator"],
+        receipt_ref=notice["notification_id"], final_ref="final:producer",
+    )
+    assert native_decision(o).action == "review-result"
+    assert co.status()["unreviewed_notices"] == [notice["notification_id"]]
+    s = co.review(P, notice["notification_id"], checked_review(), lib, P, co.read()["revision"])
+    assert s["parent_state"] == "open"
+    assert s["work"]["second"]["state"] == "planned"
+    assert native_decision(replace(o, result_stage="reviewed", review_ref="review:recorded")).action == "report-review"
+    assert co.read() == s
+
+
+def test_native_blocked_child_returns_checkpoint_without_stopping_independent_work(registry):
+    co, lib = registry
+    original = co.read()
+    assert native_decision(native_observation(activity="blocked")).action == "request-checkpoint"
+    o = native_observation(activity="blocked", result_stage="prepared",
+                           result_ref="result:blocker", final_ref="final:blocker")
+    assert native_decision(o).action == "return-result"
+    assert co.read() == original
+    assert co.read()["parent_state"] == "open"
+    # The real ledger's independent-work guard is covered separately by
+    # test_blocker_cannot_suspend_ready_independent_work, not a planner label.
+
+
+@pytest.mark.parametrize("activity", ["idle", "completed", "blocked"])
+def test_native_missing_reply_has_finite_wait_request_budget(activity):
+    o = native_observation(activity=activity)
+    assert native_decision(o).action in {"request-result", "request-checkpoint"}
+    assert native_decision(replace(o, requests=1)).action == "wait"
+    assert native_decision(replace(o, requests=1, waits=1)).action == "wait"
+    exhausted = native_decision(replace(o, requests=1, waits=2))
+    assert exhausted.action == "owned-checkpoint"
+    assert exhausted.next_owner == "coordinator"
+    assert native_decision(replace(o, waits=2)).action == "owned-checkpoint"
+
+
+@pytest.mark.parametrize("requests", [0, 1])
+def test_native_busy_never_receives_redundant_continuation(requests):
+    o = native_observation(activity="active", requests=requests)
+    assert native_decision(o).action == "wait"
+    assert native_decision(replace(o, waits=2)).action == "owned-checkpoint"
+
+
+@pytest.mark.parametrize("flag", ["input_unknown", "effect_unknown"])
+def test_native_unknown_never_replays_worker_input(flag):
+    o = native_observation(activity="idle", **{flag: True})
+    assert native_decision(o).action == "reconcile-operation"
+    assert native_decision(replace(o, waits=2)).action == "owned-checkpoint"
+    # A distinct, explicitly authorized report may still disclose the unknown
+    # effect. This is not a retry of the uncertain worker-directed input.
+    result = replace(o, result_stage="prepared", result_ref="result:unknown",
+                     final_ref="final:unknown")
+    assert native_decision(result).action == "return-result"
+
+
+@pytest.mark.parametrize("changes", [{"cancelled": True}, {"work_authority": "revoked"}])
+def test_native_cancel_and_revoke_keep_reporting_independent(changes):
+    o = native_observation(**changes)
+    assert native_decision(o).action == "stop-covered-work"
+    o = replace(o, result_stage="prepared", result_ref="result:cancelled",
+                final_ref="final:cancelled")
+    assert native_decision(o).action == "stop-covered-work"
+    assert native_decision(o).report_action == "return-result"
+    assert native_decision(replace(o, message_authority="revoked")).report_action == "owned-checkpoint"
+    unknown = replace(o, result_stage="send_unknown")
+    assert native_decision(unknown).action == "stop-covered-work"
+    assert native_decision(unknown).report_action == "reconcile-report"
+    attempted = replace(unknown, stop_stage="requested_unknown", stop_ref="stop:attempt",
+                        stop_observed_at=NATIVE_TIME, waits=2)
+    assert native_decision(attempted).action == "owned-checkpoint"
+    assert native_decision(attempted).covered_work_state == "stop_unknown"
+
+
+@pytest.mark.parametrize("authority", ["unknown", "revoked"])
+def test_native_report_authority_is_not_inferred_from_result(authority):
+    o = native_observation(result_stage="prepared", result_ref="result:ready",
+                           final_ref="final:ready", message_authority=authority)
+    assert native_decision(o).action == "owned-checkpoint"
+
+
+@pytest.mark.parametrize("observed", ["2026-01-01T11:54:59+00:00", "2026-01-01T12:00:01+00:00"])
+def test_native_stale_or_future_result_requires_read_not_send(observed):
+    o = native_observation(observed_at=observed, result_stage="prepared",
+                           result_ref="result:ready", final_ref="final:ready")
+    assert native_decision(o).action == "inspect-progress"
+    assert native_decision(replace(o, waits=2)).action == "owned-checkpoint"
+
+
+@pytest.mark.parametrize("changes,code", [
+    ({"activity": []}, "INVALID_NATIVE_ACTIVITY"),
+    ({"result_stage": "received"}, "NATIVE_RESULT_UNBOUND"),
+    ({"result_stage": "received", "result_ref": "result:1"}, "NATIVE_RECEIPT_UNBOUND"),
+    ({"result_stage": "prepared", "result_ref": "result:1", "receipt_ref": "receipt:1"}, "NATIVE_RECEIPT_UNBOUND"),
+    ({"review_ref": "review:1"}, "NATIVE_REVIEW_UNBOUND"),
+    ({"final_ref": "final:orphan"}, "NATIVE_FINAL_UNBOUND"),
+    ({"observed_at": "2026-01-01T12:00:00"}, "INVALID_NATIVE_TIME"),
+    ({"observed_at": "yesterday"}, "INVALID_NATIVE_TIME"),
+    ({"input_unknown": 1}, "INVALID_NATIVE_FLAG"),
+    ({"waits": True}, "INVALID_NATIVE_COUNTER"),
+    ({"requests": -1}, "INVALID_NATIVE_COUNTER"),
+    ({"work_authority": "assumed"}, "INVALID_NATIVE_AUTHORITY"),
+])
+def test_native_malformed_or_contradictory_evidence_is_rejected(changes, code):
+    with pytest.raises(HandoffError, match=code):
+        native_decision(native_observation(**changes))
+
+
+def test_native_unknown_state_and_authority_cannot_close_goal():
+    assert native_decision(native_observation(activity="unknown")).action == "inspect-progress"
+    assert native_decision(native_observation(work_authority="unknown")).action == "owned-checkpoint"
+    with pytest.raises(HandoffError, match="INVALID_NATIVE_OBSERVATION"):
+        native_session_next_action({}, checked_at=NATIVE_TIME)
+
+
+@pytest.mark.parametrize("control", [{"cancelled": True}, {"work_authority": "revoked"}])
+@pytest.mark.parametrize("stage,report_action", [
+    ("prepared", "return-result"), ("received", "review-result"),
+    ("reviewed", "report-review"),
+])
+def test_native_active_report_never_hides_pending_stop(control, stage, report_action):
+    o = native_observation(
+        activity="active", result_stage=stage, result_ref="result:partial",
+        final_ref="final:partial", **control,
+        receipt_ref="receipt:partial" if stage in {"received", "reviewed"} else None,
+        review_ref="review:partial" if stage == "reviewed" else None,
+    )
+    d = native_decision(o)
+    assert (d.action, d.covered_work_state, d.report_action) == (
+        "stop-covered-work", "stop_required", report_action)
+    attempted = replace(o, stop_stage="requested_unknown", stop_ref="stop:attempt",
+                        stop_observed_at=NATIVE_TIME)
+    d = native_decision(attempted)
+    assert (d.action, d.covered_work_state, d.report_action) == (
+        "reconcile-stop", "stop_unknown", report_action)
+    assert native_decision(replace(attempted, waits=2)).action == "owned-checkpoint"
+    confirmed = replace(attempted, stop_stage="confirmed", stop_ref="stop:confirmed")
+    d = native_decision(confirmed)
+    assert d.covered_work_state == "stop_confirmed"
+    assert d.action == report_action and d.report_action is None
+    # An active native chat can report after actual covered work has stopped.
+    assert native_decision(confirmed) == d
+
+
+@pytest.mark.parametrize("control", [{"cancelled": True}, {"work_authority": "revoked"}])
+def test_native_fresh_control_outweighs_stale_result(control):
+    o = native_observation(
+        activity="active", result_stage="prepared", result_ref="result:old",
+        final_ref="final:old", observed_at="2026-01-01T11:54:00+00:00",
+        control_observed_at=NATIVE_TIME, control_ref="control:current", **control,
+    )
+    d = native_decision(o)
+    assert d.action == "stop-covered-work" and d.covered_work_state == "stop_required"
+    assert d.report_action == "inspect-progress"
+
+
+def test_native_stale_control_and_old_stop_cannot_prove_current_stop():
+    o = native_observation(activity="active", cancelled=True,
+                           result_stage="prepared", result_ref="result:ready",
+                           final_ref="final:ready", control_ref="control:stale",
+                           control_observed_at="2026-01-01T11:54:00+00:00")
+    d = native_decision(o)
+    assert d.action == "inspect-progress" and d.covered_work_state == "stop_required"
+    assert d.report_action == "return-result"
+    fresh_control = replace(o, control_ref="control:new", control_observed_at=NATIVE_TIME,
+                            stop_stage="confirmed", stop_ref="stop:previous-control",
+                            stop_observed_at="2026-01-01T11:59:59+00:00")
+    d = native_decision(fresh_control)
+    assert d.action == "reconcile-stop" and d.covered_work_state == "stop_unknown"
+    assert native_decision(replace(fresh_control, waits=2)).action == "owned-checkpoint"
+    future_stop = replace(fresh_control, stop_observed_at="2026-01-01T12:00:01+00:00")
+    assert native_decision(future_stop).covered_work_state == "stop_unknown"
+    stopped = native_observation(cancelled=True, stop_stage="confirmed",
+                                 stop_ref="stop:current", stop_observed_at=NATIVE_TIME)
+    assert native_decision(stopped).action == "owned-checkpoint"
+    assert native_decision(stopped).covered_work_state == "stop_confirmed"
+
+
+@pytest.mark.parametrize("changes,code", [
+    ({"cancelled": True, "stop_stage": "confirmed"}, "NATIVE_STOP_UNBOUND"),
+    ({"control_ref": "control:missing-time"}, "NATIVE_CONTROL_UNBOUND"),
+    ({"control_ref": "control:empty-time", "control_observed_at": ""}, "INVALID_INPUT"),
+    ({"stop_stage": "requested_unknown", "stop_ref": "stop:1", "stop_observed_at": NATIVE_TIME}, "NATIVE_STOP_SCOPE_MISMATCH"),
+    ({"stop_stage": []}, "INVALID_NATIVE_STOP"),
+])
+def test_native_stop_requires_explicit_coherent_control_evidence(changes, code):
+    with pytest.raises(HandoffError, match=code):
+        native_decision(native_observation(**changes))

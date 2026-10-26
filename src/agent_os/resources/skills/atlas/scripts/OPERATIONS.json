@@ -1,0 +1,1025 @@
+{
+  "schema": "atlas.operations/v1",
+  "version": 3,
+  "description": "Static verified local method and routine registry. Handlers are data for review and a hardcoded dispatcher allowlist, never eval/import/subprocess instructions.",
+  "execution_policy": {
+    "dispatch": "HARDCODED_ALLOWLIST_ONLY",
+    "registry_is_executable": false,
+    "method_ids_are_cli_subcommands": false,
+    "unknown_handler": "REFUSE",
+    "coalesce_shared_project_load": true,
+    "external_adapters_executed_by_local_facade": false,
+    "stdout_plan_is_actual_execution": false,
+    "existing_canonical_inputs_mutated": true,
+    "initialization_exception": "Only init may create a new .atlas control tree in the explicitly selected root; it refuses existing control state.",
+    "writer_protocol": "Output publication serializes cooperating writers with .writer.lock and expected-manifest comparison. Adapter-managed project/state/generations must be written only by import_matrix refresh under IMPORT.lock; external writers ignoring these locks are outside the guarantee. Compare plus os.replace is not an atomic OS compare-and-replace against uncooperative writers.",
+    "canonical_mutation_limits": "Only explicit native source-relocate apply/reconcile may change the exact qualified entry/metadata rows; no general rewrite waiver or target authority."
+  },
+  "methods": [
+    {
+      "id": "init",
+      "handler": "initialize",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit caller-selected project root; do not discover a different project or host."
+        },
+        "project_id": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Stable new project ID; CLI flag --project-id."
+        },
+        "title": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit project title from the owner task."
+        },
+        "objective": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit owner-authorized objective; not an inferred completion claim."
+        },
+        "writer": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Known current writer; UNKNOWN is refused."
+        },
+        "authority_ref": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Exact existing task/authority reference; CLI flag --authority-ref."
+        },
+        "mode": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "native for a new canonical matrix; projection for an existing owning matrix. No automatic mode migration.",
+          "enum": [
+            "native",
+            "projection"
+          ]
+        },
+        "at": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Aware UTC/offset timestamp used once for this observation; it does not renew source activity.",
+          "omitted": "Use the method-defined current observation time; exact existing release reconciliation retains its original time."
+        }
+      },
+      "preconditions": [
+        "The selected root exists and is not a symlink.",
+        "The owner scope includes this local Atlas onboarding.",
+        "The root has no .atlas directory or symlink; existing .atlas is refused.",
+        "The current writer and intended native/projection route are known."
+      ],
+      "effects": [
+        "CREATE_NEW_ATLAS_DIRECTORY_IF_ABSENT",
+        "INITIALIZER_STAGING_AND_LOCK_IN_SELECTED_ROOT",
+        "WRITE_STDOUT_JSON"
+      ],
+      "outputs": [
+        "INITIALIZED_PARTIAL with a documentary goal, ATLAS-BOOTSTRAP work and six inventory domains all exhaustive false. Existing product documents/matrices are not overwritten."
+      ],
+      "reconcile": "If .atlas already exists, stop with ATLAS_ALREADY_EXISTS_RECONCILE and read actual state. Never delete/rename existing control data to repeat initialization."
+    },
+    {
+      "id": "methods",
+      "handler": "methods",
+      "parameters": {},
+      "preconditions": [
+        "Bundled OPERATIONS.json is present and valid JSON."
+      ],
+      "effects": [
+        "READ_BUNDLED_OPERATION_REGISTRY",
+        "WRITE_STDOUT_JSON"
+      ],
+      "outputs": [
+        "The exact bundled static method and recipe registry. No handler is executed by this command."
+      ],
+      "reconcile": "Reuse the same registry version; no environment or host probing is performed."
+    },
+    {
+      "id": "validate",
+      "handler": "validate",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit caller-selected project root; do not discover a different project or host."
+        },
+        "project": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Safe relative project manifest under root.",
+          "default": ".atlas/project.json"
+        },
+        "at": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Aware UTC/offset timestamp used once for this observation; it does not renew source activity.",
+          "omitted": "Use the method-defined current observation time; exact existing release reconciliation retains its original time."
+        }
+      },
+      "preconditions": [
+        "Project manifest and declared selected inputs are readable."
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON"
+      ],
+      "outputs": [
+        "Qualified local validation summary, source identity and issues, or REFUSED with exact code."
+      ],
+      "reconcile": "Repeat this read only when selected inputs or the concrete verification need changed; no effects to retry."
+    },
+    {
+      "id": "basis",
+      "handler": "basis",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit caller-selected project root; do not discover a different project or host."
+        },
+        "project": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Safe relative project manifest under root.",
+          "default": ".atlas/project.json"
+        }
+      },
+      "preconditions": [
+        "Selected project and per-work records are readable."
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON"
+      ],
+      "outputs": [
+        "Canonical basis digests for declared work records; no acceptance is created."
+      ],
+      "reconcile": "An unchanged basis is reused; do not overwrite historical acceptance to make it match changed work."
+    },
+    {
+      "id": "packet",
+      "handler": "packet",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit caller-selected project root; do not discover a different project or host."
+        },
+        "project": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Safe relative project manifest under root.",
+          "default": ".atlas/project.json"
+        },
+        "work": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Exact stable work ID in the selected project; never infer an alias."
+        },
+        "at": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Aware UTC/offset timestamp used once for this observation; it does not renew source activity.",
+          "omitted": "Use the method-defined current observation time; exact existing release reconciliation retains its original time."
+        }
+      },
+      "preconditions": [
+        "Exact work ID exists in the validated selected project."
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON"
+      ],
+      "outputs": [
+        "Scoped work context, criteria, artifact/evidence references and next action."
+      ],
+      "reconcile": "Read the same work identity; a new session does not require all project evidence to run again."
+    },
+    {
+      "id": "impact",
+      "handler": "impact",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit caller-selected project root; do not discover a different project or host."
+        },
+        "project": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Safe relative project manifest under root.",
+          "default": ".atlas/project.json"
+        },
+        "changed": {
+          "type": "array[string]",
+          "required": true,
+          "nullable": false,
+          "description": "Repeat --changed for exact relative changed paths. Unknown dependency coverage remains explicit."
+        }
+      },
+      "preconditions": [
+        "Paths belong to the selected project; declared relations are the known dependency set."
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON"
+      ],
+      "outputs": [
+        "Changed-path impact through declared references; not proof of complete real dependency discovery."
+      ],
+      "reconcile": "Recompute only the changed set or a concrete uncovered dependency."
+    },
+    {
+      "id": "discover",
+      "handler": "discover",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit caller-selected project root; do not discover a different project or host."
+        },
+        "project": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Safe relative project manifest under root.",
+          "default": ".atlas/project.json"
+        },
+        "under": {
+          "type": "array[string]",
+          "required": true,
+          "nullable": false,
+          "description": "Repeat --under for explicit selected project directories; no host-wide walk."
+        }
+      },
+      "preconditions": [
+        "Caller selected every search root inside the current project."
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON"
+      ],
+      "outputs": [
+        "Candidate local files and coverage hints; no automatic current/applied/accepted classification."
+      ],
+      "reconcile": "Reuse the same discovery inventory until its scope or relevant contents change."
+    },
+    {
+      "id": "pins",
+      "handler": "pins",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit caller-selected project root; do not discover a different project or host."
+        },
+        "path": {
+          "type": "array[string]",
+          "required": true,
+          "nullable": false,
+          "description": "Repeat --path for exact selected relative files."
+        }
+      },
+      "preconditions": [
+        "Each selected path is a readable permitted file."
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON"
+      ],
+      "outputs": [
+        "Exact path, SHA-256 and byte count; the caller writer includes them in its authorized manifest."
+      ],
+      "reconcile": "A hash proves the read bytes only; reconcile a mismatch with the actual owner rather than weakening the expected pin."
+    },
+    {
+      "id": "coverage",
+      "handler": "coverage",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit caller-selected project root; do not discover a different project or host."
+        },
+        "project": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Safe relative project manifest under root.",
+          "default": ".atlas/project.json"
+        },
+        "at": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Aware UTC/offset timestamp used once for this observation; it does not renew source activity.",
+          "omitted": "Use the method-defined current observation time; exact existing release reconciliation retains its original time."
+        }
+      },
+      "preconditions": [
+        "Declared project inventory and its bindings are selected inputs."
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON"
+      ],
+      "outputs": [
+        "Qualified coverage, unmapped/UNKNOWN gaps and inventory-bound completeness."
+      ],
+      "reconcile": "A registered subset remains partial; rerun for an inventory change or a named gap."
+    },
+    {
+      "id": "current-output",
+      "handler": "current_output",
+      "exposure": "INTERNAL_HELPER",
+      "invocation": {
+        "cli_subcommand": null,
+        "public_route": {
+          "command": "run",
+          "routine": "reconcile",
+          "required_parameters": [
+            "root",
+            "output"
+          ]
+        }
+      },
+      "parameters": {
+        "output": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit authorized local output directory; immutable releases and CURRENT only; no product mutation."
+        }
+      },
+      "preconditions": [
+        "Output is the selected local release family."
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON"
+      ],
+      "outputs": [
+        "Verified pinned current manifest/snapshot, no releases, or exact integrity refusal."
+      ],
+      "reconcile": "Never repair a missing/corrupt pointer or activate an orphan as part of this read."
+    },
+    {
+      "id": "history",
+      "handler": "history",
+      "parameters": {
+        "output": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit authorized local output directory; immutable releases and CURRENT only; no product mutation."
+        },
+        "limit": {
+          "type": "integer",
+          "required": false,
+          "nullable": false,
+          "minimum": 1,
+          "maximum": 100,
+          "default": 50,
+          "description": "Optional --limit. Bounds archive revisions per response (also at most 2000 matrix entries). Range validated for every mode; legacy non-archive history retains its full chronological output and does not truncate by this value.",
+          "omitted": "50 for archive pagination; no truncation of the compatible legacy history route."
+        },
+        "cursor": {
+          "type": "string",
+          "required": false,
+          "nullable": true,
+          "description": "Optional --cursor from next_cursor, exact child release ID/manifest SHA. Supported only for projection archive; verifies that child and the following page, without retraversing its ancestry to CURRENT.",
+          "omitted": "Start from the verified CURRENT pointer."
+        }
+      },
+      "preconditions": [
+        "Selected output CURRENT and each returned release can be read and verified.",
+        "Archive continuation requires an exact next_cursor anchor; missing/corrupt pages refuse when requested.",
+        "Archive output path must bind to its project root. Historical raw source availability is not rechecked by history."
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON"
+      ],
+      "outputs": [
+        "Archive: newest-first VERIFIED_PAGE or a fully traversed VERIFIED_CHAIN; bounded revisions and matrix bindings, cumulative matrix_history_total, has_more/next_cursor, actual file targets and VERIFIED_AT_IMPORT source qualification.",
+        "Caller-supplied continuation remains VERIFIED_PAGE with ancestry_to_current=NOT_RETRAVERSED_FOR_CALLER_SUPPLIED_CURSOR, even on its final page.",
+        "Legacy without archive: full chronological verified retained chain and unreferenced releases; --limit validated but not used to truncate, --cursor refused.",
+        "No archive orphan scan or old raw source reads. Legacy SHA-only tail resolution may read manifest headers on this explicit history request; the count is reported."
+      ],
+      "reconcile": "Follow each exact page link and cumulative total. A not-yet-loaded page or absent pre-Atlas raw version remains unverified/UNKNOWN. Source bytes can be checked separately with pins on the returned path; never reconstruct missing history as actual.",
+      "reference": "references/data-contract.md#history"
+    },
+    {
+      "id": "diff",
+      "handler": "diff",
+      "parameters": {
+        "output": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit authorized local output directory; immutable releases and CURRENT only; no product mutation."
+        },
+        "before": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Exact retained before release ID."
+        },
+        "after": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Exact retained after release ID."
+        }
+      },
+      "preconditions": [
+        "Both exact releases belong to the same project and verify against their manifests."
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON"
+      ],
+      "outputs": [
+        "Changed work fields, new event IDs and changed source paths between two immutable releases."
+      ],
+      "reconcile": "Use the same exact release pair; a display diff does not create a work event."
+    },
+    {
+      "id": "build",
+      "handler": "build",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit caller-selected project root; do not discover a different project or host."
+        },
+        "project": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Safe relative project manifest under root.",
+          "default": ".atlas/project.json"
+        },
+        "output": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit authorized local output directory; immutable releases and CURRENT only; no product mutation."
+        },
+        "release": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit immutable release ID."
+        },
+        "at": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit aware UTC/offset release timestamp."
+        },
+        "previous": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Exact expected previous manifest SHA-256.",
+          "omitted": "Only the initial release has no predecessor. Existing state must be reconciled."
+        }
+      },
+      "preconditions": [
+        "Caller authorizes selected local output.",
+        "Inputs and exact previous history qualify.",
+        "Only the existing output writer publishes this release."
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON",
+        "WRITE_SELECTED_OUTPUT_IMMUTABLE_RELEASE",
+        "ATOMIC_UPDATE_SELECTED_OUTPUT_CURRENT",
+        "LOCAL_OUTPUT_WRITER_LOCK"
+      ],
+      "outputs": [
+        "Immutable HTML/snapshot/manifest and selected CURRENT, exact replay, or collision/refusal."
+      ],
+      "reconcile": "On UNKNOWN verify the same release ID/manifest/bytes. Never substitute a fresh ID to retry an unknown publication."
+    },
+    {
+      "id": "cycle",
+      "handler": "cycle",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit caller-selected project root; do not discover a different project or host."
+        },
+        "project": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Safe relative project manifest under root.",
+          "default": ".atlas/project.json"
+        },
+        "output": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit authorized local output directory; immutable releases and CURRENT only; no product mutation."
+        },
+        "release": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Optional immutable release ID.",
+          "omitted": "Derive the deterministic release identity from selected source/toolchain state."
+        },
+        "at": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Aware UTC/offset timestamp used once for this observation; it does not renew source activity.",
+          "omitted": "Use the method-defined current observation time; exact existing release reconciliation retains its original time."
+        },
+        "previous": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Optional exact expected current manifest SHA-256.",
+          "omitted": "Pin the current manifest read by this cycle and retain compare-and-swap protection."
+        }
+      },
+      "preconditions": [
+        "Owning writer has already prepared exact work/document deltas and manifest pins.",
+        "Caller authorizes the selected local output; product writes are not performed by cycle."
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON",
+        "WRITE_SELECTED_OUTPUT_IMMUTABLE_RELEASE",
+        "ATOMIC_UPDATE_SELECTED_OUTPUT_CURRENT",
+        "LOCAL_OUTPUT_WRITER_LOCK"
+      ],
+      "outputs": [
+        "One-load local validation, changed paths, immutable CAS release or NO_CHANGE, qualified coverage and next actions.",
+        "Product tests are NOT_RUN_BY_ATLAS."
+      ],
+      "reconcile": "A no-op creates no release or event. For unknown results reconcile original release/output identity before another write."
+    },
+    {
+      "id": "source-relocate-plan",
+      "handler": "source_relocation.plan",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Exact selected native root; no registry/host discovery."
+        },
+        "request": {
+          "type": "object",
+          "required": true,
+          "nullable": false,
+          "description": "Exact atlas.source-relocation/v1 JSON document; CLI --request FILE or -."
+        }
+      },
+      "preconditions": [
+        "Current owner scope and writer, exact project/source/current-head pins, preserved historical bytes; see references/source-relocation.md."
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON"
+      ],
+      "outputs": [
+        "Bounded metadata, exact hashes and status; never source bodies or renewed semantic acceptance."
+      ],
+      "reconcile": "Use the same operation and expected full-plan SHA; current authority and exact source/head states. No committed replay."
+    },
+    {
+      "id": "source-relocate-apply",
+      "handler": "source_relocation.apply",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Exact selected native root; no registry/host discovery."
+        },
+        "request": {
+          "type": "object",
+          "required": true,
+          "nullable": false,
+          "description": "Exact atlas.source-relocation/v1 JSON document; CLI --request FILE or -."
+        },
+        "expected_plan": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Exact full plan SHA-256 from reviewed plan, not a new operation ID."
+        }
+      },
+      "preconditions": [
+        "Current owner scope and writer, exact project/source/current-head pins, preserved historical bytes; see references/source-relocation.md."
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON",
+        "WRITE_EXACT_NATIVE_SOURCE_ROWS",
+        "CREATE_ONLY_OPERATION_JOURNAL",
+        "CAS_IMMUTABLE_PUBLICATION"
+      ],
+      "outputs": [
+        "Bounded metadata, exact hashes and status; never source bodies or renewed semantic acceptance."
+      ],
+      "reconcile": "Use the same operation and expected full-plan SHA; current authority and exact source/head states. No committed replay."
+    },
+    {
+      "id": "source-relocate-status",
+      "handler": "source_relocation.status",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Exact selected native root; no registry/host discovery."
+        },
+        "expected_plan": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Exact full plan SHA-256 from reviewed plan, not a new operation ID."
+        },
+        "operation_id": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Exact existing 32-hex operation ID."
+        }
+      },
+      "preconditions": [
+        "Current owner scope and writer, exact project/source/current-head pins, preserved historical bytes; see references/source-relocation.md."
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON"
+      ],
+      "outputs": [
+        "Bounded metadata, exact hashes and status; never source bodies or renewed semantic acceptance."
+      ],
+      "reconcile": "Use the same operation and expected full-plan SHA; current authority and exact source/head states. No committed replay."
+    },
+    {
+      "id": "source-relocate-reconcile",
+      "handler": "source_relocation.reconcile",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Exact selected native root; no registry/host discovery."
+        },
+        "expected_plan": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Exact full plan SHA-256 from reviewed plan, not a new operation ID."
+        },
+        "operation_id": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Exact existing 32-hex operation ID."
+        },
+        "renewal": {
+          "type": "object",
+          "required": false,
+          "nullable": false,
+          "description": "Explicit fresh same-scope atlas.source-relocation-reconcile/v1 attestation when invocation expired; grants nothing by itself."
+        }
+      },
+      "preconditions": [
+        "Current owner scope and writer, exact project/source/current-head pins, preserved historical bytes; see references/source-relocation.md."
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON",
+        "WRITE_EXACT_NATIVE_SOURCE_ROWS",
+        "CREATE_ONLY_OPERATION_JOURNAL",
+        "CAS_IMMUTABLE_PUBLICATION"
+      ],
+      "outputs": [
+        "Bounded metadata, exact hashes and status; never source bodies or renewed semantic acceptance."
+      ],
+      "reconcile": "Use the same operation and expected full-plan SHA; current authority and exact source/head states. No committed replay."
+    }
+  ],
+  "recipes": [
+    {
+      "id": "session-start",
+      "handler": "session-start",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit caller-selected project root; do not discover a different project or host."
+        },
+        "project": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Safe relative project manifest under root.",
+          "default": ".atlas/project.json"
+        },
+        "at": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Aware UTC/offset timestamp used once for this observation; it does not renew source activity.",
+          "omitted": "Use the method-defined current observation time; exact existing release reconciliation retains its original time."
+        },
+        "work": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Optional exact work ID; absent means project summary and next actions, not automatic assignment."
+        }
+      },
+      "preconditions": [
+        "Registered project binding exists; otherwise return the concrete onboarding need."
+      ],
+      "steps": [
+        {
+          "method": "validate",
+          "when": "ALWAYS"
+        },
+        {
+          "method": "packet",
+          "when": "WORK_ID_SUPPLIED"
+        }
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON"
+      ],
+      "outputs": [
+        "Qualified context and scoped packet or current next actions."
+      ],
+      "reconcile": "Read the same selected project/work; preserve ownership and historical evidence."
+    },
+    {
+      "id": "finish-block",
+      "handler": "finish-block",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit caller-selected project root; do not discover a different project or host."
+        },
+        "project": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Safe relative project manifest under root.",
+          "default": ".atlas/project.json"
+        },
+        "at": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Aware UTC/offset timestamp used once for this observation; it does not renew source activity.",
+          "omitted": "Use the method-defined current observation time; exact existing release reconciliation retains its original time."
+        },
+        "output": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit authorized local output directory; immutable releases and CURRENT only; no product mutation."
+        },
+        "release": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Optional immutable release ID.",
+          "omitted": "Derive the deterministic release identity from selected source/toolchain state."
+        },
+        "previous": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Optional exact expected current manifest SHA-256.",
+          "omitted": "Pin the current manifest read by this cycle and retain compare-and-swap protection."
+        }
+      },
+      "preconditions": [
+        "Current writer has saved one substantive work delta, artifacts/evidence and exact pins."
+      ],
+      "steps": [
+        {
+          "method": "cycle",
+          "when": "ALWAYS"
+        }
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON",
+        "WRITE_SELECTED_OUTPUT_IMMUTABLE_RELEASE",
+        "ATOMIC_UPDATE_SELECTED_OUTPUT_CURRENT",
+        "LOCAL_OUTPUT_WRITER_LOCK"
+      ],
+      "outputs": [
+        "Updated immutable local Atlas view or NO_CHANGE, with scope and next action."
+      ],
+      "reconcile": "Use the same output/release identity; no new work event or product test is synthesized."
+    },
+    {
+      "id": "integrate",
+      "handler": "integrate",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit caller-selected project root; do not discover a different project or host."
+        },
+        "project": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Safe relative project manifest under root.",
+          "default": ".atlas/project.json"
+        },
+        "at": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Aware UTC/offset timestamp used once for this observation; it does not renew source activity.",
+          "omitted": "Use the method-defined current observation time; exact existing release reconciliation retains its original time."
+        },
+        "output": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit authorized local output directory; immutable releases and CURRENT only; no product mutation."
+        },
+        "release": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Optional immutable release ID.",
+          "omitted": "Derive the deterministic release identity from selected source/toolchain state."
+        },
+        "previous": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Optional exact expected current manifest SHA-256.",
+          "omitted": "Pin the current manifest read by this cycle and retain compare-and-swap protection."
+        }
+      },
+      "preconditions": [
+        "Current canonical writer has already accepted and written selected deltas; no writer transfer is implied."
+      ],
+      "steps": [
+        {
+          "method": "cycle",
+          "when": "ALWAYS"
+        }
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON",
+        "WRITE_SELECTED_OUTPUT_IMMUTABLE_RELEASE",
+        "ATOMIC_UPDATE_SELECTED_OUTPUT_CURRENT",
+        "LOCAL_OUTPUT_WRITER_LOCK"
+      ],
+      "outputs": [
+        "Validated derived integration snapshot or NO_CHANGE. Canonical product/docs are not edited by the facade."
+      ],
+      "reconcile": "Verify exact previous/current identity. Preserve unresolved operations and current writers."
+    },
+    {
+      "id": "reconcile",
+      "handler": "reconcile",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit caller-selected project root; do not discover a different project or host."
+        },
+        "output": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit authorized local output directory; immutable releases and CURRENT only; no product mutation."
+        }
+      },
+      "preconditions": [
+        "The selected output is the exact output of the original unknown local publication."
+      ],
+      "steps": [
+        {
+          "method": "current-output",
+          "when": "ALWAYS"
+        }
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON"
+      ],
+      "outputs": [
+        "Verified exact current pointer/snapshot or NO_RELEASES, with remaining integrity refusal. Use history separately for the full retained chain and orphans. Remote operation-get remains a separate declarative adapter."
+      ],
+      "reconcile": "Never auto-activate an orphan or run cycle merely because a prior ACK was lost."
+    },
+    {
+      "id": "project-audit",
+      "handler": "project-audit",
+      "parameters": {
+        "root": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Explicit caller-selected project root; do not discover a different project or host."
+        },
+        "project": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Safe relative project manifest under root.",
+          "default": ".atlas/project.json"
+        },
+        "at": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Aware UTC/offset timestamp used once for this observation; it does not renew source activity.",
+          "omitted": "Use the method-defined current observation time; exact existing release reconciliation retains its original time."
+        }
+      },
+      "preconditions": [
+        "Use existing applicable inventory, a scoped bootstrap, or a concrete inventory change/gap."
+      ],
+      "steps": [
+        {
+          "method": "validate",
+          "when": "ALWAYS"
+        },
+        {
+          "method": "coverage",
+          "when": "ALWAYS"
+        }
+      ],
+      "effects": [
+        "READ_SELECTED_LOCAL_FILES",
+        "WRITE_STDOUT_JSON"
+      ],
+      "outputs": [
+        "Coverage and current work issues, including exact onboarding/contract gaps."
+      ],
+      "reconcile": "No full repeat without changed scope or a named uncovered risk; no product suites are started."
+    }
+  ],
+  "limits": {
+    "max_work_records": 1000,
+    "max_selected_documents": 1000,
+    "max_workflow_selected_bytes": 33554432,
+    "max_navigator_document_bytes_total": 16777216,
+    "max_navigator_document_bytes_each": 2097152,
+    "on_limit": "REFUSE_WITH_EXACT_CODE; no silent truncation or false COMPLETE. Split project/module views with a root coverage map or separately qualify a limit change.",
+    "max_navigator_input_manifest_bytes": 8388608,
+    "max_current_contracts": 1000,
+    "max_matrix_entries_per_page": 2000,
+    "max_archive_history_releases_per_response": 100,
+    "default_archive_history_releases_per_response": 50,
+    "projection_archive": "Current graph/new page only; exact prior immutable releases and source raw files retained, without raising per-page limits. Normal load verifies one parent, while older source pins remain VERIFIED_AT_IMPORT."
+  }
+}

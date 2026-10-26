@@ -1,0 +1,41 @@
+{
+  "schema": "atlas.upstream-binding/v1",
+  "project": {
+    "id": "EXAMPLE-PROJECT",
+    "title": "Example project",
+    "objective": "Replace with the actual authorized project objective",
+    "writer": "EXISTING-WRITER-ID",
+    "authority_ref": "Replace with the actual existing owner instruction",
+    "scope_note": "Partial explicit source inventory; source status is not product acceptance"
+  },
+  "matrix": {
+    "path": "work/WORK_MATRIX_DATA.json",
+    "allowed_schema": "example.work-matrix/v1",
+    "pointer": ""
+  },
+  "history": {
+    "paths": [],
+    "directories": [
+      "work/matrix-history"
+    ],
+    "pointer": "",
+    "coverage_note": "Replace with the actual retained-history scope and explicitly unknown earlier versions"
+  },
+  "documents": [
+    {
+      "id": "PROJECT-ROADMAP",
+      "path": "docs/ROADMAP.md",
+      "title": "Project roadmap",
+      "role": "existing roadmap",
+      "domain": "documents"
+    },
+    {
+      "id": "DOC-API",
+      "path": "docs/API.json",
+      "title": "Existing API declarations",
+      "role": "explicit API source for optional semantic catalogue",
+      "domain": "contracts"
+    }
+  ],
+  "output": ".atlas/output"
+}

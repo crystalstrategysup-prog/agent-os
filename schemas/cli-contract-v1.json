@@ -639,14 +639,31 @@
         "BLOCKED"
       ],
       "write_surfaces": []
+    },
+    {
+      "name": "project inventory-budget",
+      "effect": "read_only_or_explicit_project_metadata",
+      "status_values": [
+        "PASS"
+      ],
+      "write_surfaces": [
+        ".agentos/project.json"
+      ],
+      "read_only_when": "Neither --max-bytes nor --reset supplied",
+      "options": {
+        "--root": "Exact project root",
+        "--max-bytes": "integer1..1073741824; explicit byte budget",
+        "--reset": "remove override; retain monotonic generation"
+      },
+      "native_hooks": "DISABLED"
     }
   ],
-  "distribution_version": "0.8.0rc2",
+  "distribution_version": "0.8.0rc2002+atlas.4",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.8.0rc2",
+  "release": "0.8.0rc2002+atlas.4",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",

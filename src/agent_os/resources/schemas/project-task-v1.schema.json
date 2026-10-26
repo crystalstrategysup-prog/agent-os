@@ -2,6 +2,25 @@
   "$id": "https://github.com/crystalstrategysup-prog/agent-os/schemas/project-task-v1.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": true,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "RECOVERY_REQUIRED"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "recovery"
+        ]
+      }
+    }
+  ],
   "properties": {
     "answers": {
       "type": "object"
@@ -27,6 +46,10 @@
       "pattern": "^task-[0-9a-f]{16}$",
       "type": "string"
     },
+    "interrupted_continuation": {
+      "description": "Nonaccepting interrupted-turn acknowledgement; requires full same-owner entry; retained after consumption.",
+      "type": "object"
+    },
     "project_id": {
       "type": "string"
     },
@@ -35,6 +58,120 @@
         "type": "string"
       },
       "type": "array"
+    },
+    "recovery": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "entered_turn_id": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            "operation_id": {
+              "pattern": "^[0-9a-f]{32}$",
+              "type": "string"
+            },
+            "request_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "resumed_revision": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "revision": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "schema": {
+              "const": "agentos.refusal-recovery-receipt/v1"
+            },
+            "state": {
+              "enum": [
+                "CONSUMED"
+              ]
+            }
+          },
+          "required": [
+            "schema",
+            "operation_id",
+            "revision",
+            "request_sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "diagnostic_receipt": {
+              "additionalProperties": false,
+              "properties": {
+                "bytes": {
+                  "maximum": 16384,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "path": {
+                  "pattern": "^\\.agentos/tasks/task-[0-9a-f]{16}/diagnostics/[0-9a-f]{32}\\.json$",
+                  "type": "string"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "bytes",
+                "sha256"
+              ],
+              "type": "object"
+            },
+            "entered_turn_id": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            "operation_id": {
+              "pattern": "^[0-9a-f]{32}$",
+              "type": "string"
+            },
+            "original_attempt_id": {
+              "pattern": "^[0-9a-f]{32}$",
+              "type": "string"
+            },
+            "request_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "resumed_revision": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "revision": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "schema": {
+              "const": "agentos.refusal-recovery-receipt/v2"
+            },
+            "state": {
+              "enum": [
+                "CONSUMED"
+              ]
+            }
+          },
+          "required": [
+            "schema",
+            "operation_id",
+            "revision",
+            "request_sha256",
+            "original_attempt_id",
+            "diagnostic_receipt"
+          ],
+          "type": "object"
+        }
+      ]
     },
     "revision": {
       "minimum": 1,
@@ -55,7 +192,9 @@
         "READY",
         "VERIFYING",
         "CLOSED",
-        "CHECKPOINT"
+        "CHECKPOINT",
+        "RECOVERY_REQUIRED",
+        "CONTINUATION_REQUIRED"
       ]
     },
     "turn_id": {

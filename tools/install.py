@@ -120,7 +120,7 @@ def wheel_coordination_schemas(wheel: Path) -> list[str]:
 
 
 def release(root: Path, identifier: str) -> Path:
-    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,119}", identifier):
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._+-]{0,119}", identifier):
         raise InstallError("invalid_release_id")
     path = root / "releases" / identifier
     if path.is_symlink() or (root / "releases").is_symlink():
@@ -146,7 +146,7 @@ def read_manifest(
     if (
         not isinstance(version, str)
         or not isinstance(wheel_name, str)
-        or not re.fullmatch(r"[A-Za-z0-9_.-]+\.whl", wheel_name)
+        or not re.fullmatch(r"[A-Za-z0-9_.+-]+\.whl", wheel_name)
         or not isinstance(wheel_hash, str)
         or not re.fullmatch(r"[0-9a-f]{64}", wheel_hash)
     ):
@@ -300,7 +300,7 @@ def _verify_owned_payload(
         # unquoted. Accept that exact form only for safe path characters.
         plain_shell_shebang = (
             "#!/bin/sh\n'''exec' " + interpreter + " \"$0\" \"$@\"\n' '''\n"
-            if re.fullmatch(r"[A-Za-z0-9/_.-]+", interpreter)
+            if re.fullmatch(r"[A-Za-z0-9/_.+-]+", interpreter)
             else ""
         )
         prefixes = tuple(x for x in (direct_shebang, shell_shebang, plain_shell_shebang) if x)
@@ -598,7 +598,7 @@ def execute(args: argparse.Namespace) -> dict:
         expected = args.sha256.lower()
         if not re.fullmatch("[0-9a-f]{64}", expected) or digest(wheel) != expected:
             raise InstallError("wheel_sha256_mismatch")
-        if not re.fullmatch(r"\d+\.\d+\.\d+(?:(?:a|b|rc)\d+|-[A-Za-z0-9.-]+)?", args.version):
+        if not re.fullmatch(r"\d+\.\d+\.\d+(?:(?:a|b|rc)\d+|-[A-Za-z0-9.-]+)?(?:\+[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*)?", args.version):
             raise InstallError("invalid_version")
         identifier = args.version + "-" + expected[:12]
         target = release(root, identifier)

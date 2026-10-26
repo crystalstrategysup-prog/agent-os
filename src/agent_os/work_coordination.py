@@ -10,8 +10,10 @@ from __future__ import annotations
 
 import copy
 import uuid
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime, timedelta
 from pathlib import PurePosixPath
+from typing import Literal
 
 from .completion import CompletionMixin
 from .handoff_store import (
@@ -42,6 +44,177 @@ ACTION_KINDS = {
     "inspect-progress",
     "owner-decision",
 }
+
+NativeAction = Literal[
+    "save-final", "return-result", "reconcile-report", "review-result",
+    "report-review", "wait", "inspect-progress", "request-result",
+    "request-checkpoint", "reconcile-operation", "stop-covered-work",
+    "owned-checkpoint", "reconcile-stop",
+]
+
+
+@dataclass(frozen=True)
+class NativeSessionObservation:
+    """Caller-captured facts for one assignment, not authenticated authority.
+
+    References must bind the same work/session and current result revision.
+    Counters are retained by the caller across turns, not reset on each call.
+    No transcript, credential, provider error payload or global state is needed.
+    """
+
+    work_id: str
+    session_id: str
+    observed_at: str
+    evidence_ref: str
+    activity: Literal["active", "idle", "completed", "blocked", "unknown"]
+    result_stage: Literal["absent", "prepared", "send_unknown", "received", "reviewed"] = "absent"
+    result_ref: str | None = None
+    receipt_ref: str | None = None
+    review_ref: str | None = None
+    final_ref: str | None = None
+    work_authority: Literal["current", "revoked", "unknown"] = "unknown"
+    message_authority: Literal["current", "revoked", "unknown"] = "unknown"
+    input_unknown: bool = False
+    effect_unknown: bool = False
+    cancelled: bool = False
+    control_observed_at: str | None = None
+    control_ref: str | None = None
+    stop_stage: Literal["not_requested", "requested_unknown", "confirmed"] = "not_requested"
+    stop_ref: str | None = None
+    stop_observed_at: str | None = None
+    waits: int = 0
+    requests: int = 0
+
+
+@dataclass(frozen=True)
+class NativeSessionDecision:
+    action: NativeAction
+    next_owner: Literal["worker", "coordinator"]
+    reason: str
+    work_id: str
+    session_id: str
+    evidence_ref: str
+    original_goal_state: Literal["OPEN"] = "OPEN"
+    delegator_responsible: bool = True
+    preserve_final: bool = True
+    effects_performed: bool = False
+    authority_granted: bool = False
+    covered_work_state: Literal["not_applicable", "stop_required", "stop_unknown", "stop_confirmed"] = "not_applicable"
+    report_action: NativeAction | None = None
+
+
+def native_session_next_action(
+    observation: NativeSessionObservation, *, checked_at: str
+) -> NativeSessionDecision:
+    """Plan one bounded native-tool step; never send, sleep, launch or accept.
+
+    This is deliberately separate from durable Coordinator mutation APIs. The
+    caller proves identity, authority, freshness and receipt/review contents,
+    retains counters and operation identity, and checks target gates at I/O.
+    Completing a turn or returning this value never discharges responsibility.
+    """
+    require(type(observation) is NativeSessionObservation, "INVALID_NATIVE_OBSERVATION")
+    o = observation
+    for value in [o.work_id, o.session_id, o.evidence_ref]:
+        text(value)
+    require(isinstance(o.activity, str) and o.activity in {"active", "idle", "completed", "blocked", "unknown"}, "INVALID_NATIVE_ACTIVITY")
+    require(isinstance(o.result_stage, str) and o.result_stage in {"absent", "prepared", "send_unknown", "received", "reviewed"}, "INVALID_NATIVE_RESULT")
+    for value in [o.work_authority, o.message_authority]:
+        require(isinstance(value, str) and value in {"current", "revoked", "unknown"}, "INVALID_NATIVE_AUTHORITY")
+    for value in [o.input_unknown, o.effect_unknown, o.cancelled]:
+        require(type(value) is bool, "INVALID_NATIVE_FLAG")
+    for value in [o.waits, o.requests]:
+        require(type(value) is int and 0 <= value <= 1000, "INVALID_NATIVE_COUNTER")
+    for ref in [o.result_ref, o.receipt_ref, o.review_ref, o.final_ref, o.control_ref, o.stop_ref]:
+        if ref is not None:
+            text(ref)
+    require((o.result_ref is not None) == (o.result_stage != "absent"), "NATIVE_RESULT_UNBOUND")
+    require((o.receipt_ref is not None) == (o.result_stage in {"received", "reviewed"}), "NATIVE_RECEIPT_UNBOUND")
+    require((o.review_ref is not None) == (o.result_stage == "reviewed"), "NATIVE_REVIEW_UNBOUND")
+    require(o.result_stage != "absent" or o.final_ref is None, "NATIVE_FINAL_UNBOUND")
+    require(isinstance(o.stop_stage, str) and o.stop_stage in {"not_requested", "requested_unknown", "confirmed"}, "INVALID_NATIVE_STOP")
+    require((o.control_ref is None) == (o.control_observed_at is None), "NATIVE_CONTROL_UNBOUND")
+    require((o.stop_ref is not None) == (o.stop_stage != "not_requested")
+            and (o.stop_observed_at is not None) == (o.stop_stage != "not_requested"), "NATIVE_STOP_UNBOUND")
+    stopped_scope = o.cancelled or o.work_authority == "revoked"
+    require(o.stop_stage == "not_requested" or stopped_scope, "NATIVE_STOP_SCOPE_MISMATCH")
+
+    def instant(value):
+        text(value)
+        try:
+            parsed = datetime.fromisoformat(value)
+        except ValueError:
+            require(False, "INVALID_NATIVE_TIME")
+        require(parsed.tzinfo is not None, "INVALID_NATIVE_TIME")
+        return parsed
+
+    checked = instant(checked_at)
+    age = checked - instant(o.observed_at)
+    control_time = instant(o.control_observed_at if o.control_observed_at is not None else o.observed_at)
+    stop_time = instant(o.stop_observed_at) if o.stop_observed_at is not None else None
+
+    def decision(action: NativeAction, owner, reason):
+        return NativeSessionDecision(action, owner, reason, o.work_id, o.session_id, o.evidence_ref)
+
+    def bounded_read(action: NativeAction, reason):
+        if o.waits >= 2:
+            return decision("owned-checkpoint", "coordinator", "Observation budget exhausted; retain observed state and next owner, without inferring worker failure.")
+        return decision(action, "coordinator", reason)
+
+    def report_step():
+        if age < timedelta(0) or age > timedelta(minutes=5):
+            return bounded_read("inspect-progress", "Refresh stale or future-dated result observation through supported reads.")
+        if o.result_stage == "send_unknown":
+            return bounded_read("reconcile-report", "Read the exact attempted report; silence is not proven non-delivery.")
+        if o.result_stage == "received":
+            return decision("review-result", "coordinator", "Receipt permits evidence review, not business acceptance.")
+        if o.result_stage == "reviewed":
+            return decision("report-review", "coordinator", "Preserve review, remaining goal and next owner in the delegator's own report.")
+        if o.result_stage == "prepared":
+            if o.final_ref is None:
+                return decision("save-final", "worker", "Preserve the producer's compact final before returning the result.")
+            if o.message_authority != "current":
+                return decision("owned-checkpoint", "coordinator", "Result is preserved; exact report-send authority is unavailable.")
+            return decision("return-result", "worker", "Return the prepared result on the authorized route; retain receipt/review separately.")
+        return None
+
+    report = report_step()
+    if stopped_scope:
+        state = "stop_required" if o.stop_stage == "not_requested" else "stop_unknown"
+        control_age = checked - control_time
+        if control_age < timedelta(0) or control_age > timedelta(minutes=5):
+            primary = bounded_read("inspect-progress", "Refresh control evidence; the covered stop obligation remains unresolved.")
+        elif o.stop_stage == "not_requested":
+            primary = decision("stop-covered-work", "worker", "Covered work must stop; record the attempt as unknown before I/O. A report does not confirm stopping.")
+        elif (o.stop_stage == "confirmed" and control_time <= stop_time <= checked
+              and checked - stop_time <= timedelta(minutes=5)):
+            state = "stop_confirmed"
+            primary = report or decision("owned-checkpoint", "worker", "Covered stop is confirmed; preserve the checkpoint without issuing another stop.")
+        else:
+            state = "stop_unknown"
+            primary = bounded_read("reconcile-stop", "Reconcile the exact stop attempt/evidence; never repeat a stop with unknown outcome.")
+        return replace(primary, covered_work_state=state,
+                       report_action=(report.action if report is not None
+                                      and report.action != primary.action
+                                      and state != "stop_confirmed" else None))
+    if report is not None:
+        return report
+    if o.input_unknown or o.effect_unknown:
+        return bounded_read("reconcile-operation", "Resolve the exact unknown input/effect before any new worker-directed input.")
+    if o.work_authority != "current":
+        return decision("owned-checkpoint", "coordinator", "Current work authority is unknown; retain the missing decision and responsible owner.")
+    if o.activity == "unknown":
+        return bounded_read("inspect-progress", "Read exact worker state; absence of a reply proves neither failure nor non-execution.")
+    if o.activity == "active":
+        return bounded_read("wait", "Use one bounded native wait and continue independent work; do not send redundant continuation.")
+    if o.requests >= 1:
+        return bounded_read("wait", "A result request already exists; observe its response without repeating the input.")
+    if o.waits >= 2:
+        return decision("owned-checkpoint", "coordinator", "Observation budget exhausted; do not start another request cycle.")
+    if o.message_authority != "current":
+        return decision("owned-checkpoint", "coordinator", "No current authority for a worker-directed result request.")
+    action = "request-checkpoint" if o.activity == "blocked" else "request-result"
+    return decision(action, "coordinator", "Request the existing result/checkpoint once, preserving assignment and operation identity.")
 
 
 def text(value):

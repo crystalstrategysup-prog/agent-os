@@ -1,0 +1,122 @@
+{
+  "schema": "atlas.work/v1",
+  "id": "W-01",
+  "parent_id": null,
+  "title": "Accept a scoped contract change",
+  "objective": "Change the limit while preserving all other obligations",
+  "outcome": "Accepted, unapplied proposal with an exact pinned basis",
+  "criteria": [
+    {
+      "id": "C-01",
+      "text": "Proposal accepted against an unchanged basis",
+      "required_scope": "DOCUMENTARY",
+      "artifact_ids": [
+        "A-BASE",
+        "A-PATCH"
+      ]
+    }
+  ],
+  "state": "ACCEPTED",
+  "writer": "integrator-demo",
+  "write_scope": [],
+  "assigned_to": "author-demo",
+  "depends_on": [],
+  "artifacts": [
+    {
+      "id": "A-BASE",
+      "path": "docs/CONTRACT-v1.md",
+      "sha256": "0f28c3a5f7b3af1eab118d986559b5da06cd234493c9e0afbac05c9024d4d917",
+      "bytes": 160,
+      "role": "input",
+      "entity_ids": [
+        "DOC-CONTRACT",
+        "API-BATCH-v1"
+      ]
+    },
+    {
+      "id": "A-PATCH",
+      "path": "docs/PATCH-v2.md",
+      "sha256": "2fef41382df4b13bf2db0139dae7bd4cba8a89d6ea8060faa5b4015259be5b35",
+      "bytes": 157,
+      "role": "patch",
+      "entity_ids": [
+        "DOC-PATCH"
+      ],
+      "patch": {
+        "target_id": "A-BASE",
+        "base_sha256": "0f28c3a5f7b3af1eab118d986559b5da06cd234493c9e0afbac05c9024d4d917",
+        "selectors": [
+          "/limit"
+        ],
+        "state": "ACCEPTED_UNAPPLIED",
+        "decision_evidence_ids": [
+          "E-REVIEW"
+        ],
+        "result_artifact_id": null
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E-REVIEW",
+      "check_id": "contract.limit.review",
+      "scope": "DOCUMENTARY",
+      "subjects": [
+        {
+          "artifact_id": "A-BASE",
+          "sha256": "0f28c3a5f7b3af1eab118d986559b5da06cd234493c9e0afbac05c9024d4d917"
+        },
+        {
+          "artifact_id": "A-PATCH",
+          "sha256": "2fef41382df4b13bf2db0139dae7bd4cba8a89d6ea8060faa5b4015259be5b35"
+        }
+      ],
+      "environment": "synthetic-example",
+      "actor": "reviewer-demo",
+      "at": "2026-10-17T03:00:00Z",
+      "receipt": {
+        "path": "receipts/contract-review.json",
+        "sha256": "8e25000f85d0628ec60459a3269f2883aa7d641d78d413d8fcb957ea047f25f2",
+        "bytes": 176
+      },
+      "result": "PASS"
+    }
+  ],
+  "acceptance": [
+    {
+      "criterion_id": "C-01",
+      "decision": "ACCEPTED",
+      "actor": "reviewer-demo",
+      "at": "2026-10-17T03:00:00Z",
+      "evidence_ids": [
+        "E-REVIEW"
+      ],
+      "basis_sha256": "806bbb9015fc1e821625e4ed0ef8fbb7a43449ca91a16c954e4840f12a9045b5"
+    }
+  ],
+  "activity": null,
+  "blocker": null,
+  "result": "Only the contract change proposal is accepted",
+  "remaining": "Implementation and runtime validation remain separate work items",
+  "next_action": null,
+  "events": [
+    {
+      "id": "EV-01",
+      "at": "2026-10-17T03:00:00Z",
+      "actor": "author-demo",
+      "kind": "CREATED",
+      "summary": "Scoped change proposal created",
+      "evidence_ids": []
+    },
+    {
+      "id": "EV-02",
+      "at": "2026-10-17T03:00:00Z",
+      "actor": "reviewer-demo",
+      "kind": "ACCEPTED",
+      "summary": "Document proposal accepted; code unchanged",
+      "evidence_ids": [
+        "E-REVIEW"
+      ]
+    }
+  ]
+}

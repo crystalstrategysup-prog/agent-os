@@ -374,9 +374,20 @@ class Library:
             for item in manifest[section]:
                 if item["preservation"] == "embedded":
                     require(item["asset_id"] in assets, "SOURCE_UNAVAILABLE")
-                    item["ref"] = self.store.put(
-                        assets[item["asset_id"]], item["media_type"]
-                    )
+                    try:
+                        item["ref"] = self.store.put(
+                            assets[item["asset_id"]], item["media_type"]
+                        )
+                    except HandoffError as exc:
+                        if exc.code == "SECRET_DETECTED":
+                            # Attach identity only; scanner/predicates and error
+                            # code remain unchanged. No source or match is copied.
+                            try:
+                                from .handoff_diagnostics import asset_context
+                                exc.handoff_asset = asset_context(item, len(assets[item["asset_id"]]))
+                            except Exception:
+                                pass  # Diagnostics must not mask the original guard.
+                        raise
                     if section == "evidence":
                         item["source_ref"]["snapshot_ref"] = item["ref"]["object_id"]
         manifest["handoff_ref"] = self.store.put(

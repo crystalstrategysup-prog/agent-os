@@ -151,13 +151,22 @@ def draft(
     }
 
 
-def deliver(root, task, review, assessment, *, profile, user_home=None):
+def deliver(root, task, review, assessment, *, profile, user_home=None, protected_sources=None, capture_selection=None):
     """Called under the project write lock before a terminal status is persisted."""
+    if (protected_sources is not None or capture_selection is not None) and profile != "checkpoint":
+        raise GateError("protected_sources_checkpoint_only")
     home = Path(user_home or task.get("handoff_user_home") or "")
     if not user_home and not task.get("handoff_user_home"):
         raise GateError("handoff_user_home_required")
     principal = local_principal()
     library_path = home / "results-library"
+    from .handoff_diagnostics import new_attempt, record_failure
+    diagnostic_attempt = new_attempt()
+    diagnostic_stage = "library_open"
+    diagnostic_captures = {}
+    fingerprint = None
+    snapshot = None
+    journal = None
     try:
         library = (
             Library(library_path)
@@ -168,13 +177,22 @@ def deliver(root, task, review, assessment, *, profile, user_home=None):
         from .project import SKIP, document_check, source_snapshot
         from .source_links import attest_directory_link
 
+        diagnostic_stage = "source_snapshot"
         snapshot = source_snapshot(root)
+        from .source_selection import require_source_write_paths
+
+        require_source_write_paths(snapshot, task["answers"]["write_paths"])
         require(
             profile != "completion"
             or assessment["source_sha256"] == snapshot["sha256"],
             "INTEGRITY_FAILED",
         )
+        diagnostic_stage = "document_check"
         docs = document_check(root, task)
+        from .protected_checkpoint import validate, reference
+        protected = validate(root, task, snapshot, docs, protected_sources)
+        from .checkpoint_selection import validate as validate_selection
+        selection = validate_selection(root, task, snapshot, capture_selection)
         link_rechecks = []
         for path, expected in snapshot.get("symlinks", {}).items():
             metadata, recheck = attest_directory_link(root, root / path, SKIP)
@@ -188,6 +206,8 @@ def deliver(root, task, review, assessment, *, profile, user_home=None):
             "assessment": assessment,
             "source_snapshot": snapshot,
             "documents": docs,
+            **({"protected_sources_request": protected_sources} if protected_sources is not None else {}),
+            **({"capture_selection_request": capture_selection} if capture_selection is not None else {}),
         }
         fingerprint = hashlib.sha256(encoded(payload)).hexdigest()
         journal_path = within(
@@ -200,10 +220,13 @@ def deliver(root, task, review, assessment, *, profile, user_home=None):
                 "HANDOFF_REVIEW_CHANGED_RETRY_REQUIRED",
             )
         else:
+            diagnostic_stage = "capture"
             assets = {"evidence:review": encoded(payload)}
+            diagnostic_captures["evidence:review"] = {"sha256": fingerprint, "bytes": len(assets["evidence:review"]), "path": "evidence/review.json"}
             deliverables = []
             captured_paths = {}
             captured_links = []
+            captured_protected = []
             # Preserve approved changed surfaces and current selected documents,
             # not an unbounded project history or unrelated data directory.
             approved = task["answers"]["write_paths"]
@@ -215,6 +238,12 @@ def deliver(root, task, review, assessment, *, profile, user_home=None):
                     for allowed in approved
                 )
             }
+            if selection is not None:
+                files = {path: value for path, value in files.items()
+                         if any(path == allowed or path.startswith(allowed + "/") for allowed in selection)}
+                # Explicit protected refs remain captured even outside selection;
+                # their content is still never embedded.
+                files.update({path: snapshot["files"][path] for path in protected})
             from .project import load_project
 
             project = load_project(root)
@@ -234,8 +263,14 @@ def deliver(root, task, review, assessment, *, profile, user_home=None):
                         hashlib.sha256(data).hexdigest() == expected,
                         "INTEGRITY_FAILED",
                     )
-                    captured_paths[asset_id] = "source/" + path
+                    if path in protected:
+                        data = encoded(reference(protected[path], data))
+                        captured_paths[asset_id] = f"protected-source-refs/source-{i:06d}.json"
+                        captured_protected.append(path)
+                    else:
+                        captured_paths[asset_id] = "source/" + path
                 assets[asset_id] = data
+                diagnostic_captures[asset_id] = {"sha256": expected if metadata is None and path not in protected else hashlib.sha256(data).hexdigest(), "bytes": len(data), "path": captured_paths[asset_id]}
                 deliverables.append(asset_id)
             if not deliverables:
                 assets["result:report"] = encoded(review)
@@ -259,6 +294,14 @@ def deliver(root, task, review, assessment, *, profile, user_home=None):
             manifest["entity"]["scope_revision"] = task["revision"]
             manifest["privacy"]["scope_id"] = current["library_id"]
             manifest["limitations"] = [review["limitations"]]
+            for cache in snapshot.get("source_selection", {}).get("generated_caches", []):
+                manifest["recovery"]["level"] = "external_required"
+                manifest["recovery"]["not_restored"].append("Generated cache " + cache["path"])
+                manifest["recovery"]["dependencies"].append({
+                    "dependency_id": "source-rebuild:" + digest(cache),
+                    "required": True, "status": "unknown"})
+                manifest["limitations"].append("Generated cache " + cache["path"] +
+                    " excluded by " + cache["rule"] + "; " + cache["recovery"])
             if set(snapshot["files"]) - set(files):
                 manifest["recovery"]["level"] = "external_required"
                 manifest["recovery"]["dependencies"] = [
@@ -271,6 +314,17 @@ def deliver(root, task, review, assessment, *, profile, user_home=None):
                 manifest["limitations"].append(
                     "Only approved result surfaces and current entry documents are captured; other source files require the recorded baseline."
                 )
+            if selection is not None:
+                manifest["limitations"].append("Explicit unfinished checkpoint capture selection: " + ", ".join(selection) + ". Full source identity is retained in evidence/review.json; omitted content requires the external baseline.")
+                if set(snapshot["files"]) - set(files):
+                    manifest["recovery"]["not_restored"].append("Omitted source baseline " + snapshot["sha256"] + " (fingerprints retained; content external and unverified).")
+            for path in captured_protected:
+                manifest["recovery"]["level"] = "external_required"
+                manifest["recovery"]["dependencies"].append({
+                    "dependency_id": "protected-source:" + digest({"path": path, "sha256": protected[path]["sha256"]}),
+                    "required": True, "status": "unknown"})
+                manifest["recovery"]["not_restored"].append("Protected config " + path + " (content withheld; local original required).")
+                manifest["limitations"].append("Protected config " + path + " is an explicit fingerprint reference only; no content captured or result acceptance implied.")
             for path in captured_links:
                 manifest["recovery"]["level"] = "external_required"
                 manifest["recovery"]["dependencies"].append(
@@ -340,6 +394,7 @@ def deliver(root, task, review, assessment, *, profile, user_home=None):
                 {"filters": {"handoff_id": manifest["handoff_id"]}}, principal
             )["results"]
             revision = existing[0]["manifest_ref"]["object_id"] if existing else None
+            diagnostic_stage = "build_handoff"
             candidate = library.build_handoff(
                 manifest, revision, principal, assets=assets, acceptance_profile=profile
             )
@@ -355,6 +410,7 @@ def deliver(root, task, review, assessment, *, profile, user_home=None):
             recheck()
         require(source_snapshot(root) == snapshot, "INTEGRITY_FAILED")
         require(document_check(root, task) == docs, "INTEGRITY_FAILED")
+        diagnostic_stage = "publish_handoff"
         receipt = library.publish_handoff(
             journal["candidate_ref"],
             library._authorize(principal)["generation"],
@@ -362,6 +418,7 @@ def deliver(root, task, review, assessment, *, profile, user_home=None):
             principal,
             acceptance_profile=profile,
         )
+        diagnostic_stage = "verify_handoff"
         hid = "handoff:" + task["id"]
         resolved = library.resolve(hid, principal)
         require(
@@ -392,7 +449,20 @@ def deliver(root, task, review, assessment, *, profile, user_home=None):
             "cleanup_authorized": False,
         }
     except (HandoffError, OSError) as exc:
-        raise GateError("handoff_acceptance_failed:" + str(exc)) from exc
+        error = GateError("handoff_acceptance_failed:" + str(exc))
+        try:
+            envelope = record_failure(
+                root, task, exc, profile=profile, attempt=diagnostic_attempt,
+                stage=diagnostic_stage, fingerprint=fingerprint,
+                source_sha=snapshot.get("sha256") if isinstance(snapshot, dict) else None,
+                captures=diagnostic_captures,
+                candidate_ref=journal.get("candidate_ref") if isinstance(journal, dict) else None,
+            )
+            if envelope is not None:
+                error.handoff_diagnostic = envelope
+        except Exception:
+            pass  # Optional diagnostic failure cannot replace the original refusal.
+        raise error from exc
 
 
 def verify(binding):

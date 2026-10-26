@@ -21,3 +21,8 @@
 - For coordination, use the versioned `docs/COORDINATOR_KNOWLEDGE_INDEX.json` and `docs/WORK_COORDINATION.md`: retain the original parent goal; verified result → remainder → owned next action. Preserve independent work, typed session/subagent ownership and unknown-outcome reconciliation. Source instructions are not live adoption or external authority.
 
 - Model selection follows `docs/MODEL_SELECTION.md`: current catalog latest available Sol, minimum sufficient supported effort, scoped alternate-model agreement, explicit escalation/quality evidence and higher-priority constraints. Requested/assigned never prove actual runtime. No automatic model or settings change.
+
+## Improving AgentOS
+Agents may propose in-scope verified bug fixes, performance or quality improvements, loop prevention and bottleneck removal without repeated approval for each PR. Preserve existing rights and target controls. Publish accepted changes through the canonical Git branch/PR workflow in docs/development/AGENT_IMPROVEMENTS.md; do not leave them only local.
+
+For project development and continuation, resolve and read modules/atlas/skills/atlas/SKILL.md and docs/ATLAS_SOURCE_POLICY.md. Ordinary read-only questions retain the direct path above.

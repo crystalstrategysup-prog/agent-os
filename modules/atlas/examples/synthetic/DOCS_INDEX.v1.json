@@ -1,0 +1,278 @@
+{
+  "schema": "docs-navigator.input/v1",
+  "project": {
+    "id": "SYNTHETIC_ONLY",
+    "title": "Synthetic example · Documentation and contracts"
+  },
+  "release": {
+    "id": "DEMO-20261017.1",
+    "created_at": "2026-10-17T03:07:11.492505+00:00",
+    "previous": null
+  },
+  "documents": [
+    {
+      "id": "doc.project",
+      "title": "PROJECT.md",
+      "path": "PROJECT.md",
+      "kind": "markdown",
+      "version": "2",
+      "lifecycle": "current",
+      "sha256": "85bf88fc0ad391e7aac5fae5877c4fa8a00097499ab9735d76bb8566e0a3d2be",
+      "bytes": 282,
+      "source_ref": "synthetic-local-generated; no actual YoMyo facts",
+      "readback_at": "2026-10-17T03:07:11.489817+00:00",
+      "evidence_state": "DESIGN",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "doc.schema",
+      "title": "PLAN.schema.json",
+      "path": "PLAN.schema.json",
+      "kind": "schema",
+      "version": "2",
+      "lifecycle": "current",
+      "sha256": "5b2e4f37ed753f4dc58d0698d11d86b0567681d052a306e8d77f46f901580c67",
+      "bytes": 318,
+      "source_ref": "synthetic-local-generated; no actual YoMyo facts",
+      "readback_at": "2026-10-17T03:07:11.491564+00:00",
+      "evidence_state": "DESIGN",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "doc.old",
+      "title": "OLD_PLAN.md",
+      "path": "OLD_PLAN.md",
+      "kind": "markdown",
+      "version": "1",
+      "lifecycle": "archived",
+      "sha256": "fdb62ae226c0cdcb2806a2c27e8a2f60c29c3773edbf0fe298cdd6f24fba4384",
+      "bytes": 146,
+      "source_ref": "synthetic-local-generated; no actual YoMyo facts",
+      "readback_at": "2026-10-17T03:07:11.491718+00:00",
+      "evidence_state": "DESIGN",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "doc.contracts",
+      "title": "CONTRACTS.md",
+      "path": "CONTRACTS.md",
+      "kind": "markdown",
+      "version": "2",
+      "lifecycle": "current",
+      "sha256": "111086f17e445ee9abe3d5b7a18f3167f8e48ade4d29a4918cc444e82533e257",
+      "bytes": 279,
+      "source_ref": "synthetic-local-generated; no actual YoMyo facts",
+      "readback_at": "2026-10-17T03:07:11.492189+00:00",
+      "evidence_state": "DESIGN",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "doc.matrix",
+      "title": "MATRIX_REFS.json",
+      "path": "MATRIX_REFS.json",
+      "kind": "json",
+      "version": "2",
+      "lifecycle": "current",
+      "sha256": "f38fb20e1bffdb318059f6066e1cc74ea63d8de90ad82a1945a0eaa18c4ad069",
+      "bytes": 493,
+      "source_ref": "synthetic-local-generated; no actual YoMyo facts",
+      "readback_at": "2026-10-17T03:07:11.492493+00:00",
+      "evidence_state": "DESIGN",
+      "execution": "NOT_RUN"
+    }
+  ],
+  "modules": [
+    {
+      "id": "module.planner",
+      "title": "Planner · example",
+      "purpose": "Shows explicit inputs and outputs without real project claims",
+      "state_owner": "module.planner",
+      "dependencies": [
+        "module.journal"
+      ],
+      "docs": [
+        "doc.project",
+        "doc.schema",
+        "doc.contracts",
+        "doc.old"
+      ]
+    },
+    {
+      "id": "module.journal",
+      "title": "Journal · example",
+      "purpose": "Owns synthetic receipts",
+      "state_owner": "module.journal",
+      "dependencies": [],
+      "docs": [
+        "doc.contracts",
+        "doc.matrix"
+      ]
+    }
+  ],
+  "contracts": [
+    {
+      "id": "contract.plan.v1",
+      "contract_key": "demo.plan",
+      "title": "Example planning",
+      "version": "1",
+      "lifecycle": "archived",
+      "module": "module.planner",
+      "state_owner": "module.planner",
+      "input": "locality, period",
+      "output": "plan_id",
+      "parameters": [
+        {
+          "name": "period",
+          "type": "string",
+          "required": true,
+          "description": "Synthetic parameter; actual project semantics UNKNOWN"
+        }
+      ],
+      "errors": [
+        {
+          "code": "INVALID_PERIOD",
+          "meaning": "Example error; actual behavior NOT_RUN"
+        }
+      ],
+      "auth": "SYNTHETIC_LOCAL_ONLY; actual project auth UNKNOWN",
+      "dependencies": [],
+      "usage": "Navigation demonstration only; no external operations",
+      "docs": [
+        "doc.old"
+      ],
+      "evidence_state": "DESIGN",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "contract.plan.v2",
+      "contract_key": "demo.plan",
+      "title": "Example planning",
+      "version": "2",
+      "lifecycle": "current",
+      "module": "module.planner",
+      "state_owner": "module.planner",
+      "input": "locality, period",
+      "output": "plan_id",
+      "parameters": [
+        {
+          "name": "period",
+          "type": "string",
+          "required": true,
+          "description": "Synthetic parameter; actual project semantics UNKNOWN"
+        }
+      ],
+      "errors": [
+        {
+          "code": "INVALID_PERIOD",
+          "meaning": "Example error; actual behavior NOT_RUN"
+        }
+      ],
+      "auth": "SYNTHETIC_LOCAL_ONLY; actual project auth UNKNOWN",
+      "dependencies": [
+        "contract.journal.v1"
+      ],
+      "usage": "Navigation demonstration only; no external operations",
+      "docs": [
+        "doc.contracts"
+      ],
+      "evidence_state": "DESIGN",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "contract.journal.v1",
+      "contract_key": "demo.journal",
+      "title": "Example journal",
+      "version": "1",
+      "lifecycle": "current",
+      "module": "module.journal",
+      "state_owner": "module.journal",
+      "input": "detached plan_id",
+      "output": "receipt_id",
+      "parameters": [
+        {
+          "name": "plan_id",
+          "type": "string",
+          "required": true,
+          "description": "Synthetic parameter; actual project semantics UNKNOWN"
+        }
+      ],
+      "errors": [
+        {
+          "code": "UNKNOWN",
+          "meaning": "Example error; actual behavior NOT_RUN"
+        }
+      ],
+      "auth": "SYNTHETIC_LOCAL_ONLY; actual project auth UNKNOWN",
+      "dependencies": [],
+      "usage": "Navigation demonstration only; no external operations",
+      "docs": [
+        "doc.contracts"
+      ],
+      "evidence_state": "DESIGN",
+      "execution": "NOT_RUN"
+    }
+  ],
+  "relations": [
+    {
+      "from": "module.planner",
+      "to": "module.journal",
+      "type": "depends_on",
+      "evidence_docs": [
+        "doc.contracts"
+      ]
+    },
+    {
+      "from": "contract.plan.v2",
+      "to": "contract.journal.v1",
+      "type": "uses",
+      "evidence_docs": [
+        "doc.contracts"
+      ]
+    },
+    {
+      "from": "doc.schema",
+      "to": "contract.plan.v2",
+      "type": "describes",
+      "evidence_docs": [
+        "doc.schema"
+      ]
+    }
+  ],
+  "matrix": {
+    "doc": "doc.matrix"
+  },
+  "bindings": [
+    {
+      "entity_id": "contract.plan.v2",
+      "step_ids": [
+        "DEMO-STEP-01",
+        "DEMO-STEP-02"
+      ],
+      "event_ids": [
+        "DEMO-EVENT-01"
+      ]
+    }
+  ],
+  "history": [
+    {
+      "id": "DEMO-HISTORY-01",
+      "at": "2026-10-17T00:00:00Z",
+      "kind": "DESIGN_ARCHIVED",
+      "summary": "Example version 1 retained; the source does not establish runtime behavior",
+      "entity_ids": [
+        "doc.old",
+        "contract.plan.v1"
+      ]
+    },
+    {
+      "id": "DEMO-HISTORY-02",
+      "at": "2026-10-17T00:02:00Z",
+      "kind": "DESIGN_NOT_RUN",
+      "summary": "Example version 2 added; no real project integration performed",
+      "entity_ids": [
+        "doc.contracts",
+        "contract.plan.v2"
+      ]
+    }
+  ]
+}

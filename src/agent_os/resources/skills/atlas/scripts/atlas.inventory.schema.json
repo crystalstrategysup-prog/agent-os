@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "atlas.inventory.schema.json",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "atlas.inventory/v1",
+      "type": "string"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "pattern": "[A-Za-z0-9][A-Za-z0-9_.:@-]{0,99}"
+    },
+    "scope_note": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20000
+    },
+    "source_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20000
+    },
+    "observed_at": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "domains": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "[A-Za-z0-9][A-Za-z0-9_.:@-]{0,99}"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "exhaustive": {
+            "type": "boolean"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "[A-Za-z0-9][A-Za-z0-9_.:@-]{0,99}"
+            },
+            "minItems": 0,
+            "maxItems": 2000
+          },
+          "exclusions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100,
+                  "pattern": "[A-Za-z0-9][A-Za-z0-9_.:@-]{0,99}"
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 20000
+                }
+              },
+              "required": [
+                "id",
+                "reason"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0,
+            "maxItems": 2000
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "exhaustive",
+          "items",
+          "exclusions"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 20
+    }
+  },
+  "required": [
+    "schema",
+    "id",
+    "scope_note",
+    "source_ref",
+    "observed_at",
+    "domains"
+  ],
+  "additionalProperties": false
+}

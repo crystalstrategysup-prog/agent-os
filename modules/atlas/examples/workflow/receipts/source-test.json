@@ -1,0 +1,7 @@
+{
+  "synthetic": true,
+  "result": "PASS",
+  "scope": "TEST",
+  "check_id": "batch.limit.v1",
+  "claim": "Demonstration receipt, not executed application test"
+}

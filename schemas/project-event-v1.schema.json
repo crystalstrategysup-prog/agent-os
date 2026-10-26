@@ -2,6 +2,114 @@
   "$id": "https://github.com/crystalstrategysup-prog/agent-os/schemas/project-event-v1.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "REFUSAL_ACKNOWLEDGED"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "details": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "full_goal": {
+                    "const": "OPEN"
+                  },
+                  "operation_id": {
+                    "pattern": "^[0-9a-f]{32}$",
+                    "type": "string"
+                  },
+                  "partial_objects": {
+                    "const": "UNKNOWN"
+                  },
+                  "refusal_witness_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "operation_id",
+                  "refusal_witness_sha256",
+                  "full_goal",
+                  "partial_objects"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "diagnostic_receipt": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "maximum": 16384,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "path": {
+                        "pattern": "^\\.agentos/tasks/task-[0-9a-f]{16}/diagnostics/[0-9a-f]{32}\\.json$",
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "path",
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "full_goal": {
+                    "const": "OPEN"
+                  },
+                  "operation_id": {
+                    "pattern": "^[0-9a-f]{32}$",
+                    "type": "string"
+                  },
+                  "original_attempt_id": {
+                    "pattern": "^[0-9a-f]{32}$",
+                    "type": "string"
+                  },
+                  "partial_objects": {
+                    "const": "UNKNOWN"
+                  },
+                  "refusal_witness_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "schema": {
+                    "const": "agentos.refusal-recovery-receipt/v2"
+                  }
+                },
+                "required": [
+                  "operation_id",
+                  "refusal_witness_sha256",
+                  "full_goal",
+                  "partial_objects",
+                  "schema",
+                  "original_attempt_id",
+                  "diagnostic_receipt"
+                ],
+                "type": "object"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
   "properties": {
     "at": {
       "format": "date-time",
@@ -16,7 +124,9 @@
         "READY",
         "CHECK",
         "CLOSE",
-        "CHECKPOINT"
+        "CHECKPOINT",
+        "REFUSAL_ACKNOWLEDGED",
+        "INTERRUPTED_CONTINUATION"
       ]
     }
   },

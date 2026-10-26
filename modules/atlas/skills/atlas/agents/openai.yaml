@@ -1,0 +1,4 @@
+interface:
+  display_name: "Atlas — controlled development"
+  short_description: "Work, contracts, actors, and evidence"
+  default_prompt: "Use $atlas to continue project work from its objective, contracts, and verified results."

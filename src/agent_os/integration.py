@@ -153,6 +153,7 @@ def install(
         "For project changes read " + method + ". Use `agentos project questions`, then `enter`, "
         "register required documents, `ready`, approved checks and `close` or `checkpoint`.\n"
         "For coordination read " + str(resources / "docs/COORDINATOR_KNOWLEDGE_INDEX.json") + ". Verify selected references; keep parent open until checked user result and record remainder/next owner. This routing does not launch sessions or prove live adoption.\n"
+        "Native workers must preserve a final and return result/evidence/remainder/next owner to their delegator through an explicitly authorized supported route. Delegators retain responsibility through bounded wait, receipt and semantic review; an owned blocker checkpoint names the next owner instead of abandoning the child. Busy gets no redundant continuation; unknown inputs/effects are reconciled before replay. Prepared report, uncertain send, recipient receipt and semantic acceptance are separate. New instructions do not automatically update already-running chats.\n"
         "Core resources: " + str(resources) + "\n"
         "Private user overlay: " + str(user_home) + "\n"
         "Load only relevant verified overlay knowledge; absent/stale profiles do not block unrelated reads. Never preload history.\n"

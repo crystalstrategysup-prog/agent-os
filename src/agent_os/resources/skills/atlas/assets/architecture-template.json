@@ -1,0 +1,355 @@
+{
+  "schema": "atlas.architecture-template/v1",
+  "classification": "SYNTHETIC_DESIGN_TEMPLATE",
+  "evidence_state": "DESIGN",
+  "execution": "NOT_RUN",
+  "scope_note": "Complete illustrative method semantics for adaptation. No source, installed, runtime, permission or project-completeness claim.",
+  "project": {
+    "id": "example-project",
+    "title": "Synthetic inventory example"
+  },
+  "modules": [
+    {
+      "id": "example.inventory",
+      "purpose": "Own inventory reservations and their durable operation outcomes.",
+      "state_owner": "example.inventory repository",
+      "provides": [
+        "example.inventory.reserve@1",
+        "example.inventory.observe@1"
+      ],
+      "consumes": [],
+      "source_binding": "REQUIRED_PROJECT_BINDING",
+      "build_deploy_contract": "module-template.json"
+    }
+  ],
+  "methods": [
+    {
+      "id": "example.inventory.reserve@1",
+      "logical_key": "example.inventory.reserve",
+      "version": "synthetic-1",
+      "module": "example.inventory",
+      "invocation": {
+        "kind": "in_process",
+        "name": "reserve",
+        "handler": "REQUIRED_PROJECT_HANDLER",
+        "endpoint": null,
+        "verb": null
+      },
+      "inputs": [
+        {
+          "name": "request_id",
+          "type": "UUID",
+          "required": true,
+          "default": {
+            "defined": false
+          },
+          "omitted": "Reject BadInput before storage.",
+          "null": "Reject BadInput.",
+          "false": "Reject BadInput; bool is not UUID."
+        },
+        {
+          "name": "item_id",
+          "type": "non-empty builtin string",
+          "required": true,
+          "default": {
+            "defined": false
+          },
+          "omitted": "Reject BadInput.",
+          "null": "Reject BadInput.",
+          "false": "Reject BadInput."
+        },
+        {
+          "name": "quantity",
+          "type": "exact builtin int, 1..100",
+          "required": true,
+          "default": {
+            "defined": false
+          },
+          "omitted": "Reject BadInput.",
+          "null": "Reject BadInput.",
+          "false": "Reject BadInput; bool is not int for this contract."
+        },
+        {
+          "name": "expires_in_seconds",
+          "type": "exact builtin int 30..3600 or null",
+          "required": false,
+          "default": {
+            "defined": true,
+            "value": 60
+          },
+          "omitted": "Use 60 seconds from the confirmed transaction clock.",
+          "null": "Create a non-expiring reservation if caller has reserve_permanent authority; otherwise reject Forbidden before mutation.",
+          "false": "Reject BadInput; false is not null or integer 0."
+        },
+        {
+          "name": "allow_partial",
+          "type": "exact builtin bool",
+          "required": false,
+          "default": {
+            "defined": true,
+            "value": false
+          },
+          "omitted": "Use false.",
+          "null": "Reject BadInput.",
+          "false": "Require the full quantity; insufficient stock gives a known no-effect error. True permits a positive partial reservation. Zero units never produce a committed reservation."
+        }
+      ],
+      "output": {
+        "type": "immutable ReservationResult",
+        "fields": [
+          {
+            "name": "request_id",
+            "type": "UUID",
+            "required": true,
+            "nullable": false
+          },
+          {
+            "name": "reservation_id",
+            "type": "UUID",
+            "required": true,
+            "nullable": false
+          },
+          {
+            "name": "reserved_quantity",
+            "type": "exact int 1..requested quantity",
+            "required": true,
+            "nullable": false
+          },
+          {
+            "name": "expires_at",
+            "type": "aware timestamp",
+            "required": true,
+            "nullable": true,
+            "null_meaning": "No expiration."
+          },
+          {
+            "name": "replayed",
+            "type": "exact bool",
+            "required": true,
+            "nullable": false
+          }
+        ],
+        "raw_return": "Return the declared result unchanged; no transport envelope or coercion."
+      },
+      "errors": [
+        {
+          "code": "BadInput",
+          "type": "synthetic.InvalidRequest",
+          "http_status": null,
+          "when": "Input type/range/shape invalid.",
+          "effects": "CONFIRMED_NO_EFFECT",
+          "retry": "Correct input; preserve request identity rules."
+        },
+        {
+          "code": "Forbidden",
+          "type": "synthetic.Forbidden",
+          "http_status": null,
+          "when": "Caller lacks inventory.write or requested permanent reservation authority.",
+          "effects": "CONFIRMED_NO_EFFECT",
+          "retry": "Only after a qualified authority change; never fabricate a role."
+        },
+        {
+          "code": "InsufficientStock",
+          "type": "synthetic.StockConflict",
+          "http_status": null,
+          "when": "Full requested quantity unavailable with allow_partial false, or zero available.",
+          "effects": "CONFIRMED_NO_EFFECT",
+          "retry": "No blind loop; a changed stock condition is required."
+        },
+        {
+          "code": "IdempotencyConflict",
+          "type": "synthetic.RequestConflict",
+          "http_status": null,
+          "when": "Same request_id with different canonical inputs or owner.",
+          "effects": "NO_ADDITIONAL_EFFECT",
+          "retry": "Do not allocate a new ID to disguise the collision."
+        },
+        {
+          "code": "StorageOutcomeUnknown",
+          "type": "synthetic.OutcomeUnknown",
+          "http_status": null,
+          "when": "Commit/response outcome cannot be established.",
+          "effects": "UNKNOWN",
+          "retry": "Observe exact request_id first; no mutation retry inside this scenario."
+        }
+      ],
+      "auth": {
+        "caller": "Explicit authorized application actor",
+        "role": "inventory.write; inventory.reserve_permanent only for explicit null expiry",
+        "tenant": "Caller-owned tenant context; body does not assign tenant or authority",
+        "credentials": "Not part of this method registry"
+      },
+      "effects": {
+        "owner": "example.inventory repository",
+        "state": [
+          "reservation",
+          "available stock",
+          "operation outcome"
+        ],
+        "transaction": "Validate ownership and inputs; lock item; record reservation, stock change and request outcome atomically. Return COMMITTED only after confirmed commit.",
+        "external": "None."
+      },
+      "idempotency": {
+        "key": "tenant_id + caller_id + request_id",
+        "same_inputs": "Return the durable original ReservationResult with replayed true; no additional reservation or stock change.",
+        "different_inputs": "IdempotencyConflict; never silently reinterpret the request.",
+        "unknown": "Call example.inventory.observe@1 with the same caller/tenant/request_id; missing observation does not authorize a resend."
+      },
+      "callers": [
+        "example.application.reserve-once"
+      ],
+      "runtime_identity": "Synthetic names only; bind actual existing return/exception identities before adapting to a real project.",
+      "source": {
+        "state": "SYNTHETIC_NO_SOURCE",
+        "refs": []
+      },
+      "evidence": {
+        "state": "DESIGN",
+        "execution": "NOT_RUN",
+        "refs": []
+      }
+    },
+    {
+      "id": "example.inventory.observe@1",
+      "logical_key": "example.inventory.observe",
+      "version": "synthetic-1",
+      "module": "example.inventory",
+      "invocation": {
+        "kind": "in_process",
+        "name": "observe",
+        "handler": "REQUIRED_PROJECT_HANDLER",
+        "endpoint": null,
+        "verb": null
+      },
+      "inputs": [
+        {
+          "name": "request_id",
+          "type": "UUID",
+          "required": true,
+          "default": {
+            "defined": false
+          },
+          "omitted": "Reject BadInput.",
+          "null": "Reject BadInput.",
+          "false": "Reject BadInput."
+        }
+      ],
+      "output": {
+        "type": "immutable ReservationObservation",
+        "fields": [
+          {
+            "name": "request_id",
+            "type": "UUID",
+            "required": true,
+            "nullable": false
+          },
+          {
+            "name": "state",
+            "type": "enum COMMITTED | CONFIRMED_NO_EFFECT | UNKNOWN",
+            "required": true,
+            "nullable": false
+          },
+          {
+            "name": "result",
+            "type": "ReservationResult",
+            "required": true,
+            "nullable": true,
+            "null_meaning": "Absent unless a matching committed outcome is qualified."
+          },
+          {
+            "name": "observed_at",
+            "type": "aware timestamp",
+            "required": true,
+            "nullable": false
+          }
+        ],
+        "semantics": "COMMITTED requires matching durable request/caller/tenant and result. CONFIRMED_NO_EFFECT requires a definitive terminal operation record. No record, unavailable read or an in-flight outcome means UNKNOWN. Never infer no effect from null/missing result.",
+        "raw_return": "Return the declared observation unchanged."
+      },
+      "errors": [
+        {
+          "code": "BadInput",
+          "type": "synthetic.InvalidRequest",
+          "when": "Invalid request_id.",
+          "effects": "NO_MUTATION",
+          "retry": "Correct input.",
+          "http_status": null
+        },
+        {
+          "code": "Forbidden",
+          "type": "synthetic.Forbidden",
+          "when": "Caller/tenant does not own observation scope.",
+          "effects": "NO_MUTATION",
+          "retry": "No role or identity substitution.",
+          "http_status": null
+        }
+      ],
+      "auth": {
+        "caller": "Original caller or explicitly authorized read-only operator",
+        "role": "inventory.read_own_operation",
+        "tenant": "Explicit existing caller tenant context",
+        "credentials": "Not recorded here"
+      },
+      "effects": {
+        "owner": "example.inventory repository",
+        "state": [],
+        "transaction": "Read exact operation identity; no create/resend/release/repair.",
+        "external": "None."
+      },
+      "idempotency": {
+        "key": "Original operation identity",
+        "same_inputs": "Repeated read may observe a later durable state; each observation retains its own time.",
+        "unknown": "Remain UNKNOWN until positive qualified evidence; no implicit mutation."
+      },
+      "callers": [
+        "example.application.reserve-once"
+      ],
+      "runtime_identity": "Synthetic return and exception names only; actual identity binding is required.",
+      "source": {
+        "state": "SYNTHETIC_NO_SOURCE",
+        "refs": []
+      },
+      "evidence": {
+        "state": "DESIGN",
+        "execution": "NOT_RUN",
+        "refs": []
+      }
+    }
+  ],
+  "composites": [
+    {
+      "id": "example.application.reserve-once",
+      "classification": "SYNTHETIC_DESIGN_NOT_EXECUTABLE",
+      "parameters_from": "example.inventory.reserve@1",
+      "preconditions": [
+        "Explicit caller/tenant authority.",
+        "Original request_id is fixed before the first invocation."
+      ],
+      "steps": [
+        {
+          "id": "reserve-once",
+          "method": "example.inventory.reserve@1",
+          "max_calls": 1,
+          "bind": "Exact declared request parameters; preserve omitted/null/false."
+        },
+        {
+          "id": "observe-unknown",
+          "method": "example.inventory.observe@1",
+          "when": "Reserve outcome is UNKNOWN.",
+          "max_calls": 1,
+          "bind": {
+            "request_id": "original request_id"
+          }
+        }
+      ],
+      "postconditions": [
+        "Return a qualified committed reservation if observed.",
+        "Known no-effect error or CONFIRMED_NO_EFFECT ends this scenario without automatic mutation retry.",
+        "UNKNOWN remains held with the same request identity."
+      ],
+      "state_owner": "Existing example.inventory repository only; no composite ledger or scheduler.",
+      "evidence_state": "DESIGN",
+      "execution": "NOT_RUN"
+    }
+  ]
+}

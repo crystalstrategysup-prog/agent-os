@@ -1,0 +1,537 @@
+{
+  "entrypoint": "workspace.py",
+  "execution_policy": "Fixed Python dispatcher only. Registry and documents are data, never eval, shell or dynamic module instructions. No network, product execution or native messages.",
+  "external_transport_registry": "../assets/adapters/owner-hosts.json",
+  "limits_reference": [
+    "../references/upstream-adapter.md",
+    "../references/document-sync.md",
+    "../references/data-contract.md"
+  ],
+  "methods": [
+    {
+      "cli": "workspace.py --registry PATH list",
+      "effects": [
+        "READ_REGISTRY"
+      ],
+      "handler": "workspace.list",
+      "id": "list",
+      "output": "Exact declared keys, roots and bindings; no bootstrap",
+      "parameters": {}
+    },
+    {
+      "cli": "workspace.py --registry PATH refresh PROJECT",
+      "effects": [
+        "READ_DECLARED_SOURCES",
+        "WRITE_ADAPTER_PROJECTION_ONLY_ON_DELTA",
+        "PUBLISH_OR_REPAIR_VERIFIED_CURRENT_HTML"
+      ],
+      "handler": "import_matrix.refresh",
+      "id": "refresh",
+      "output": "IMPORTED_PARTIAL or NO_CHANGE; capacity, current, view_path",
+      "parameters": {
+        "project": {
+          "meaning": "Exact key from atlas.workspace/v1; root and binding are resolved once from that registry",
+          "required": true,
+          "type": "string"
+        }
+      }
+    },
+    {
+      "cli": "workspace.py --registry PATH finish PROJECT",
+      "effects": [
+        "READ_DECLARED_SOURCES",
+        "WRITE_ADAPTER_PROJECTION_ONLY_ON_DELTA",
+        "PUBLISH_OR_REPAIR_VERIFIED_CURRENT_HTML"
+      ],
+      "handler": "import_matrix.refresh",
+      "id": "finish",
+      "output": "IMPORTED_PARTIAL or NO_CHANGE; capacity, current, view_path",
+      "parameters": {
+        "project": {
+          "meaning": "Exact key from atlas.workspace/v1; root and binding are resolved once from that registry",
+          "required": true,
+          "type": "string"
+        }
+      }
+    },
+    {
+      "cli": "workspace.py --registry PATH work PROJECT --operation ID --work ID --phase PHASE --executor ID --note TEXT --next-action TEXT [--status STATUS] [--evidence REL] [--document-edit DOCUMENT PREPARED_FILE]",
+      "effects": [
+        "PREPARE_ONE_IMMUTABLE_TYPED_REQUEST_WITH_CURRENT_SOURCE_AND_DOCUMENT_PINS",
+        "READ_EXPLICIT_WRITER_PROFILE_AND_PREPARED_RECORD",
+        "COMPARE_SOURCE_AND_DOCUMENT_PINS",
+        "APPEND_ONE_UNACCEPTED_LIFECYCLE_EVENT",
+        "APPLY_PREPARED_ALLOWLISTED_DOCUMENT_BYTES",
+        "RETAIN_FULL_OPERATION_PREIMAGES_AND_RESULTS",
+        "PUBLISH_PROJECTION_AND_CURRENT_HTML"
+      ],
+      "handler": "workspace.prepare_work_record -> checkpoint.checkpoint -> import_matrix.refresh -> navigator.publish_current_view",
+      "id": "work",
+      "output": "CHECKPOINT_PUBLISHED, NO_CHANGE or CHECKPOINT_PENDING; operation_id, phase, source_effect, pending, receipt, separately qualified projection, current and view_path; prepared_record names the saved original request",
+      "parameters": {
+        "document_edit": {
+          "meaning": "Pairs of allowed existing destination and separate prepared file; repeat --document-edit, maximum 16",
+          "required": false,
+          "type": "array"
+        },
+        "evidence": {
+          "meaning": "Explicit existing project-relative evidence paths; repeat --evidence, maximum 32",
+          "required": false,
+          "type": "array"
+        },
+        "executor": {
+          "meaning": "Exact declared executor ID",
+          "required": true,
+          "type": "string"
+        },
+        "next_action": {
+          "meaning": "Owned next action or remaining work",
+          "required": true,
+          "type": "string"
+        },
+        "note": {
+          "meaning": "The new observed fact",
+          "required": true,
+          "type": "string"
+        },
+        "operation": {
+          "meaning": "Stable identity of the real work fact, reused after an unknown outcome",
+          "required": true,
+          "type": "string"
+        },
+        "phase": {
+          "enum": [
+            "start",
+            "dispatch",
+            "progress",
+            "complete"
+          ],
+          "required": true,
+          "type": "string"
+        },
+        "project": {
+          "meaning": "Exact registered project key with an explicitly selected current owning-writer profile",
+          "required": true,
+          "type": "string"
+        },
+        "status": {
+          "meaning": "Start/dispatch imply doing; progress/complete require an explicit lifecycle status",
+          "required": false,
+          "type": "string"
+        },
+        "work": {
+          "meaning": "Exact existing source work ID",
+          "required": true,
+          "type": "string"
+        }
+      },
+      "preconditions": [
+        "Explicit .atlas/WRITER.json atlas.matrix-writer/v1 matches the current upstream binding",
+        "The caller is the declared current matrix writer; all matrix writers use the declared cooperative lock",
+        "Selected source and prepared document pins match; work and executor already exist",
+        "A previous unknown operation is reconciled under its original identity before another write"
+      ],
+      "reconcile": "checkpoint-reconcile PROJECT --operation ID reads the exact retained operation; --finish-pending resumes only its verified before/after state.",
+      "semantics": "One fixed parameterized call prepares the timestamp and hashes and publishes the checkpoint. Repeating the same operation with the same semantic parameters reuses its original request; changed parameters are refused. No activity claim is created by this convenience route. Advanced explicitly pinned activity uses checkpoint --record."
+    },
+    {
+      "cli": "workspace.py --registry PATH checkpoint PROJECT --record RELPATH",
+      "effects": [
+        "READ_EXPLICIT_WRITER_PROFILE_AND_PREPARED_RECORD",
+        "COMPARE_SOURCE_AND_DOCUMENT_PINS",
+        "APPEND_ONE_UNACCEPTED_LIFECYCLE_EVENT",
+        "APPLY_PREPARED_ALLOWLISTED_DOCUMENT_BYTES",
+        "RETAIN_FULL_OPERATION_PREIMAGES_AND_RESULTS",
+        "PUBLISH_PROJECTION_AND_CURRENT_HTML"
+      ],
+      "handler": "checkpoint.checkpoint -> import_matrix.refresh -> navigator.publish_current_view",
+      "id": "checkpoint",
+      "output": "CHECKPOINT_PUBLISHED, NO_CHANGE or CHECKPOINT_PENDING; operation_id, phase, source_effect, pending, receipt, separately qualified projection, current and view_path",
+      "parameters": {
+        "project": {
+          "meaning": "Exact registered project key with an explicitly selected current owning-writer profile",
+          "required": true,
+          "type": "string"
+        },
+        "record": {
+          "meaning": "Project-relative atlas.checkpoint/v1 JSON record; stable operation_id identifies the same real work fact across retries",
+          "required": true,
+          "type": "string"
+        }
+      },
+      "preconditions": [
+        "Explicit .atlas/WRITER.json atlas.matrix-writer/v1 matches the current upstream binding",
+        "The caller is the declared current matrix writer; all matrix writers use the declared cooperative lock",
+        "Selected source and prepared document pins match; work and executor already exist",
+        "A previous unknown operation is reconciled under its original identity before another write"
+      ],
+      "reconcile": "checkpoint-reconcile PROJECT --operation ID reads the exact retained operation; --finish-pending resumes only its verified before/after state.",
+      "semantics": "Start/dispatch immediately record doing. Dispatch is not proof of execution. Apply only prepared existing document deltas, never infer contracts or acceptance. The unchanged same operation is an idempotent receipt read, not a new history event."
+    },
+    {
+      "cli": "workspace.py --registry PATH checkpoint-reconcile PROJECT --operation ID [--finish-pending] [--inspect-protected-text-restore | --restore-protected-texts --finish-pending]",
+      "effects": [
+        "READ_EXACT_RETAINED_CHECKPOINT",
+        "READ_ONLY_BY_DEFAULT",
+        "OPTIONAL_FINISH_SAME_PINNED_OPERATION"
+      ],
+      "handler": "checkpoint.reconcile",
+      "id": "checkpoint-reconcile",
+      "output": "Verified published receipt or CHECKPOINT_PENDING with observed destination states. Completing an exact pending operation may publish its projection and repair the stable current page.",
+      "parameters": {
+        "finish_pending": {
+          "default": false,
+          "meaning": "Finish only the retained operation after exact before/after destination reconciliation; never release another operation lock",
+          "required": false,
+          "type": "boolean"
+        },
+        "operation": {
+          "meaning": "Exact original checkpoint operation_id",
+          "required": true,
+          "type": "string"
+        },
+        "project": {
+          "meaning": "Exact registered project key with an explicitly selected current owning-writer profile",
+          "required": true,
+          "type": "string"
+        },
+        "inspect_protected_text_restore": {
+          "required": false,
+          "type": "boolean",
+          "meaning": "Read-only exact prior objective/scope_note v3 restoration qualification; no writes"
+        },
+        "restore_protected_texts": {
+          "required": false,
+          "type": "boolean",
+          "meaning": "Requires finish_pending; exact frozen prior two-text restoration and original operation only; distinct from legacy note v2"
+        }
+      },
+      "reconcile": "Conflicting bytes remain refused. Resolve them with the current source writer; do not erase pending history or use a replacement operation identity."
+    },
+    {
+      "cli": "workspace.py --registry PATH start PROJECT --work ID",
+      "effects": [
+        "REFRESH_THEN_READ_PACKET",
+        "PUBLISH_OR_REPAIR_VERIFIED_CURRENT_HTML"
+      ],
+      "handler": "import_matrix.refresh -> atlas.packet",
+      "id": "start",
+      "output": "CONTEXT_LOADED with work_recording NOT_REQUESTED; refresh, packet, summary, coverage, current and stable view_path. The current writer records actual start/dispatch separately with checkpoint.",
+      "parameters": {
+        "project": {
+          "meaning": "Exact key from atlas.workspace/v1; root and binding are resolved once from that registry",
+          "required": true,
+          "type": "string"
+        },
+        "work": {
+          "meaning": "Existing stable work ID",
+          "required": true,
+          "type": "string"
+        }
+      }
+    },
+    {
+      "cli": "workspace.py --registry PATH packet PROJECT --work ID",
+      "effects": [
+        "READ_ONLY"
+      ],
+      "handler": "atlas.packet",
+      "id": "packet",
+      "output": "CONTEXT_LOADED with exact work dependency packet",
+      "parameters": {
+        "project": {
+          "meaning": "Exact key from atlas.workspace/v1; root and binding are resolved once from that registry",
+          "required": true,
+          "type": "string"
+        },
+        "work": {
+          "meaning": "Existing stable work ID",
+          "required": true,
+          "type": "string"
+        }
+      }
+    },
+    {
+      "cli": "workspace.py --registry PATH audit PROJECT",
+      "effects": [
+        "READ_ONLY"
+      ],
+      "handler": "atlas.coverage / project analysis",
+      "id": "audit",
+      "output": "PROJECT_CONTROL_REVIEW with gaps; product_execution NOT_RUN",
+      "parameters": {
+        "project": {
+          "meaning": "Exact key from atlas.workspace/v1; root and binding are resolved once from that registry",
+          "required": true,
+          "type": "string"
+        }
+      }
+    },
+    {
+      "cli": "workspace.py --registry PATH history PROJECT",
+      "effects": [
+        "READ_ONLY_RETAINED_RELEASE_PAGE"
+      ],
+      "handler": "atlas.history",
+      "id": "history",
+      "output": "VERIFIED_PAGE or VERIFIED_CHAIN; has_more and next_cursor",
+      "parameters": {
+        "cursor": {
+          "meaning": "Exact next_cursor from previous page",
+          "required": false,
+          "type": "string"
+        },
+        "limit": {
+          "default": 50,
+          "maximum": 100,
+          "minimum": 1,
+          "required": false,
+          "type": "integer"
+        },
+        "project": {
+          "meaning": "Exact key from atlas.workspace/v1; root and binding are resolved once from that registry",
+          "required": true,
+          "type": "string"
+        }
+      }
+    },
+    {
+      "cli": "workspace.py --registry PATH reconcile PROJECT",
+      "effects": [
+        "READ_ONLY"
+      ],
+      "handler": "import_matrix.reconcile",
+      "id": "reconcile",
+      "output": "Exact state, pending/lock/CURRENT observations; no retry or lock removal",
+      "parameters": {
+        "project": {
+          "meaning": "Exact key from atlas.workspace/v1; root and binding are resolved once from that registry",
+          "required": true,
+          "type": "string"
+        }
+      }
+    },
+    {
+      "cli": "workspace.py --registry PATH docs PROJECT",
+      "effects": [
+        "READ_PREPARED_DOCUMENT_SOURCE",
+        "WRITE_DECLARED_DOCUMENT_COPY_AND_CATALOG",
+        "REFRESH_PROJECTION",
+        "PUBLISH_OR_REPAIR_VERIFIED_CURRENT_HTML"
+      ],
+      "handler": "sync_docs.update",
+      "id": "docs",
+      "output": "NO_CHANGE or DOCUMENT_SNAPSHOT_UPDATED plus separately qualified projection.status",
+      "parameters": {
+        "project": {
+          "meaning": "Exact key from atlas.workspace/v1; root and binding are resolved once from that registry",
+          "required": true,
+          "type": "string"
+        },
+        "source_root": {
+          "meaning": "Explicit prepared local canonical-document snapshot folder",
+          "required": true,
+          "type": "string"
+        }
+      }
+    },
+    {
+      "cli": "workspace.py --registry PATH docs-reconcile PROJECT",
+      "effects": [
+        "READ_ONLY_BY_DEFAULT",
+        "OPTIONAL_FINISH_SAME_PINNED_DOCUMENT_PLAN"
+      ],
+      "handler": "sync_docs.reconcile",
+      "id": "docs-reconcile",
+      "output": "Read-only file states or exact completed document-sync generation; no owning matrix writes",
+      "parameters": {
+        "finish_pending": {
+          "default": false,
+          "meaning": "Finish exact retained plan only after every destination matches its before/after bytes",
+          "required": false,
+          "type": "boolean"
+        },
+        "project": {
+          "meaning": "Exact key from atlas.workspace/v1; root and binding are resolved once from that registry",
+          "required": true,
+          "type": "string"
+        }
+      }
+    },
+    {
+      "cli": "workspace.py --registry PATH views PROJECT",
+      "compatibility": "Old releases without atlas.presentation.sections return the base artifact URL and manual section names; source revision is UNKNOWN without a matched source document pin",
+      "effects": [
+        "READ_REGISTRY",
+        "READ_BINDING",
+        "VERIFY_ONE_CURRENT_RELEASE",
+        "JSON_STDOUT",
+        "READ_SELECTED_OWNING_MATRIX_FOR_HASH_COMPARISON"
+      ],
+      "freshness": "Compare only the selected owning matrix with the retained pin: MATCHED, CHANGED or UNKNOWN. Other source documents are NOT_COMPARED. No refresh or writes; immutable artifact identity and stable current_view status remain explicit.",
+      "handler": "workspace.project_views -> atlas.current_output / navigator.current_view_status",
+      "id": "views",
+      "output": "ARTIFACTS_READY or NO_CURRENT_VIEW; verified current_view, stable HTML path when CURRENT, immutable HTML/JSON pins, contract/roadmap section routes, retained source revision, selected matrix freshness and coverage; browser NOT_REQUESTED",
+      "parameters": {
+        "project": {
+          "meaning": "Exact registered project key; no work ID or source discovery needed",
+          "required": true,
+          "type": "string"
+        }
+      },
+      "preconditions": [
+        "Selected registry and binding are readable",
+        "Any CURRENT release must pass the existing immutable output verifier"
+      ],
+      "presentation": "Return artifact routes only. The current caller handles supported opening and readback; queued or prepared is not opened.",
+      "reconcile": "Call this read-only method again to observe a current artifact. For an unknown prior mutation, use its exact declared reconcile method; do not replay it."
+    },
+    {
+      "id": "history-requalify",
+      "cli": "workspace.py --registry PATH history-requalify PROJECT --operation ID [--cursor N]",
+      "handler": "history_requalification.requalify",
+      "parameters": {
+        "project": {
+          "required": true,
+          "type": "string"
+        },
+        "operation": {
+          "required": true,
+          "type": "string",
+          "meaning": "Stable finite requalification identity; distinct from original checkpoint operation"
+        },
+        "cursor": {
+          "required": false,
+          "type": "integer",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 100000
+        }
+      },
+      "effects": [
+        "READ_DECLARED_GENERATION_SOURCE_RETAINED_PINS",
+        "ACQUIRE_EXISTING_CHECKPOINT_AND_IMPORT_LOCKS",
+        "WRITE_ONE_BOUNDED_REQUALIFICATION_JOURNAL_PAGE_OR_COMPLETE_CERTIFICATE"
+      ],
+      "output": "PAGE_COMPLETE/PAGE_ALREADY_COMMITTED/CERTIFICATE_COMPLETE; cursor, read_bytes <= 33554432; publication NOT_RUN",
+      "limits": {
+        "read_bytes_per_call": 33554432,
+        "page_rows": 64,
+        "metadata_file_bytes": 8388608
+      },
+      "preconditions": [
+        "Exact adapter-owned state with generation metadata hash",
+        "Frozen binding/source/old full history roster",
+        "Existing local write authority required only for history-requalify"
+      ],
+      "reconcile": "Read status with the same operation; preserve unknown/orphan effects. After certificate completion use existing exact checkpoint-reconcile, never a new checkpoint.",
+      "reference": "../references/history-requalification.md"
+    },
+    {
+      "id": "history-requalification-status",
+      "cli": "workspace.py --registry PATH history-requalification-status PROJECT --operation ID [--cursor N]",
+      "handler": "history_requalification.requalify",
+      "parameters": {
+        "project": {
+          "required": true,
+          "type": "string"
+        },
+        "operation": {
+          "required": true,
+          "type": "string",
+          "meaning": "Stable finite requalification identity; distinct from original checkpoint operation"
+        },
+        "cursor": {
+          "required": false,
+          "type": "integer",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 100000
+        }
+      },
+      "effects": [
+        "READ_DECLARED_GENERATION_SOURCE_RETAINED_PINS",
+        "READ_ONLY"
+      ],
+      "output": "NOT_STARTED/PENDING/PENDING_CERTIFICATE_COMMIT/CERTIFICATE_COMPLETE; no publication",
+      "limits": {
+        "read_bytes_per_call": 33554432,
+        "page_rows": 64,
+        "metadata_file_bytes": 8388608
+      },
+      "preconditions": [
+        "Exact adapter-owned state with generation metadata hash",
+        "Frozen binding/source/old full history roster",
+        "Existing local write authority required only for history-requalify"
+      ],
+      "reconcile": "Read status with the same operation; preserve unknown/orphan effects. After certificate completion use existing exact checkpoint-reconcile, never a new checkpoint.",
+      "reference": "../references/history-requalification.md"
+    },
+    {
+      "id": "profile",
+      "entry": "agentos atlas profile",
+      "handler": "work_profile.select_profile",
+      "contract_version": "1.0.0",
+      "effect": "read_only",
+      "state_owner": "none; pure caller-declared scope classification",
+      "source": {
+        "path": "scripts/work_profile.py",
+        "sha256": "092dc71cbc71091fd991fd8a161d97e7c73caec85f03821c032f8d63b4079d01",
+        "symbol": "select_profile"
+      },
+      "inputs": [
+        "existing agentos.workflow.route result",
+        "changes: closed enum",
+        "bounded/full: strict booleans",
+        "context/writer: CURRENT|UNKNOWN|STALE|CONFLICT"
+      ],
+      "output": "atlas.work-profile/v1; READ_ONLY|MINIMAL|FULL; explicit unknowns and authority=false",
+      "preconditions": [
+        "Existing read access only; optional classification, never a prerequisite for ordinary reads",
+        "Caller CURRENT declarations must be independently verified before dependent changes"
+      ],
+      "postconditions": [
+        "No project/user registry, task, matrix, source, network or credentials read or written",
+        "Original workflow target authority requirement preserved; READY never granted"
+      ],
+      "errors": [
+        "WORK_PROFILE_ROUTE_REQUIRED",
+        "WORK_PROFILE_CHANGES",
+        "WORK_PROFILE_BOOLEAN",
+        "WORK_PROFILE_STATE",
+        "WORK_PROFILE_READ_ONLY_WITH_CHANGES"
+      ],
+      "idempotency": "Pure deterministic classification; retry has no effects",
+      "rollback": "No state mutation to undo; source-only candidate can be discarded",
+      "tests": [
+        "tests/test_atlas_work_profile.py",
+        "tests/test_atlas_entry_routing_policy.py"
+      ],
+      "evidence": "SOURCE tests only; installed/runtime/client adoption not implied",
+      "unknowns": [
+        "Input declarations are not an authenticated observation or authority receipt"
+      ]
+    }
+  ],
+  "registry": {
+    "flag": "--registry",
+    "required": true,
+    "schema": "atlas.workspace/v1"
+  },
+  "schema": "atlas.workspace-operations/v1",
+  "standalone_catalog": {
+    "effects": [
+      "READ_ONLY",
+      "JSON_STDOUT"
+    ],
+    "entrypoint": "catalog.py --root PATH --source PATH",
+    "execution": "NOT_RUN for every imported API card",
+    "formats": [
+      "openapi",
+      "record-catalog",
+      "operation-registry"
+    ],
+    "source_schema": "atlas.catalog-source/v1"
+  },
+  "version": 4
+}

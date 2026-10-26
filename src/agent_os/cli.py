@@ -32,6 +32,9 @@ def parser() -> argparse.ArgumentParser:
     root.add_argument("--home", "--user-home", dest="home", type=Path)
     root.add_argument("--version", action="version", version=__version__)
     commands = root.add_subparsers(dest="command", required=True)
+    atlas = commands.add_parser("atlas", add_help=False,
+        help="Use local project documentation and work methods; atlas --help")
+    atlas.add_argument("atlas_args", nargs=argparse.REMAINDER)
     commands.add_parser("init", help="Create a private local AgentOS home")
     commands.add_parser("doctor", help="Run secret-free local checks")
     commands.add_parser(
@@ -95,9 +98,15 @@ def parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    from .atlas_module import dispatch as atlas_dispatch
+
+    selected_argv = list(sys.argv[1:] if argv is None else argv)
+    atlas_result = atlas_dispatch(selected_argv)
+    if atlas_result is not None:
+        return atlas_result
     from .foundation_cli import dispatch
 
-    handled = dispatch(list(sys.argv[1:] if argv is None else argv))
+    handled = dispatch(selected_argv)
     if handled is not None:
         return handled
     args = parser().parse_args(argv)

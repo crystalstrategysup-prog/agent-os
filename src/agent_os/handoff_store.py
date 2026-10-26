@@ -160,13 +160,16 @@ def _dynamic_credential_expression(
     seen=frozenset(),
     depth=0,
     budget=None,
+    runtime_calls=frozenset(),
 ):
-    """Bounded lookup grammar; calls/literals and ambiguous local origins fail."""
+    """Bounded lookups and pre-proven runtime calls; ambiguous origins fail."""
     if budget is None:
         budget = [4096]
     budget[0] -= 1
     if budget[0] < 0 or depth > 64:
         return False
+    if isinstance(node, ast.Call):
+        return node in runtime_calls
     if isinstance(node, ast.Name):
         if node.id in seen:
             return False
@@ -182,6 +185,7 @@ def _dynamic_credential_expression(
                 seen | {node.id},
                 depth + 1,
                 budget,
+                runtime_calls,
             )
             for value in values
         )
@@ -196,6 +200,7 @@ def _dynamic_credential_expression(
             seen,
             depth + 1,
             budget,
+            runtime_calls,
         )
     if isinstance(node, ast.Subscript):
         key = node.slice
@@ -209,6 +214,7 @@ def _dynamic_credential_expression(
                 seen,
                 depth + 1,
                 budget,
+                runtime_calls,
             )
             and (
                 isinstance(key, ast.Name)
@@ -313,6 +319,12 @@ def _source_literal_spans(data: bytes) -> set[tuple[int, int]]:
                 result.update(ancestor[kind])
         return result
 
+    jwt_source = None
+    if any(isinstance(node, ast.Import) and any(alias.name == "jwt" for alias in node.names)
+           for node, _ in nodes):
+        from .source_runtime_jwt import RuntimeJWTSource
+        jwt_source = RuntimeJWTSource([node for node, _ in nodes])
+
     def local_output_safe(
         expression, bindings, assigned_paths, seen=frozenset(), depth=0, budget=None
     ):
@@ -324,6 +336,9 @@ def _source_literal_spans(data: bytes) -> set[tuple[int, int]]:
         if isinstance(expression, ast.Constant):
             return not isinstance(expression.value, str)
         if isinstance(expression, ast.Call):
+            if jwt_source is not None and jwt_source.claims_encoder(expression):
+                return jwt_source.allows(expression, lambda value: _dynamic_credential_expression(
+                    value, bindings, assigned_paths, set()))
             # Only external method-call data remains opaque. Local callables,
             # bare calls and literal receivers cannot certify a return origin.
             return (
@@ -398,6 +413,17 @@ def _source_literal_spans(data: bytes) -> set[tuple[int, int]]:
             else:
                 scope["bindings"].setdefault(name, []).append(ast.Constant(value=None))
         scope["runtime_unpack"] = runtime_unpack
+    runtime_calls = set()
+    if jwt_source is not None:
+        call_scopes = {node: scope for node, scope in nodes if isinstance(node, ast.Call)}
+        for call in jwt_source.candidates():
+            scope = call_scopes[call]
+            call_bindings = visible(scope, "bindings")
+            call_paths = visible(scope, "paths")
+            call_unpack = scope["runtime_unpack"]
+            if jwt_source.allows(call, lambda value: _dynamic_credential_expression(
+                    value, call_bindings, call_paths, call_unpack)):
+                runtime_calls.add(call)
     for node, scope in nodes:
         bindings = visible(scope, "bindings")
         assigned_paths = visible(scope, "paths")
@@ -421,17 +447,22 @@ def _source_literal_spans(data: bytes) -> set[tuple[int, int]]:
                 and isinstance(value.left, ast.Constant)
                 and value.left.value == "Bearer "
                 and _dynamic_credential_expression(
-                    value.right, bindings, assigned_paths, runtime_unpack
+                    value.right, bindings, assigned_paths, runtime_unpack,
+                    runtime_calls=runtime_calls
                 )
             ):
                 continue
             left = value.left
-            spans.add(
-                (
-                    offsets[left.lineno - 1] + left.col_offset,
-                    offsets[left.end_lineno - 1] + left.end_col_offset,
-                )
-            )
+            span = (offsets[left.lineno - 1] + left.col_offset,
+                    offsets[left.end_lineno - 1] + left.end_col_offset)
+            # AST columns use UTF-8 offsets. An alternate source encoding must
+            # never redirect this exception onto another field/comment value.
+            try:
+                original = ast.literal_eval(data[span[0]:span[1]].decode("utf-8"))
+            except (SyntaxError, ValueError, UnicodeError, RecursionError):
+                continue
+            if original == "Bearer ":
+                spans.add(span)
     return spans
 
 

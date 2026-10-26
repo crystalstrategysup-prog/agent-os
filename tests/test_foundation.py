@@ -645,6 +645,23 @@ def test_integration_preserves_user_content(tmp_path):
     assert "agentosManaged" not in before.decode()
 
 
+def test_integration_native_return_routing_is_idempotent_without_new_runtime(tmp_path):
+    ch, sh, home = tmp_path / "codex", tmp_path / "skills", tmp_path / "owner"
+    ch.mkdir()
+    (ch / "AGENTS.md").write_text("Keep existing owner instructions.\n")
+    integration.install(ch, sh, home, apply=True)
+    first = (ch / "AGENTS.md").read_bytes()
+    integration.install(ch, sh, home, apply=True)
+    assert (ch / "AGENTS.md").read_bytes() == first
+    body = first.decode()
+    assert body.startswith("Keep existing owner instructions.")
+    assert "Delegators retain responsibility through bounded wait, receipt and semantic review" in body
+    assert "Prepared report, uncertain send, recipient receipt and semantic acceptance are separate" in body
+    assert "New instructions do not automatically update already-running chats" in body
+    assert not (ch / "hooks.json").exists()
+    assert not (ch / "config.toml").exists()
+
+
 def test_integration_modified_skill_conflict(tmp_path):
     ch = tmp_path / "codex"
     sh = tmp_path / "skills"

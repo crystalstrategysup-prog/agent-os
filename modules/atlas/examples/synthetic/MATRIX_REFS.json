@@ -1,0 +1,24 @@
+{
+  "schema": "docs-navigator.matrix-refs/v1",
+  "dataset_id": "SYNTHETIC_ONLY",
+  "steps": [
+    {
+      "id": "DEMO-STEP-01",
+      "title": "Declare a synthetic contract"
+    },
+    {
+      "id": "DEMO-STEP-02",
+      "title": "Validate a real project — NOT_RUN"
+    }
+  ],
+  "events": [
+    {
+      "id": "DEMO-EVENT-01",
+      "at": "2026-10-17T00:02:00Z",
+      "title": "Example design recorded; implementation NOT_RUN",
+      "step_ids": [
+        "DEMO-STEP-01"
+      ]
+    }
+  ]
+}

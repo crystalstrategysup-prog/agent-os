@@ -4,7 +4,7 @@
 
 AgentOS gives a project a repeatable path from its current state to a verified change: project dossier → roadmap → documented stage → implementation → checks → updated documentation. A short intake selects only the relevant document layers. The CLI keeps the task, source, documents and check evidence bound to the same stage; ordinary read-only questions bypass intake entirely. Native hooks are excluded; explicit CLI checks do not intercept arbitrary tools.
 
-This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). This source declares candidate `0.8.0rc2` (Python distribution version `0.8.0rc2`). It is a local publication candidate until the canonical tag, release object and uploaded assets are independently read back. It is separate from any maintainer's private runtime, infrastructure and personal data.
+This is the canonical public repository: [crystalstrategysup-prog/agent-os](https://github.com/crystalstrategysup-prog/agent-os). This branch publishes source candidate `0.8.0rc2033`, reconstructed byte-for-byte from the identified public distribution. See [source provenance](.release/0.8.0rc2033-source.json). The source branch, reviewed merge, release assets and installed adoption are separate states; this candidate is not a new official release. It is separate from any maintainer's private runtime, infrastructure and personal data.
 
 Visit the [public project website](https://crystalstrategy.ru/agent-os/), read the [changelog](CHANGELOG.md), or open an [issue](https://github.com/crystalstrategysup-prog/agent-os/issues) with a bug or technical review. Verify tag, release asset and website deployment separately.
 
@@ -128,3 +128,7 @@ Qualified creation now reads the exact approved Codex binary's inherited configu
 ## Completion and safe recovery candidate
 
 [The completion guide](docs/COMPLETION.md) describes explicit bounded continuation, receiver fencing, independent acceptance, verified handoff and checkpoint recovery on the existing Coordinator store. This candidate does not install a scheduler or hooks. Only the scoped local POSIX registered-command adapter is qualified; remote/cloud completion and Goals activation require separate actual adapter qualification. The owner runtime and already-open sessions do not adopt source changes automatically.
+
+## Agent improvements and pull requests
+
+Any agent with existing task authority and repository access may submit verified bug fixes, performance or quality improvements, loop prevention and bottleneck removal. Publish accepted improvements as commits and pull requests in this canonical repository. See [the contribution policy](docs/development/AGENT_IMPROVEMENTS.md). This source guidance does not prove that already-running clients loaded it.

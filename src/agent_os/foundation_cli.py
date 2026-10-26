@@ -101,5 +101,13 @@ def dispatch(argv: list[str]) -> int | None:
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return code
     except (GateError, OSError, ValueError, KeyError, TypeError) as exc:
-        print(json.dumps({"status": "BLOCKED", "error": str(exc)}, ensure_ascii=False))
+        result = {"status": "BLOCKED", "error": str(exc)}
+        try:
+            from .handoff_diagnostics import public_envelope
+            diagnostic = public_envelope(exc)
+        except Exception:
+            diagnostic = None  # Original BLOCKED/error/exit semantics are decisive.
+        if diagnostic is not None:
+            result["diagnostic"] = diagnostic
+        print(json.dumps(result, ensure_ascii=False))
         return 2
