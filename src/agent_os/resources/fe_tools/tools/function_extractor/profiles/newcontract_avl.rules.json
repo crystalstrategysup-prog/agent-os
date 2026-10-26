@@ -1,0 +1,840 @@
+{
+  "schema": "function-extractor.rule-declarations/v1",
+  "rules": [
+    {
+      "rule_id": "avl.h01.trace",
+      "boundary_id": "AVL-H01",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "sent"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "sent"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "NONE"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.h02.trace",
+      "boundary_id": "AVL-H02",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.h03.trace",
+      "boundary_id": "AVL-H03",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.h04.trace",
+      "boundary_id": "AVL-H04",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.h05.trace",
+      "boundary_id": "AVL-H05",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.h06.trace",
+      "boundary_id": "AVL-H06",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.h07.trace",
+      "boundary_id": "AVL-H07",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.h08.trace",
+      "boundary_id": "AVL-H08",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "failed"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "failed"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "provider_rejected_401_unknown_other"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.h09.trace",
+      "boundary_id": "AVL-H09",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.h10.trace",
+      "boundary_id": "AVL-H10",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "failed"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "failed"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "provider_rejected_400_parent_not_found"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.h11.trace",
+      "boundary_id": "AVL-H11",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "native_post_response_invalid"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.h12.trace",
+      "boundary_id": "AVL-H12",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "failed"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "failed"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "transport_not_installed"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.t03.trace",
+      "boundary_id": "AVL-T03",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "retry_wait",
+          "retry_after": 7
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "retry_wait"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "flood_control"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.t04.trace",
+      "boundary_id": "AVL-T04",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "provider_indeterminate"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.t11.trace",
+      "boundary_id": "AVL-T11",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.t12.trace",
+      "boundary_id": "AVL-T12",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "partial_or_invalid_receipt"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.c01.trace",
+      "boundary_id": "AVL-C01",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_group.sent"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_reply.queued"
+          },
+          {
+            "phase": "canonical_posts",
+            "event": "counted"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.c02.trace",
+      "boundary_id": "AVL-C02",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_group.unknown"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_reply.queued"
+          },
+          {
+            "phase": "canonical_posts",
+            "event": "counted"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.c03.trace",
+      "boundary_id": "AVL-C03",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_group.sent"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_reply.sent"
+          },
+          {
+            "phase": "canonical_posts",
+            "event": "counted"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.c04.trace",
+      "boundary_id": "AVL-C04",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_group.sent"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_reply.unknown"
+          },
+          {
+            "phase": "canonical_posts",
+            "event": "counted"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.c05.trace",
+      "boundary_id": "AVL-C05",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "canonical_receipt_commit",
+            "event": "failed"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_group.sending"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_reply.queued"
+          },
+          {
+            "phase": "canonical_posts",
+            "event": "counted"
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "avl.fixture.schema",
+      "boundary_id": "avl-fixture",
+      "kind": "input_schema",
+      "constraint": {
+        "type": "object",
+        "properties": {
+          "case": {
+            "type": "string"
+          },
+          "route": {
+            "enum": [
+              "platform_group"
+            ]
+          }
+        },
+        "required": [
+          "case",
+          "route"
+        ],
+        "additionalProperties": true
+      }
+    },
+    {
+      "rule_id": "avl.c01.no_retry",
+      "boundary_id": "AVL-C01",
+      "kind": "no_retry",
+      "constraint": {
+        "max_attempts": 1
+      }
+    },
+    {
+      "rule_id": "avl.c02.no_retry",
+      "boundary_id": "AVL-C02",
+      "kind": "no_retry",
+      "constraint": {
+        "max_attempts": 1
+      }
+    },
+    {
+      "rule_id": "avl.c03.no_retry",
+      "boundary_id": "AVL-C03",
+      "kind": "no_retry",
+      "constraint": {
+        "max_attempts": 1
+      }
+    },
+    {
+      "rule_id": "avl.c04.no_retry",
+      "boundary_id": "AVL-C04",
+      "kind": "no_retry",
+      "constraint": {
+        "max_attempts": 1
+      }
+    },
+    {
+      "rule_id": "avl.c05.no_retry",
+      "boundary_id": "AVL-C05",
+      "kind": "no_retry",
+      "constraint": {
+        "max_attempts": 1
+      }
+    }
+  ],
+  "boundaries": [
+    {
+      "boundary_id": "AVL-H01",
+      "symbol": "app.ingest.telegram_private_transport:deliver",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-H02",
+      "symbol": "app.ingest.telegram_private_transport:deliver",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-H03",
+      "symbol": "app.ingest.telegram_private_transport:deliver",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-H04",
+      "symbol": "app.ingest.telegram_private_transport:deliver",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-H05",
+      "symbol": "app.ingest.telegram_private_transport:deliver",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-H06",
+      "symbol": "app.ingest.telegram_private_transport:deliver",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-H07",
+      "symbol": "app.ingest.telegram_private_transport:deliver",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-H08",
+      "symbol": "app.ingest.telegram_private_transport:deliver",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-H09",
+      "symbol": "app.ingest.telegram_private_transport:deliver",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-H10",
+      "symbol": "app.ingest.telegram_private_transport:deliver",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-H11",
+      "symbol": "app.ingest.telegram_private_transport:deliver",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-H12",
+      "symbol": "app.ingest.telegram_private_transport:deliver",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-T03",
+      "symbol": "app.ingest.telegram_private_transport:deliver",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-T04",
+      "symbol": "app.ingest.telegram_private_transport:deliver",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-T11",
+      "symbol": "app.ingest.telegram_private_transport:deliver",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-T12",
+      "symbol": "app.ingest.telegram_private_transport:deliver",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-C01",
+      "symbol": "app.ingest.telegram_private_worker:process_delivery_once",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-C02",
+      "symbol": "app.ingest.telegram_private_worker:process_delivery_once",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-C03",
+      "symbol": "app.ingest.telegram_private_worker:process_delivery_once",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-C04",
+      "symbol": "app.ingest.telegram_private_worker:process_delivery_once",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "AVL-C05",
+      "symbol": "app.ingest.telegram_private_worker:process_delivery_once",
+      "kind": "semantic"
+    },
+    {
+      "boundary_id": "avl-fixture",
+      "symbol": "avl-fixture",
+      "kind": "semantic"
+    }
+  ]
+}

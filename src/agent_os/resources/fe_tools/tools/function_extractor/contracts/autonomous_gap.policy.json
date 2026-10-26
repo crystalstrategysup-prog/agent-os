@@ -1,0 +1,88 @@
+{
+  "schema": "fe-autonomous-gap-policy/v1",
+  "status": "REVIEWED_SOURCE_POLICY_PENDING_FINAL_ACCEPTANCE_NOT_RUNTIME_AUTOREPAIR",
+  "probability_policy": {
+    "metric": "empirical_event_frequency",
+    "definition": "confirmed events / observed executions for the same boundary, source revision and window; always report both integer counts",
+    "when_denominator_missing_or_zero": "UNKNOWN_NOT_ESTIMATED",
+    "recurrence_probability": "UNKNOWN; empirical frequency is not a recurrence model",
+    "sample_size_guarantees": false,
+    "minimum_sample_guarantees": false,
+    "impact_tiers": [
+      "LOW",
+      "MEDIUM",
+      "HIGH",
+      "CRITICAL"
+    ]
+  },
+  "gap_classes": [
+    {
+      "code": "SCHEMA_UNSUPPORTED",
+      "risk": "HIGH",
+      "expected_frequency": "UNKNOWN",
+      "automatic_response": "capture exact rule/pins, isolate engine patch, negative tests, replay, independent review; preserve UNKNOWN until acceptance",
+      "human_gate": "Only if changing production, shared source owned by another active writer, or an external approval boundary"
+    },
+    {
+      "code": "CONTRACT_MISSING",
+      "risk": "HIGH",
+      "expected_frequency": "UNKNOWN",
+      "automatic_response": "pin official reference and existing local sources; create PROPOSED contract and tests; do not self-declare OFFICIAL",
+      "human_gate": "Canonical normative admission requires existing review authority"
+    },
+    {
+      "code": "SOURCE_PIN_DRIFT",
+      "risk": "HIGH",
+      "expected_frequency": "UNKNOWN",
+      "automatic_response": "halt current replay, capture actual hashes, build isolated overlay, re-run exact AST/manifest tests",
+      "human_gate": "Only if promotion crosses source governance or active writer lease"
+    },
+    {
+      "code": "PROVIDER_RECEIPT_UNKNOWN",
+      "risk": "CRITICAL",
+      "expected_frequency": "UNKNOWN",
+      "automatic_response": "preserve pending effect/receipt, stop retry, report diagnostic family separately from delivery status; guarded read-only reconciliation",
+      "human_gate": "Any native write, pending reset, replay of UNKNOWN or live provider mutation requires scoped authority"
+    },
+    {
+      "code": "TEST_REGRESSION",
+      "risk": "HIGH",
+      "expected_frequency": "UNKNOWN",
+      "automatic_response": "capture FAIL and exact reproduction, stop promotion, minimal isolated patch, green target and unaffected suite",
+      "human_gate": "If regression affects active production or cannot be safely isolated"
+    },
+    {
+      "code": "ACCESS_OR_LEASE_MISSING",
+      "risk": "HIGH",
+      "expected_frequency": "UNKNOWN",
+      "automatic_response": "stop at approval boundary, preserve artifacts and request minimum exact permission; never forge grants",
+      "human_gate": "Explicit authorized owner/lease issuer"
+    }
+  ],
+  "bounded_iteration": {
+    "max_single_step_seconds": 300,
+    "timeout_semantics": "Resource limit for a single bounded command; record timeout and revise method, not a goal deadline",
+    "max_local_attempts_per_gap": null,
+    "on_same_failure_without_new_evidence": "CHANGE_METHOD_OR_HYPOTHESIS_AND_INDEPENDENT_CHECK",
+    "escalate_only": "Genuine missing authority, business decision, secret or irreducible external dependency",
+    "no_retry_on_UNKNOWN_remote_operation": true,
+    "evidence_required": [
+      "source_sha",
+      "contract_reference",
+      "expected_actual",
+      "trace",
+      "test_receipt",
+      "scope",
+      "owner"
+    ]
+  },
+  "authority": {
+    "isolated_sources_and_offline_tests": "OWNER_TASK_AUTHORIZED",
+    "canonical_source_write": "CURRENT_SOURCE_GOVERNANCE_AND_REVIEW_REQUIRED",
+    "live_telegram_or_production_mutation": "EXACT_EXISTING_PRODUCTION_APPROVAL_REQUIRED",
+    "approval_bypass": "FORBIDDEN"
+  },
+  "version": 2,
+  "source_skill": ".agents/skills/function-extractor/SKILL.md#\u043f\u0440\u043e\u0442\u043e\u043a\u043e\u043b-\u0430\u0432\u0442\u043e\u043d\u043e\u043c\u043d\u043e\u0433\u043e-\u0443\u0441\u0442\u0440\u0430\u043d\u0435\u043d\u0438\u044f-\u043f\u0440\u0435\u043f\u044f\u0442\u0441\u0442\u0432\u0438\u0439",
+  "implementation_scope": "Policy for Codex and static checker guidance only; not implemented unattended repair, probability estimation, live rollout or new approval"
+}

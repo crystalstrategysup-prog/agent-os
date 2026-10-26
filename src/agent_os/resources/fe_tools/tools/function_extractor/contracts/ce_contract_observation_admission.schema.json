@@ -1,0 +1,43 @@
+{
+  "$id": "urn:function-extractor:ce_contract_observation_admission:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "admission_scope": {
+      "enum": [
+        "NONE",
+        "STRUCTURAL_ONLY",
+        "VERIFIED_MANIFEST_BINDING"
+      ]
+    },
+    "reason_code": {
+      "enum": [
+        null,
+        "PLAN_INVALID",
+        "OBSERVATIONS_INVALID",
+        "OBSERVATIONS_ABSENT"
+      ]
+    },
+    "schema": {
+      "const": "function-extractor.contract-observation-admission/v1"
+    },
+    "status": {
+      "enum": [
+        "VALID",
+        "REFUSED",
+        "UNKNOWN"
+      ]
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "schema",
+    "version",
+    "status",
+    "reason_code",
+    "admission_scope"
+  ],
+  "type": "object"
+}

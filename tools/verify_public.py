@@ -5,7 +5,6 @@ import ast
 import json
 import re
 import sys
-import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,31 +18,9 @@ def runtime_receipts_present(root: Path) -> bool:
     return (root / ".agentos").exists()
 
 
-def version_matches(project_text: str, module_version: str) -> bool:
-    try:
-        declared = tomllib.loads(project_text)["project"]["version"]
-    except (ValueError, KeyError, TypeError):
-        return False
-    return type(declared) is str and bool(declared) and declared == module_version
-
-
-def skill_name(rel: Path, text: str):
-    match = re.match(r"^---\nname: ([^\n]+)\ndescription: .+\n---\n", text)
-    if not match:
-        return None
-    name = match.group(1)
-    if name.startswith("agentos-"):
-        return name
-    if name == "atlas" and str(rel) in {"src/agent_os/resources/skills/atlas/SKILL.md", "modules/atlas/skills/atlas/SKILL.md"}:
-        return name
-    return None
-
-
 def verify() -> dict:
     errors = []
     counts = {"python": 0, "json": 0, "skills": 0, "markdown": 0}
-    foundation_skills = set()
-    atlas_skills = 0
     if runtime_receipts_present(ROOT):
         errors.append("runtime_receipts_in_public_tree")
     forbidden = ["/Users/", "PRIVATE-DO-NOT-PUBLISH", "private-current-rc."]
@@ -77,6 +54,14 @@ def verify() -> dict:
         "dist",
         "build",
         ".agentos",
+    }
+    # Exact plugin entrypoints are bundled as independent modules. Foundation
+    # still requires its original nine canonical agentos-* skills; importing
+    # third-party skills must neither rename them nor discard their locales.
+    extension_skills = {
+        "src/agent_os/resources/skills/atlas/SKILL.md": "atlas",
+        "src/agent_os/resources/skills/function-extractor/SKILL.md": "function-extractor",
+        "modules/atlas/skills/atlas/SKILL.md": "atlas",
     }
     for path in ROOT.rglob("*"):
         rel = path.relative_to(ROOT)
@@ -119,20 +104,25 @@ def verify() -> dict:
             counts["markdown"] += 1
         if path.name == "SKILL.md":
             counts["skills"] += 1
-            name = skill_name(rel, text)
+            name = extension_skills.get(str(rel))
             if name is None:
-                errors.append("skill_frontmatter:" + str(rel))
-            elif name == "atlas":
-                atlas_skills += 1
+                allowed = str(rel).startswith("src/agent_os/resources/skills/agentos-")
+                expected_name = "agentos-[^\n]+" if allowed else None
             else:
-                foundation_skills.add(name)
+                expected_name = re.escape(name)
+            if expected_name is None or not re.match(
+                r"^---\nname: " + expected_name + r"\ndescription: .+\n---\n", text
+            ):
+                errors.append("skill_frontmatter:" + str(rel))
     for doc_id in DOCS:
         if not (ROOT / f"src/agent_os/resources/templates/{doc_id}.md").is_file():
             errors.append("missing_template:" + doc_id)
-    if len(foundation_skills) != 9 or atlas_skills != 2 or counts["skills"] != 11:
-        errors.append("foundation_or_atlas_skill_inventory_mismatch")
-    version_text = (ROOT / "pyproject.toml").read_text()
-    if not version_matches(version_text, __version__):
+    base_skills = list((ROOT / "src/agent_os/resources/skills").glob("agentos-*/SKILL.md"))
+    if len(base_skills) != 9 or counts["skills"] != len(base_skills) + len(extension_skills) or not all((ROOT / name).is_file() for name in extension_skills):
+        errors.append("unexpected_module_skill_inventory")
+    import tomllib
+    project_version = tomllib.loads((ROOT / "pyproject.toml").read_text()).get("project", {}).get("version")
+    if project_version != __version__ or not re.fullmatch(r"0\.8\.0rc[0-9]+(?:\+[a-z0-9]+(?:[.-][a-z0-9]+)*)?", __version__):
         errors.append("version_mismatch")
     return {
         "status": "PASS" if not errors else "FAIL",

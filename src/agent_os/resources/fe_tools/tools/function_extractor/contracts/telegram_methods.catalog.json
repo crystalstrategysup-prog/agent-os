@@ -1,0 +1,384 @@
+{
+  "methods": [
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "copyMessage",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "copyMessages",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "forwardMessage",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "forwardMessages",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "getChat",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "getChatMember",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "getFile",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "getMe",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "getWebhookInfo",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "sendAnimation",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "sendAudio",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "sendDocument",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "sendMediaGroup",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [
+        "telegram.sendMessage.plain",
+        "telegram.response.envelope"
+      ],
+      "contract_source_ids": [
+        "telegram-sendmessage-subset"
+      ],
+      "gaps": [
+        "UNOBSERVED_WIRE_VALUE",
+        "OPTIONAL_AND_NESTED_SCHEMA_UNSPECIFIED"
+      ],
+      "method": "sendMessage",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Plain text input and partial common response envelope only; nested result and actual wire validation absent.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "PARTIAL"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "sendPhoto",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "sendSticker",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "sendVideo",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "sendVideoNote",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "sendVoice",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "setMessageReaction",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "setWebhook",
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "scope": "Finite selected BNT declaration/dispatch surface, not one delivery allowlist or runtime execution. Selected official field/result facts only; no implemented CE method rules. Dedicated configuration mutation; analysis only.",
+      "source_ids": [
+        "telegram-botapi-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    },
+    {
+      "boundary_ids": [],
+      "contract_source_ids": [],
+      "gaps": [
+        "EXTERNAL_METHOD_RULES_MISSING",
+        "SDK_LAYER_UNQUALIFIED",
+        "UNOBSERVED_WIRE_VALUE"
+      ],
+      "method": "messages.sendMessage",
+      "protocol": "MTProto",
+      "provider": "telegram",
+      "scope": "Fixed Telethon SendMessageRequest construction only; constructor presence is not request execution. SDK layer and other client calls unresolved. Bot API semantics do not apply.",
+      "source_ids": [
+        "telegram-mtproto-selected-20261022"
+      ],
+      "status": "CONTRACT_GAP"
+    }
+  ],
+  "schema": "function-extractor.method-catalog/v1",
+  "sources": [
+    {
+      "id": "telegram-botapi-selected-20261022",
+      "primary_ref": "https://core.telegram.org/bots/api",
+      "representation_kind": "selected-public-field-facts/v1-NOT-raw-HTML; combined BotAPI and MTProto snapshot",
+      "representation_sha256": "0ec158fb3a43a7cbf413585fe69d4be7837698a4020b7adba2120e7198b87fc6",
+      "retrieved_at": "2026-10-22",
+      "trust": "OFFICIAL",
+      "version": "Bot API 10.3; August 24, 2026; document header only"
+    },
+    {
+      "id": "telegram-mtproto-selected-20261022",
+      "primary_ref": "https://core.telegram.org/method/messages.sendMessage",
+      "representation_kind": "selected-public-field-facts/v1-NOT-raw-HTML; combined BotAPI and MTProto snapshot",
+      "representation_sha256": "0ec158fb3a43a7cbf413585fe69d4be7837698a4020b7adba2120e7198b87fc6",
+      "retrieved_at": "2026-10-22",
+      "trust": "OFFICIAL",
+      "version": "Layer 225; viewed document only; installed SDK layer UNKNOWN"
+    }
+  ],
+  "version": 1
+}

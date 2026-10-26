@@ -1,0 +1,364 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "ce-evidence.validation/v1"
+    },
+    "version": {
+      "const": 1
+    },
+    "status": {
+      "const": "VALIDATED"
+    },
+    "source_sha256": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "contract_sha256": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "fixture_sha256": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "scenario_sha256": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "case_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180
+          },
+          "delivery_state": {
+            "enum": [
+              "queued",
+              "sending",
+              "sent",
+              "delivered",
+              "failed",
+              "unknown",
+              "partial",
+              "retry_wait",
+              "not_started",
+              "not_requested",
+              "disabled",
+              "unobserved"
+            ]
+          },
+          "test_verdict": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "UNKNOWN"
+            ]
+          },
+          "diagnostic_status": {
+            "enum": [
+              "DRIFT",
+              "CONFORMANT",
+              "INCOMPLETE"
+            ]
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "rule_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 180
+                },
+                "boundary_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 180
+                },
+                "source_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 180
+                },
+                "source_sha256": {
+                  "type": "string",
+                  "minLength": 64,
+                  "maxLength": 64
+                },
+                "provenance": {
+                  "enum": [
+                    "OFFICIAL",
+                    "APPROVED_INTERNAL",
+                    "OBSERVED",
+                    "UNSPECIFIED"
+                  ]
+                },
+                "test_verdict": {
+                  "enum": [
+                    "PASS",
+                    "FAIL",
+                    "UNKNOWN"
+                  ]
+                },
+                "classification": {
+                  "enum": [
+                    "CODE_BUG",
+                    "CONTRACT_GAP",
+                    "DOCUMENTATION_DRIFT",
+                    "ENVIRONMENT_DEPENDENT",
+                    "EXPECTED_FAILURE",
+                    "UNDETERMINED"
+                  ]
+                },
+                "reason_code": {
+                  "enum": [
+                    "delivery_unobserved",
+                    "rule_match",
+                    "delivery_difference",
+                    "trace_difference",
+                    "output_difference",
+                    "unsupported_rule",
+                    "attempts_unobserved",
+                    "retry_difference",
+                    "case_not_executed",
+                    "contract_conflict",
+                    "unspecified_contract",
+                    "incomplete_recording",
+                    "input_difference",
+                    "wire_value_unobserved",
+                    "fixture_unbound",
+                    "wire_recording_incomplete",
+                    "wire_source_unbound",
+                    "wire_environment_unbound",
+                    "wire_rule_unbound",
+                    "wire_anchor_unobserved",
+                    "wire_schema_invalid",
+                    "wire_schema_unsupported",
+                    "wire_schema_valid",
+                    "expected_schema_violation",
+                    "schema_observation_difference",
+                    "wire_guards_unverified"
+                  ]
+                },
+                "trace_anchors": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "file": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 180
+                      },
+                      "symbol": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 180
+                      },
+                      "line": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  },
+                  "maxItems": 8
+                },
+                "comparison_role": {
+                  "enum": [
+                    "NORMATIVE",
+                    "OBSERVATIONAL"
+                  ]
+                },
+                "observed_schema_verdict": {
+                  "enum": [
+                    "PASS",
+                    "FAIL",
+                    "UNKNOWN"
+                  ]
+                },
+                "expected_schema_verdict": {
+                  "enum": [
+                    "PASS",
+                    "FAIL",
+                    "UNKNOWN"
+                  ]
+                }
+              },
+              "required": [
+                "rule_id",
+                "boundary_id",
+                "source_id",
+                "source_sha256",
+                "provenance",
+                "test_verdict",
+                "classification",
+                "reason_code",
+                "trace_anchors",
+                "comparison_role"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 1000
+          },
+          "cache_key": {
+            "type": "string",
+            "minLength": 64,
+            "maxLength": 64
+          },
+          "expected_contract_verdict": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "UNKNOWN"
+            ]
+          },
+          "cache_eligible": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "case_id",
+          "delivery_state",
+          "test_verdict",
+          "diagnostic_status",
+          "rules",
+          "cache_key",
+          "expected_contract_verdict",
+          "cache_eligible"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 1000
+    },
+    "coverage": {
+      "type": "object",
+      "properties": {
+        "boundaries": {
+          "type": "object",
+          "properties": {
+            "declared": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "observed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "observed_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 180
+              },
+              "maxItems": 1000
+            }
+          },
+          "required": [
+            "declared",
+            "observed",
+            "observed_ids"
+          ],
+          "additionalProperties": false
+        },
+        "branches": {
+          "type": "object",
+          "properties": {
+            "total": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "observed": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "denominator_known": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "total",
+            "observed",
+            "denominator_known"
+          ],
+          "additionalProperties": false
+        },
+        "variants": {
+          "type": "object",
+          "properties": {
+            "planned": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "executed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unexecuted": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "planned",
+            "executed",
+            "unexecuted"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "boundaries",
+        "branches",
+        "variants"
+      ],
+      "additionalProperties": false
+    },
+    "normative_modified": {
+      "const": false
+    },
+    "production_acceptance": {
+      "const": false
+    },
+    "content_digest": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64
+    }
+  },
+  "required": [
+    "schema",
+    "version",
+    "status",
+    "source_sha256",
+    "contract_sha256",
+    "fixture_sha256",
+    "scenario_sha256",
+    "cases",
+    "coverage",
+    "normative_modified",
+    "production_acceptance",
+    "content_digest"
+  ],
+  "additionalProperties": false
+}

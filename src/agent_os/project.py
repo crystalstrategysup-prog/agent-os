@@ -13,6 +13,7 @@ import re
 import selectors
 import signal
 import subprocess
+import sys
 import time
 import uuid
 from datetime import UTC, datetime
@@ -360,7 +361,15 @@ def _recover_entry(root: Path, user_home: Path) -> None:
             path = allowed_turn
         else:
             raise GateError("entry_recovery_path_invalid")
-        row_limit = tm.limit(root) if row["root"] == "project" and re.fullmatch(r"\.agentos/tasks/task-[a-f0-9]{16}/task\.json", row["path"]) else MAX_JSON
+        if row["root"] == "project" and re.fullmatch(r"\.agentos/tasks/task-[a-f0-9]{16}/task\.json", row["path"]):
+            try:
+                row_limit = tm.limit(root)
+            except (ValueError, GateError) as exc:
+                # An interrupted transaction must never rewrite an owner-edited
+                # project file, even when the edit is no longer valid JSON.
+                raise GateError("entry_recovery_conflict:" + str(within(root, ".agentos/project.json"))) from exc
+        else:
+            row_limit = MAX_JSON
         current = _entry_current(path, row_limit)
         current_hash = sha(current) if current is not None else None
         if current_hash not in (row["before"], row["after"]):
@@ -972,12 +981,35 @@ def _group_alive(pgid: int) -> bool:
     except ProcessLookupError:
         return False
     except PermissionError:
-        # macOS may report EPERM for a group containing only unreaped zombies.
-        return True
+        if sys.platform != 'darwin':
+            return True
+    if sys.platform == 'darwin':
+        # killpg(0) may succeed or return EPERM for unreaped zombies. Only
+        # positive process-state evidence can classify those as non-running.
+        try:
+            result = subprocess.run(['/bin/ps', '-axo', 'pgid=,stat='],
+                                    capture_output=True, text=True, timeout=2)
+            if result.returncode == 0 and len(result.stdout) <= 512 * 1024:
+                states = []
+                for line in result.stdout.splitlines():
+                    row = line.split()
+                    if len(row) == 2 and row[0] == str(pgid):
+                        states.append(row[1])
+                if states and all(state.startswith('Z') for state in states):
+                    return False
+                if not states:
+                    try:
+                        os.killpg(pgid, 0)
+                    except ProcessLookupError:
+                        return False
+                    except PermissionError:
+                        pass
+        except (OSError, subprocess.TimeoutExpired):
+            pass
     return True
 
 
-def _stop_check_group(pgid: int, process: subprocess.Popen) -> bool:
+def _stop_check_group(pgid: int, process: subprocess.Popen, *, on_signal=None) -> bool:
     """Stop only the session created for this check; report if it survives."""
     process.poll()
     if not _group_alive(pgid):
@@ -989,6 +1021,8 @@ def _stop_check_group(pgid: int, process: subprocess.Popen) -> bool:
             return True
         except PermissionError:
             return False
+        if on_signal is not None:
+            on_signal()
         deadline = time.monotonic() + 0.5
         while time.monotonic() < deadline:
             process.poll()
@@ -1031,6 +1065,11 @@ def _capture_check_process(process: subprocess.Popen, timeout: int) -> tuple[int
         eof = False
         exit_code: int | None = None
         descendants = False
+
+        def terminated_descendants():
+            nonlocal descendants
+            descendants = True
+
         handled_exit = False
         selector = selectors.DefaultSelector()
         selector.register(fd, selectors.EVENT_READ)
@@ -1070,8 +1109,7 @@ def _capture_check_process(process: subprocess.Popen, timeout: int) -> tuple[int
             if parent_code is not None and not handled_exit:
                 handled_exit = True
                 if _group_alive(process.pid):
-                    descendants = True
-                    if not _stop_check_group(process.pid, process):
+                    if not _stop_check_group(process.pid, process, on_signal=terminated_descendants):
                         exit_code = 125
                         tail.extend(b"\nCHECK DESCENDANTS SURVIVED\n")
                         break
@@ -1079,8 +1117,7 @@ def _capture_check_process(process: subprocess.Popen, timeout: int) -> tuple[int
                 exit_code = parent_code
                 break
         if _group_alive(process.pid):
-            descendants = True
-            if not _stop_check_group(process.pid, process):
+            if not _stop_check_group(process.pid, process, on_signal=terminated_descendants):
                 if exit_code in (None, 0):
                     exit_code = 125
                 tail.extend(b"\nCHECK DESCENDANTS SURVIVED\n")
@@ -1477,6 +1514,9 @@ def make_parser() -> argparse.ArgumentParser:
 
 
 def command(argv: list[str], user_home: Path) -> tuple[dict, int]:
+    if argv and argv[0] == "local":
+        from .project_lite import command as local_command
+        return local_command(argv[1:], user_home)
     if argv and argv[0] == "interrupted-continuation":
         from .interrupted_continuation import command as interrupted_command
         return interrupted_command(argv[1:],user_home)

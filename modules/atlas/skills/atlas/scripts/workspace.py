@@ -195,10 +195,21 @@ def project_views(root, binding):
     current_view = nav.current_view_status(
         output, expected_release=pointer["release"],
         expected_manifest_sha256=pointer["manifest_sha256"])
+    # A modified stable alias cannot be trusted. A missing alias is different:
+    # the retained release has already passed immutable hash verification and
+    # remains readable, while the writer is offered an explicit repair route.
+    require(current_view["status"] != "STALE", "OUTPUT_FILE_HASH")
+    # Preserve the published current alias for clients following the current
+    # view; a missing alias falls back to the verified immutable release.
     selected_path = current_view["path"] if current_view["status"] == "CURRENT" else artifacts["html"]["path"]
+    # Keep the stable alias as the backwards-compatible public link. A
+    # separate immutable_url anchors the exact verified release so a reader
+    # can select either latest-following or evidence-pinned navigation.
     selected_url = Path(selected_path).as_uri()
+    immutable_url = Path(artifacts["html"]["path"]).as_uri()
     sections = {name: {"section": name, "anchor_supported": name in declared,
                        "url": selected_url + ("#" + name if name in declared else ""),
+                       "immutable_url": immutable_url + ("#" + name if name in declared else ""),
                        "fallback": None if name in declared else "Open the base artifact and select the section manually; this release declares no matching anchor."}
                 for name in ("contracts", "roadmap")}
     revision, revision_status = source_revision(snapshot, presentation)

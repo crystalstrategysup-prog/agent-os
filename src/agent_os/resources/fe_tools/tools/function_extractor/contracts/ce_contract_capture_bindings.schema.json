@@ -1,0 +1,135 @@
+{
+  "$id": "urn:function-extractor:ce_contract_capture_bindings:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bindings": {
+      "items": {
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "required": [
+                "applicability"
+              ]
+            },
+            "then": {
+              "oneOf": [
+                {
+                  "properties": {
+                    "applicability": {
+                      "const": "PLAIN_TEXT_ONLY"
+                    },
+                    "boundary_id": {
+                      "const": "telegram.sendMessage.plain"
+                    },
+                    "direction": {
+                      "const": "input"
+                    },
+                    "phase": {
+                      "const": "REQUEST"
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "applicability": {
+                      "const": "HTML_BOLD_TEXT_V1"
+                    },
+                    "boundary_id": {
+                      "const": "telegram.sendMessage.html.bold"
+                    },
+                    "direction": {
+                      "const": "input"
+                    },
+                    "phase": {
+                      "const": "REQUEST"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "properties": {
+          "applicability": {
+            "enum": [
+              "PLAIN_TEXT_ONLY",
+              "HTML_BOLD_TEXT_V1"
+            ]
+          },
+          "binding_id": {
+            "maxLength": 180,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+            "type": "string"
+          },
+          "boundary_id": {
+            "maxLength": 180,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+            "type": "string"
+          },
+          "direction": {
+            "enum": [
+              "input",
+              "output"
+            ]
+          },
+          "file": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "line": {
+            "maximum": 10000000,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "phase": {
+            "enum": [
+              "REQUEST",
+              "RESPONSE"
+            ]
+          },
+          "sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "symbol": {
+            "maxLength": 180,
+            "minLength": 1,
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "binding_id",
+          "boundary_id",
+          "direction",
+          "phase",
+          "file",
+          "sha256",
+          "symbol",
+          "line"
+        ],
+        "type": "object"
+      },
+      "maxItems": 32,
+      "minItems": 1,
+      "type": "array"
+    },
+    "schema": {
+      "const": "function-extractor.contract-capture-bindings/v1"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "schema",
+    "version",
+    "bindings"
+  ],
+  "type": "object"
+}

@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+"""Read-only environment preflight, independent of runtime container lease."""
+import json
+import argparse
+import runpy
+from pathlib import Path
+import sys
+
+root, project = runpy.run_path(str(Path(__file__).with_name('_bootstrap.py')))['prepare'](__file__)
+sys.path.insert(0, str(root))
+from tools.function_extractor.runner.environment import select_existing_environment
+
+p = argparse.ArgumentParser(description=__doc__)
+p.add_argument('--source-root', type=Path, default=project)
+a = p.parse_args()
+result = select_existing_environment(a.source_root)
+print(json.dumps(result, ensure_ascii=False, sort_keys=True))
+raise SystemExit(0 if result["status"] == "EXISTING_QUALIFIED" else 2)

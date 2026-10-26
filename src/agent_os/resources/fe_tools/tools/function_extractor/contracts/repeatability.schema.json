@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/contracts/v1/repeatability.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "runs",
+    "digests",
+    "normalized_equal",
+    "production_acceptance"
+  ],
+  "properties": {
+    "schema": {
+      "const": "function-extractor.repeatability/v1"
+    },
+    "version": {
+      "const": 1
+    },
+    "runs": {
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 100
+    },
+    "digests": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 100,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      }
+    },
+    "normalized_equal": {
+      "type": "boolean"
+    },
+    "production_acceptance": {
+      "const": false
+    }
+  }
+}

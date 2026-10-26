@@ -101,6 +101,15 @@ def main(argv: list[str] | None = None) -> int:
     from .atlas_module import dispatch as atlas_dispatch
 
     selected_argv = list(sys.argv[1:] if argv is None else argv)
+    extension_args = selected_argv[2:] if len(selected_argv) > 2 and selected_argv[0] in ('--home','--user-home') else selected_argv
+    if extension_args and extension_args[0] == 'fe':
+        from .fe_module import main as fe_main
+        return fe_main(extension_args[1:])
+    if extension_args and extension_args[0] == 'modules':
+        from .module_registry import command as modules_command
+        result, code = modules_command(extension_args[1:])
+        _print(result)
+        return code
     atlas_result = atlas_dispatch(selected_argv)
     if atlas_result is not None:
         return atlas_result

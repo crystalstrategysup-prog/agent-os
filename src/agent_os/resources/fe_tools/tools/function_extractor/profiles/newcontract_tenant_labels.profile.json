@@ -1,0 +1,236 @@
+{
+  "schema": "function-extractor.scenario-profile/v1",
+  "version": 1,
+  "profile_id": "tenant-labels-v1",
+  "route_id": "tenant-labels",
+  "entry": "app.core.tenant_labels:tenant_display_label",
+  "bindings": [
+    {
+      "binding_id": "LABEL-known-vl",
+      "variant": "known-vl",
+      "rule_ids": [
+        "labels.source-behavior",
+        "owner.offline.guards"
+      ],
+      "fixture": {
+        "args": [
+          "vladivostok"
+        ],
+        "kwargs": {},
+        "expected_result": "Владивосток"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        }
+      },
+      "expected_delivery_state": "not_applicable",
+      "evidence_scope": "ORIGINAL_PLATFORM_FUNCTION_CODE_DERIVED_OBSERVED_EXPECTATION_NOT_NORMATIVE",
+      "bundle_role": "tenant_labels"
+    },
+    {
+      "binding_id": "LABEL-case-space",
+      "variant": "case-space",
+      "rule_ids": [
+        "labels.source-behavior",
+        "owner.offline.guards"
+      ],
+      "fixture": {
+        "args": [
+          "  ARTEM  "
+        ],
+        "kwargs": {},
+        "expected_result": "Артём"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        }
+      },
+      "expected_delivery_state": "not_applicable",
+      "evidence_scope": "ORIGINAL_PLATFORM_FUNCTION_CODE_DERIVED_OBSERVED_EXPECTATION_NOT_NORMATIVE",
+      "bundle_role": "tenant_labels"
+    },
+    {
+      "binding_id": "LABEL-cyrillic-meta",
+      "variant": "cyrillic-meta",
+      "rule_ids": [
+        "labels.source-behavior",
+        "owner.offline.guards"
+      ],
+      "fixture": {
+        "args": [
+          "vladivostok"
+        ],
+        "kwargs": {
+          "metadata": {
+            "tenant_label": "Город у моря"
+          }
+        },
+        "expected_result": "Город у моря"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        }
+      },
+      "expected_delivery_state": "not_applicable",
+      "evidence_scope": "ORIGINAL_PLATFORM_FUNCTION_CODE_DERIVED_OBSERVED_EXPECTATION_NOT_NORMATIVE",
+      "bundle_role": "tenant_labels"
+    },
+    {
+      "binding_id": "LABEL-latin-meta-known",
+      "variant": "latin-meta-known",
+      "rule_ids": [
+        "labels.source-behavior",
+        "owner.offline.guards"
+      ],
+      "fixture": {
+        "args": [
+          "vladivostok"
+        ],
+        "kwargs": {
+          "metadata": {
+            "tenant_label": "Coastal city"
+          }
+        },
+        "expected_result": "Владивосток"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        }
+      },
+      "expected_delivery_state": "not_applicable",
+      "evidence_scope": "ORIGINAL_PLATFORM_FUNCTION_CODE_DERIVED_OBSERVED_EXPECTATION_NOT_NORMATIVE",
+      "bundle_role": "tenant_labels"
+    },
+    {
+      "binding_id": "LABEL-priority-meta",
+      "variant": "priority-meta",
+      "rule_ids": [
+        "labels.source-behavior",
+        "owner.offline.guards"
+      ],
+      "fixture": {
+        "args": [
+          "unknown"
+        ],
+        "kwargs": {
+          "metadata": {
+            "city_label": "Second",
+            "name": "Fourth"
+          }
+        },
+        "expected_result": "Second"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        }
+      },
+      "expected_delivery_state": "not_applicable",
+      "evidence_scope": "ORIGINAL_PLATFORM_FUNCTION_CODE_DERIVED_OBSERVED_EXPECTATION_NOT_NORMATIVE",
+      "bundle_role": "tenant_labels"
+    },
+    {
+      "binding_id": "LABEL-fallback",
+      "variant": "fallback",
+      "rule_ids": [
+        "labels.source-behavior",
+        "owner.offline.guards"
+      ],
+      "fixture": {
+        "args": [
+          "new_city-west"
+        ],
+        "kwargs": {},
+        "expected_result": "New City West"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        }
+      },
+      "expected_delivery_state": "not_applicable",
+      "evidence_scope": "ORIGINAL_PLATFORM_FUNCTION_CODE_DERIVED_OBSERVED_EXPECTATION_NOT_NORMATIVE",
+      "bundle_role": "tenant_labels"
+    },
+    {
+      "binding_id": "LABEL-empty",
+      "variant": "empty",
+      "rule_ids": [
+        "labels.source-behavior",
+        "owner.offline.guards"
+      ],
+      "fixture": {
+        "args": [
+          ""
+        ],
+        "kwargs": {},
+        "expected_result": ""
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        }
+      },
+      "expected_delivery_state": "not_applicable",
+      "evidence_scope": "ORIGINAL_PLATFORM_FUNCTION_CODE_DERIVED_OBSERVED_EXPECTATION_NOT_NORMATIVE",
+      "bundle_role": "tenant_labels"
+    }
+  ],
+  "input_seed": {
+    "tenant_id": "vladivostok",
+    "metadata": {}
+  }
+}

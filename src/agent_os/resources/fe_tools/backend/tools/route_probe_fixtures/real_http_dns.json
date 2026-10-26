@@ -1,0 +1,33 @@
+{
+  "schema": "route-probe.avl-real-http-fixture/v1",
+  "stack_variant": "requests_http",
+  "case": "dns",
+  "route": "platform_group",
+  "entry": "app.ingest.telegram_private_transport:deliver",
+  "adapter": "tools.route_probe_avl:prepare",
+  "include_modules": [
+    "app.ingest.telegram_basic_native_transport",
+    "app.ingest.telegram_private_transport",
+    "app.ingest.telegram_basic_upload_store",
+    "app.ingest.telegram_private_binding",
+    "app.ingest.bot_bridge_core",
+    "app.ingest.telegram_reply_presentation"
+  ],
+  "opaque_modules": [
+    "app.core.config",
+    "app.ingest.telegram_basic_subscription",
+    "app.ingest.telegram_basic_media_policy"
+  ],
+  "expected": {
+    "state": "unknown",
+    "category": "native_post_transport_or_receipt_unknown",
+    "status_code": null,
+    "fake_socket_post_count": 0,
+    "session_count": 1,
+    "connect_count": 1,
+    "asserted_requests_exception": "REQUESTS_CONNECTION"
+  },
+  "proof_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims",
+  "network_dns_tcp_socks_tls": "SIMULATED",
+  "historical_cause": "NOT_REPRODUCED"
+}

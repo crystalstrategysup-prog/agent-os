@@ -1,0 +1,111 @@
+{
+  "boundaries": [
+    {
+      "boundary_id": "telegram.sendMessage.html.bold",
+      "symbol": "telegram.BotAPI.sendMessage",
+      "kind": "http"
+    },
+    {
+      "boundary_id": "telegram.response.envelope",
+      "symbol": "telegram.BotAPI.response",
+      "kind": "http"
+    }
+  ],
+  "rules": [
+    {
+      "rule_id": "telegram.sendMessage.html.bold.input",
+      "boundary_id": "telegram.sendMessage.html.bold",
+      "kind": "input_schema",
+      "constraint": {
+        "type": "object",
+        "required": [
+          "chat_id",
+          "text",
+          "parse_mode"
+        ],
+        "properties": {
+          "chat_id": {
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "parse_mode": {
+            "const": "HTML"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    {
+      "rule_id": "telegram.response.ok",
+      "boundary_id": "telegram.response.envelope",
+      "kind": "output_schema",
+      "constraint": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "ok",
+              "result"
+            ],
+            "properties": {
+              "ok": {
+                "const": true
+              },
+              "result": {
+                "type": "object",
+                "required": [
+                  "message_id",
+                  "chat"
+                ],
+                "properties": {
+                  "message_id": {
+                    "type": "integer"
+                  },
+                  "chat": {
+                    "type": "object"
+                  }
+                },
+                "additionalProperties": true
+              }
+            },
+            "additionalProperties": true
+          },
+          {
+            "type": "object",
+            "required": [
+              "ok",
+              "error_code"
+            ],
+            "properties": {
+              "ok": {
+                "const": false
+              },
+              "error_code": {
+                "type": "integer"
+              },
+              "description": {
+                "type": "string"
+              },
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "retry_after": {
+                    "type": "integer"
+                  }
+                }
+              }
+            },
+            "additionalProperties": true
+          }
+        ]
+      }
+    }
+  ]
+}

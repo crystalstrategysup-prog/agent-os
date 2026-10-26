@@ -1,0 +1,50 @@
+{
+  "schema": "agentas.versioned-wheel-delta/v1",
+  "version": "0.8.0rc2041+agentas1",
+  "wheel": "crystal_agent_os-0.8.0rc2041+agentas1-py3-none-any.whl",
+  "wheel_sha256": "701734c186bc45e29bf7e468bd4ea3a2481d7500db2c3b88abfa159dc1f231b2",
+  "base_version": "0.8.0rc2041",
+  "base_sha256": "2ff5834e9db4f996a7917061d7cd45117c67cd03e8fab1668ff38af21da0a21b",
+  "patch_source_sha256": "c15d1d0027c087e7f4fa711ded357333c37af3bc67cf320e459d775e46906e9b",
+  "changed_payloads": [
+    {
+      "path": "agent_os/__init__.py",
+      "after_path": "agent_os/__init__.py",
+      "before_sha256": "961bd2f2ba1fb3e9d57a3910f3270bf55417f0cce2b7be762040571854613061",
+      "after_sha256": "e66459d5b138f838d982ee0281b337e46d9de585a3c495a843dd1280939dbfc9"
+    },
+    {
+      "path": "agent_os/resources/contracts/cli-contract-v1.json",
+      "after_path": "agent_os/resources/contracts/cli-contract-v1.json",
+      "before_sha256": "f891bdb7de2423e3ae8bf34b2c1650c2a85e31bb2435a8b32b7eba8f5f65d0f2",
+      "after_sha256": "6220be449073383abf6db6233a53930f37eb708b15edd98d4bc12721d2ec2834"
+    },
+    {
+      "path": "agent_os/resources/contracts/mcp-tools-v1.json",
+      "after_path": "agent_os/resources/contracts/mcp-tools-v1.json",
+      "before_sha256": "a6cec88408338757bc8d32ff74556bcbab6920584d8b2b0ef97471871fbbc582",
+      "after_sha256": "5a119c3d4720cd49b4a55f986710b3bcc062b6c1d85f5d1c975ce43790cb8836"
+    },
+    {
+      "path": "agent_os/resources/skills/atlas/scripts/import_matrix.py",
+      "after_path": "agent_os/resources/skills/atlas/scripts/import_matrix.py",
+      "before_sha256": "570222fb3ec39b8b59aebcd00e93d866df87825868b091d4a7788b803e90b45f",
+      "after_sha256": "c15d1d0027c087e7f4fa711ded357333c37af3bc67cf320e459d775e46906e9b"
+    },
+    {
+      "path": "crystal_agent_os-0.8.0rc2041.dist-info/METADATA",
+      "after_path": "crystal_agent_os-0.8.0rc2041+agentas1.dist-info/METADATA",
+      "before_sha256": "899a1379a361a45cae05792d8d362172df1a643d7bc3aa25917da4281acb46b0",
+      "after_sha256": "0aca3465162a0eb1b20a4fa7bab4b0bf4ee4c035cd115c90d46f2d7075ef510e"
+    }
+  ],
+  "all_other_core2041_payloads": "BYTE_IDENTICAL",
+  "private_fe_ce_added": false,
+  "native_business_acceptance": "NOT_CLAIMED",
+  "publication_status": "branch_candidate_not_official_release",
+  "source_base": "Reviewed rc2041 source; all397 base package members matched the pinned base wheel",
+  "public_atlas_commit_lineage": "de84063abb4f2263ae04a69f629c75bf819a42b8",
+  "new_feature_changes": false,
+  "validation": "Exact package member comparison, source CLI version and public-boundary checks. Existing accepted importer and host installation evidence reused.",
+  "runtime_adoption": "Managed candidate installed; existing client instruction adoption and full native business acceptance are separate."
+}

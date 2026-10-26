@@ -1,0 +1,210 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/schemas/ce_profile.schema.json",
+  "description": "Structural schema for current Contract Engine artifacts; runtime identity, path, provenance, credential and trace guards remain authoritative.",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "function-extractor.scenario-profile/v1"
+    },
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "profile_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+    },
+    "route_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 180
+    },
+    "entry": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_.]*:[A-Za-z_][A-Za-z0-9_.]*$"
+    },
+    "bindings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "binding_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+          },
+          "variant": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+          },
+          "rule_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 180
+            },
+            "minItems": 1,
+            "maxItems": 32,
+            "uniqueItems": true
+          },
+          "fixture": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/$defs/json"
+            }
+          },
+          "expected": {
+            "$ref": "#/$defs/expected"
+          },
+          "expected_delivery_state": {
+            "enum": [
+              null,
+              "sent",
+              "delivered",
+              "queued",
+              "pending",
+              "sending",
+              "unknown",
+              "failed",
+              "partial",
+              "retry_wait",
+              "not_applicable"
+            ]
+          },
+          "evidence_scope": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "bundle_role": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+          },
+          "entry": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_.]*:[A-Za-z_][A-Za-z0-9_.]*$"
+          },
+          "observation_expectations": {
+            "type": "object",
+            "maxProperties": 32,
+            "additionalProperties": {
+              "enum": [
+                "PASS",
+                "FAIL"
+              ]
+            }
+          }
+        },
+        "required": [
+          "binding_id",
+          "variant",
+          "rule_ids",
+          "fixture",
+          "expected",
+          "expected_delivery_state",
+          "evidence_scope"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 128
+    },
+    "input_seed": {
+      "$ref": "#/$defs/json"
+    }
+  },
+  "required": [
+    "schema",
+    "version",
+    "profile_id",
+    "route_id",
+    "entry",
+    "bindings"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "json": {
+      "type": [
+        "null",
+        "boolean",
+        "number",
+        "string",
+        "array",
+        "object"
+      ],
+      "items": {
+        "$ref": "#/$defs/json"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/json"
+      }
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "version"
+      ],
+      "properties": {
+        "schema": {
+          "const": "function-extractor.contract/v1"
+        },
+        "version": {
+          "const": 1
+        },
+        "expected_status": {
+          "enum": [
+            "RETURNED",
+            "RAISED",
+            "DENIED",
+            "REFUSED",
+            "TIMEOUT",
+            "TRACE_LIMIT"
+          ]
+        },
+        "result_summary": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/json"
+          }
+        },
+        "guards": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "audit": {
+              "type": "boolean"
+            },
+            "seccomp": {
+              "type": "boolean"
+            }
+          }
+        },
+        "phase_events": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "phase",
+              "event"
+            ],
+            "properties": {
+              "phase": {
+                "type": "string",
+                "maxLength": 180
+              },
+              "event": {
+                "type": "string",
+                "maxLength": 180
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

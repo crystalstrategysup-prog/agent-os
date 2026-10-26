@@ -1,0 +1,14 @@
+{
+  "schema": "function-extractor.diagnostic-contract/v1",
+  "version": 1,
+  "rules": [
+    {
+      "boundary_id": "AVL-H06",
+      "scope": "Recorded synthetic READ_TIMEOUT on the offline Telegram sendMessage route",
+      "cause": "An explicit simulated fault marker can attribute the injected cause only",
+      "receipt": "unknown",
+      "retry_safe_to_assume": false,
+      "historical_cause_proven": false
+    }
+  ]
+}

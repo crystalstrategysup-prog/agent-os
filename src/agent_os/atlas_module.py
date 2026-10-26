@@ -213,6 +213,11 @@ def _render(raw: str, exit_code: int, argv: list[str]) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     selected = list(sys.argv[1:] if argv is None else argv)
+    if not selected:
+        print(json.dumps({'schema': 'agentos.atlas-help/v1', 'status': 'HELP',
+                          'commands': ['list', 'views', 'refresh', 'work', 'checkpoint'],
+                          'registry': 'EXPLICIT_FOR_PROJECT_OPERATIONS'}))
+        return 0
     if selected and selected[0] == 'source-relocate':
         # Explicit native route. No registry lookup or implicit project choice.
         try:

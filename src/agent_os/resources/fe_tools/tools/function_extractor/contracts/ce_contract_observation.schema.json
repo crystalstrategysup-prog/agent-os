@@ -1,0 +1,250 @@
+{
+  "$id": "urn:function-extractor:ce_contract_observation:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "checks": {
+                "contains": {
+                  "properties": {
+                    "reason_code": {
+                      "const": "CONTRACT_SCOPE_UNSUPPORTED"
+                    }
+                  },
+                  "required": [
+                    "reason_code"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "checks"
+            ]
+          },
+          "then": {
+            "properties": {
+              "boundary_id": {
+                "const": "telegram.sendMessage.plain"
+              },
+              "direction": {
+                "const": "input"
+              },
+              "phase": {
+                "const": "REQUEST"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "anchor": {
+          "additionalProperties": false,
+          "properties": {
+            "file": {
+              "maxLength": 512,
+              "minLength": 1,
+              "type": "string"
+            },
+            "line": {
+              "maximum": 10000000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "symbol": {
+              "maxLength": 180,
+              "minLength": 1,
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "file",
+            "sha256",
+            "symbol",
+            "line"
+          ],
+          "type": "object"
+        },
+        "binding_id": {
+          "maxLength": 180,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+          "type": "string"
+        },
+        "boundary_id": {
+          "maxLength": 180,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+          "type": "string"
+        },
+        "checks": {
+          "items": {
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "reason_code": {
+                      "const": "CONTRACT_SCOPE_UNSUPPORTED"
+                    }
+                  },
+                  "required": [
+                    "reason_code"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "test_verdict": {
+                      "const": "UNKNOWN"
+                    }
+                  }
+                }
+              }
+            ],
+            "properties": {
+              "provenance": {
+                "enum": [
+                  "OFFICIAL",
+                  "APPROVED_INTERNAL",
+                  "OBSERVED",
+                  "UNSPECIFIED"
+                ]
+              },
+              "reason_code": {
+                "enum": [
+                  "SCHEMA_MATCH",
+                  "SCHEMA_INVALID",
+                  "SCHEMA_UNSUPPORTED_OR_BOUNDED",
+                  "CONTRACT_CONFLICT",
+                  "CONTRACT_UNSPECIFIED",
+                  "EVALUATOR_FAILURE",
+                  "CONTRACT_SCOPE_UNSUPPORTED"
+                ]
+              },
+              "rule_id": {
+                "maxLength": 180,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+                "type": "string"
+              },
+              "schema_sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "source_id": {
+                "maxLength": 180,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+                "type": "string"
+              },
+              "source_sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "test_verdict": {
+                "enum": [
+                  "PASS",
+                  "FAIL",
+                  "UNKNOWN"
+                ]
+              }
+            },
+            "required": [
+              "rule_id",
+              "source_id",
+              "source_sha256",
+              "schema_sha256",
+              "provenance",
+              "test_verdict",
+              "reason_code"
+            ],
+            "type": "object"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "type": "array"
+        },
+        "direction": {
+          "enum": [
+            "input",
+            "output"
+          ]
+        },
+        "evidence_scope": {
+          "const": "OFFLINE_INTERCEPTED_TRANSIENT_VALUE_NOT_PROVIDER_PROOF"
+        },
+        "invocation_id": {
+          "maximum": 128,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "phase": {
+          "enum": [
+            "REQUEST",
+            "RESPONSE"
+          ]
+        },
+        "plan_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "schema": {
+          "const": "function-extractor.contract-observation/v1"
+        },
+        "status": {
+          "const": "EVALUATED"
+        },
+        "version": {
+          "const": 1
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "status",
+        "plan_sha256",
+        "binding_id",
+        "boundary_id",
+        "direction",
+        "phase",
+        "anchor",
+        "invocation_id",
+        "checks",
+        "evidence_scope"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "reason_code": {
+          "const": "OBSERVATION_INPUT_INVALID"
+        },
+        "schema": {
+          "const": "function-extractor.contract-observation/v1"
+        },
+        "status": {
+          "const": "REFUSED"
+        },
+        "version": {
+          "const": 1
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "status",
+        "reason_code"
+      ],
+      "type": "object"
+    }
+  ]
+}

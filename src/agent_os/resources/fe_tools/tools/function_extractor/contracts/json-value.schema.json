@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/contracts/v1/json-value.schema.json",
+  "anyOf": [
+    {
+      "type": "null"
+    },
+    {
+      "type": "boolean"
+    },
+    {
+      "type": "number"
+    },
+    {
+      "type": "string"
+    },
+    {
+      "type": "array",
+      "maxItems": 50000,
+      "items": {
+        "$ref": "#"
+      }
+    },
+    {
+      "type": "object",
+      "maxProperties": 50000,
+      "additionalProperties": {
+        "$ref": "#"
+      }
+    }
+  ]
+}

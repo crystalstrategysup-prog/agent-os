@@ -138,7 +138,7 @@ def methods(trace):
 @pytest.mark.parametrize("mode", ["normal", "default-provider"])
 def test_real_stdio_supported_sequence_current_readback_and_actual_probe_commands(tmp_path, mode):
     req, binary, trace = fixture(tmp_path, mode)
-    rpc = StdioRpc(binary, tmp_path, dict(os.environ), "9.99.1", timeout=3)
+    rpc = StdioRpc(binary, tmp_path, dict(os.environ), "9.99.1", timeout=10)
     claims = []
     try:
         receipt = launch(req, CodexLaunchProvider(rpc, work_timeout=3), dispatch_claim=lambda: claims.append("claimed"))

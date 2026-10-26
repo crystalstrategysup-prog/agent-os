@@ -63,13 +63,13 @@ function runGeneric(snapshot) {
   const {elements, button, all, context, downloads} = createHarness(snapshot);
   check(() => assert.match(elements.title.textContent, /Synthetic/));
   check(() => { button('tab', 'contracts').click(); assert.match(elements.summary.textContent, /2 items/); });
-  check(() => { elements.search.value = 'NO MATCH'; elements.search.dispatch('input'); assert.match(elements.list.textContent, /Nothing found/); });
+  check(() => { elements.search.value = 'NO MATCH'; elements.search.dispatch('input'); assert.match(elements.list.textContent, /Ничего не найдено/); });
   check(() => { elements.reset.click(); assert.match(elements.summary.textContent, /2 items/); });
-  check(() => { button('entity', 'contract.plan.v2').click(); assert.match(elements.detail.textContent, /Input.*locality, period/); assert.match(elements.detail.textContent, /Authorization/); assert.match(elements.detail.textContent, /INVALID_PERIOD/); });
+  check(() => { button('entity', 'contract.plan.v2').click(); assert.match(elements.detail.textContent, /Вход.*locality, period/); assert.match(elements.detail.textContent, /Авторизация/); assert.match(elements.detail.textContent, /INVALID_PERIOD/); });
   check(() => { button('matrix', 'step:DEMO-STEP-01').click(); assert.match(elements.detail.textContent, /Declare a synthetic contract/); assert.match(elements.detail.textContent, /SYNTHETIC_ONLY/); });
-  check(() => { button('entity', 'doc.matrix').click(); assert.match(elements.detail.textContent, /SHA256/); assert.match(elements.detail.textContent, /Readback UTC/); });
+  check(() => { button('entity', 'doc.matrix').click(); assert.match(elements.detail.textContent, /SHA256/); assert.match(elements.detail.textContent, /Время проверки UTC/); });
   check(() => { button('tab', 'documents').click(); button('entity', 'doc.project').click(); assert.match(elements.detail.textContent, /<script>globalThis.INJECTED=true/); assert.equal(context.INJECTED, undefined); assert.equal(descendants(elements.detail).some(e => e.tagName === 'script' || e.tagName === 'img'), false); });
-  check(() => { elements.lifecycle.value = 'archived'; elements.lifecycle.dispatch('change'); assert.match(elements.summary.textContent, /1 items/); button('entity', 'doc.old').click(); assert.match(elements.detail.textContent, /Archive/); });
+  check(() => { elements.lifecycle.value = 'archived'; elements.lifecycle.dispatch('change'); assert.match(elements.summary.textContent, /1 items/); button('entity', 'doc.old').click(); assert.match(elements.detail.textContent, /Архив/); });
   check(() => { elements.reset.click(); assert.match(elements.summary.textContent, /4 items/); });
   check(() => { button('tab', 'relations').click(); assert.match(elements.summary.textContent, /3 items/); });
   check(() => { button('tab', 'history').click(); assert.match(elements.list.textContent, /DEMO-HISTORY-01/); assert.match(elements.list.textContent, /DEMO-HISTORY-02/); });

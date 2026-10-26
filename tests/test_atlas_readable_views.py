@@ -106,7 +106,8 @@ class WorkspaceViewsTests(unittest.TestCase):
         self.assertEqual(result["coverage"]["domains"][0]["missing_count"], 5000)
         for section in ("contracts", "roadmap"):
             self.assertTrue(result["sections"][section]["anchor_supported"])
-            self.assertEqual(result["sections"][section]["url"], (release / "index.html").as_uri() + "#" + section)
+            self.assertEqual(result["sections"][section]["url"], (self.root / ".atlas/output/index.html").as_uri() + "#" + section)
+            self.assertEqual(result["sections"][section]["immutable_url"], (release / "index.html").as_uri() + "#" + section)
         for key, name in (("html", "index.html"), ("json", "snapshot.json")):
             item = result["artifacts"][key]
             self.assertEqual(Path(item["path"]), release / name)

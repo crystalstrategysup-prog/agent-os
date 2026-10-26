@@ -649,24 +649,194 @@
       "write_surfaces": [
         ".agentos/project.json"
       ],
-      "read_only_when": "Neither --max-bytes nor --reset supplied",
+      "read_only_when": "Neither --max-bytes, --max-files nor --reset supplied",
       "options": {
         "--root": "Exact project root",
-        "--max-bytes": "integer1..1073741824; explicit byte budget",
-        "--reset": "remove override; retain monotonic generation"
+        "--max-bytes": "integer1..17179869184; omitted preserves effective bytes on file-only update",
+        "--max-files": "integer1..40000; omitted preserves effective files on byte-only update; default20000",
+        "--reset": "remove override; restore both defaults; retain monotonic generation",
+        "--expected-project-sha256": "optional paired CAS: 64 lowercase hex over current project bytes; checked inside existing write lock",
+        "--expected-budget-revision": "optional paired CAS: exact integer0..2147483647; both required together for set/reset; checked inside existing write lock"
       },
       "native_hooks": "DISABLED"
+    },
+    {
+      "name": "project handoff-diagnostic",
+      "effect": "read_only",
+      "status_values": [
+        "SAVED_METADATA",
+        "METADATA_UNAVAILABLE",
+        "BLOCKED"
+      ],
+      "write_surfaces": [],
+      "arguments": [
+        "--root",
+        "--task",
+        "--revision",
+        "--attempt optional"
+      ],
+      "limits": {
+        "receipt_bytes": 16384
+      },
+      "semantics": "Exact existingtask/attemptmetadata only. No scanner/capture/source_snapshot/libraryobjectread/retry; absentlegacyrecord unavailable. Existingterminal BLOCKED/error/exit2 unchanged, optionaldiagnosticenvelope only."
+    },
+    {
+      "name": "project refusal-acknowledge",
+      "effect": "explicit_metadata_disposition",
+      "status_values": [
+        "ACKNOWLEDGED",
+        "BLOCKED"
+      ],
+      "write_surfaces": [
+        "task recovery status",
+        "task-owned recovery metadata/event/journal"
+      ],
+      "contract": "docs/REFUSAL_RECOVERY.md",
+      "no_source_scanner_capture_library_effects": true,
+      "semantic_acceptance": false
+    },
+    {
+      "name": "project refusal-status",
+      "effect": "read_only",
+      "status_values": [
+        "METADATA_UNAVAILABLE",
+        "UNKNOWN",
+        "PREPARED",
+        "ACKNOWLEDGED",
+        "ADVANCED",
+        "BLOCKED"
+      ],
+      "write_surfaces": [],
+      "contract": "docs/REFUSAL_RECOVERY.md",
+      "no_source_scanner_capture_library_effects": true,
+      "semantic_acceptance": false
+    },
+    {
+      "name": "project refusal-reconcile",
+      "effect": "explicit_exact_pending_metadata_postimages",
+      "status_values": [
+        "ACKNOWLEDGED",
+        "ADVANCED",
+        "BLOCKED"
+      ],
+      "write_surfaces": [
+        "same exact recovery journal targets only"
+      ],
+      "contract": "docs/REFUSAL_RECOVERY.md",
+      "no_source_scanner_capture_library_effects": true,
+      "semantic_acceptance": false
+    },
+    {
+      "name": "project next-turn --recovery-request --recovery-permit",
+      "effect": "explicit_nonaccepting_turn_advance",
+      "status_values": [
+        "ADVANCED",
+        "BLOCKED"
+      ],
+      "write_surfaces": [
+        "exact existing standalone turn receipt",
+        "task-owned advance metadata"
+      ],
+      "contract": "docs/REFUSAL_RECOVERY.md",
+      "no_source_scanner_capture_library_effects": true,
+      "semantic_acceptance": false
+    },
+    {
+      "name": "project task-metadata-budget",
+      "effect": "read_only_or_explicit_project_metadata",
+      "status_values": [
+        "PASS"
+      ],
+      "write_surfaces": [
+        ".agentos/project.json"
+      ],
+      "read_only_when": "Neither --max-bytes nor --reset supplied",
+      "options": {
+        "--max-bytes": "integer4194304..33554432; TASK JSON only; default4194304",
+        "--reset": "restore default if bounded lowering compatibility passes; retain monotonic generation",
+        "--expected-project-sha256": "optional paired64lowerhex CAS under existinglock",
+        "--expected-budget-revision": "optional paired int0..2147483647 CAS for task_metadata_budget_revision; NOT inventory revision"
+      },
+      "native_hooks": "DISABLED"
+    },
+    {
+      "name": "atlas source-relocate plan",
+      "effect": "read_only_preview",
+      "status_values": [
+        "PLANNED",
+        "REFUSED"
+      ],
+      "write_surfaces": [],
+      "contract": "atlas.source-relocation/v1"
+    },
+    {
+      "name": "atlas source-relocate status",
+      "effect": "read_only",
+      "status_values": [
+        "OBSERVED",
+        "PREPARATION_INCOMPLETE",
+        "REFUSED"
+      ],
+      "write_surfaces": [],
+      "contract": "atlas.source-relocation/v1"
+    },
+    {
+      "name": "atlas source-relocate apply",
+      "effect": "explicit_native_source_transaction",
+      "status_values": [
+        "COMMITTED",
+        "REFUSED"
+      ],
+      "write_surfaces": [
+        "exact-qualified-native-entry-and-metadata",
+        "operation-journal",
+        "native-output-CAS"
+      ],
+      "contract": "atlas.source-relocation/v1"
+    },
+    {
+      "name": "atlas source-relocate reconcile",
+      "effect": "explicit_native_source_transaction",
+      "status_values": [
+        "COMMITTED",
+        "ROLLED_BACK_UNPUBLISHED",
+        "REFUSED"
+      ],
+      "write_surfaces": [
+        "exact-qualified-native-entry-and-metadata",
+        "operation-journal",
+        "native-output-CAS"
+      ],
+      "contract": "atlas.source-relocation/v1"
     }
   ],
-  "distribution_version": "0.8.0rc2002+atlas.4",
+  "distribution_version": "0.8.0rc2041+agentas1",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.8.0rc2002+atlas.4",
+  "release": "0.8.0rc2041+agentas1",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",
     "2": "blocked, validation failure or argparse error"
+  },
+  "refusal_recovery": {
+    "schema": "agentos.refusal-recovery-request/v1",
+    "permit_schema": "agentos.refusal-recovery-permit/v1",
+    "receipt_schema": "agentos.refusal-recovery-receipt/v1",
+    "new_workflow_status": "RECOVERY_REQUIRED",
+    "new_document_max_bytes": 16384,
+    "existing_metadata_max_bytes": 4194304,
+    "observation_max_age_seconds": 900,
+    "authority_truth": "Owner-attested local evidence; not cryptographically authenticated by core",
+    "resume": "RECOVERY_REQUIRED-specific enter guard checks committed B and exact project/task/revision/op/newbinding under project→turn locks BEFORE all answers/docs/status writes",
+    "legacy": "Existing normal gates, predicates, acceptance, source/scan/capacity unchanged outside pending/newstatus branch",
+    "pending_signal": "Atomic reserved directory + identity before preparation; complete journal afterward; either signal blocks all ordinary require_clear callsites. IncompleteUNKNOWN is never auto-cleared.",
+    "task_metadata_entry_max": 256,
+    "journal_admission": "Bounded one exact task metadata directory names, producer handoff-{profile}-{fingerprint}.json and any uncertain handoff-shaped entry refuse before recovery writes; no source/library discovery",
+    "schemas": "Bundled task/event enums and typed recovery contract now include actual A/C outputs; old enum values/bounds preserved",
+    "typed_revision": "Strict int permit and receipt revision, bool/float do not equal int1",
+    "staged_semantics": "Canonical typed parsed JSON equality, not Python dict equality, for ALL task/turn/ack/advance postimages before first targetwrite. Invalid aliases preserve targets/reservation/journal; keyorder/whitespace allowed."
   }
 }

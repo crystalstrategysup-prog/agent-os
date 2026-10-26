@@ -810,12 +810,12 @@
       "contract": "atlas.source-relocation/v1"
     }
   ],
-  "distribution_version": "0.8.0rc2033+ao08src3",
+  "distribution_version": "0.8.0rc2041+agentas1",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.8.0rc2018",
+  "release": "0.8.0rc2041+agentas1",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",
@@ -830,7 +830,7 @@
     "existing_metadata_max_bytes": 4194304,
     "observation_max_age_seconds": 900,
     "authority_truth": "Owner-attested local evidence; not cryptographically authenticated by core",
-    "resume": "RECOVERY_REQUIRED-specific enter guard checks committed B and exact project/task/revision/op/newbinding under project\u2192turn locks BEFORE all answers/docs/status writes",
+    "resume": "RECOVERY_REQUIRED-specific enter guard checks committed B and exact project/task/revision/op/newbinding under project→turn locks BEFORE all answers/docs/status writes",
     "legacy": "Existing normal gates, predicates, acceptance, source/scan/capacity unchanged outside pending/newstatus branch",
     "pending_signal": "Atomic reserved directory + identity before preparation; complete journal afterward; either signal blocks all ordinary require_clear callsites. IncompleteUNKNOWN is never auto-cleared.",
     "task_metadata_entry_max": 256,

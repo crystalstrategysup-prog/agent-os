@@ -1,0 +1,27 @@
+{
+  "bindings": [
+    {
+      "applicability": "HTML_BOLD_TEXT_V1",
+      "binding_id": "telegram.sendMessage.request",
+      "boundary_id": "telegram.sendMessage.html.bold",
+      "direction": "input",
+      "file": "app/ingest/telegram_basic_native_transport.py",
+      "line": 789,
+      "phase": "REQUEST",
+      "sha256": "ad9e85d6029239e182f025a7b475b62d93b3837ad6684761ba2ba35b72817cfa",
+      "symbol": "BasicNativeTransport._request_once"
+    },
+    {
+      "binding_id": "telegram.sendMessage.response",
+      "boundary_id": "telegram.response.envelope",
+      "direction": "output",
+      "file": "app/ingest/telegram_basic_native_transport.py",
+      "line": 808,
+      "phase": "RESPONSE",
+      "sha256": "ad9e85d6029239e182f025a7b475b62d93b3837ad6684761ba2ba35b72817cfa",
+      "symbol": "BasicNativeTransport._request_once"
+    }
+  ],
+  "schema": "function-extractor.contract-capture-bindings/v1",
+  "version": 1
+}

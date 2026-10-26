@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/contracts/v1/manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "route-probe.bundle/v1"
+    },
+    "entry": {
+      "type": "string"
+    },
+    "adapter": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "opaque_modules": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "string"
+      }
+    },
+    "files": {
+      "type": "array",
+      "maxItems": 160,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2097152
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "bytes"
+        ]
+      }
+    },
+    "graph_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "coverage": {
+      "const": "BOUNDED_STATIC_NOT_EXHAUSTIVE"
+    },
+    "live_send_supported": {
+      "const": false
+    },
+    "source_pin": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "commit"
+          ],
+          "properties": {
+            "status": {
+              "const": "FILE_HASH_ONLY"
+            },
+            "commit": {
+              "type": "null"
+            },
+            "loaded_runtime_proof": {
+              "const": false
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "commit",
+            "git_files",
+            "file_hash_only_additions",
+            "loaded_runtime_proof"
+          ],
+          "properties": {
+            "status": {
+              "const": "GIT_OBJECTS_VERIFIED"
+            },
+            "commit": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{40}$"
+            },
+            "git_files": {
+              "type": "array",
+              "maxItems": 160,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+\\.py$"
+              }
+            },
+            "file_hash_only_additions": {
+              "type": "array",
+              "maxItems": 160,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+\\.py$"
+              }
+            },
+            "loaded_runtime_proof": {
+              "const": false
+            }
+          }
+        }
+      ]
+    },
+    "capture_mode": {
+      "enum": [
+        "STRICT",
+        "PARTIAL_STATIC"
+      ]
+    }
+  },
+  "required": [
+    "schema",
+    "entry",
+    "adapter",
+    "opaque_modules",
+    "files",
+    "graph_sha256",
+    "coverage",
+    "live_send_supported"
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/contracts/v1/boundaries.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "boundaries",
+    "executed",
+    "unresolved_caps"
+  ],
+  "properties": {
+    "schema": {
+      "const": "function-extractor.boundaries/v1"
+    },
+    "version": {
+      "const": 1
+    },
+    "boundaries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "source",
+          "target",
+          "file",
+          "line",
+          "resolution",
+          "evidence",
+          "admission"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "kind": {
+            "enum": [
+              "network",
+              "database",
+              "process",
+              "broker",
+              "filesystem",
+              "opaque_import",
+              "dynamic_call",
+              "external_dependency"
+            ]
+          },
+          "source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "target": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "file": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "line": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "resolution": {
+            "enum": [
+              "external",
+              "dynamic"
+            ]
+          },
+          "evidence": {
+            "const": "STATIC_NOT_EXECUTED"
+          },
+          "admission": {
+            "const": "REQUIRES_EXPLICIT_FIXTURE_OR_DENIAL"
+          }
+        }
+      }
+    },
+    "executed": {
+      "const": false
+    },
+    "unresolved_caps": {
+      "type": "array",
+      "items": {
+        "$ref": "json-value.schema.json"
+      }
+    }
+  }
+}

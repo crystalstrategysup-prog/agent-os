@@ -1,0 +1,324 @@
+{
+  "$id": "urn:function-extractor:ce_contract_observation_plan:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "additionalProperties": false,
+      "properties": {
+        "bindings": {
+          "items": {
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "required": [
+                    "applicability"
+                  ]
+                },
+                "then": {
+                  "oneOf": [
+                    {
+                      "properties": {
+                        "applicability": {
+                          "const": "PLAIN_TEXT_ONLY"
+                        },
+                        "boundary_id": {
+                          "const": "telegram.sendMessage.plain"
+                        },
+                        "direction": {
+                          "const": "input"
+                        },
+                        "phase": {
+                          "const": "REQUEST"
+                        }
+                      }
+                    },
+                    {
+                      "properties": {
+                        "applicability": {
+                          "const": "HTML_BOLD_TEXT_V1"
+                        },
+                        "boundary_id": {
+                          "const": "telegram.sendMessage.html.bold"
+                        },
+                        "direction": {
+                          "const": "input"
+                        },
+                        "phase": {
+                          "const": "REQUEST"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            "properties": {
+              "applicability": {
+                "enum": [
+                  "PLAIN_TEXT_ONLY",
+                  "HTML_BOLD_TEXT_V1"
+                ]
+              },
+              "binding_id": {
+                "maxLength": 180,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+                "type": "string"
+              },
+              "boundary_id": {
+                "maxLength": 180,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+                "type": "string"
+              },
+              "direction": {
+                "enum": [
+                  "input",
+                  "output"
+                ]
+              },
+              "file": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "line": {
+                "maximum": 10000000,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "phase": {
+                "enum": [
+                  "REQUEST",
+                  "RESPONSE"
+                ]
+              },
+              "sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "symbol": {
+                "maxLength": 180,
+                "minLength": 1,
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "binding_id",
+              "boundary_id",
+              "direction",
+              "phase",
+              "file",
+              "sha256",
+              "symbol",
+              "line"
+            ],
+            "type": "object"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "type": "array"
+        },
+        "content_digest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "contract_map_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "graph_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "manifest_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "route_entry": {
+          "maxLength": 512,
+          "minLength": 3,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_.]*:[A-Za-z_][A-Za-z0-9_.]*$",
+          "type": "string"
+        },
+        "rule_ids": {
+          "items": {
+            "maxLength": 180,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+            "type": "string"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "rules": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "boundary_id": {
+                "maxLength": 180,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+                "type": "string"
+              },
+              "conflicts": {
+                "items": {
+                  "maxLength": 180,
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+                  "type": "string"
+                },
+                "maxItems": 64,
+                "minItems": 0,
+                "type": "array",
+                "uniqueItems": true
+              },
+              "constraint": {
+                "type": [
+                  "object",
+                  "boolean"
+                ]
+              },
+              "kind": {
+                "enum": [
+                  "input_schema",
+                  "output_schema"
+                ]
+              },
+              "provenance": {
+                "enum": [
+                  "OFFICIAL",
+                  "APPROVED_INTERNAL",
+                  "OBSERVED",
+                  "UNSPECIFIED"
+                ]
+              },
+              "rule_id": {
+                "maxLength": 180,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+                "type": "string"
+              },
+              "schema_sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "source_id": {
+                "maxLength": 180,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+                "type": "string"
+              },
+              "source_sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "rule_id",
+              "boundary_id",
+              "kind",
+              "source_id",
+              "source_sha256",
+              "provenance",
+              "schema_sha256",
+              "constraint",
+              "conflicts"
+            ],
+            "type": "object"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "type": "array"
+        },
+        "schema": {
+          "const": "function-extractor.contract-observation-plan/v1"
+        },
+        "selected_rule_digest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "source_pins": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "bytes": {
+                "maximum": 2000000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "path": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256",
+              "bytes"
+            ],
+            "type": "object"
+          },
+          "maxItems": 160,
+          "minItems": 1,
+          "type": "array"
+        },
+        "status": {
+          "const": "COMPILED"
+        },
+        "version": {
+          "const": 1
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "status",
+        "route_entry",
+        "graph_sha256",
+        "manifest_sha256",
+        "contract_map_sha256",
+        "selected_rule_digest",
+        "rule_ids",
+        "source_pins",
+        "rules",
+        "bindings",
+        "content_digest"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "reason_code": {
+          "const": "PLAN_INPUT_INVALID"
+        },
+        "schema": {
+          "const": "function-extractor.contract-observation-plan/v1"
+        },
+        "status": {
+          "const": "REFUSED"
+        },
+        "version": {
+          "const": 1
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "status",
+        "reason_code"
+      ],
+      "type": "object"
+    }
+  ]
+}

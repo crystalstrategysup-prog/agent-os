@@ -1,3 +1,9 @@
+# 0.8.0rc2041+agentas1 — installed source candidate
+
+- Publish the reviewed rc2041 public source with the accepted pinned Atlas CE evidence import patch.
+- Match all397 package members to the installed wheel and retain exact base/candidate hashes.
+- Preserve prior scoped checks and distinguish branch source delivery from official release and native business acceptance.
+
 # 0.8.0rc2 — handoff scanner and CLI input correction
 
 ## 0.8.0rc2033 source publication candidate

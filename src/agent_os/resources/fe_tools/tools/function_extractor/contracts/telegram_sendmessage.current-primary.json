@@ -1,0 +1,60 @@
+{
+  "schema": "function-extractor.primary-extract/v1",
+  "provider": "telegram",
+  "protocol": "BotAPI",
+  "method": "sendMessage",
+  "canonical_reference": "https://core.telegram.org/bots/api#sendmessage",
+  "retrieved_at": "2026-10-23T08:55:07.211507+00:00",
+  "retrieval": "ROOT read official documentation through the web tool in this finalization; normalized selected facts, not raw HTTP/provider invocation",
+  "document_header_version": "Bot API 10.3; August 24, 2026",
+  "representation": "Normalized selected documentation facts, not raw HTML and not official OpenAPI",
+  "facts": {
+    "chat_id": {
+      "required": true,
+      "types": [
+        "integer",
+        "string"
+      ]
+    },
+    "text": {
+      "required": true,
+      "type": "string",
+      "min_characters": 1,
+      "max_characters": 4096,
+      "count_basis": "after entities parsing"
+    },
+    "success_result": "Message",
+    "response_ok": {
+      "type": "boolean",
+      "success_result_field": "result",
+      "success_requires_result": true
+    },
+    "error_code": {
+      "type": "integer",
+      "stability": "contents may change",
+      "required_when_ok_false": true
+    },
+    "retry_after": {
+      "type": "integer",
+      "semantics": "rate-limit delay where provided"
+    },
+    "description": {
+      "type": "string",
+      "required": false
+    },
+    "success_message_subset": {
+      "message_id": "integer",
+      "chat": "object",
+      "full_message_schema": false
+    }
+  },
+  "adapter_scope": "Plain-text request and conditional response envelope with selected message_id/chat success fields ONLY; complete Message, all optional parameters and HTML/entities not validated",
+  "unspecified": [
+    "outbound transport timeout",
+    "idempotency guarantee",
+    "historical socket cause",
+    "current runtime adoption"
+  ],
+  "live_provider_observed": false,
+  "official_schema": false
+}

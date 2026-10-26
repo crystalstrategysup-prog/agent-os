@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+import argparse,json,os,time,uuid
+from pathlib import Path
+from datetime import datetime,timezone
+p=argparse.ArgumentParser()
+p.add_argument('action',choices=['start','finish','report'])
+p.add_argument('--ledger',required=True)
+p.add_argument('--step');p.add_argument('--id');p.add_argument('--result');p.add_argument('--note',default='')
+a=p.parse_args();path=Path(a.ledger)
+if path.is_symlink() or not path.parent.is_dir():raise SystemExit('invalid_ledger')
+rows=[json.loads(x) for x in path.read_text().splitlines()] if path.exists() else []
+def now():return datetime.now(timezone.utc).isoformat()
+def append(x):
+ fd=os.open(path,os.O_APPEND|os.O_CREAT|os.O_WRONLY|os.O_NOFOLLOW,0o600)
+ try:os.write(fd,(json.dumps(x,sort_keys=True,ensure_ascii=False)+'\n').encode());os.fsync(fd)
+ finally:os.close(fd)
+if a.action=='start':
+ if not a.step or len(a.step)>80:raise SystemExit('invalid_step')
+ active=[x for x in rows if x['event']=='start' and not any(y['event']=='finish' and y.get('id')==x['id'] for y in rows)]
+ if active:raise SystemExit('active_step_exists')
+ item=dict(event='start',id=uuid.uuid4().hex,step=a.step,utc=now(),monotonic_ns=time.monotonic_ns(),note=a.note)
+ append(item);print(json.dumps(item))
+elif a.action=='finish':
+ starts=[x for x in rows if x['event']=='start' and x['id']==a.id]
+ if len(starts)!=1 or not a.result or any(x['event']=='finish' and x.get('id')==a.id for x in rows):raise SystemExit('invalid_finish')
+ duration=(time.monotonic_ns()-starts[0]['monotonic_ns'])/1e9
+ if duration<0:raise SystemExit('noncomparable_monotonic')
+ item=dict(event='finish',id=a.id,step=starts[0]['step'],utc=now(),duration_seconds=round(duration,3),result=a.result,note=a.note)
+ append(item);print(json.dumps(item,ensure_ascii=False))
+else:
+ for x in rows:print(json.dumps(x,ensure_ascii=False))

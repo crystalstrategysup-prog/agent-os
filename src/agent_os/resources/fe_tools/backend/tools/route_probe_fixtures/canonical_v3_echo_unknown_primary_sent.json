@@ -1,0 +1,54 @@
+{
+  "schema": "route-probe.avl-fixture/v1",
+  "stack_variant": "canonical_v3",
+  "case": "echo_unknown_primary_sent",
+  "route": "platform_group",
+  "evidence": "SIMULATED",
+  "opaque_modules": [
+    "app.core.config",
+    "app.ingest.telegram_basic_subscription"
+  ],
+  "entry": "app.ingest.telegram_private_worker:process_delivery_once",
+  "include_modules": [
+    "app.core.db",
+    "app.ingest.bot_bridge_core",
+    "app.ingest.telegram_basic_group_budget",
+    "app.ingest.telegram_basic_native_transport",
+    "app.ingest.telegram_basic_upload_store",
+    "app.ingest.telegram_private_binding",
+    "app.ingest.telegram_private_inbox",
+    "app.ingest.telegram_private_materializer",
+    "app.ingest.telegram_private_transport",
+    "app.ingest.telegram_private_worker",
+    "app.ingest.telegram_reply_presentation",
+    "app.models",
+    "app.ingest.telegram_basic_media_policy",
+    "app.ingest.telegram_basic_platform_reply",
+    "app.ingest.telegram_owner_private_composition",
+    "app.ingest.telegram_owner_private_state",
+    "app.ingest.telegram_owner_private_route",
+    "app.core.tenant_settings",
+    "app.core.message_reply_outcomes",
+    "app.ingest.telegram_basic_case_admission"
+  ],
+  "include_entries": [
+    "app.ingest.telegram_basic_native_transport:BasicNativeTransport.__call__",
+    "app.ingest.telegram_basic_platform_reply:enqueue_platform_reply"
+  ],
+  "capture_mode": "PARTIAL_STATIC",
+  "public_assets": [
+    {
+      "name": "timezone:Asia/Vladivostok",
+      "sha256": "5a892182d8f69f0523f7dda1ed2c9f07f7d134700a7cf37386c7ffa19a629bc7"
+    }
+  ],
+  "trace_modules": [
+    "app.ingest.telegram_private_worker",
+    "app.ingest.telegram_private_transport",
+    "app.ingest.telegram_basic_native_transport",
+    "app.ingest.bot_bridge_core",
+    "app.ingest.telegram_basic_platform_reply"
+  ],
+  "expected_result": "sent",
+  "max_trace_events": 5000
+}

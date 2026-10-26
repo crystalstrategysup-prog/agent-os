@@ -1,0 +1,246 @@
+{
+  "declarations": [
+    {
+      "id": "bnt-delivery-capabilities",
+      "paths": [
+        "app/ingest/telegram_basic_native_transport.py",
+        "backend/app/ingest/telegram_basic_native_transport.py"
+      ],
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "symbol": "_DELIVERY_METHODS"
+    },
+    {
+      "id": "bnt-probe-capabilities",
+      "paths": [
+        "app/ingest/telegram_basic_native_transport.py",
+        "backend/app/ingest/telegram_basic_native_transport.py"
+      ],
+      "protocol": "BotAPI",
+      "provider": "telegram",
+      "symbol": "_PROBE_METHODS"
+    }
+  ],
+  "dispatches": [
+    {
+      "callee": "self._request",
+      "fixed_method": null,
+      "id": "bnt-request",
+      "method_arg": 1,
+      "method_kw": "method",
+      "paths": [
+        "app/ingest/telegram_basic_native_transport.py",
+        "backend/app/ingest/telegram_basic_native_transport.py"
+      ],
+      "protocol": "BotAPI",
+      "provider": "telegram"
+    },
+    {
+      "callee": "self._request_once",
+      "fixed_method": null,
+      "id": "bnt-request-once",
+      "method_arg": 1,
+      "method_kw": "method",
+      "paths": [
+        "app/ingest/telegram_basic_native_transport.py",
+        "backend/app/ingest/telegram_basic_native_transport.py"
+      ],
+      "protocol": "BotAPI",
+      "provider": "telegram"
+    },
+    {
+      "callee": "self._request_upload",
+      "fixed_method": null,
+      "id": "bnt-request-upload",
+      "method_arg": 1,
+      "method_kw": "method",
+      "paths": [
+        "app/ingest/telegram_basic_native_transport.py",
+        "backend/app/ingest/telegram_basic_native_transport.py"
+      ],
+      "protocol": "BotAPI",
+      "provider": "telegram"
+    },
+    {
+      "callee": "api_call",
+      "fixed_method": null,
+      "id": "basic-private-call",
+      "method_arg": 1,
+      "method_kw": "method",
+      "paths": [
+        "app/ingest/telegram_private_transport.py",
+        "backend/app/ingest/telegram_private_transport.py"
+      ],
+      "protocol": "BotAPI",
+      "provider": "telegram"
+    },
+    {
+      "callee": "api_call.send_clean",
+      "fixed_method": null,
+      "id": "basic-private-clean",
+      "method_arg": 1,
+      "method_kw": "method",
+      "paths": [
+        "app/ingest/telegram_private_transport.py",
+        "backend/app/ingest/telegram_private_transport.py"
+      ],
+      "protocol": "BotAPI",
+      "provider": "telegram"
+    },
+    {
+      "callee": "api_call.send_forward",
+      "fixed_method": null,
+      "id": "basic-private-forward",
+      "method_arg": 1,
+      "method_kw": "method",
+      "paths": [
+        "app/ingest/telegram_private_transport.py",
+        "backend/app/ingest/telegram_private_transport.py"
+      ],
+      "protocol": "BotAPI",
+      "provider": "telegram"
+    },
+    {
+      "callee": "api_call.send_reaction",
+      "fixed_method": "setMessageReaction",
+      "id": "basic-private-reaction",
+      "method_arg": null,
+      "method_kw": null,
+      "paths": [
+        "app/ingest/telegram_private_transport.py",
+        "backend/app/ingest/telegram_private_transport.py"
+      ],
+      "protocol": "BotAPI",
+      "provider": "telegram"
+    },
+    {
+      "callee": "transport",
+      "fixed_method": null,
+      "id": "owner-private-call",
+      "method_arg": 1,
+      "method_kw": "method",
+      "paths": [
+        "app/ingest/telegram_owner_private_runtime.py",
+        "backend/app/ingest/telegram_owner_private_runtime.py"
+      ],
+      "protocol": "BotAPI",
+      "provider": "telegram"
+    },
+    {
+      "callee": "transport.send_forward",
+      "fixed_method": null,
+      "id": "owner-private-forward",
+      "method_arg": 1,
+      "method_kw": "method",
+      "paths": [
+        "app/ingest/telegram_owner_private_runtime.py",
+        "backend/app/ingest/telegram_owner_private_runtime.py"
+      ],
+      "protocol": "BotAPI",
+      "provider": "telegram"
+    },
+    {
+      "callee": "transport.send_media_group",
+      "fixed_method": "sendMediaGroup",
+      "id": "owner-private-album",
+      "method_arg": null,
+      "method_kw": null,
+      "paths": [
+        "app/ingest/telegram_owner_private_runtime.py",
+        "backend/app/ingest/telegram_owner_private_runtime.py"
+      ],
+      "protocol": "BotAPI",
+      "provider": "telegram"
+    },
+    {
+      "callee": "transport.probe",
+      "fixed_method": null,
+      "id": "basic-qualification-native",
+      "method_arg": 1,
+      "method_kw": "method",
+      "paths": [
+        "app/ingest/telegram_basic_runtime.py",
+        "backend/app/ingest/telegram_basic_runtime.py"
+      ],
+      "protocol": "BotAPI",
+      "provider": "telegram"
+    },
+    {
+      "callee": "probe",
+      "fixed_method": null,
+      "id": "basic-qualification-helper",
+      "method_arg": 0,
+      "method_kw": "method",
+      "paths": [
+        "app/ingest/telegram_basic_runtime.py",
+        "backend/app/ingest/telegram_basic_runtime.py"
+      ],
+      "protocol": "BotAPI",
+      "provider": "telegram"
+    },
+    {
+      "callee": "transport.probe",
+      "fixed_method": null,
+      "id": "owned-probe",
+      "method_arg": 1,
+      "method_kw": "method",
+      "paths": [
+        "app/ingest/telegram_basic_webhook_control.py",
+        "app/ingest/telegram_owner_private_activation.py",
+        "app/ingest/telegram_owner_private_source_adoption.py",
+        "backend/app/ingest/telegram_basic_webhook_control.py",
+        "backend/app/ingest/telegram_owner_private_activation.py",
+        "backend/app/ingest/telegram_owner_private_source_adoption.py"
+      ],
+      "protocol": "BotAPI",
+      "provider": "telegram"
+    },
+    {
+      "callee": "transport.set_webhook",
+      "fixed_method": "setWebhook",
+      "id": "owned-webhook-control",
+      "method_arg": null,
+      "method_kw": null,
+      "paths": [
+        "app/ingest/telegram_basic_webhook_control.py",
+        "app/ingest/telegram_owner_private_activation.py",
+        "backend/app/ingest/telegram_basic_webhook_control.py",
+        "backend/app/ingest/telegram_owner_private_activation.py"
+      ],
+      "protocol": "BotAPI",
+      "provider": "telegram"
+    },
+    {
+      "callee": "telegram_api_request",
+      "fixed_method": null,
+      "id": "api-selected-identity",
+      "method_arg": 1,
+      "method_kw": "method",
+      "paths": [
+        "app/api/messages.py",
+        "backend/app/api/messages.py"
+      ],
+      "protocol": "BotAPI",
+      "provider": "telegram"
+    },
+    {
+      "callee": "SendMessageRequest",
+      "fixed_method": "messages.sendMessage",
+      "id": "human2257-message-constructor",
+      "method_arg": null,
+      "method_kw": null,
+      "paths": [
+        "app/ingest/telegram_basic_human2257_supplier.py",
+        "backend/app/ingest/telegram_basic_human2257_supplier.py"
+      ],
+      "protocol": "MTProto",
+      "provider": "telegram"
+    }
+  ],
+  "include_prefixes": [
+    "backend/app/",
+    "app/"
+  ],
+  "schema": "function-extractor.method-policy/v1",
+  "version": 1
+}

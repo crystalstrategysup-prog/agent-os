@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/schemas/ce_run.schema.json",
+  "description": "Structural schema for current Contract Engine artifacts; runtime identity, path, provenance, credential and trace guards remain authoritative.",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "contract-run/v1"
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "contract_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "fixture_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "case_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180
+          },
+          "trace": {
+            "type": "object",
+            "description": "Deliberately partial structural trace shape. api._trace remains authoritative for every nested field, privacy allowlist, enums and resource bound; evidence_registry binds entry/fixture/completion.",
+            "required": [
+              "schema",
+              "status",
+              "spans",
+              "sandbox"
+            ],
+            "properties": {
+              "schema": {
+                "const": "route-probe.trace/v1"
+              },
+              "status": {
+                "enum": [
+                  "RETURNED",
+                  "RAISED",
+                  "DENIED",
+                  "TIMEOUT",
+                  "REFUSED",
+                  "TRACE_LIMIT",
+                  "BLOCKED_LIVE_PROOF"
+                ]
+              },
+              "spans": {
+                "type": "array",
+                "maxItems": 10000,
+                "items": {
+                  "type": "object"
+                }
+              },
+              "sandbox": {
+                "type": "object"
+              },
+              "fixture_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "source_entry": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_.]*:[A-Za-z_][A-Za-z0-9_.]*$"
+              },
+              "contract_observations": {
+                "$ref": "urn:function-extractor:ce_contract_observations:v1"
+              }
+            },
+            "additionalProperties": true
+          },
+          "environment": {
+            "type": "object",
+            "properties": {
+              "source_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "bundle_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "manifest_source_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "runner_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "profile_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "runner": {
+                "enum": [
+                  "subprocess",
+                  "container"
+                ]
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "delivery_state": {
+            "enum": [
+              "queued",
+              "sending",
+              "sent",
+              "delivered",
+              "failed",
+              "unknown",
+              "partial",
+              "retry_wait",
+              "not_started",
+              "not_requested",
+              "disabled",
+              "unobserved"
+            ]
+          }
+        },
+        "required": [
+          "case_id",
+          "trace"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 40
+    },
+    "branch_inventory": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 180
+      },
+      "minItems": 0,
+      "maxItems": 10000,
+      "uniqueItems": true
+    },
+    "branch_observations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 180
+      },
+      "minItems": 0,
+      "maxItems": 10000,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema",
+    "source_sha256",
+    "contract_sha256",
+    "fixture_sha256",
+    "cases"
+  ],
+  "additionalProperties": false
+}

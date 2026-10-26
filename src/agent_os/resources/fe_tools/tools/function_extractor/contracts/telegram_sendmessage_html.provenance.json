@@ -1,0 +1,20 @@
+{
+  "schema": "function-extractor.adapter-provenance/v1",
+  "version": 1,
+  "primary_ref": "https://core.telegram.org/bots/api#html-style",
+  "primary_sha256": "e2733c05fef5d09323c13915fa5ce753f978163ed4b25b7506c6fcd3c6259cf3",
+  "adapter_sha256": "f9b5e2d3670f2760ef6b1976d922d3e11a671b329181a092f3a26e6a7eab5e80",
+  "official_schema": false,
+  "machine_adapter": true,
+  "scope": "HTML_BOLD_TEXT_V1; selected request plus retained partial response envelope",
+  "review": "Source-based bounded adapter under current owner offline request; no platform or provider acceptance",
+  "coverage": {
+    "full_html": false,
+    "full_message_schema": false,
+    "request_applicability": "HTML_BOLD_TEXT_V1"
+  },
+  "source_basis": [
+    "Telegram Bot API sendMessage and HTML style",
+    "backend/app/ingest/telegram_reply_presentation.py render_reply emits nonnested b and html.escape"
+  ]
+}

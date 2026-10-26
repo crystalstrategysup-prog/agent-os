@@ -1,0 +1,25 @@
+{
+  "schema": "function-extractor.primary-extract/v1",
+  "method": "sendMessage",
+  "canonical_reference": "https://core.telegram.org/bots/api#html-style",
+  "retrieved_at": "2026-10-23T12:38:11.924275+00:00",
+  "representation": "Normalized selected facts reviewed with official web source; not official OpenAPI or provider execution",
+  "facts": {
+    "parse_mode": "HTML",
+    "text_characters_after_entities_parsing": {
+      "minimum": 1,
+      "maximum": 4096
+    },
+    "selected_tag": "b",
+    "named_entities": [
+      "lt",
+      "gt",
+      "amp",
+      "quot"
+    ],
+    "numeric_entities": "supported"
+  },
+  "local_scope": "Non-nested exact bold tags, escaped text and bounded numeric Unicode scalar references. Other syntax UNKNOWN; no full HTML, optional parameter or delivery proof.",
+  "live_provider_observed": false,
+  "official_schema": false
+}

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/contracts/v1/sandbox.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "bundle",
+    "entry",
+    "timeout_seconds",
+    "requirements",
+    "enforcement_proven",
+    "container_proven"
+  ],
+  "properties": {
+    "schema": {
+      "const": "function-extractor.sandbox/v1"
+    },
+    "version": {
+      "const": 1
+    },
+    "bundle": {
+      "type": "string"
+    },
+    "entry": {
+      "type": "string"
+    },
+    "timeout_seconds": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 30
+    },
+    "requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "audit",
+        "seccomp",
+        "network",
+        "credentials"
+      ],
+      "properties": {
+        "audit": {
+          "const": true
+        },
+        "seccomp": {
+          "const": true
+        },
+        "network": {
+          "const": "DENY"
+        },
+        "credentials": {
+          "const": "NONE"
+        }
+      }
+    },
+    "enforcement_proven": {
+      "const": false
+    },
+    "container_proven": {
+      "const": false
+    }
+  }
+}

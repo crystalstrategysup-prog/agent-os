@@ -1,0 +1,40 @@
+{
+  "schema": "function-extractor.rule-declarations/v1",
+  "rules": [
+    {
+      "rule_id": "labels.source-behavior",
+      "boundary_id": "label-function",
+      "kind": "semantic",
+      "constraint": {
+        "description": "Observed source mapping, metadata precedence/Cyrillic filter and normalized fallback; fixture expected_result is code-derived, never normative approval."
+      }
+    },
+    {
+      "rule_id": "labels.input",
+      "boundary_id": "label-function",
+      "kind": "input_schema",
+      "constraint": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "tenant_id"
+        ],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "boundaries": [
+    {
+      "boundary_id": "label-function",
+      "symbol": "app.core.tenant_labels:tenant_display_label",
+      "kind": "python"
+    }
+  ]
+}
