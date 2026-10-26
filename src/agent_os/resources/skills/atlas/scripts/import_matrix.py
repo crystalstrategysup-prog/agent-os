@@ -110,7 +110,7 @@ def pointer_value(value, pointer):
 
 def binding_model(raw):
     b = nav.parse(raw)
-    shape(b, ("schema", "project", "matrix", "history", "documents", "output"), ("semantic_catalog",))
+    shape(b, ("schema", "project", "matrix", "history", "documents", "output"), ("semantic_catalog", "ce_evidence"))
     require(b["schema"] == "atlas.upstream-binding/v1", "UPSTREAM_BINDING_SCHEMA")
     shape(b["project"], ("id", "title", "objective", "writer", "authority_ref", "scope_note"), label="project")
     nav.ident(b["project"]["id"])
@@ -140,6 +140,23 @@ def binding_model(raw):
         for k in ("title", "role"):
             nav.text(d[k], "document." + k)
         require(d["domain"] in DOMAINS, "DOCUMENT_DOMAIN")
+    if "ce_evidence" in b:
+        rows=b["ce_evidence"]
+        require(type(rows) is list and 1 <= len(rows) <= 32, "CE_EVIDENCE_BOUND")
+        seen=set()
+        for item in rows:
+            shape(item,("contract_key","source_path","source_sha256","fe_source_root",
+                "registry_root","chunks_root","source_entry","fixture_sha256",
+                "runner_sha256","expected_manifest_sha256","verifier_sha256",
+                "api_module_sha256","recording_gate_sha256"),label="ce_evidence")
+            nav.ident(item["contract_key"])
+            require(item["contract_key"] not in seen,"CE_EVIDENCE_DUPLICATE")
+            seen.add(item["contract_key"])
+            relative(item["source_path"])
+            for key in ("source_sha256","fixture_sha256","runner_sha256","expected_manifest_sha256","verifier_sha256","api_module_sha256","recording_gate_sha256"):
+                require(type(item[key]) is str and nav.SHA.fullmatch(item[key]),"CE_EVIDENCE_PIN")
+            for key in ("fe_source_root","registry_root","chunks_root","source_entry"):
+                nav.text(item[key],"ce_evidence."+key)
     if "semantic_catalog" in b:
         c = b["semantic_catalog"]
         shape(c, ("path", "sha256", "bytes"), label="semantic_catalog")
@@ -347,6 +364,92 @@ def source_stat(root, path):
             "mtime_ns": st.st_mtime_ns, "ctime_ns": st.st_ctime_ns}
 
 
+def verified_ce_evidence(root, binding):
+    """Opt-in owning contract validation using the EXISTING FE/CE registry code.
+
+    No FE/CE module copied into Atlas. Physical source bytes are checked from
+    the selected Atlas project; caller SHA/manifest alone are insufficient.
+    """
+    import subprocess
+    import sys
+    results={}
+    child_code="""import hashlib,importlib.abc,importlib.util,json,sys
+from pathlib import Path
+root=Path(sys.argv[1]).resolve()
+args=json.loads(sys.argv[2]); expected=json.loads(sys.argv[3])
+executed={}
+class VerifiedSourceLoader(importlib.abc.SourceLoader):
+ def __init__(self,name,path):self.name,self.path=name,path
+ def get_filename(self,fullname):return str(self.path)
+ def get_data(self,path):return Path(path).read_bytes()
+ def get_code(self,fullname):
+  data=self.get_data(self.path)
+  relative=self.path.relative_to(root).as_posix()
+  digest=hashlib.sha256(data).hexdigest()
+  if relative in expected and digest!=expected[relative]:raise ImportError('SOURCE_DIGEST_MISMATCH')
+  executed[relative]=digest
+  return compile(data,str(self.path),'exec',dont_inherit=True)
+class VerifiedFinder(importlib.abc.MetaPathFinder):
+ def find_spec(self,fullname,path=None,target=None):
+  if fullname!='tools' and not fullname.startswith('tools.') :return None
+  parts=fullname.split('.')
+  location=root.joinpath(*parts)
+  file=location/'__init__.py' if (location/'__init__.py').is_file() else location.with_suffix('.py')
+  if location.is_dir() and not (location/'__init__.py').exists():
+   spec=importlib.util.spec_from_loader(fullname,loader=None,is_package=True)
+   spec.submodule_search_locations=[str(location)]
+   return spec
+  if not file.is_file() or file.is_symlink() or not file.resolve().is_relative_to(root):raise ImportError('VERIFIER_MODULE_UNAVAILABLE')
+  loader=VerifiedSourceLoader(fullname,file)
+  return importlib.util.spec_from_loader(fullname,loader,is_package=file.name=='__init__.py')
+sys.meta_path.insert(0,VerifiedFinder())
+import tools.function_extractor.api
+import tools.function_extractor.recording_gate
+import tools.function_extractor.evidence_registry as module
+assert Path(module.__file__).resolve()==(root/'tools/function_extractor/evidence_registry.py').resolve(), 'VERIFIER_MODULE_PATH'
+result=module.load_chunk_evidence_v2(args['registry_root'],args['chunks_root'],
+ source_entry=args['source_entry'],fixture_sha256=args['fixture_sha256'],
+ runner_sha256=args['runner_sha256'],expected_manifest_sha256=args['expected_manifest_sha256'])
+assert all(executed.get(k)==v for k,v in expected.items()),'VERIFIER_EXECUTED_ORIGIN'
+print(json.dumps({'status':result.get('status'),'executed':executed}))"""
+    for row in binding.get("ce_evidence",[]):
+        source=read(root,row["source_path"])
+        source_valid=sha(source)==row["source_sha256"]
+        fe_root=Path(row["fe_source_root"]).absolute()
+        pinned=(("tools/function_extractor/evidence_registry.py","verifier_sha256"),
+                ("tools/function_extractor/api.py","api_module_sha256"),
+                ("tools/function_extractor/recording_gate.py","recording_gate_sha256"))
+        def check_pins():
+            for relative,key in pinned:
+                dep=fe_root/relative
+                require(dep.is_file() and not dep.is_symlink() and sha(dep.read_bytes())==row[key],
+                        "CE_VERIFIER_UNQUALIFIED" if key=="verifier_sha256" else "CE_TRANSITIVE_VERIFIER_UNQUALIFIED")
+        check_pins()
+        args={key:row[key] for key in ("registry_root","chunks_root","source_entry",
+               "fixture_sha256","runner_sha256","expected_manifest_sha256")}
+        try:
+            child=subprocess.run([sys.executable,"-I","-B","-c",child_code,str(fe_root),
+                                  json.dumps(args,sort_keys=True,separators=(",",":")),
+                                  json.dumps({rel:row[key] for rel,key in pinned},sort_keys=True)],
+                                  stdin=subprocess.DEVNULL,capture_output=True,text=True,
+                                  timeout=8,check=False)
+        except (OSError,subprocess.TimeoutExpired):
+            require(False,"CE_VERIFIER_EXECUTION_UNKNOWN")
+        check_pins()
+        require(child.returncode==0 and len(child.stdout)<=4096 and len(child.stderr)<=4096,
+                "CE_VERIFIER_EXECUTION_UNKNOWN")
+        try:
+            verdict=json.loads(child.stdout)
+        except (ValueError,TypeError):
+            require(False,"CE_VERIFIER_RESULT_UNKNOWN")
+        require(type(verdict) is dict and set(verdict)=={"status","executed"} and
+                type(verdict["executed"]) is dict and
+                all(verdict["executed"].get(rel)==row[key] for rel,key in pinned) and
+                verdict["status"] in ("HIT","MISS","REFUSED","UNKNOWN"),"CE_VERIFIER_RESULT_UNKNOWN")
+        results[row["contract_key"]]="FACT" if source_valid and verdict.get("status")=="HIT" else "UNKNOWN"
+    return results
+
+
 def source_bundle(root, b, binding_raw, at, old_meta=None, binding_path=".atlas/UPSTREAM.json"):
     capacity = {}
     paths = history_paths(root, b, capacity=capacity)
@@ -406,12 +509,21 @@ def source_bundle(root, b, binding_raw, at, old_meta=None, binding_path=".atlas/
         c = b["semantic_catalog"]
         require(pin(c["path"], sources[c["path"]]) == c, "SEMANTIC_CATALOG_PIN")
         catalog = catalog_model(sources[c["path"]], b, {s["id"] for s in matrix["steps"]})
+    evidence=verified_ce_evidence(root,b)
+    if evidence:
+        require(catalog is not None,"CE_CATALOG_REQUIRED")
+        matched=set()
+        for row in catalog["contracts"]:
+            if row["contract_key"] in evidence:
+                row["evidence_state"]=evidence[row["contract_key"]]
+                matched.add(row["contract_key"])
+        require(matched==set(evidence),"CE_CONTRACT_BINDING_MISSING")
     identity = {"binding_sha256": sha(binding_raw), "matrix_sha256": sha(selected),
                 "histories": {"count": len(histories), "sha256": sequence_sha256({"path": h["source_path"], "sha256": h["origin"]["selected_sha256"]} for h in histories)},
                 "documents": [{"path": d["path"], "sha256": sha(sources[d["path"]])} for d in b["documents"]],
-                "adapter_version": VERSION, "toolchain_sha256": sha(nav.canonical({p.name: sha(p.read_bytes()) for p in sorted(Path(__file__).parent.iterdir()) if p.is_file() and p.suffix in (".py", ".json", ".js", ".css")}))}
+                "ce_evidence_states": evidence, "adapter_version": VERSION, "toolchain_sha256": sha(nav.canonical({p.name: sha(p.read_bytes()) for p in sorted(Path(__file__).parent.iterdir()) if p.is_file() and p.suffix in (".py", ".json", ".js", ".css")}))}
     return {"matrix": matrix, "matrix_raw": selected, "origin": origin, "histories": histories,
-            "sources": sources, "source_guards": guards, "catalog": catalog,
+            "sources": sources, "source_guards": guards, "ce_evidence_states": evidence, "catalog": catalog,
             "history_paths": paths, "capacity": capacity, "identity": identity, "fingerprint": sha(nav.canonical(identity)), "binding_raw": binding_raw}
 
 
@@ -923,6 +1035,10 @@ def refresh(root, binding_path=".atlas/UPSTREAM.json", at=None):
         require(optional_read(root, PROJECT) == before_raw, "PROJECT_CAS_FAILED")
         current_pointer, _ = atlas.current_output(root / b["output"])
         require(current_pointer == pointer, "IMPORT_OUTPUT_CAS_FAILED")
+        # Revalidate source bytes and CE registry at the commit boundary.
+        # This is a cooperative source guard, not a same-UID hard fence.
+        require(verified_ce_evidence(root,b)==bundle["ce_evidence_states"],
+                "CE_EVIDENCE_CHANGED_BEFORE_COMMIT")
         pending = {"schema": "atlas.import-pending/v1", "fingerprint": bundle["fingerprint"], "generation": meta["generation"],
                    "before_project_sha256": sha(before_raw) if before_raw else None, "after_project_sha256": sha(project_raw),
                    "before_output_manifest_sha256": pointer["manifest_sha256"] if pointer else None}

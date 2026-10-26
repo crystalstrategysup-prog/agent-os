@@ -810,7 +810,7 @@
       "contract": "atlas.source-relocation/v1"
     }
   ],
-  "distribution_version": "0.8.0rc2033",
+  "distribution_version": "0.8.0rc2033+ao08src3",
   "global_options": [
     "--home",
     "--user-home"
