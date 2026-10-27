@@ -206,7 +206,7 @@ def apply(root: Path, home: Path, req: dict, *, plan=False):
             target_before.append(before)
             modes.append(old["rows"][index]["mode"] if old else
                          stat.S_IMODE(within(root, item["target"]).stat().st_mode) if before is not None else 0o644)
-            _fail(modes[-1] in {0o600, 0o644}, "file_mode")
+            _fail(modes[-1] in {0o600, 0o644, 0o664}, "file_mode")
         directories = req["create_directories"]
         for target in [x["target"] for x in req["files"]]:
             for parent in reversed(PurePosixPath(target).parents):

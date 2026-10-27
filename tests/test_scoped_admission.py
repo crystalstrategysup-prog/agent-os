@@ -152,3 +152,41 @@ def test_cli_routes_to_canonical_module(setup):
     root,home,req=fixture(setup);path=root/'request.json';path.write_text(json.dumps(req))
     result,code=p.command(['scoped-apply','--root',str(root),'--request',str(path),'--plan'],home)
     assert code==0 and result['status']=='SCOPED_PLAN'
+
+
+@pytest.mark.parametrize('mode', [0o600, 0o644, 0o664])
+def test_existing_modes_preserved_without_permission_changes(setup, mode):
+    root,home,req=fixture(setup)
+    target=root/'old.txt';target.chmod(mode)
+    assert s.apply(root,home,req,plan=True)['status']=='SCOPED_PLAN'
+    assert target.stat().st_mode & 0o7777 == mode
+    s.apply(root,home,req)
+    assert target.stat().st_mode & 0o7777 == mode
+    assert s.apply(root,home,req)['replayed']
+    assert target.stat().st_mode & 0o7777 == mode
+    assert (root/'evidence/1.json').stat().st_mode & 0o7777 == 0o644
+
+
+@pytest.mark.parametrize('mode', [0o755, 0o666, 0o777, 0o2644, 0o4644])
+def test_unsupported_modes_refused_before_journal(setup, mode):
+    root,home,req=fixture(setup)
+    target=root/'old.txt';target.chmod(mode)
+    with pytest.raises(GateError,match='file_mode'):s.apply(root,home,req)
+    assert target.read_bytes()==b'old\n'
+    assert target.stat().st_mode & 0o7777 == mode
+    assert not (root/'.agentos/scoped-transaction.json').exists()
+
+
+def test_group_writable_mode_survives_interrupted_apply(setup,monkeypatch):
+    root,home,req=fixture(setup);target=root/'old.txt';target.chmod(0o664)
+    real=s.atomic_bytes
+    def crash(path,*args,**kwargs):
+        real(path,*args,**kwargs)
+        if path.name=='old.txt':raise RuntimeError('interrupted after product write')
+    monkeypatch.setattr(s,'atomic_bytes',crash)
+    with pytest.raises(RuntimeError):s.apply(root,home,req)
+    assert target.stat().st_mode & 0o7777 == 0o664
+    monkeypatch.setattr(s,'atomic_bytes',real)
+    assert s.apply(root,home,req)['status']=='SCOPED_APPLIED'
+    assert target.stat().st_mode & 0o7777 == 0o664
+    assert not (root/'.agentos/scoped-transaction.json').exists()

@@ -225,3 +225,7 @@ Compatibility: the default user home changes from `~/.agent-os` to `~/.agentos-u
 ## 0.2.0 — 2026-09-17
 
 - Add the owner-only Telegram Session Hub for persisted Codex sessions and GNU Screen bindings.
+
+## 0.8.0rc2041+scoped2
+
+Preserve existing 0664 regular-file mode during scoped apply and interrupted replay. Existing target permissions are not changed; executable, set-id and world-writable mode restrictions remain.

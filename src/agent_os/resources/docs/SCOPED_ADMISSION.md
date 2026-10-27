@@ -59,3 +59,5 @@ preservation, same-ID replay, metadata CAS, held paths, symlink/hardlink aliases
 missing parents, metadata targets, foreign writes, CLI dispatch and crashes
 after each durable row. Existing foundation/workflow tests cover unchanged
 ordinary lifecycle behavior. Synthetic results are separate from target proof.
+
+Existing regular-file modes 0600, 0644 and 0664 are preserved exactly; newly created targets use 0644. Executable, set-id, world-writable and other modes remain unsupported. This does not grant rights or chmod target files.
