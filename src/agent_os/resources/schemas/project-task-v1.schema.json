@@ -194,7 +194,8 @@
         "CLOSED",
         "CHECKPOINT",
         "RECOVERY_REQUIRED",
-        "CONTINUATION_REQUIRED"
+        "CONTINUATION_REQUIRED",
+        "SCOPED_APPLIED"
       ]
     },
     "turn_id": {

@@ -320,6 +320,8 @@ def _entry_journal(root: Path) -> Path:
 
 
 def _require_entry_recovered(root: Path) -> None:
+    from .scoped_admission import require_clear as scoped_clear
+    scoped_clear(root)
     from .interrupted_continuation import require_clear as interrupted_clear
     interrupted_clear(root)
     from .refusal_recovery import require_clear
@@ -546,11 +548,14 @@ def enter(
     nonempty(turn_id, "turn_id", 200)
     validate_roots(user_home)
     from .refusal_recovery import require_clear
+    from .scoped_admission import require_clear as scoped_clear
     from contextlib import ExitStack
     require_clear(root)
+    scoped_clear(root)
     from .interrupted_continuation import require_clear as interrupted_clear
     interrupted_clear(root)
     with lock(within(root, ".agentos/write.lock")), ExitStack() as recovery_locks:
+        scoped_clear(root)
         interrupted_clear(root)
         require_clear(root)
         if _entry_journal(root).exists():
@@ -1215,6 +1220,9 @@ def assess(root: Path, task_id: str, *, _closed: bool = False) -> dict:
     _require_entry_recovered(root_path(root))
     root = root_path(root)
     task = load_task(root, task_id)
+    if task.get("status") == "SCOPED_APPLIED":
+        return {"status": "BLOCKED", "task_id": task_id,
+                "errors": ["scoped_result_requires_full_reentry_for_global_assessment"]}
     gate = check_ready(root, task_id)
     errors = list(gate["errors"])
     if _closed and task["status"] == "CLOSED" and task.get("ready"):
@@ -1514,6 +1522,9 @@ def make_parser() -> argparse.ArgumentParser:
 
 
 def command(argv: list[str], user_home: Path) -> tuple[dict, int]:
+    if argv and argv[0] == "scoped-apply":
+        from .scoped_admission import command as scoped_command
+        return scoped_command(argv[1:], user_home)
     if argv and argv[0] == "local":
         from .project_lite import command as local_command
         return local_command(argv[1:], user_home)
@@ -1526,6 +1537,9 @@ def command(argv: list[str], user_home: Path) -> tuple[dict, int]:
         return observation_command(argv[1:], user_home)
     args = make_parser().parse_args(argv)
     root = args.root
+    if args.action in {"refusal-acknowledge", "refusal-reconcile"}:
+        from .scoped_admission import require_clear as scoped_clear
+        scoped_clear(root_path(root))
     if args.action in {"refusal-acknowledge", "refusal-reconcile", "refusal-status"}:
         from . import refusal_recovery as recovery
         root = root_path(root)

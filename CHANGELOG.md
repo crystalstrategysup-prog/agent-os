@@ -1,3 +1,7 @@
+# Scoped admission candidate
+
+0.8.0rc2041+scoped1 adds finite same-task file application with pinned metadata, protected-path checks, durable reconciliation and separate scoped acceptance. No whole-project READY is inferred. See docs/SCOPED_ADMISSION.md.
+
 # 0.8.0rc2041+agentas1 — installed source candidate
 
 - Publish the reviewed rc2041 public source with the accepted pinned Atlas CE evidence import patch.

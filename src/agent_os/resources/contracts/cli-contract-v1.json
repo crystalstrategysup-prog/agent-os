@@ -810,12 +810,12 @@
       "contract": "atlas.source-relocation/v1"
     }
   ],
-  "distribution_version": "0.8.0rc2041+agentas1",
+  "distribution_version": "0.8.0rc2041+scoped1",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.8.0rc2041+agentas1",
+  "release": "0.8.0rc2041+scoped1",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",
@@ -838,5 +838,16 @@
     "schemas": "Bundled task/event enums and typed recovery contract now include actual A/C outputs; old enum values/bounds preserved",
     "typed_revision": "Strict int permit and receipt revision, bool/float do not equal int1",
     "staged_semantics": "Canonical typed parsed JSON equality, not Python dict equality, for ALL task/turn/ack/advance postimages before first targetwrite. Invalid aliases preserve targets/reservation/journal; keyorder/whitespace allowed."
+  },
+  "scoped_file_admission": {
+    "command": "project scoped-apply",
+    "request_schema": "agentos.scoped-file-admission/v1",
+    "status_values": [
+      "SCOPED_PLAN",
+      "SCOPED_APPLIED"
+    ],
+    "scope": "Finite pinned file writes plus same-task revision/history; no source inventory or whole-project acceptance",
+    "recovery": "Same exact request reconciles recorded pre/post rows; unknown effects stop",
+    "authority": "Caller must verify target authority; strings grant nothing"
   }
 }
