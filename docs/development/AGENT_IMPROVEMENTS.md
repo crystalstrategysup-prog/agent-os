@@ -2,6 +2,28 @@
 
 Agents using AgentOS may propose verified improvements to AgentOS and its dependencies within their current task authority and existing repository access. A complete blocker is not required, and repeated permission for each in-scope pull request is not required.
 
+## Reuse the owner's instruction, without another approval gate
+
+Already assigned ordinary AgentOS engineering includes diagnosing and designing
+the necessary owning source/dependency repair, preparing its bounded candidate
+and synthetic checks, and reviewing it through the existing source writer and
+repository access. Do not ask the owner or the AgentOS maintainer to approve that
+same work again merely because a new file, module, turn or blocker is involved.
+The maintainer is an executor and technical reviewer, not a second owner approver.
+
+Revalidate the existing instruction's actual scope, target, validity and
+revocation. Full answers/entry for changed technical scope remain required;
+they record the work and do not imply a new human-approval round when the owner
+has already authorized it. Ask only for a genuinely missing material decision or
+a protected effect outside that authorization, naming its exact current source.
+
+Distinguish an unavailable supported target method from missing source authority.
+Prepare the allowed source repair instead of seeking the same permission again.
+Its patch, tests and publication never admit held product files, grant target
+installation/runtime/production/data/authentication permissions, override a
+protective refusal, authorize another message, or permit UNKNOWN replay. Those
+existing controls and separately required target receipts retain their force.
+
 ## Grounds for a pull request
 
 | Category | Evidence appropriate to the change |

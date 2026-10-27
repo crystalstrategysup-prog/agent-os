@@ -78,11 +78,27 @@ agentos project enter --root P --session S --turn T --resume-task TASK \
   --reuse-answers --answers current-authority.json
 ```
 
-`current-authority.json` supplies fresh `authority`; the other answers are reused
-only for the same scope. Authority is never inherited. A changed scope requires
-a complete new answer set without `--reuse-answers`. `--interactive` asks only
-for missing answers. Resuming a task increments its revision and clears READY
-and old check evidence. CLOSED is immutable; begin a new task.
+`current-authority.json` identifies the currently valid owner instruction; it
+does not require a new owner message. Revalidate its target, scope, validity and
+revocation, then reuse it while those remain valid. A new turn, file, module or
+technical blocker is not by itself a reason to ask the owner again. A maintainer
+or coordinator verifies technical scope and is not an additional owner approver.
+
+Reuse the other answers for the same scope. Changed scope requires a complete
+answer set without `--reuse-answers`; full entry is workflow bookkeeping, not a
+new human-approval request when the existing owner instruction already covers
+the work. `--interactive` asks only for genuinely missing material answers.
+Resuming increments the task revision and clears READY and old check evidence.
+CLOSED is immutable; begin a new task.
+
+For already assigned ordinary AgentOS engineering, diagnose, design and prepare
+the necessary owning source/dependency fix with bounded local synthetic checks
+under the existing authorization and repository access. Do not stop that work
+to seek a second approval from the AgentOS maintainer. State an actual missing
+target capability, method or input precisely. A source fix does not authorize
+its installation or application to a held target, change security controls,
+replay UNKNOWN effects, or replace required target receipts. Existing external,
+production, data, authentication and protected-read boundaries remain in force.
 
 Only one task may be active in a project. After CHECKPOINT or CLOSED in the same
 workflow session, use `project next-turn --root P --session S --from-turn OLD

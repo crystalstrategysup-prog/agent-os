@@ -20,11 +20,21 @@ init, intake, observation, an answers file, a profile interview, or closeout.
 
 For a change, inspect the README, dossier, roadmap, stage, architecture, and
 contracts. Reuse verified facts; create only missing applicable docs before
-product writes. `questions` and `enter` need current authority. JSON stdin via
+product writes. `questions` and `enter` need current authority, which may be the
+same still-valid owner instruction; do not ask for a new grant merely because
+the turn, file, module or technical blocker changed. Revalidate its actual target,
+scope, validity and revocation. A maintainer checks scope, not another owner's
+approval. Necessary owning AgentOS source/dependency diagnosis, design and fixes
+for already assigned ordinary work proceed through the existing source writer
+and repository access, with bounded synthetic checks and normal entry/READY.
+Actual target holds, protected reads, installation, external effects and security
+controls remain separate; missing target capability never becomes a source
+approval loop or permission to bypass that target. JSON stdin via
 `--answers -` supports entry without a bootstrap file. For same-scope resume,
 use `questions --resume-task` and `enter --resume-task --reuse-answers` with
-fresh authority. Do not ask again for known facts. Changed scope requires full
-entry. Register docs, reach READY, perform approved changes and checks, update
+currently revalidated authority. Do not ask again for known facts. Changed scope
+requires full entry; it does not itself require another human grant when the
+existing instruction covers the work. Register docs, reach READY, perform approved changes and checks, update
 docs, then close or checkpoint.
 
 Keep inherited `AGENTS.md` a short routing index. Follow only relevant links and
