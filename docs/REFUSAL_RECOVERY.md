@@ -249,3 +249,67 @@ The complete request and permit remain bounded by 16 KiB; consequently some
 Ordinary resume still requires the exact reviewed list (order-insensitive only),
 with unchanged authority, CAS, witness, turn, journal, locks and UNKNOWN guards.
 Source inventory, scanner and result-library capacities are unchanged.
+
+
+## Workflow/native identity v3 — source-only candidate
+
+`agentos.refusal-recovery-request/v3` is a separate modern-witness branch.
+V1/v2 requirements, UUID grammar and receipt shapes remain unchanged. V3 retains
+all v2 request fields and adds exactly `native_origin`: `thread_id` and `turn_id`
+are canonical lowercase native UUIDs; `observation_ref` is a bounded short reference
+and `observation_sha256` is its exact evidence digest. The operator independently
+checks the historical mapping from this native origin to the exact task/witness.
+The whole request hash binds that mapping, expected metadata CAS and whole witness.
+References/hashes do not authenticate a human, provider, callable or historical
+mapping and are not permission to fetch referenced private contents.
+
+Only v3 `expected.bound_turn_id` uses ordinary entry's nonempty string domain
+(maximum200characters). Its raw value is NEVER normalized, migrated or substituted.
+Task, existing standalone binding and saved modern diagnostic must still match it
+literally. Producer diagnostic grammar is unchanged; a workflow label unsupported
+by a SAVED whole diagnostic does not qualify merely because entry accepted it.
+Native current/target turns remain strict UUIDs. B compares the current UUID to
+`native_origin.turn_id`, never to the opaque workflow label.
+
+First v3 A/B and reconcile require a selected existing `SupportedReadThreadObserver` bridge
+(`interrupted_continuation.py`). The embedding passes it via `observer=` to
+`refusal_recovery.acknowledge/advance/reconcile`, or `recovery_observer=` to
+`project.next_turn`. No observer is selected by default; ordinary CLI requests
+without it refuse BEFORE reservation/fixed writes. A caller JSON document is not
+accepted as proof of a tool call. The trusted embedding verifies the callable's
+actual supported-tool origin and retains its primary observation with the permit.
+No new provider, RPC, worker, credentials or security policy is introduced.
+
+The bridge retains its existing byte/page/turn/time bounds. V3 checks exact native
+thread/cwd/request/session/origin/current metadata and <=120second nonfuture
+observation. Current must be inProgress. A may use the still-current origin; if
+current differs, origin must already be completed/interrupted. B always requires
+a different current native UUID and inactive origin. All project/task/binding
+CAS preimages and permit validity are rechecked after the observer call and before preparation.
+A rechecks the bounded whole witness/diagnostic pins after that call; B/C do not
+reread those historical bytes. Committed replay and status remain historical
+metadata readbacks, not a fresh native observation or new effect authority.
+An unknown/stale/missing/mismatched native observation refuses without writes.
+Truth of historical origin-to-witness mapping and owner authority remain separate
+operator checks, not a claim that source fixture PASS authenticates native work.
+
+V3 uses `agentos.refusal-recovery-receipt/v3` in task recovery, ack, advance and
+results. It carries the same original attempt and diagnostic reference as v2,
+plus the exact native_origin descriptor. The acknowledgement event has a separate
+v3 schema branch. Old v1/v2 schema branches remain byte-equivalent values.
+Existing request-hash-bound transaction journals remain v1 with exact typed
+postimage checks. Modern witness/envelope/diagnostic formats and readers are
+unchanged; no legacy downgrade or source/scanner/library operation is introduced.
+
+V3 reconcile only finishes the exact admitted staged metadata, with a fresh
+supported native observation and all existing journal/CAS checks. For an interrupted
+B, the real current UUID must still equal the original B target; changed native
+turn requires owned review and is never silently rebound. No original checkpoint
+or side effect is replayed. Incomplete pre-journal preparation remains UNKNOWN.
+
+C still requires committed B, the exact original request and scope, unchanged
+metadata CAS and its exact target turn. A-only resume refuses. C increments the
+ordinary answer revision and invalidates old readiness/checks. New ordinary READY
+and any authorized tail are separate. V3 metadata requires a v3-capable reader;
+no generic installer/rollback compatibility is inferred after real activation.
+This source candidate is not managed adoption or actual recovery qualification.

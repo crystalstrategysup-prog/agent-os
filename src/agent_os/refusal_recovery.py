@@ -19,6 +19,8 @@ from .safeio import GateError, _parse_json, atomic_bytes, create_only_bytes, sha
 REQUEST = 'agentos.refusal-recovery-request/v1'
 MODERN_REQUEST = 'agentos.refusal-recovery-request/v2'
 MODERN_RECEIPT = 'agentos.refusal-recovery-receipt/v2'
+WORKFLOW_REQUEST = 'agentos.refusal-recovery-request/v3'
+WORKFLOW_RECEIPT = 'agentos.refusal-recovery-receipt/v3'
 PERMIT = 'agentos.refusal-recovery-permit/v1'
 RECEIPT = 'agentos.refusal-recovery-receipt/v1'
 JOURNAL = 'agentos.refusal-recovery-transaction/v1'
@@ -60,6 +62,23 @@ def digest(value):
 
 def uuid(value):
     return ident(value, r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
+
+
+def _modern(request):
+    return request['schema'] in (MODERN_REQUEST, WORKFLOW_REQUEST)
+
+
+def _receipt_schema(request):
+    if request['schema'] == WORKFLOW_REQUEST:
+        return WORKFLOW_RECEIPT
+    return MODERN_RECEIPT if request['schema'] == MODERN_REQUEST else RECEIPT
+
+
+def _native_origin(value):
+    keys(value, 'thread_id turn_id observation_ref observation_sha256')
+    uuid(value['thread_id']); uuid(value['turn_id'])
+    short(value['observation_ref']); digest(value['observation_sha256'])
+    return value
 
 
 def op(value):
@@ -252,8 +271,9 @@ def _release_committed_reservation(root, request, journal):
 
 
 def validate_request(root, home, task_id, request):
-    keys(request, 'schema root user_home operation_id actor_id session_id project_id task_id revision expected witness goal next_owner next_scope')
-    if request['schema'] not in (REQUEST, MODERN_REQUEST) or canonical(request['root']) != root or canonical(request['user_home']) != home or request['task_id'] != task_id:
+    workflow = isinstance(request, dict) and request.get('schema') == WORKFLOW_REQUEST
+    keys(request, 'schema root user_home operation_id actor_id session_id project_id task_id revision expected witness goal next_owner next_scope' + (' native_origin' if workflow else ''))
+    if request['schema'] not in (REQUEST, MODERN_REQUEST, WORKFLOW_REQUEST) or canonical(request['root']) != root or canonical(request['user_home']) != home or request['task_id'] != task_id:
         fail('recovery_identity_mismatch')
     op(request['operation_id']); short(request['actor_id']); nonempty(request['session_id'], 'session_id', 200)
     ident(task_id, r'task-[0-9a-f]{16}'); ident(request['project_id'], r'project-[0-9a-f]{16}')
@@ -261,9 +281,14 @@ def validate_request(root, home, task_id, request):
         fail()
     e = request['expected']; keys(e, 'task_sha256 project_sha256 turn_sha256 bound_turn_id status')
     for key in ('task_sha256', 'project_sha256', 'turn_sha256'): digest(e[key])
-    uuid(e['bound_turn_id'])
+    if workflow:
+        # Match ordinary entry's bounded domain; never normalize historical IDs.
+        nonempty(e['bound_turn_id'], 'bound_turn_id', 200)
+        _native_origin(request['native_origin'])
+    else:
+        uuid(e['bound_turn_id'])
     if e['status'] != 'VERIFYING': fail()
-    w = request['witness']; modern = request['schema'] == MODERN_REQUEST
+    w = request['witness']; modern = _modern(request)
     keys(w, 'root path bytes sha256 kind attempt_id exit_code' + (' diagnostic' if modern else ''))
     canonical(w['root']); digest(w['sha256']); _path(Path(w['root']), w['path'])
     if (not isinstance(w['path'], str) or not w['path'].endswith('.json') or type(w['bytes']) is not int
@@ -298,14 +323,17 @@ def _diagnostic_reference(request, value):
 
 
 def _modern_fields(request):
-    if request['schema'] == MODERN_REQUEST:
-        return {'original_attempt_id': request['witness']['attempt_id'],
-                'diagnostic_receipt': dict(request['witness']['diagnostic'])}
+    if _modern(request):
+        fields = {'original_attempt_id': request['witness']['attempt_id'],
+                  'diagnostic_receipt': dict(request['witness']['diagnostic'])}
+        if request['schema'] == WORKFLOW_REQUEST:
+            fields['native_origin'] = dict(request['native_origin'])
+        return fields
     return {}
 
 
 def _task_recovery(request):
-    value = {'schema': MODERN_RECEIPT if request['schema'] == MODERN_REQUEST else RECEIPT,
+    value = {'schema': _receipt_schema(request),
              'operation_id': request['operation_id'], 'revision': request['revision'],
              'request_sha256': sha(enc(request))}
     value.update(_modern_fields(request))
@@ -316,8 +344,8 @@ def _event_details(request):
     value = {'operation_id': request['operation_id'],
              'refusal_witness_sha256': request['witness']['sha256'],
              'full_goal': 'OPEN', 'partial_objects': 'UNKNOWN'}
-    if request['schema'] == MODERN_REQUEST:
-        value.update(schema=MODERN_RECEIPT, **_modern_fields(request))
+    if _modern(request):
+        value.update(schema=_receipt_schema(request), **_modern_fields(request))
     return value
 
 
@@ -378,9 +406,58 @@ def validate_permit(request, permit, phase, receipt_sha=None, journal_sha=None):
         fail('recovery_authority_stale')
     if permit['valid_until'] is not None and stamp(permit['valid_until']) < current:
         fail('recovery_authority_stale')
-    if phase == 'advance' and permit['current_turn_id'] == request['expected']['bound_turn_id']:
+    previous = request['native_origin']['turn_id'] if request['schema'] == WORKFLOW_REQUEST else request['expected']['bound_turn_id']
+    if phase == 'advance' and permit['current_turn_id'] == previous:
         fail('recovery_current_turn_required')
     if len(enc(permit)) > MAX_DOCUMENT: fail()
+
+
+def _verify_native(request, permit, observer, *, advancing=False):
+    """V3 only: use the existing selected read-thread bridge, never JSON proof.
+
+    The embedding owner verifies the callable's origin and the attested mapping
+    from the native origin to this exact witness. Core checks bounded metadata;
+    it does not authenticate a callable, owner or the historical mapping.
+    """
+    if request['schema'] != WORKFLOW_REQUEST:
+        return
+    if observer is None or not callable(getattr(observer, 'read_turn_metadata', None)):
+        fail('recovery_supported_observer_unavailable')
+    origin = request['native_origin']; current = permit['current_turn_id']
+    projection = {'operation_id': request['operation_id'], 'session_id': request['session_id'],
+                  'native_thread_id': origin['thread_id'], 'previous_turn': origin['turn_id'],
+                  'current_turn': current, 'native_mapping': {'native_cwd': request['root']}}
+    value = observer.read_turn_metadata(projection, sha(enc(request)), current_turn=current, bound_current=current)
+    keys(value, 'schema source request_sha256 session_id native_thread_id native_cwd previous current bound_current observed_at observation_ref')
+    if (value['schema'] != 'agentos.provider-turn-metadata/v1' or value['source'] != 'supported_read_thread'
+            or value['request_sha256'] != sha(enc(request)) or value['session_id'] != request['session_id']
+            or value['native_thread_id'] != origin['thread_id'] or value['native_cwd'] != request['root']):
+        fail('recovery_native_identity_mismatch')
+    for key in ('previous', 'current', 'bound_current'):
+        keys(value[key], 'id status')
+    if (value['previous']['id'] != origin['turn_id']
+            or value['current'] != {'id': current, 'status': 'inProgress'}
+            or value['bound_current'] != value['current']):
+        fail('recovery_native_identity_mismatch')
+    if current == origin['turn_id']:
+        if advancing or value['previous']['status'] != 'inProgress':
+            fail('recovery_current_turn_required')
+    elif value['previous']['status'] not in ('completed', 'interrupted'):
+        fail('recovery_origin_writer_not_inactive')
+    seconds = (datetime.now(timezone.utc) - stamp(value['observed_at'])).total_seconds()
+    if not 0 <= seconds <= 120:
+        fail('recovery_native_observation_stale')
+    short(value['observation_ref'])
+
+
+def _observe_unchanged(root, home, request, permit, observer, before, *, advancing=False):
+    if request['schema'] != WORKFLOW_REQUEST:
+        return
+    _verify_native(request, permit, observer, advancing=advancing)
+    # An observer call cannot silently invalidate any admitted CAS preimage.
+    _, after, _ = _metadata(root, home, request)
+    if [sha(raw) for raw in after] != [sha(raw) for raw in before]:
+        fail('recovery_cas_mismatch')
 
 
 def _paths(root, home, request):
@@ -411,7 +488,7 @@ def _metadata(root, home, request):
 
 
 def _base_receipt(request, phase, at, permit_sha):
-    return {'schema': MODERN_RECEIPT if request['schema'] == MODERN_REQUEST else RECEIPT, 'operation_id': request['operation_id'], 'task_id': request['task_id'],
+    return {'schema': _receipt_schema(request), 'operation_id': request['operation_id'], 'task_id': request['task_id'],
             'revision': request['revision'], 'request_sha256': sha(enc(request)), 'phase': phase, 'at': at,
             'original_error': ERROR, 'original_attempt_id': None, 'partial_objects': 'UNKNOWN',
             'full_goal': 'OPEN', 'next_owner': request['next_owner'], 'semantic_acceptance': False,
@@ -423,7 +500,7 @@ def _ack(root, request):
     p = area(root, request['task_id'], request['operation_id'])/'ack.json'; raw = _read(p, missing=True)
     if raw is None: fail('recovery_ack_required')
     value = parse(raw)
-    keys(value, 'schema operation_id task_id revision request_sha256 phase at original_error original_attempt_id partial_objects full_goal next_owner semantic_acceptance ready_granted authority_basis authority_permit_sha256 task_before_sha256 task_after_sha256 project_sha256 turn_before_sha256 witness_sha256' + (' diagnostic_receipt' if request['schema'] == MODERN_REQUEST else ''))
+    keys(value, 'schema operation_id task_id revision request_sha256 phase at original_error original_attempt_id partial_objects full_goal next_owner semantic_acceptance ready_granted authority_basis authority_permit_sha256 task_before_sha256 task_after_sha256 project_sha256 turn_before_sha256 witness_sha256' + (' diagnostic_receipt' if _modern(request) else '') + (' native_origin' if request['schema'] == WORKFLOW_REQUEST else ''))
     if (type(value['revision']) is not int or not 1 <= value['revision'] <= 2147483647
             or value['semantic_acceptance'] is not False or value['ready_granted'] is not False
             or enc({k: value[k] for k in _modern_fields(request)}) != enc(_modern_fields(request))
@@ -441,7 +518,7 @@ def _advance_receipt(root, request):
     p = area(root, request['task_id'], request['operation_id'])/'advance.json'; raw = _read(p, missing=True)
     if raw is None: return None, None
     value = parse(raw)
-    keys(value, 'schema operation_id task_id revision request_sha256 phase at original_error original_attempt_id partial_objects full_goal next_owner semantic_acceptance ready_granted authority_basis authority_permit_sha256 task_after_sha256 turn_before_sha256 turn_after_sha256 target_turn_id ack_sha256' + (' diagnostic_receipt' if request['schema'] == MODERN_REQUEST else ''))
+    keys(value, 'schema operation_id task_id revision request_sha256 phase at original_error original_attempt_id partial_objects full_goal next_owner semantic_acceptance ready_granted authority_basis authority_permit_sha256 task_after_sha256 turn_before_sha256 turn_after_sha256 target_turn_id ack_sha256' + (' diagnostic_receipt' if _modern(request) else '') + (' native_origin' if request['schema'] == WORKFLOW_REQUEST else ''))
     if (type(value['revision']) is not int or not 1 <= value['revision'] <= 2147483647
             or value['semantic_acceptance'] is not False or value['ready_granted'] is not False
             or enc({k: value[k] for k in _modern_fields(request)}) != enc(_modern_fields(request))
@@ -454,7 +531,7 @@ def _advance_receipt(root, request):
 
 
 def _result(request, state, *, replay=False, journal_sha=None):
-    return {'schema': MODERN_RECEIPT if request['schema'] == MODERN_REQUEST else RECEIPT, 'status': state, 'operation_id': request['operation_id'],
+    return {'schema': _receipt_schema(request), 'status': state, 'operation_id': request['operation_id'],
             'task_id': request['task_id'], 'revision': request['revision'], 'historical_replay': replay,
             'full_goal': 'OPEN', 'partial_objects': 'UNKNOWN', 'semantic_acceptance': False,
             'ready_granted': False, 'journal_sha256': journal_sha, **_modern_fields(request)}
@@ -593,7 +670,7 @@ def _protected_call(call):
         raise GateError('recovery_operation_unknown') from None
 
 
-def acknowledge(root, home, task_id, request, permit):
+def acknowledge(root, home, task_id, request, permit, *, observer=None):
     def run():
         validate_request(root,home,task_id,request);validate_permit(request,permit,'ack')
         with lock(_path(root,'.agentos/write.lock')), lock(_path(home,'state/turns.lock')):
@@ -608,6 +685,10 @@ def acknowledge(root, home, task_id, request, permit):
             if task.get('checkpoint') or task.get('closeout'):fail('recovery_publication_unreconciled')
             _reject_handoff_journals(root, task_id)
             w=request['witness'];_validate_witness(root,request)
+            _observe_unchanged(root,home,request,permit,observer,raws)
+            if request['schema'] == WORKFLOW_REQUEST:
+                validate_permit(request,permit,'ack')
+                _validate_witness(root,request)
             task=dict(task);task.update(status='RECOVERY_REQUIRED',recovery=_task_recovery(request))
             at=datetime.now(timezone.utc).isoformat();ack=_base_receipt(request,'ack',at,sha(enc(permit)))
             ack.update(task_before_sha256=sha(raws[1]),task_after_sha256=sha(enc(task)),project_sha256=sha(raws[0]),turn_before_sha256=sha(raws[2]),witness_sha256=w['sha256'])
@@ -618,7 +699,7 @@ def acknowledge(root, home, task_id, request, permit):
     return _protected_call(run)
 
 
-def advance(root, home, task_id, request, permit):
+def advance(root, home, task_id, request, permit, *, observer=None):
     def run():
         validate_request(root,home,task_id,request)
         with lock(_path(root,'.agentos/write.lock')),lock(_path(home,'state/turns.lock')):
@@ -632,6 +713,9 @@ def advance(root, home, task_id, request, permit):
             _,raws,values=_metadata(root,home,request);project,task,binding=values
             if (sha(raws[0])!=ack['project_sha256'] or sha(raws[1])!=ack['task_after_sha256'] or sha(raws[2])!=ack['turn_before_sha256']):fail('recovery_cas_mismatch')
             if task.get('status')!='RECOVERY_REQUIRED' or binding.get('status')!='ENTERED' or binding.get('task_id')!=task_id:fail('recovery_state_invalid')
+            _observe_unchanged(root,home,request,permit,observer,raws,advancing=True)
+            if request['schema'] == WORKFLOW_REQUEST:
+                validate_permit(request,permit,'advance',sha(ackraw))
             at=datetime.now(timezone.utc).isoformat();turn={'schema':'agentos.turn/v1','session_id':request['session_id'],'turn_id':permit['current_turn_id'],'root':str(root),'task_id':None,'status':'INTAKE_REQUIRED','at':at,'hook_seen':False,'source':'standalone_cli'}
             rec=_base_receipt(request,'advance',at,sha(enc(permit)));rec.update(task_after_sha256=ack['task_after_sha256'],turn_before_sha256=sha(raws[2]),turn_after_sha256=sha(enc(turn)),target_turn_id=permit['current_turn_id'],ack_sha256=sha(ackraw))
             _prepare(root,home,request,permit,'advance',{'turn':enc(turn),'advance':enc(rec)},at)
@@ -671,7 +755,7 @@ def status(root, home, task_id, operation):
     return _protected_call(run)
 
 
-def reconcile(root, home, task_id, request, permit):
+def reconcile(root, home, task_id, request, permit, *, observer=None):
     def run():
         validate_request(root,home,task_id,request)
         with lock(_path(root,'.agentos/write.lock')),lock(_path(home,'state/turns.lock')):
@@ -690,6 +774,13 @@ def reconcile(root, home, task_id, request, permit):
             else:
                 ack,_=_ack(root,request)
                 if sha(_read(_path(root,f'.agentos/tasks/{task_id}/task.json'),task_metadata_limit(root)))!=ack['task_after_sha256']:fail('recovery_cas_mismatch')
+            if request['schema'] == WORKFLOW_REQUEST:
+                original = parse(_read(directory/('permit-'+j['phase']+'.json')))
+                if j['phase'] == 'advance' and permit['current_turn_id'] != original['current_turn_id']:
+                    fail('recovery_turn_changed_requires_review')
+                _, native_before, _ = _metadata(root,home,request)
+                _observe_unchanged(root,home,request,permit,observer,native_before,advancing=j['phase']=='advance')
+                validate_permit(request,permit,'reconcile',journal_sha=sha(jraw))
             audit=directory/('reconcile-permit-'+sha(enc(permit))+'.json')
             prior=_read(audit,missing=True)
             if prior is None:write(audit,enc(permit),root,only=True)
@@ -702,7 +793,7 @@ def reconcile(root, home, task_id, request, permit):
 def validate_resume(root, home, task, session_id, turn_id, answers):
     """Called under ordinary project enter lock, before answers/status mutation."""
     recovery=task.get('recovery')
-    if not isinstance(recovery,dict) or recovery.get('schema') not in (RECEIPT,MODERN_RECEIPT):fail('recovery_resume_required')
+    if not isinstance(recovery,dict) or recovery.get('schema') not in (RECEIPT,MODERN_RECEIPT,WORKFLOW_RECEIPT):fail('recovery_resume_required')
     directory=area(root,task['id'],recovery.get('operation_id'))
     request=validate_request(root,home,task['id'],parse(_read(directory/'request.json')))
     if enc(recovery) != enc(_task_recovery(request)):fail('recovery_resume_cas_mismatch')

@@ -1,3 +1,9 @@
+# 0.8.0rc2041+agentas2 — source-only recovery v3 candidate
+
+- Add a separate workflow/native-turn recovery v3 branch; preserve v1/v2 behavior.
+- Retain raw workflow IDs, whole modern witness and exact metadata CAS. Require the existing selected supported native observer for v3; native B must advance to a different active turn after the origin becomes inactive.
+- This candidate is uninstalled, unpublished and pending independent review. It grants no real recovery or managed adoption authority.
+
 # 0.8.0rc2041+agentas1 — installed source candidate
 
 - Publish the reviewed rc2041 public source with the accepted pinned Atlas CE evidence import patch.

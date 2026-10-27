@@ -719,6 +719,7 @@ def next_turn(
     task_id: str,
     recovery_request: dict | None = None,
     recovery_permit: dict | None = None,
+    recovery_observer=None,
 ) -> dict:
     from .turns import advance_standalone_turn
 
@@ -734,7 +735,7 @@ def next_turn(
                 or recovery_permit.get("current_turn_id") != turn_id):
             raise GateError("recovery_turn_identity_mismatch")
         from .refusal_recovery import advance
-        return advance(root, user_home, task_id, recovery_request, recovery_permit)
+        return advance(root, user_home, task_id, recovery_request, recovery_permit, observer=recovery_observer)
     if recovery_request is not None or recovery_permit is not None:
         raise GateError("recovery_parameters_for_nonrecovery_task")
     with lock(within(root, ".agentos/write.lock")):
