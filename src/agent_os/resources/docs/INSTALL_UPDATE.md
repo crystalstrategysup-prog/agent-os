@@ -102,12 +102,25 @@ turns, and task, then enter. A pre-entry failure has no task to close.
 
 ## Update
 
+Select verification scope before expensive work using
+[dependency-scoped update verification](UPDATE_VERIFICATION.md). An unchanged
+isolated regression or rollback rehearsal may reuse verified evidence for its
+complete source/test/contract/runtime scope. A new package version alone does
+not require repeating every suite. Artifact integrity, actual compatibility,
+the exact installer plan/apply boundary and installed readback remain fresh.
+
 Old releases remain immutable. Install a new verified wheel offline with the
 observed expected current release. The installer does not migrate user data
-implicitly. After switching, update only managed AGENTS and skills through the
-new interpreter and test them in a fresh session. Do not enable hooks or install
+implicitly. After switching, refresh only changed managed AGENTS and skills
+through the new interpreter. Test new CLI processes; use a fresh native session
+when client integration changed or when making a native-adoption claim. Do not
+rewrite unchanged instructions or retry a conflicting integration as an update
+ritual. Do not enable hooks or install
 simply because advisory metadata reports a tag. Record docs, compatibility, and
-health evidence against the exact source SHA.
+health evidence against the exact source SHA. Reuse matching isolated rollback
+proof when the complete installer/runtime/schema/fixture scope is unchanged;
+otherwise rehearse in a temporary contour. Never reuse a real activation or
+unknown external outcome as an offline result.
 
 ## Rollback
 

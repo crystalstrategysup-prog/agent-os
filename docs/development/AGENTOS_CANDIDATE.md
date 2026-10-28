@@ -1,4 +1,8 @@
-# Agentas installed source candidate
+# AgentOS installed source candidate
+
+AgentOS is the product name. Historical local-version suffixes, manifest paths
+and published branch/commit identifiers are retained verbatim below solely for
+source verification; their old misspelling is not a new name or naming pattern.
 
 Candidate: `0.8.0rc2041+agentas1`. This branch preserves the public Atlas patch lineage and imports the reviewed rc2041 source, tests and tooling. All 397 package files are compared with the exact installed wheel; the manifest is `.release/0.8.0rc2041+agentas1-source.json`.
 

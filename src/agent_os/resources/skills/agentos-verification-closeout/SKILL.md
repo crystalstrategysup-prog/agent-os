@@ -19,6 +19,19 @@ run read-only `project verify-closeout` without rewriting history. Report receip
 closeout, and an updated roadmap; do not claim independent review when there was
 only self-review.
 
+For selected command evidence, use the bounded typed observer or its explicit
+`--` CLI contract in `docs/OBSERVED_EVIDENCE.md`. Do not promote failed,
+nonterminal, truncated, unbound or context-only observations to primary proof.
+Check artifact hashes and actual semantic coverage separately; the observer is
+not a sandbox or provenance authority. A known unfinished required criterion
+keeps overall completion INCOMPLETE even when other criteria are UNKNOWN.
+
+When diagnosing a failure, retain a safe category/code and actual exit status
+before removing raw diagnostics under the applicable data policy. A hash binds
+bytes but does not explain the cause; never guess a category from a hash alone.
+An expected-negative cause probe can confirm the diagnosis while the original
+operation remains failed. Keep those outcomes separate.
+
 The installed `resources/docs/PROCESS.md` and README are normative; locate them with
 `agentos resources`. Project gates apply to real changes. Reading requires no
 intake or observation. Native hooks remain excluded and must not be enabled or

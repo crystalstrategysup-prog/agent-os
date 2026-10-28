@@ -12,6 +12,23 @@ weaken a guard to make it pass. If scope expands, checkpoint the task, update th
 scope and documents, and enter again. Verify source rather than relying on an
 external report.
 
+Select bounded relevant sections before reading large files. Source reads can
+use `agent_os.source_sections` to refuse oversized rendered output
+before printing any source; see `docs/OBSERVED_EVIDENCE.md`. Reuse supplied exact
+references before discovering replacements. For primary command proof isolate
+the business command: a later successful read must not mask an earlier exit.
+Ordinary source dependencies needed for the same authorized goal are routine discovery, not a
+new permission gate. A newly discovered protected effect still needs its own
+authority. When an observation is refused, stop dependent business work, but
+finish mandatory cleanup and reconciliation of resources already owned by the
+task; refusal does not cancel those obligations or authorize unrelated cleanup.
+
+When the owner explicitly requests supervised forks, pass the next task's delta
+and reuse accepted facts with their scope and freshness limits. Do not rebuild
+the whole handoff or fork for each helper. Otherwise keep the existing executor.
+For an already READY task, use assess to check current evidence; do not repeat
+ready unless the workflow requires a new readiness transition.
+
 Before an external write, verify the target host, current source and runtime,
 authority, and rollback. Local task permission does not authorize another
 production system. Output changed source, tests, docs, and actual limitations;
