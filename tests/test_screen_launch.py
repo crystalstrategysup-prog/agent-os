@@ -21,8 +21,11 @@ from agent_os.screen_launch import ScreenLaunchProvider, continue_managed, creat
 from agent_os.session_launch import LaunchError
 
 SCREEN = r'''
-import json, os, pathlib, signal, subprocess, sys
+import json, os, pathlib, signal, subprocess, sys, traceback
 root=pathlib.Path(os.environ['FIXTURE_SCREEN_REGISTRY'])
+def fixture_error(kind, value, tb):
+ (root/'fixture-screen-error.log').write_text(''.join(traceback.format_exception(kind,value,tb)))
+sys.excepthook=fixture_error
 if sys.argv[1:]==['-ls']:
  count=0
  for path in root.glob('*.json'):
@@ -37,7 +40,8 @@ assert os.environ['SYSSCREENRC']==os.devnull and os.environ['SYSTEM_SCREENRC']==
 assert sys.argv[7]==sys.executable
 path=root/(name+'.json'); path.write_text(json.dumps({'pid':os.getpid(),'name':name}))
 env=dict(os.environ); env['STY']=str(os.getpid())+'.'+name
-worker=subprocess.Popen(sys.argv[7:],env=env)
+with (root/'fixture-worker-error.log').open('a') as error:
+ worker=subprocess.Popen(sys.argv[7:],env=env,stderr=error)
 def stop(*args):
  worker.terminate()
 signal.signal(signal.SIGTERM,stop)
@@ -108,6 +112,11 @@ for line in sys.stdin:
   else: item({'id':'ack-'+turn,'type':'agentMessage','text':'I can run commands.'})
  else:
   with pathlib.Path('fixture-business.jsonl').open('a') as f: f.write(json.dumps({'turn':turn,'text':prompt})+'\n')
+  if mode=='large-work':
+   for idx in range(5):
+    item({'id':'large-'+turn+'-'+str(idx),'type':'commandExecution','status':'completed','exitCode':0,'aggregatedOutput':'x'*250000})
+  if mode=='oversized-work':
+   item({'id':'oversized-'+turn,'type':'commandExecution','aggregatedOutput':'x'*1100000})
   item({'id':'result-'+turn,'type':'agentMessage','text':'Synthetic task turn completed; acceptance not evaluated.'})
  send({'method':'turn/completed','params':{'threadId':thread,'turn':{'id':turn,'status':'completed'}}})
 '''
@@ -120,6 +129,7 @@ def screen_fixture(tmp_path, monkeypatch):
     binaries = tmp_path / "binaries"
     binaries.mkdir()
     for name, source in (("screen", SCREEN), ("codex", CODEX)):
+        compile(source, "synthetic-" + name, "exec")
         path = binaries / name
         path.write_text("#!" + sys.executable + "\n" + source)
         path.chmod(0o700)
@@ -186,7 +196,17 @@ def _events(fixture):
     return list(map(json.loads, trace.read_text().splitlines())) if trace.exists() else []
 
 
-@pytest.mark.parametrize("mode", ["normal", "default-provider"])
+def test_work_projection_does_not_relax_individual_jsonl_frame_limit(screen_fixture):
+    fixture = screen_fixture
+    fixture["environment"]["FIXTURE_MODE"] = "oversized-work"
+    with pytest.raises(LaunchError, match="provider_response_limit"):
+        create_screen(**fixture, dispatch_claim=lambda: None)
+    # The real local synthetic peer saw one dispatch. UNKNOWN is not a retry.
+    business = Path(fixture["request"]["workspace"]) / "fixture-business.jsonl"
+    assert len(business.read_text().splitlines()) == 1
+
+
+@pytest.mark.parametrize("mode", ["normal", "default-provider", "large-work"])
 def test_screen_persists_after_caller_exit_and_continues_with_exact_provider_proof(screen_fixture, mode):
     fixture = screen_fixture
     fixture["environment"]["FIXTURE_MODE"] = mode

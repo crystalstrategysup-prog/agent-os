@@ -17,6 +17,91 @@ from agent_os.config import default_config
 from agent_os.session_hub import CodexRunner, discover_sessions
 from agent_os.session_launch import LaunchError, launch
 
+
+def _work_stream(items, status="completed", error=None):
+    messages = [{"method": "item/completed", "params": {
+        "threadId": "fixture-thread", "turnId": "fixture-turn", "item": item}} for item in items]
+    messages.append({"method": "turn/completed", "params": {"threadId": "fixture-thread", "turn": {
+        "id": "fixture-turn", "status": status, "error": error, "items": items}}})
+    rpc = object.__new__(StdioRpc)
+    rpc.pending = []
+    source = iter(messages)
+    rpc._receive = lambda deadline: next(source)
+    rpc.call = lambda method, params: {"turn": {"id": "fixture-turn"}}
+    return rpc
+
+
+def test_work_compacts_cumulative_large_output_and_retains_original_item_hashes():
+    from agent_os.codex_launch import MAX_BYTES
+    from agent_os.safeio import digest
+    from agent_os.screen_launch import _PersistentProvider
+
+    envelope = "Exact ordinary fixture work"
+    items = [{"id": "user", "type": "userMessage", "content": [
+        {"type": "text", "text": envelope, "text_elements": []}]}]
+    items += [{"id": str(i), "type": "commandExecution", "status": "completed", "exitCode": 0,
+               "aggregatedOutput": "x" * 300000} for i in range(4)]
+    assert all(len(json.dumps(item)) < MAX_BYTES for item in items)
+    assert sum(len(json.dumps(item)) for item in items) > MAX_BYTES
+    rpc = _work_stream(items)
+    result = _PersistentProvider(rpc).dispatch({}, {"session_id": "fixture-thread"}, envelope)
+    assert result["status"] == "completed" and result["delivery"] == "accepted"
+    assert result["semantic_acceptance"] == "NOT_EVALUATED"
+    assert [item["sha256"] for item in result["items"]] == [digest(item) for item in items]
+    assert len(json.dumps(result)) < 5000
+
+
+def test_large_raw_probe_evidence_remains_unknown():
+    items = [{"id": str(i), "type": "commandExecution", "aggregatedOutput": "x" * 300000}
+             for i in range(4)]
+    with pytest.raises(LaunchError, match="bounded_turn_evidence_exceeded"):
+        _work_stream(items).events_until_complete("fixture-thread", "fixture-turn", 1)
+
+
+@pytest.mark.parametrize("text", ["Wrong input", None])
+def test_compact_work_never_accepts_provider_supplied_user_hash(text):
+    from agent_os.safeio import digest
+    from agent_os.screen_launch import _PersistentProvider
+
+    items = [{"id": "user", "type": "userMessage", "content": [{"type": "text", "text": text}],
+              "user_text_sha256": digest("expected")},
+             {"id": "reply", "type": "agentMessage", "text": "done"}]
+    result = _PersistentProvider(_work_stream(items)).dispatch({}, {"session_id": "fixture-thread"}, "expected")
+    assert result["delivery"] == "delivery_not_proven"
+    assert result["items"][0]["sha256"] == digest(items[0])
+
+
+def test_compact_work_keeps_item_count_limit_and_exact_scope_filter():
+    rpc = _work_stream([{"id": str(i), "type": "reasoning"} for i in range(256)])
+    with pytest.raises(LaunchError, match="bounded_turn_evidence_exceeded"):
+        rpc.events_until_complete("fixture-thread", "fixture-turn", 1, compact_work=True)
+    rpc = _work_stream([{"id": "own", "type": "commandExecution"}])
+    rpc.pending = [{"method": "item/completed", "params": {"threadId": "other-thread",
+        "turnId": "fixture-turn", "item": {"id": "foreign", "type": "fileChange"}}},
+        {"method": "turn/completed", "params": {"threadId": "fixture-thread",
+        "turn": {"id": "other-turn", "status": "completed"}}}]
+    events = rpc.events_until_complete("fixture-thread", "fixture-turn", 1, compact_work=True)
+    assert len(events) == 2 and events[0]["params"]["item"]["id"] == "own"
+
+
+def test_compact_direct_work_keeps_failed_terminal_category_and_tool_count():
+    result = CodexLaunchProvider(_work_stream([{"id": "cmd", "type": "commandExecution"}],
+        status="failed", error={"codexErrorInfo": "serverOverloaded", "message": "private raw body"})).dispatch(
+            {}, {"session_id": "fixture-thread"}, "fixture work")
+    assert result["status"] == "failed" and result["completed_tool_items"] == 1
+    assert result["failure"]["category"] == "service_unavailable"
+    assert "private raw body" not in json.dumps(result)
+
+
+@pytest.mark.parametrize("compact", [False, True])
+@pytest.mark.parametrize("terminal_id", [None, "foreign-turn"])
+def test_terminal_cannot_override_exact_turn_identity(compact, terminal_id):
+    rpc = _work_stream([])
+    rpc.pending = [{"method": "turn/completed", "params": {"threadId": "fixture-thread",
+        "turnId": "fixture-turn", "turn": {"id": terminal_id, "status": "completed"}}}]
+    with pytest.raises(LaunchError, match="provider_terminal_identity_mismatch"):
+        rpc.events_until_complete("fixture-thread", "fixture-turn", 1, compact_work=compact)
+
 PEER = r'''
 import json, pathlib, shlex, subprocess, sys
 mode = MODE
@@ -607,7 +692,7 @@ def test_unrecognized_failed_turn_fields_remain_unknown_without_copying_strings(
     req, _, _ = fixture(tmp_path)
     provider = CodexLaunchProvider(CatalogRpc(req))
     secret = "SYNTHETIC_UNRECOGNIZED_SECRET"
-    provider._turn = lambda session, prompt, timeout: ("failed-work-turn", [
+    provider._turn = lambda session, prompt, timeout, **kwargs: ("failed-work-turn", [
         {"method": "turn/completed", "params": {"threadId": session,
          "turn": {"id": "failed-work-turn", "status": "failed",
                   "error": {"message": secret, "codexErrorInfo": secret}}}}])

@@ -16,7 +16,7 @@ import time
 import uuid
 from pathlib import Path
 
-from .codex_launch import CodexLaunchProvider, StdioRpc, _model_binding, _safe_turn_failure
+from .codex_launch import CodexLaunchProvider, StdioRpc, _WorkEvidenceItem, _model_binding, _safe_turn_failure
 from .safeio import GateError, atomic_json, digest, lock, read_json, within
 from .session_launch import LaunchError, LaunchJournal, _observation, _targets, launch, validate_request
 
@@ -219,19 +219,23 @@ class ScreenLaunchProvider:
 
 class _PersistentProvider(CodexLaunchProvider):
     def dispatch(self, request: dict, startup: dict, envelope: str) -> dict:
-        turn_id, events = self._turn(startup["session_id"], envelope, self.work_timeout)
+        turn_id, events = self._turn(startup["session_id"], envelope, self.work_timeout, compact_work=True)
         saw_user, saw_reply = False, False
         evidence = []
         for event in events:
             item = event.get("params", {}).get("item", {})
             if item.get("type") == "userMessage":
-                content = item.get("content")
-                saw_user = (isinstance(content, list) and len(content) == 1 and isinstance(content[0], dict)
-                            and content[0].get("type") == "text" and content[0].get("text") == envelope)
+                if isinstance(item, _WorkEvidenceItem):
+                    saw_user = item.user_text_sha256 == digest(envelope)
+                else:
+                    content = item.get("content")
+                    saw_user = (isinstance(content, list) and len(content) == 1 and isinstance(content[0], dict)
+                                and content[0].get("type") == "text" and content[0].get("text") == envelope)
             elif saw_user and item.get("type") in {"agentMessage", "commandExecution", "fileChange", "mcpToolCall"}:
                 saw_reply = True
             if item:
-                evidence.append({"id": item.get("id"), "type": item.get("type"), "sha256": digest(item)})
+                evidence.append({"id": item.get("id"), "type": item.get("type"),
+                                 "sha256": item.original_sha256 if isinstance(item, _WorkEvidenceItem) else digest(item)})
         completed = events[-1].get("params", {}).get("turn", {}) if events else {}
         return {"session_id": startup["session_id"], "turn_id": turn_id,
                 "status": completed.get("status", "unknown"), "items": evidence,

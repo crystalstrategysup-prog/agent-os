@@ -34,6 +34,23 @@ Implement this sequence, in order:
    then claim and dispatch the exact original task with its retained context.
    A started or completed turn is not semantic acceptance of the result.
 
+## Bounded ordinary-work evidence
+
+Ordinary work uses compact trusted in-memory item evidence before cumulative
+retention: original item digest, ID/type and a derived exact user-text digest.
+Persistent delivery still requires the actual submitted envelope followed by a
+non-user provider event on the same thread/turn. Provider-supplied hash fields
+are not trusted. Receipts retain original item hashes, not hashes of projections.
+The terminal retains its actual ID/status and safely classified failure; a
+completed turn remains separate from semantic acceptance.
+
+Startup capability probes retain full command/cwd/output validation and their
+strict raw evidence budget. The one-MiB JSONL frame/retained-evidence limits,
+256 selected-event and4096receive bounds, deadlines and approval refusal remain.
+Individually oversized frames or excessive events still yield UNKNOWN. A lost
+receipt does not prove native work stopped and never authorizes blind replay.
+This source correction does not update already-running workers.
+
 ## Public interfaces
 
 `session_launch.launch(request, provider, target_guard, dispatch_claim)` is the

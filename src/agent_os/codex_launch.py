@@ -31,6 +31,43 @@ MAX_MODEL_PAGES = 4
 MAX_MODEL_ENTRIES = 256
 
 
+class _WorkEvidenceItem(dict):
+    """Trusted local projection; JSON fields cannot supply these attributes."""
+
+    def __init__(self, item: dict):
+        if not isinstance(item, dict):
+            raise LaunchError("work_item_evidence_invalid", status="UNKNOWN")
+        identity = {key: item.get(key) for key in ("id", "type")}
+        if any(value is not None and (not isinstance(value, str) or len(value) > 1024)
+               for value in identity.values()):
+            raise LaunchError("work_item_identity_limit", status="UNKNOWN")
+        super().__init__(identity)
+        self.original_sha256 = digest(item)
+        content = item.get("content")
+        self.user_text_sha256 = None
+        if (item.get("type") == "userMessage" and isinstance(content, list)
+                and len(content) == 1 and isinstance(content[0], dict)
+                and content[0].get("type") == "text" and isinstance(content[0].get("text"), str)):
+            self.user_text_sha256 = digest(content[0]["text"])
+
+
+def _compact_work_event(message: dict) -> tuple[dict, int]:
+    params = message["params"]
+    if message["method"] == "item/completed":
+        item = _WorkEvidenceItem(params.get("item", {}))
+        projected = {"threadId": params.get("threadId"), "turnId": params.get("turnId"), "item": item}
+        extra_bytes = len(item.original_sha256) + len(item.user_text_sha256 or "")
+    else:
+        turn = params.get("turn", {})
+        if not isinstance(turn, dict):
+            raise LaunchError("work_terminal_evidence_invalid", status="UNKNOWN")
+        # Do not retain a provider's duplicate turn.items or unrelated bodies.
+        projected = {"threadId": params.get("threadId"), "turnId": params.get("turnId"),
+                     "turn": {key: turn.get(key) for key in ("id", "status", "error")}}
+        extra_bytes = 0
+    return {"method": message["method"], "params": projected}, extra_bytes
+
+
 class StdioRpc:
     """Bounded JSONL connection; no auth, policy setters or approval replies."""
 
@@ -150,7 +187,8 @@ class StdioRpc:
             raise LaunchError("exact_text_turn_required")
         return self._request(method, params, deadline=deadline)
 
-    def events_until_complete(self, session_id: str, turn_id: str, timeout: float) -> list[dict]:
+    def events_until_complete(self, session_id: str, turn_id: str, timeout: float,
+                              *, compact_work: bool = False) -> list[dict]:
         if not 0 < timeout <= 1800:
             raise LaunchError("bounded_turn_timeout_required")
         deadline = time.monotonic() + timeout
@@ -164,9 +202,15 @@ class StdioRpc:
             event_turn = params.get("turnId") or params.get("turn", {}).get("id")
             if event_turn != turn_id:
                 continue
+            if message.get("method") == "turn/completed" and (
+                    not isinstance(params.get("turn"), dict) or params["turn"].get("id") != turn_id):
+                raise LaunchError("provider_terminal_identity_mismatch", status="UNKNOWN")
             if message.get("method") in {"item/completed", "turn/completed"}:
+                extra_bytes = 0
+                if compact_work:
+                    message, extra_bytes = _compact_work_event(message)
                 selected.append(message)
-                size += len(json.dumps(message))
+                size += len(json.dumps(message)) + extra_bytes
                 if size > MAX_BYTES or len(selected) > 256:
                     raise LaunchError("bounded_turn_evidence_exceeded", status="UNKNOWN")
             if message.get("method") == "turn/completed":
@@ -522,11 +566,14 @@ class CodexLaunchProvider:
             raise
         return observed
 
-    def _turn(self, session_id: str, prompt: str, timeout: float) -> tuple[str, list[dict]]:
+    def _turn(self, session_id: str, prompt: str, timeout: float,
+              *, compact_work: bool = False) -> tuple[str, list[dict]]:
         response = self.rpc.call("turn/start", {"threadId": session_id, "input": [{"type": "text", "text": prompt}]})
         turn_id = response.get("turn", {}).get("id")
         if not isinstance(turn_id, str) or not turn_id:
             raise LaunchError("turn_id_missing", status="UNKNOWN")
+        if compact_work:
+            return turn_id, self.rpc.events_until_complete(session_id, turn_id, timeout, compact_work=True)
         return turn_id, self.rpc.events_until_complete(session_id, turn_id, timeout)
 
     def probe(self, request: dict, startup: dict, attempt: str) -> dict:
@@ -572,7 +619,7 @@ class CodexLaunchProvider:
                            for cap in sorted(proven) for item in evidence if item["matched"] == cap and item.get("item_id")]}
 
     def dispatch(self, request: dict, startup: dict, envelope: str) -> dict:
-        turn_id, events = self._turn(startup["session_id"], envelope, self.work_timeout)
+        turn_id, events = self._turn(startup["session_id"], envelope, self.work_timeout, compact_work=True)
         completed = events[-1].get("params", {}).get("turn", {}) if events else {}
         items = [event["params"]["item"] for event in events if event["method"] == "item/completed"]
         return {"session_id": startup["session_id"], "turn_id": turn_id, "status": completed.get("status", "unknown"),
