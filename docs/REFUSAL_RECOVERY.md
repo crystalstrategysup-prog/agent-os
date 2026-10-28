@@ -315,7 +315,7 @@ no generic installer/rollback compatibility is inferred after real activation.
 This source candidate is not managed adoption or actual recovery qualification.
 
 
-## Bounded recovery adapter — agentas3 source/package candidate
+## Bounded recovery adapter — historical AgentOS source/package candidate
 
 The optional one-shot entry is:
 

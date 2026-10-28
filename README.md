@@ -131,4 +131,4 @@ Qualified creation now reads the exact approved Codex binary's inherited configu
 
 ## Current practical patch
 
-See [the Agentas candidate](docs/development/AGENTAS_CANDIDATE.md) for source identity, validation and honest release limits.
+See [the AgentOS candidate](docs/development/AGENTOS_CANDIDATE.md) for source identity, validation and honest release limits.
