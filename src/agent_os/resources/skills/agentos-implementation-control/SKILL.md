@@ -12,8 +12,12 @@ weaken a guard to make it pass. If scope expands, checkpoint the task, update th
 scope and documents, and enter again. Verify source rather than relying on an
 external report.
 
-Select bounded relevant sections before reading large files. Ordinary source
-dependencies needed for the same authorized goal are routine discovery, not a
+Select bounded relevant sections before reading large files. Source reads can
+use `agent_os.source_sections` to refuse oversized rendered output
+before printing any source; see `docs/OBSERVED_EVIDENCE.md`. Reuse supplied exact
+references before discovering replacements. For primary command proof isolate
+the business command: a later successful read must not mask an earlier exit.
+Ordinary source dependencies needed for the same authorized goal are routine discovery, not a
 new permission gate. A newly discovered protected effect still needs its own
 authority. When an observation is refused, stop dependent business work, but
 finish mandatory cleanup and reconciliation of resources already owned by the

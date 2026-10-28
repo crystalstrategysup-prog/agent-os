@@ -1,5 +1,18 @@
 # Bounded command evidence
 
+For selected source reads, `agent_os.source_sections.read_sections` accepts an
+explicit absolute root and up to16 relative file/range records. Its standalone
+CLI takes `--root ROOT --request RANGES.json`, where the JSON list contains
+`{"path":"module.py","start":10,"end":30}` records (1-based, inclusive).
+It returns exact UTF-8 text, line bounds and full-file hashes. Default rendered
+JSON budget is6000 bytes, configurable up to16000. Oversized output is refused
+before any source body is printed; reduce the selected ranges instead of
+clipping output. Files are bounded to2MiB, requests to16KiB; symlinks, path escape,
+nonregular files and invalid ranges are refused. Use a verified resolved root
+when an alias is a symlink. This POSIX helper reads no project state, imports no
+application and needs no intake. Complete means only the selected ranges, not
+the entire source or dependency coverage; caller authority remains separate.
+
 `agent_os.observed_command.run_observed` observes a caller-authorized typed argv
 on POSIX. It introduces no shell, permission, sandbox, scheduler or live write
 authority. A caller can still explicitly invoke an interpreter or shell and is
