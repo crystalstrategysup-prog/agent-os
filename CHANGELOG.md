@@ -1,8 +1,14 @@
+# 0.8.0rc2041+agentas3 — bounded recovery adapter candidate
+
+- Add a v3 acknowledge/advance/reconcile entry using the existing supported-tool stdio bridge and original response accounting. Recovery and observer guards remain unchanged.
+- Retain the exact missing historical-origin capability when the selected provider cannot reach the origin within its existing finite horizon. No invented cursor, saved-observation fallback or limit increase.
+- Source/package candidate only. Independent final-byte review, installation and actual recovery remain separate.
+
 # 0.8.0rc2041+agentas2 — source-only recovery v3 candidate
 
 - Add a separate workflow/native-turn recovery v3 branch; preserve v1/v2 behavior.
 - Retain raw workflow IDs, whole modern witness and exact metadata CAS. Require the existing selected supported native observer for v3; native B must advance to a different active turn after the origin becomes inactive.
-- This candidate is uninstalled, unpublished and pending independent review. It grants no real recovery or managed adoption authority.
+- This source checkpoint is uninstalled and pending independent review. It grants no real recovery or managed adoption authority.
 
 # 0.8.0rc2041+agentas1 — installed source candidate
 

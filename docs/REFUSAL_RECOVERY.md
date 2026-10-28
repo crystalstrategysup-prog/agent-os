@@ -313,3 +313,58 @@ ordinary answer revision and invalidates old readiness/checks. New ordinary READ
 and any authorized tail are separate. V3 metadata requires a v3-capable reader;
 no generic installer/rollback compatibility is inferred after real activation.
 This source candidate is not managed adoption or actual recovery qualification.
+
+
+## Bounded recovery adapter — agentas3 source/package candidate
+
+The optional one-shot entry is:
+
+```text
+python -m agent_os.refusal_recovery_bridge acknowledge|advance|reconcile \
+  --root ROOT --home HOME --task TASK --request REQUEST --permit PERMIT
+```
+
+It accepts only the existing v3 request and exact task. The original16KiB
+request/permit bounds and canonical recovery validation apply. It delegates A
+to acknowledge, B to project.next_turn/advance, and UNKNOWN reconciliation to
+the existing exact journal operation. No C, automatic READY or checkpoint replay
+is included. Normal v1/v2 APIs and the ordinary CLI are unchanged.
+
+The entry uses the EXACT existing StdioToolBridge, SupportedReadThreadObserver,
+MetadataResponseAccounting and prepare_metadata_response. The selected trusted
+caller executes each named actual mcp__codex_app__read_thread challenge and
+passes its original in-memory return through prepare_metadata_response with
+ONE MetadataResponseAccounting instance for the request hash and native thread.
+Measure and charge the original response before stripping bodies. Preserve
+nonce/tool/params/request identity and original byte counts. Keep that accounting
+for the operation; never reset it to extend history. Do not persist or display
+raw turns. Stdin/callbacks and local JSON files do not authenticate the caller;
+the owner must verify its actual tool origin and retain primary metadata proof.
+The direct embedding API is command(argv, read_thread=ACTUAL_SUPPORTED_TOOL);
+without that selected tool it refuses. The module entry selects the same stdio
+protocol, not a new provider or RPC.
+
+Capacity remains40one-turn pages,120seconds total,45seconds per call,4MiB per
+original response,16MiB aggregate and64KiB sanitized wire. Each mutation has its
+existing request/authority/CAS checks. No cursor/anchor/recorded-observation flag
+is exposed. The current supported tool accepts only earlier provider-issued
+pagination cursors; it has no exposed exact-turn argument. A within-horizon
+historical origin can qualify through fresh actual pages. An origin outside
+that horizon returns provider_turn_unavailable before recovery reservation or
+fixed writes; this is bounded NOT_FOUND, not absence or quiescence proof.
+
+If the owning integration lacks an already lawfully obtained provider anchor
+and the supported API has no exact-origin capability, operational adoption is
+HOLD. The next owner is the selected provider/integration owner. A future proposal
+must supply a supported exact-origin or provider-issued verified anchor route,
+show fresh metadata for the original identity within the SAME aggregate caps,
+and qualify provenance/staleness/current-writer/conflict handling before use.
+Do not fabricate or edit a cursor, reconstruct one from its apparent encoding,
+relabel the original workflow/native identity, concatenate forty-page operations
+to evade the horizon, replay old JSON, or raise caps as a consumer workaround.
+
+Local fixture and wheel proof qualifies this adapter source only. After any
+real v3 metadata write, retain a v3-capable reader and exact pending journals;
+installer rollback to a v1/v2-only reader is not project downgrade safety.
+Pre-A installer rollback and post-v3 forward repair require separate exact
+parent/target review. No installation or recovery authority is granted here.
