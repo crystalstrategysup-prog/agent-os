@@ -1,0 +1,61 @@
+{
+  "schema": "atlas.work/v1",
+  "id": "W-03",
+  "parent_id": null,
+  "title": "Verify runtime after authorized integration",
+  "objective": "Verify the new behavior of the installed module",
+  "outcome": "Installed version and observed runtime response recorded",
+  "criteria": [
+    {
+      "id": "C-03",
+      "text": "Observed runtime matches the version",
+      "required_scope": "RUNTIME",
+      "artifact_ids": [
+        "A-SOURCE"
+      ]
+    }
+  ],
+  "state": "BLOCKED",
+  "writer": "runtime-owner-demo",
+  "write_scope": [],
+  "assigned_to": "runtime-owner-demo",
+  "depends_on": [
+    "W-02"
+  ],
+  "artifacts": [
+    {
+      "id": "A-SOURCE",
+      "path": "src/batch.py",
+      "sha256": "e1eb1c798d3a858909ccf30823aaad5829db6857aae2e8da6859b8663df35e18",
+      "bytes": 33,
+      "role": "output",
+      "entity_ids": [
+        "MOD-BATCH"
+      ]
+    }
+  ],
+  "evidence": [],
+  "acceptance": [],
+  "activity": null,
+  "blocker": {
+    "reason": "Source work is still in progress; runtime authorization is defined by the project",
+    "unblock_condition": "W-02 accepted and authorized integration completed by its owner",
+    "next_owner": "runtime-owner-demo"
+  },
+  "result": null,
+  "remaining": "Change the limit and run the targeted test",
+  "next_action": {
+    "actor": "runtime-owner-demo",
+    "action": "After the dependency is completed, follow the current project deployment contract"
+  },
+  "events": [
+    {
+      "id": "EV-04",
+      "at": "2026-10-17T03:00:00Z",
+      "actor": "integrator-demo",
+      "kind": "BLOCKED",
+      "summary": "Runtime validation is separate from source validation",
+      "evidence_ids": []
+    }
+  ]
+}

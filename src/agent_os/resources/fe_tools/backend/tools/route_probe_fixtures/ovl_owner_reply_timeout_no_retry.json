@@ -1,0 +1,51 @@
+{
+  "schema": "route-probe.ovl-owner-reply-fixture/v1",
+  "case": "owner_reply_timeout_no_retry",
+  "route": "owner_private",
+  "evidence": "SIMULATED",
+  "entry": "app.ingest.telegram_owner_private_runtime:dispatch_once",
+  "opaque_modules": [
+    "app.core.config"
+  ],
+  "include_modules": [
+    "app.ingest.telegram_owner_private_runtime",
+    "app.ingest.telegram_owner_private_composition",
+    "app.ingest.telegram_owner_private_state",
+    "app.ingest.telegram_owner_private_route",
+    "app.ingest.telegram_owner_private_forwarding",
+    "app.ingest.telegram_owner_private_presentation",
+    "app.ingest.telegram_owner_private_policy",
+    "app.ingest.telegram_owner_private_upload",
+    "app.ingest.telegram_basic_native_transport",
+    "app.ingest.telegram_private_transport",
+    "app.ingest.telegram_private_binding",
+    "app.ingest.bot_bridge_core",
+    "app.ingest.telegram_basic_subscription",
+    "app.ingest.telegram_basic_media_policy",
+    "app.ingest.telegram_basic_upload_store",
+    "app.ingest.telegram_reply_presentation",
+    "app.models",
+    "app.core.db"
+  ],
+  "include_entries": [
+    "tools.route_probe_ovl:observe_outcome",
+    "app.ingest.telegram_owner_private_composition:accept_webhook",
+    "app.ingest.telegram_owner_private_forwarding:prove_owner_alias",
+    "app.ingest.telegram_owner_private_presentation:present_new_plan",
+    "app.ingest.telegram_owner_private_presentation:reprove_presented_plan",
+    "app.ingest.telegram_owner_private_presentation:validate_projection_source",
+    "app.ingest.telegram_owner_private_presentation:load_resident_event",
+    "app.ingest.telegram_owner_private_presentation:physical_original_body",
+    "app.ingest.telegram_owner_private_runtime:check_claim",
+    "app.ingest.telegram_owner_private_runtime:reconcile_projection",
+    "app.ingest.telegram_basic_native_transport:BasicNativeTransport.__call__"
+  ],
+  "capture_mode": "PARTIAL_STATIC",
+  "trace_modules": [
+    "app.ingest.telegram_owner_private_runtime",
+    "app.ingest.telegram_owner_private_composition",
+    "app.ingest.telegram_owner_private_state",
+    "app.ingest.telegram_basic_native_transport"
+  ],
+  "max_trace_events": 5000
+}

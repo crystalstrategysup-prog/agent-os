@@ -112,13 +112,9 @@ def _link_state(path: Path) -> tuple[tuple[int, ...], bytes]:
 def attest_directory_link(
     root: Path, path: Path, excluded: set[str]
 ) -> tuple[dict, Callable[[], None]]:
-    """Bind a stage0 tracked alias and non-symlink directory, returning a recheck."""
+    """Attest a tracked owning-repo link or exact sibling checkout alias; no walk."""
     try:
         rel = path.relative_to(root).as_posix()
-        if os.fsdecode(_git(root, "rev-parse", "--show-toplevel").rstrip(b"\n")) != str(
-            root
-        ):
-            raise GateError("tracked_symlink_project_git_root_required")
         parents = _chain(root, path.parent.relative_to(root).parts)
         link_identity, target_bytes = _link_state(path)
         try:
@@ -152,11 +148,61 @@ def attest_directory_link(
             raise GateError("tracked_symlink_excluded_target")
         referent = _chain(root, tuple(parts))
         target_rel = PurePosixPath(*parts).as_posix()
-        entries = _entries(root, rel)
+        # Git ownership belongs to the link's actual parent, not necessarily
+        # the admitted project directory. Never search through a link itself.
+        try:
+            owner = Path(os.fsdecode(_git(path.parent, "rev-parse", "--show-toplevel").rstrip(b"\n")))
+        except GateError as exc:
+            if str(exc) != "tracked_symlink_git_read_failed":
+                raise
+            owner = None
+        if owner is None:
+            # A checkout alias is metadata only: the real checkout is scanned
+            # under its canonical directory elsewhere in the same source root.
+            # Ordinary untracked directory aliases remain refused.
+            target_path = root / target_rel
+            actual = os.fsdecode(_git(target_path, "rev-parse", "--show-toplevel").rstrip(b"\n"))
+            if actual != str(target_path) or target_path == root or path.parent != target_path.parent:
+                raise GateError("tracked_symlink_stage0_link_required")
+            head = _git(target_path, "rev-parse", "--verify", "HEAD")
+            index = _git(target_path, "ls-files", "--stage", "-z")
+            if not index or any(row.split(b"\t", 1)[0].split(b" ")[-1] != b"0" for row in index.split(b"\0") if row):
+                raise GateError("tracked_symlink_stage0_link_required")
+            def recheck_checkout() -> None:
+                if _link_state(path) != (link_identity, target_bytes):
+                    raise GateError("tracked_symlink_identity_changed")
+                for item, identity in visited + referent:
+                    m = item.lstat()
+                    if (m.st_dev, m.st_ino, m.st_mode) != identity:
+                        raise GateError("tracked_symlink_identity_changed")
+                if (os.fsdecode(_git(target_path, "rev-parse", "--show-toplevel").rstrip(b"\n")) != actual
+                    or _git(target_path, "rev-parse", "--verify", "HEAD") != head
+                    or _git(target_path, "ls-files", "--stage", "-z") != index):
+                    raise GateError("tracked_symlink_index_changed")
+            recheck_checkout()
+            return {"kind": "internal_git_checkout_alias/v1", "target": target,
+                    "target_path": target_rel, "link_sha256": sha(target_bytes),
+                    "git_head": head.decode().strip(), "git_index_sha256": sha(index)}, recheck_checkout
+        try:
+            owner.relative_to(root)
+            git_rel = path.relative_to(owner).as_posix()
+            git_target_rel = (root / target_rel).relative_to(owner).as_posix()
+        except ValueError as exc:
+            raise GateError("tracked_symlink_target_escape") from exc
+        lexical = list(path.parent.relative_to(owner).parts)
+        for part in raw.parts:
+            if part == "..":
+                if not lexical:
+                    raise GateError("tracked_symlink_target_escape")
+                lexical.pop()
+            elif part != ".":
+                lexical.append(part)
+        owner_chain = _chain(root, owner.relative_to(root).parts)
+        entries = _entries(owner, git_rel)
         if (
             len(entries) != 1
             or entries[0][0] != b"120000"
-            or entries[0][2:] != (b"0", os.fsencode(rel))
+            or entries[0][2:] != (b"0", os.fsencode(git_rel))
         ):
             raise GateError("tracked_symlink_stage0_link_required")
         oid = entries[0][1]
@@ -168,8 +214,8 @@ def attest_directory_link(
         )
         if actual_oid != oid:
             raise GateError("tracked_symlink_index_target_mismatch")
-        target_entries = _entries(root, target_rel)
-        prefix = os.fsencode(target_rel) + b"/"
+        target_entries = _entries(owner, git_target_rel)
+        prefix = os.fsencode(git_target_rel) + b"/"
         if (
             not target_entries
             or any(
@@ -186,13 +232,14 @@ def attest_directory_link(
             try:
                 if _link_state(path) != (link_identity, target_bytes):
                     raise GateError("tracked_symlink_identity_changed")
-                for item, identity in visited + referent:
+                for item, identity in visited + referent + owner_chain:
                     metadata = item.lstat()
                     if (metadata.st_dev, metadata.st_ino, metadata.st_mode) != identity:
                         raise GateError("tracked_symlink_identity_changed")
                 if (
-                    _entries(root, rel) != entries
-                    or _entries(root, target_rel) != target_entries
+                    os.fsdecode(_git(path.parent, "rev-parse", "--show-toplevel").rstrip(b"\n")) != str(owner)
+                    or _entries(owner, git_rel) != entries
+                    or _entries(owner, git_target_rel) != target_entries
                 ):
                     raise GateError("tracked_symlink_index_changed")
             except OSError as exc:
@@ -203,6 +250,7 @@ def attest_directory_link(
             "kind": "tracked_internal_directory_symlink/v1",
             "target": target,
             "target_path": target_rel,
+            **({"git_root": owner.relative_to(root).as_posix()} if owner != root else {}),
             "git_mode": "120000",
             "git_blob_oid": oid.decode(),
             "link_sha256": sha(target_bytes),

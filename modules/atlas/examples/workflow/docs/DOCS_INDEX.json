@@ -1,0 +1,138 @@
+{
+  "schema": "docs-navigator.input/v1",
+  "project": {
+    "id": "DEMO-WORKFLOW",
+    "title": "Atlas · work coordination example",
+    "scope_note": "Entirely synthetic data. No receipt represents validation of a real application."
+  },
+  "release": {
+    "id": "DOCS-DEMO-1",
+    "created_at": "2026-10-17T03:00:00Z",
+    "previous": null
+  },
+  "documents": [
+    {
+      "id": "DOC-PROJECT",
+      "title": "DOC-PROJECT",
+      "kind": "markdown",
+      "version": "1",
+      "lifecycle": "current",
+      "path": "docs/PROJECT.md",
+      "sha256": "6284dc94fb6df7af0bf8df513f3971290ad11138d728ad0218cfc704ede875bb",
+      "bytes": 138,
+      "source_ref": "synthetic/example/docs/PROJECT.md",
+      "readback_at": "2026-10-17T03:00:00Z",
+      "evidence_state": "DESIGN",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "DOC-CONTRACT",
+      "title": "DOC-CONTRACT",
+      "kind": "markdown",
+      "version": "1",
+      "lifecycle": "current",
+      "path": "docs/CONTRACT-v1.md",
+      "sha256": "0f28c3a5f7b3af1eab118d986559b5da06cd234493c9e0afbac05c9024d4d917",
+      "bytes": 160,
+      "source_ref": "synthetic/example/docs/CONTRACT-v1.md",
+      "readback_at": "2026-10-17T03:00:00Z",
+      "evidence_state": "DESIGN",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "DOC-PATCH",
+      "title": "DOC-PATCH",
+      "kind": "markdown",
+      "version": "proposal-2",
+      "lifecycle": "current",
+      "path": "docs/PATCH-v2.md",
+      "sha256": "2fef41382df4b13bf2db0139dae7bd4cba8a89d6ea8060faa5b4015259be5b35",
+      "bytes": 157,
+      "source_ref": "synthetic/example/docs/PATCH-v2.md",
+      "readback_at": "2026-10-17T03:00:00Z",
+      "evidence_state": "DESIGN",
+      "execution": "NOT_RUN"
+    }
+  ],
+  "modules": [
+    {
+      "id": "MOD-BATCH",
+      "title": "Batch",
+      "purpose": "Process a bounded batch",
+      "state_owner": "BatchRepository",
+      "dependencies": [],
+      "docs": [
+        "DOC-PROJECT",
+        "DOC-CONTRACT"
+      ]
+    }
+  ],
+  "contracts": [
+    {
+      "id": "API-BATCH-v1",
+      "contract_key": "batch.process",
+      "title": "Batch processing",
+      "version": "1",
+      "lifecycle": "current",
+      "module": "MOD-BATCH",
+      "state_owner": "BatchRepository",
+      "input": "items; request_id",
+      "output": "item results",
+      "parameters": [
+        {
+          "name": "items",
+          "type": "list",
+          "required": true,
+          "description": "at most 20 items"
+        },
+        {
+          "name": "request_id",
+          "type": "str",
+          "required": true,
+          "description": "idempotency key"
+        }
+      ],
+      "errors": [
+        {
+          "code": "LIMIT",
+          "meaning": "Limit exceeded"
+        }
+      ],
+      "auth": "UNKNOWN",
+      "dependencies": [],
+      "usage": "Through the public module API",
+      "docs": [
+        "DOC-CONTRACT"
+      ],
+      "evidence_state": "DESIGN",
+      "execution": "NOT_RUN"
+    }
+  ],
+  "relations": [
+    {
+      "from": "DOC-PATCH",
+      "to": "API-BATCH-v1",
+      "type": "describes",
+      "evidence_docs": [
+        "DOC-PATCH"
+      ]
+    }
+  ],
+  "matrix": {
+    "doc": null
+  },
+  "bindings": [],
+  "history": [
+    {
+      "id": "DH-01",
+      "at": "2026-10-17T03:00:00Z",
+      "kind": "created",
+      "summary": "Synthetic example created",
+      "entity_ids": [
+        "DOC-PROJECT",
+        "DOC-CONTRACT",
+        "DOC-PATCH"
+      ]
+    }
+  ]
+}

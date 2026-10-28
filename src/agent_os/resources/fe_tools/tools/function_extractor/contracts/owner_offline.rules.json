@@ -1,0 +1,18 @@
+{
+  "schema": "function-extractor.rule-declarations/v1",
+  "boundaries": [
+    {"boundary_id": "offline.sandbox", "symbol": "function_extractor.sandbox", "kind": "semantic"}
+  ],
+  "rules": [
+    {
+      "rule_id": "owner.offline.guards",
+      "boundary_id": "offline.sandbox",
+      "kind": "trace_match",
+      "constraint": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {"audit": true, "seccomp": true}
+      }
+    }
+  ]
+}

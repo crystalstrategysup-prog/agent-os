@@ -1,0 +1,26 @@
+{
+  "schema": "route-probe.avl-fixture/v1",
+  "case": "dns",
+  "route": "platform_group",
+  "adapter": "tools.route_probe_avl:prepare",
+  "entry": "app.ingest.telegram_private_transport:deliver",
+  "expected": {
+    "state": "unknown",
+    "error_category": "native_post_transport_or_receipt_unknown",
+    "post_count": 1
+  },
+  "evidence": "SIMULATED",
+  "opaque_modules": [
+    "app.core.config",
+    "app.ingest.telegram_basic_subscription",
+    "app.ingest.telegram_basic_media_policy"
+  ],
+  "include_modules": [
+    "app.ingest.bot_bridge_core",
+    "app.ingest.telegram_basic_native_transport",
+    "app.ingest.telegram_basic_upload_store",
+    "app.ingest.telegram_private_binding",
+    "app.ingest.telegram_private_transport",
+    "app.ingest.telegram_reply_presentation"
+  ]
+}

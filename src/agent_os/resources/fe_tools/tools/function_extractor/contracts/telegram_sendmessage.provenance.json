@@ -1,0 +1,30 @@
+{
+  "schema": "function-extractor.normative-adapter-provenance/v1",
+  "official_schema": false,
+  "machine_adapter": true,
+  "scope": "Selected plain-text sendMessage input and conditional response envelope; successful result validates selected message_id/chat fields ONLY, not the complete Message schema. Failure requires integer error_code; description remains optional. HTML/entities and unspecified provider guarantees are outside this adapter.",
+  "primary_ref": "https://core.telegram.org/bots/api#making-requests",
+  "primary_sha256": "90488c6b4dbc6e733feba7ed5e30bff391e73bf46f6f0299a47c578aece96268",
+  "primary_representation": "ROOT-web-reader-normalized-selected-facts-NOT-raw-HTML",
+  "retrieved_at": "2026-10-23T08:55:07.211507+00:00",
+  "version": "Bot API 10.3 document header; selected normalized facts refreshed 2026-10-23",
+  "adapter_sha256": "ed9a3bd48a827a0045734e69116410a0c8f060aaf52e183930c7af9d39869083",
+  "external_ref_fetches_by_core": 0,
+  "coverage": {
+    "request_applicability": "PLAIN_TEXT_ONLY",
+    "conditional_envelope": true,
+    "failure_error_code_required": true,
+    "failure_description_required": false,
+    "full_message_schema": false,
+    "success_message_fields": [
+      "message_id",
+      "chat"
+    ],
+    "all_optional_parameters": false
+  },
+  "review_authority_ref": "/home/deploy/owner-reports/FE_OWNER_CONTRACT_20261023/FINALIZATION_TASK_20261023T083815Z.md",
+  "review_status": "INDEPENDENT_SOURCE_REVIEWED_SELECTED_SCOPE_RUNTIME_ACCEPTANCE_SEPARATE",
+  "primary_artifact": "tools/function_extractor/contracts/telegram_sendmessage.current-primary.json",
+  "independent_review_ref": "/home/deploy/owner-reports/FE_OWNER_CONTRACT_20261023/INDEPENDENT_REVIEW/INTEGRATED_SOURCE_REVIEW.json",
+  "independent_review_sha256": "b93fac8e4555e38966c42f8e444a926e356b99de7fd00dc590cdf86846624a22"
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Contract workflow invocation; referenced maps have their own schemas",
+  "type": "object",
+  "required": ["mode", "runner", "timeout", "budget_seconds"],
+  "properties": {
+    "mode": {"enum": ["offline", "synthetic", "recorded-replay", "allowlisted-integration"]},
+    "runner": {"enum": ["container", "subprocess"]},
+    "timeout": {"type": "number", "exclusiveMinimum": 0, "maximum": 30},
+    "budget_seconds": {"type": "number", "minimum": 1, "maximum": 3600}
+  },
+  "additionalProperties": false
+}

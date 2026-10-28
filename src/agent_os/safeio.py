@@ -9,7 +9,7 @@ import re
 import stat
 import sys
 import tempfile
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
@@ -193,6 +193,7 @@ def filemap(
     limit: int = 20000,
     max_bytes: int = 128 * 1024 * 1024,
     tracked_directory_links: dict[str, dict] | None = None,
+    directory_excluder: Callable[[Path], bool] | None = None,
 ) -> dict[str, str]:
     result: dict[str, str] = {}
     total = 0
@@ -200,6 +201,9 @@ def filemap(
     for parent, dirs, files in os.walk(root, followlinks=False):
         dirs[:] = sorted(d for d in dirs if d not in (skip or set()))
         for d in dirs[:]:
+            if directory_excluder is not None and directory_excluder(Path(parent) / d):
+                dirs.remove(d)
+                continue
             if (Path(parent) / d).is_symlink():
                 if tracked_directory_links is None:
                     raise GateError("symlink_directory_refused")

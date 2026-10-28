@@ -1,0 +1,59 @@
+{
+  "schema": "atlas.semantic-catalog/v1",
+  "modules": [
+    {
+      "id": "EXAMPLE-MODULE",
+      "title": "Replace with a source-declared module",
+      "purpose": "Replace with the source-declared module purpose",
+      "state_owner": "UNKNOWN: qualify the actual state owner",
+      "dependencies": [],
+      "docs": ["DOC-API"]
+    }
+  ],
+  "contracts": [
+    {
+      "id": "EXAMPLE-METHOD",
+      "contract_key": "EXAMPLE-API-METHOD",
+      "title": "Replace with an exact declared API method",
+      "version": "EXAMPLE-DESIGN",
+      "lifecycle": "current",
+      "module": "EXAMPLE-MODULE",
+      "state_owner": "UNKNOWN: qualify from the owning source",
+      "input": "Example design only: {limit?: integer}. Omitted limit uses 5; explicit null and false are invalid.",
+      "output": "Example design only: {items: array}; an empty array means an observed empty result, not an omitted response.",
+      "parameters": [
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Illustrative design: default 5 when omitted; null and false rejected; valid range 1..20. Replace with actual source semantics."
+        }
+      ],
+      "errors": [
+        {
+          "code": "INVALID_LIMIT",
+          "meaning": "Illustrative design: invalid type/range; no effects occurred. Replace with actual source error semantics."
+        }
+      ],
+      "auth": "UNKNOWN: bind the actual caller and authorization rules",
+      "dependencies": [],
+      "usage": "Illustrative documentary design. Register actual callers, effects, idempotency and source pointer before treating this as a project contract.",
+      "docs": ["DOC-API"],
+      "evidence_state": "DESIGN",
+      "execution": "NOT_RUN"
+    }
+  ],
+  "relations": [
+    {
+      "from": "DOC-API",
+      "to": "EXAMPLE-METHOD",
+      "type": "describes",
+      "evidence_docs": ["DOC-API"]
+    }
+  ],
+  "work_bindings": [
+    {"work_id": "WORK-1", "entity_ids": ["EXAMPLE-METHOD"]}
+  ],
+  "work_context": [],
+  "patch_bindings": []
+}

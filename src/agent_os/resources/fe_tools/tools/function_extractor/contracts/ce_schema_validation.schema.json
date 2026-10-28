@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/schemas/ce_schema_validation.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "errors",
+    "unsupported"
+  ],
+  "properties": {
+    "status": {
+      "enum": [
+        "VALID",
+        "INVALID",
+        "UNKNOWN"
+      ]
+    },
+    "errors": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "enum": [
+          "FALSE_SCHEMA",
+          "TYPE_MISMATCH",
+          "CONST_MISMATCH",
+          "ENUM_MISMATCH",
+          "NUMBER_BOUND",
+          "STRING_BOUND",
+          "ARRAY_BOUND",
+          "ARRAY_NOT_UNIQUE",
+          "OBJECT_BOUND",
+          "REQUIRED_MISSING",
+          "INVALID_CONTRACT_MAP"
+        ]
+      }
+    },
+    "unsupported": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "const": "UNSUPPORTED_OR_BOUNDED_SCHEMA"
+      }
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "schema": "route-probe.ovl-admission-fixture/v1",
+  "case": "spoofed_private_actor",
+  "route": "owner_private",
+  "evidence": "SIMULATED",
+  "entry": "app.ingest.telegram_owner_private_composition:accept_webhook",
+  "opaque_modules": [
+    "app.core.config"
+  ],
+  "include_modules": [
+    "app.ingest.telegram_owner_private_composition",
+    "app.ingest.telegram_owner_private_route",
+    "app.ingest.telegram_owner_private_state",
+    "app.ingest.telegram_owner_private_forwarding",
+    "app.models",
+    "app.core.db",
+    "app.ingest.telegram_owner_private_presentation",
+    "app.ingest.telegram_owner_private_upload",
+    "app.ingest.telegram_reply_presentation",
+    "app.ingest.telegram_basic_media_policy",
+    "app.ingest.telegram_basic_upload_store"
+  ],
+  "include_entries": [
+    "tools.route_probe_ovl:observe_outcome"
+  ],
+  "capture_mode": "PARTIAL_STATIC",
+  "trace_modules": [
+    "app.ingest.telegram_owner_private_composition",
+    "app.ingest.telegram_owner_private_route",
+    "app.ingest.telegram_owner_private_state",
+    "app.ingest.telegram_owner_private_forwarding"
+  ],
+  "max_trace_events": 5000
+}

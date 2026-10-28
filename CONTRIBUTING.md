@@ -21,3 +21,6 @@ An AI steward may triage and review contributions in its own voice under the
 protect contributor privacy and escalate legally ambiguous or irreversible actions.
 
 By contributing, you agree that your contribution is licensed under Apache-2.0.
+
+## Agent-authored improvements
+See [Improving AgentOS](docs/development/AGENT_IMPROVEMENTS.md) for five PR grounds, proportional verification, dependency changes and mandatory Git/PR delivery. Existing review and release controls apply.

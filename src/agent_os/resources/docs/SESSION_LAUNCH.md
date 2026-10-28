@@ -346,3 +346,23 @@ actual identity. Optional `nextCursor` absence/null is terminal; a non-null curs
 continues the bounded catalog read. Neither schema establishes a model alias rule
 or a provider name to infer before startup. These finite schema checks do not make
 either version a universal minimum or prove any target's current model access.
+
+## Existing native conversation surface
+
+An owner-selected native chat is a different provider surface from the stdio
+and Screen adapters above. Use its supported read/wait/send tools and their
+actual returned identities. A native chat title, configured preference or
+created-thread response cannot substitute for unavailable effective startup
+model/provider/effort evidence: record UNKNOWN. Do not start another executable
+or change settings to manufacture that metadata. Current harmless tool results
+establish only the capabilities actually exercised in that exact conversation.
+Ordinary authorized reads retain their direct path; dependent writes need their
+own current authority, observed necessary capabilities and target gates.
+
+The assigning coordinator binds the return destination and current human
+authorization for messages. Both parties follow the native result-return
+contract in [WORK_COORDINATION](WORK_COORDINATION.md): prepared result, uncertain
+send, recipient receipt and semantic review are different facts. Delegation and
+a final do not discharge responsibility for dependent work. Existing native
+sessions do not automatically adopt a new bootstrap or another session's
+instructions. No new launcher, timer or implicit extra worker is added here.

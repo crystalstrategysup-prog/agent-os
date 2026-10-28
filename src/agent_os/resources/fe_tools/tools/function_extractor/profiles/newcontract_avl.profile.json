@@ -1,0 +1,1584 @@
+{
+  "schema": "function-extractor.scenario-profile/v1",
+  "version": 1,
+  "profile_id": "avl-original-major-v1",
+  "route_id": "avl-original",
+  "entry": "app.ingest.telegram_private_transport:deliver",
+  "bindings": [
+    {
+      "binding_id": "AVL-H01",
+      "variant": "requests_http:success",
+      "rule_ids": [
+        "avl.h01.trace",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "bundle_role": "bridge",
+      "fixture": {
+        "schema": "route-probe.avl-real-http-fixture/v1",
+        "stack_variant": "requests_http",
+        "case": "success",
+        "route": "platform_group",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "adapter": "tools.route_probe_avl:prepare",
+        "include_modules": [
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_reply_presentation"
+        ],
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "expected": {
+          "state": "sent",
+          "category": null,
+          "status_code": 200,
+          "fake_socket_post_count": 1,
+          "session_count": 1,
+          "connect_count": 1,
+          "asserted_requests_exception": null
+        },
+        "proof_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims",
+        "network_dns_tcp_socks_tls": "SIMULATED",
+        "historical_cause": "NOT_REPRODUCED"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "sent"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "sent"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "NONE"
+          }
+        ]
+      },
+      "expected_delivery_state": "sent",
+      "evidence_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims"
+    },
+    {
+      "binding_id": "AVL-H02",
+      "variant": "requests_http:dns",
+      "rule_ids": [
+        "avl.h02.trace",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "bundle_role": "bridge",
+      "fixture": {
+        "schema": "route-probe.avl-real-http-fixture/v1",
+        "stack_variant": "requests_http",
+        "case": "dns",
+        "route": "platform_group",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "adapter": "tools.route_probe_avl:prepare",
+        "include_modules": [
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_reply_presentation"
+        ],
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "expected": {
+          "state": "unknown",
+          "category": "native_post_transport_or_receipt_unknown",
+          "status_code": null,
+          "fake_socket_post_count": 0,
+          "session_count": 1,
+          "connect_count": 1,
+          "asserted_requests_exception": "REQUESTS_CONNECTION"
+        },
+        "proof_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims",
+        "network_dns_tcp_socks_tls": "SIMULATED",
+        "historical_cause": "NOT_REPRODUCED"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      },
+      "expected_delivery_state": "unknown",
+      "evidence_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims"
+    },
+    {
+      "binding_id": "AVL-H03",
+      "variant": "requests_http:proxy",
+      "rule_ids": [
+        "avl.h03.trace",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "bundle_role": "bridge",
+      "fixture": {
+        "schema": "route-probe.avl-real-http-fixture/v1",
+        "stack_variant": "requests_http",
+        "case": "proxy",
+        "route": "platform_group",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "adapter": "tools.route_probe_avl:prepare",
+        "include_modules": [
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_reply_presentation"
+        ],
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "expected": {
+          "state": "unknown",
+          "category": "native_post_transport_or_receipt_unknown",
+          "status_code": null,
+          "fake_socket_post_count": 0,
+          "session_count": 1,
+          "connect_count": 1,
+          "asserted_requests_exception": "REQUESTS_PROXY"
+        },
+        "proof_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims",
+        "network_dns_tcp_socks_tls": "SIMULATED",
+        "historical_cause": "NOT_REPRODUCED"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      },
+      "expected_delivery_state": "unknown",
+      "evidence_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims"
+    },
+    {
+      "binding_id": "AVL-H04",
+      "variant": "requests_http:tls",
+      "rule_ids": [
+        "avl.h04.trace",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "bundle_role": "bridge",
+      "fixture": {
+        "schema": "route-probe.avl-real-http-fixture/v1",
+        "stack_variant": "requests_http",
+        "case": "tls",
+        "route": "platform_group",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "adapter": "tools.route_probe_avl:prepare",
+        "include_modules": [
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_reply_presentation"
+        ],
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "expected": {
+          "state": "unknown",
+          "category": "native_post_transport_or_receipt_unknown",
+          "status_code": null,
+          "fake_socket_post_count": 0,
+          "session_count": 1,
+          "connect_count": 1,
+          "asserted_requests_exception": "REQUESTS_TLS"
+        },
+        "proof_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims",
+        "network_dns_tcp_socks_tls": "SIMULATED",
+        "historical_cause": "NOT_REPRODUCED"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      },
+      "expected_delivery_state": "unknown",
+      "evidence_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims"
+    },
+    {
+      "binding_id": "AVL-H05",
+      "variant": "requests_http:connect_timeout",
+      "rule_ids": [
+        "avl.h05.trace",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "bundle_role": "bridge",
+      "fixture": {
+        "schema": "route-probe.avl-real-http-fixture/v1",
+        "stack_variant": "requests_http",
+        "case": "connect_timeout",
+        "route": "platform_group",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "adapter": "tools.route_probe_avl:prepare",
+        "include_modules": [
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_reply_presentation"
+        ],
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "expected": {
+          "state": "unknown",
+          "category": "native_post_transport_or_receipt_unknown",
+          "status_code": null,
+          "fake_socket_post_count": 0,
+          "session_count": 1,
+          "connect_count": 1,
+          "asserted_requests_exception": "REQUESTS_CONNECT_TIMEOUT"
+        },
+        "proof_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims",
+        "network_dns_tcp_socks_tls": "SIMULATED",
+        "historical_cause": "NOT_REPRODUCED"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      },
+      "expected_delivery_state": "unknown",
+      "evidence_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims"
+    },
+    {
+      "binding_id": "AVL-H06",
+      "variant": "requests_http:read_timeout",
+      "rule_ids": [
+        "avl.h06.trace",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "bundle_role": "bridge",
+      "fixture": {
+        "schema": "route-probe.avl-real-http-fixture/v1",
+        "stack_variant": "requests_http",
+        "case": "read_timeout",
+        "route": "platform_group",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "adapter": "tools.route_probe_avl:prepare",
+        "include_modules": [
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_reply_presentation"
+        ],
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "expected": {
+          "state": "unknown",
+          "category": "native_post_transport_or_receipt_unknown",
+          "status_code": 200,
+          "fake_socket_post_count": 1,
+          "session_count": 1,
+          "connect_count": 1,
+          "asserted_requests_exception": "REQUESTS_CONNECTION"
+        },
+        "proof_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims",
+        "network_dns_tcp_socks_tls": "SIMULATED",
+        "historical_cause": "NOT_REPRODUCED"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      },
+      "expected_delivery_state": "unknown",
+      "evidence_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims"
+    },
+    {
+      "binding_id": "AVL-H07",
+      "variant": "requests_http:reset",
+      "rule_ids": [
+        "avl.h07.trace",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "bundle_role": "bridge",
+      "fixture": {
+        "schema": "route-probe.avl-real-http-fixture/v1",
+        "stack_variant": "requests_http",
+        "case": "reset",
+        "route": "platform_group",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "adapter": "tools.route_probe_avl:prepare",
+        "include_modules": [
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_reply_presentation"
+        ],
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "expected": {
+          "state": "unknown",
+          "category": "native_post_transport_or_receipt_unknown",
+          "status_code": 200,
+          "fake_socket_post_count": 1,
+          "session_count": 1,
+          "connect_count": 1,
+          "asserted_requests_exception": "REQUESTS_BROKEN_STREAM"
+        },
+        "proof_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims",
+        "network_dns_tcp_socks_tls": "SIMULATED",
+        "historical_cause": "NOT_REPRODUCED"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      },
+      "expected_delivery_state": "unknown",
+      "evidence_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims"
+    },
+    {
+      "binding_id": "AVL-H08",
+      "variant": "requests_http:http401",
+      "rule_ids": [
+        "avl.h08.trace",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "bundle_role": "bridge",
+      "fixture": {
+        "schema": "route-probe.avl-real-http-fixture/v1",
+        "stack_variant": "requests_http",
+        "case": "http401",
+        "route": "platform_group",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "adapter": "tools.route_probe_avl:prepare",
+        "include_modules": [
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_reply_presentation"
+        ],
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "expected": {
+          "state": "failed",
+          "category": "provider_rejected_401_unknown_other",
+          "status_code": 401,
+          "fake_socket_post_count": 1,
+          "session_count": 1,
+          "connect_count": 1,
+          "asserted_requests_exception": null
+        },
+        "proof_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims",
+        "network_dns_tcp_socks_tls": "SIMULATED",
+        "historical_cause": "NOT_REPRODUCED"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "failed"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "failed"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "provider_rejected_401_unknown_other"
+          }
+        ]
+      },
+      "expected_delivery_state": "failed",
+      "evidence_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims"
+    },
+    {
+      "binding_id": "AVL-H09",
+      "variant": "requests_http:empty_body",
+      "rule_ids": [
+        "avl.h09.trace",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "bundle_role": "bridge",
+      "fixture": {
+        "schema": "route-probe.avl-real-http-fixture/v1",
+        "stack_variant": "requests_http",
+        "case": "empty_body",
+        "route": "platform_group",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "adapter": "tools.route_probe_avl:prepare",
+        "include_modules": [
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_reply_presentation"
+        ],
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "expected": {
+          "state": "unknown",
+          "category": "native_post_transport_or_receipt_unknown",
+          "status_code": 200,
+          "fake_socket_post_count": 1,
+          "session_count": 1,
+          "connect_count": 1,
+          "asserted_requests_exception": null
+        },
+        "proof_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims",
+        "network_dns_tcp_socks_tls": "SIMULATED",
+        "historical_cause": "NOT_REPRODUCED"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      },
+      "expected_delivery_state": "unknown",
+      "evidence_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims"
+    },
+    {
+      "binding_id": "AVL-H10",
+      "variant": "requests_http:ok_false",
+      "rule_ids": [
+        "avl.h10.trace",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "bundle_role": "bridge",
+      "fixture": {
+        "schema": "route-probe.avl-real-http-fixture/v1",
+        "stack_variant": "requests_http",
+        "case": "ok_false",
+        "route": "platform_group",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "adapter": "tools.route_probe_avl:prepare",
+        "include_modules": [
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_reply_presentation"
+        ],
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "expected": {
+          "state": "failed",
+          "category": "provider_rejected_400_parent_not_found",
+          "status_code": 200,
+          "fake_socket_post_count": 1,
+          "session_count": 1,
+          "connect_count": 1,
+          "asserted_requests_exception": null
+        },
+        "proof_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims",
+        "network_dns_tcp_socks_tls": "SIMULATED",
+        "historical_cause": "NOT_REPRODUCED"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "failed"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "failed"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "provider_rejected_400_parent_not_found"
+          }
+        ]
+      },
+      "expected_delivery_state": "failed",
+      "evidence_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims"
+    },
+    {
+      "binding_id": "AVL-H11",
+      "variant": "requests_http:bad_shape",
+      "rule_ids": [
+        "avl.h11.trace",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "bundle_role": "bridge",
+      "fixture": {
+        "schema": "route-probe.avl-real-http-fixture/v1",
+        "stack_variant": "requests_http",
+        "case": "bad_shape",
+        "route": "platform_group",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "adapter": "tools.route_probe_avl:prepare",
+        "include_modules": [
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_reply_presentation"
+        ],
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "expected": {
+          "state": "unknown",
+          "category": "native_post_response_invalid",
+          "status_code": 200,
+          "fake_socket_post_count": 1,
+          "session_count": 1,
+          "connect_count": 1,
+          "asserted_requests_exception": null
+        },
+        "proof_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims",
+        "network_dns_tcp_socks_tls": "SIMULATED",
+        "historical_cause": "NOT_REPRODUCED"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "native_post_response_invalid"
+          }
+        ]
+      },
+      "expected_delivery_state": "unknown",
+      "evidence_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims"
+    },
+    {
+      "binding_id": "AVL-H12",
+      "variant": "requests_http:config_missing",
+      "rule_ids": [
+        "avl.h12.trace",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "bundle_role": "bridge",
+      "fixture": {
+        "schema": "route-probe.avl-real-http-fixture/v1",
+        "stack_variant": "requests_http",
+        "case": "config_missing",
+        "route": "platform_group",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "adapter": "tools.route_probe_avl:prepare",
+        "include_modules": [
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_reply_presentation"
+        ],
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "expected": {
+          "state": "failed",
+          "category": "transport_not_installed",
+          "status_code": null,
+          "fake_socket_post_count": 0,
+          "session_count": 0,
+          "connect_count": 0,
+          "asserted_requests_exception": null
+        },
+        "proof_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims",
+        "network_dns_tcp_socks_tls": "SIMULATED",
+        "historical_cause": "NOT_REPRODUCED"
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "failed"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "real_http_receipt",
+            "event": "failed"
+          },
+          {
+            "phase": "real_http_category",
+            "event": "transport_not_installed"
+          }
+        ]
+      },
+      "expected_delivery_state": "failed",
+      "evidence_scope": "actual_requests_httpadapter_urllib3_httpclient_with_simulated_connect_socket_provider_and_claims"
+    },
+    {
+      "binding_id": "AVL-T03",
+      "variant": "fake_session:telegram429",
+      "rule_ids": [
+        "avl.t03.trace",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "bundle_role": "bridge",
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "telegram429",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "retry_wait",
+          "error_category": "flood_control",
+          "post_count": 1
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "retry_wait",
+          "retry_after": 7
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "retry_wait"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "flood_control"
+          }
+        ]
+      },
+      "expected_delivery_state": "retry_wait",
+      "evidence_scope": "actual_unmodified_source_with_synthetic_boundaries"
+    },
+    {
+      "binding_id": "AVL-T04",
+      "variant": "fake_session:telegram5xx",
+      "rule_ids": [
+        "avl.t04.trace",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "bundle_role": "bridge",
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "telegram5xx",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "unknown",
+          "error_category": "provider_indeterminate",
+          "post_count": 1
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "provider_indeterminate"
+          }
+        ]
+      },
+      "expected_delivery_state": "unknown",
+      "evidence_scope": "actual_unmodified_source_with_synthetic_boundaries"
+    },
+    {
+      "binding_id": "AVL-T11",
+      "variant": "fake_session:malformed_json",
+      "rule_ids": [
+        "avl.t11.trace",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "bundle_role": "bridge",
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "malformed_json",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "unknown",
+          "error_category": "native_post_transport_or_receipt_unknown",
+          "post_count": 1
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      },
+      "expected_delivery_state": "unknown",
+      "evidence_scope": "actual_unmodified_source_with_synthetic_boundaries"
+    },
+    {
+      "binding_id": "AVL-T12",
+      "variant": "fake_session:missing_receipt",
+      "rule_ids": [
+        "avl.t12.trace",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "bundle_role": "bridge",
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "missing_receipt",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "unknown",
+          "error_category": "partial_or_invalid_receipt",
+          "post_count": 1
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "partial_or_invalid_receipt"
+          }
+        ]
+      },
+      "expected_delivery_state": "unknown",
+      "evidence_scope": "actual_unmodified_source_with_synthetic_boundaries"
+    },
+    {
+      "binding_id": "AVL-C01",
+      "variant": "canonical_v2:group_success",
+      "rule_ids": [
+        "avl.c01.trace",
+        "avl.c01.no_retry",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_worker:process_delivery_once",
+      "bundle_role": "canonical",
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "stack_variant": "canonical_v2",
+        "case": "group_success",
+        "route": "platform_group",
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription"
+        ],
+        "entry": "app.ingest.telegram_private_worker:process_delivery_once",
+        "include_modules": [
+          "app.core.db",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_group_budget",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_inbox",
+          "app.ingest.telegram_private_materializer",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_private_worker",
+          "app.ingest.telegram_reply_presentation",
+          "app.models",
+          "app.ingest.telegram_basic_media_policy",
+          "app.ingest.telegram_basic_platform_reply",
+          "app.ingest.telegram_owner_private_composition",
+          "app.ingest.telegram_owner_private_state",
+          "app.ingest.telegram_owner_private_route"
+        ],
+        "include_entries": [
+          "app.ingest.telegram_basic_native_transport:BasicNativeTransport.__call__"
+        ],
+        "capture_mode": "PARTIAL_STATIC",
+        "public_assets": [
+          {
+            "name": "timezone:Asia/Vladivostok",
+            "sha256": "5a892182d8f69f0523f7dda1ed2c9f07f7d134700a7cf37386c7ffa19a629bc7"
+          }
+        ],
+        "trace_modules": [
+          "app.ingest.telegram_basic_platform_reply",
+          "app.ingest.telegram_private_worker",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_private_inbox",
+          "app.ingest.bot_bridge_message_ledger",
+          "tools.route_probe_avl"
+        ],
+        "expected_result": "sent",
+        "max_trace_events": 5000
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_group.sent"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_reply.queued"
+          },
+          {
+            "phase": "canonical_posts",
+            "event": "counted"
+          }
+        ]
+      },
+      "expected_delivery_state": "sent",
+      "evidence_scope": "ACTUAL_CANONICAL_V2_FUNCTIONS_SQLITE_AND_PROVIDER_SIMULATED_NOT_PG_OR_LIVE"
+    },
+    {
+      "binding_id": "AVL-C02",
+      "variant": "canonical_v2:group_unknown",
+      "rule_ids": [
+        "avl.c02.trace",
+        "avl.c02.no_retry",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_worker:process_delivery_once",
+      "bundle_role": "canonical",
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "stack_variant": "canonical_v2",
+        "case": "group_unknown",
+        "route": "platform_group",
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription"
+        ],
+        "entry": "app.ingest.telegram_private_worker:process_delivery_once",
+        "include_modules": [
+          "app.core.db",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_group_budget",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_inbox",
+          "app.ingest.telegram_private_materializer",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_private_worker",
+          "app.ingest.telegram_reply_presentation",
+          "app.models",
+          "app.ingest.telegram_basic_media_policy",
+          "app.ingest.telegram_basic_platform_reply",
+          "app.ingest.telegram_owner_private_composition",
+          "app.ingest.telegram_owner_private_state",
+          "app.ingest.telegram_owner_private_route"
+        ],
+        "include_entries": [
+          "app.ingest.telegram_basic_native_transport:BasicNativeTransport.__call__"
+        ],
+        "capture_mode": "PARTIAL_STATIC",
+        "public_assets": [
+          {
+            "name": "timezone:Asia/Vladivostok",
+            "sha256": "5a892182d8f69f0523f7dda1ed2c9f07f7d134700a7cf37386c7ffa19a629bc7"
+          }
+        ],
+        "trace_modules": [
+          "app.ingest.telegram_basic_platform_reply",
+          "app.ingest.telegram_private_worker",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_private_inbox",
+          "app.ingest.bot_bridge_message_ledger",
+          "tools.route_probe_avl"
+        ],
+        "expected_result": "unknown",
+        "max_trace_events": 5000
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_group.unknown"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_reply.queued"
+          },
+          {
+            "phase": "canonical_posts",
+            "event": "counted"
+          }
+        ]
+      },
+      "expected_delivery_state": "unknown",
+      "evidence_scope": "ACTUAL_CANONICAL_V2_FUNCTIONS_SQLITE_AND_PROVIDER_SIMULATED_NOT_PG_OR_LIVE"
+    },
+    {
+      "binding_id": "AVL-C03",
+      "variant": "canonical_v2:private_success",
+      "rule_ids": [
+        "avl.c03.trace",
+        "avl.c03.no_retry",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_worker:process_delivery_once",
+      "bundle_role": "canonical",
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "stack_variant": "canonical_v2",
+        "case": "private_success",
+        "route": "platform_group",
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription"
+        ],
+        "entry": "app.ingest.telegram_private_worker:process_delivery_once",
+        "include_modules": [
+          "app.core.db",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_group_budget",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_inbox",
+          "app.ingest.telegram_private_materializer",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_private_worker",
+          "app.ingest.telegram_reply_presentation",
+          "app.models",
+          "app.ingest.telegram_basic_media_policy",
+          "app.ingest.telegram_basic_platform_reply",
+          "app.ingest.telegram_owner_private_composition",
+          "app.ingest.telegram_owner_private_state",
+          "app.ingest.telegram_owner_private_route"
+        ],
+        "include_entries": [
+          "app.ingest.telegram_basic_native_transport:BasicNativeTransport.__call__"
+        ],
+        "capture_mode": "PARTIAL_STATIC",
+        "public_assets": [
+          {
+            "name": "timezone:Asia/Vladivostok",
+            "sha256": "5a892182d8f69f0523f7dda1ed2c9f07f7d134700a7cf37386c7ffa19a629bc7"
+          }
+        ],
+        "trace_modules": [
+          "app.ingest.telegram_private_worker",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.bot_bridge_core",
+          "tools.route_probe_avl"
+        ],
+        "expected_result": "sent",
+        "max_trace_events": 5000
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_group.sent"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_reply.sent"
+          },
+          {
+            "phase": "canonical_posts",
+            "event": "counted"
+          }
+        ]
+      },
+      "expected_delivery_state": "sent",
+      "evidence_scope": "ACTUAL_CANONICAL_V2_FUNCTIONS_SQLITE_AND_PROVIDER_SIMULATED_NOT_PG_OR_LIVE"
+    },
+    {
+      "binding_id": "AVL-C04",
+      "variant": "canonical_v2:private_unknown",
+      "rule_ids": [
+        "avl.c04.trace",
+        "avl.c04.no_retry",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_worker:process_delivery_once",
+      "bundle_role": "canonical",
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "stack_variant": "canonical_v2",
+        "case": "private_unknown",
+        "route": "platform_group",
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription"
+        ],
+        "entry": "app.ingest.telegram_private_worker:process_delivery_once",
+        "include_modules": [
+          "app.core.db",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_group_budget",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_inbox",
+          "app.ingest.telegram_private_materializer",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_private_worker",
+          "app.ingest.telegram_reply_presentation",
+          "app.models",
+          "app.ingest.telegram_basic_media_policy",
+          "app.ingest.telegram_basic_platform_reply",
+          "app.ingest.telegram_owner_private_composition",
+          "app.ingest.telegram_owner_private_state",
+          "app.ingest.telegram_owner_private_route"
+        ],
+        "include_entries": [
+          "app.ingest.telegram_basic_native_transport:BasicNativeTransport.__call__"
+        ],
+        "capture_mode": "PARTIAL_STATIC",
+        "public_assets": [
+          {
+            "name": "timezone:Asia/Vladivostok",
+            "sha256": "5a892182d8f69f0523f7dda1ed2c9f07f7d134700a7cf37386c7ffa19a629bc7"
+          }
+        ],
+        "trace_modules": [
+          "app.ingest.telegram_private_worker",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.bot_bridge_core",
+          "tools.route_probe_avl"
+        ],
+        "expected_result": "unknown",
+        "max_trace_events": 5000
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_group.sent"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_reply.unknown"
+          },
+          {
+            "phase": "canonical_posts",
+            "event": "counted"
+          }
+        ]
+      },
+      "expected_delivery_state": "unknown",
+      "evidence_scope": "ACTUAL_CANONICAL_V2_FUNCTIONS_SQLITE_AND_PROVIDER_SIMULATED_NOT_PG_OR_LIVE"
+    },
+    {
+      "binding_id": "AVL-C05",
+      "variant": "canonical_v2:receipt_commit_failure",
+      "rule_ids": [
+        "avl.c05.trace",
+        "avl.c05.no_retry",
+        "owner.offline.guards"
+      ],
+      "entry": "app.ingest.telegram_private_worker:process_delivery_once",
+      "bundle_role": "canonical",
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "stack_variant": "canonical_v2",
+        "case": "receipt_commit_failure",
+        "route": "platform_group",
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription"
+        ],
+        "entry": "app.ingest.telegram_private_worker:process_delivery_once",
+        "include_modules": [
+          "app.core.db",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_group_budget",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_inbox",
+          "app.ingest.telegram_private_materializer",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_private_worker",
+          "app.ingest.telegram_reply_presentation",
+          "app.models",
+          "app.ingest.telegram_basic_media_policy",
+          "app.ingest.telegram_basic_platform_reply",
+          "app.ingest.telegram_owner_private_composition",
+          "app.ingest.telegram_owner_private_state",
+          "app.ingest.telegram_owner_private_route"
+        ],
+        "include_entries": [
+          "app.ingest.telegram_basic_native_transport:BasicNativeTransport.__call__"
+        ],
+        "capture_mode": "PARTIAL_STATIC",
+        "public_assets": [
+          {
+            "name": "timezone:Asia/Vladivostok",
+            "sha256": "5a892182d8f69f0523f7dda1ed2c9f07f7d134700a7cf37386c7ffa19a629bc7"
+          }
+        ],
+        "trace_modules": [
+          "app.ingest.telegram_basic_platform_reply",
+          "app.ingest.telegram_private_worker",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_private_inbox",
+          "app.ingest.bot_bridge_message_ledger",
+          "tools.route_probe_avl"
+        ],
+        "expected_result": "receipt_pending",
+        "max_trace_events": 5000
+      },
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "canonical_receipt_commit",
+            "event": "failed"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_group.sending"
+          },
+          {
+            "phase": "canonical_operation",
+            "event": "platform_reply.queued"
+          },
+          {
+            "phase": "canonical_posts",
+            "event": "counted"
+          }
+        ]
+      },
+      "expected_delivery_state": "sending",
+      "evidence_scope": "ACTUAL_CANONICAL_V2_FUNCTIONS_SQLITE_AND_PROVIDER_SIMULATED_NOT_PG_OR_LIVE"
+    }
+  ],
+  "input_seed": {
+    "case": "success",
+    "route": "platform_group"
+  }
+}

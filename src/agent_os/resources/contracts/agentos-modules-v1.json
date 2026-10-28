@@ -1,0 +1,93 @@
+{
+  "schema": "agentos.modules/v1",
+  "modules": {
+    "agentos": {
+      "version": "0.8.0rc2041",
+      "pins": [
+        {
+          "path": "contracts/continuation-capabilities-v2.json",
+          "sha256": "439ea099ba4e901ee339ea1cd70f7cc4f070b5b4d5aa87e9cb7d7866db58eb58"
+        },
+        {
+          "path": "skills/agentos-project-entry/SKILL.md",
+          "sha256": "ea8687a7cf3ead7cc039aeeacbf003a69f607f0e7948b77be37eb2311fc3647a"
+        }
+      ]
+    },
+    "atlas": {
+      "version": "atlas-bundled-20261024",
+      "pins": [
+        {
+          "path": "skills/atlas/SKILL.md",
+          "sha256": "d7cd449b4ea4f790070ff1632848d4e539b81e69f2d8c864ef01f3b74c45c950"
+        },
+        {
+          "path": "skills/atlas/scripts/atlas.py",
+          "sha256": "bb7039bdc9773cec9866be609bb0ac8d9f5c18742c57408718042fb0afcfbd96"
+        },
+        {
+          "path": "skills/atlas/scripts/navigator.py",
+          "sha256": "4063935ff654290f69c7a324e8b146f5ced3c9612f1f478f7f0eec4dcdb52bea"
+        }
+      ]
+    },
+    "function-extractor": {
+      "version": "0.4.6",
+      "pins": [
+        {
+          "path": "skills/function-extractor/SKILL.md",
+          "sha256": "72eb4dcad76a0068afcc25c12b69b773a8a84016d6a1af27e82a757890696b26"
+        },
+        {
+          "path": "skills/function-extractor/references/execution-protocol.md",
+          "sha256": "2d18e2766260ba6eaf6fea07fbacaed0db37b58f146fbe4c4d5c8ea7a14a5a6c"
+        },
+        {
+          "path": "fe_tools/tools/function_extractor/diagnostic_attribution.py",
+          "sha256": "8ac15df24c2a8ac70fe984b8d7e042b0827363ed7ed499675077073ce276b7d5"
+        },
+        {
+          "path": "fe_tools/tools/function_extractor/cli.py",
+          "sha256": "24524b59351c994263c7f09b9b7800e03f77692fff637096986b43d000b9b6b4"
+        },
+        {
+          "path": "fe_tools/backend/tools/route_probe_replay.py",
+          "sha256": "ee01ac1bda2eeaa1cfeaa8bd08894ebbfdf2ed8b8534bfa5be6d20174450f0a9"
+        },
+        {
+          "path": "fe_tools/backend/tools/route_probe_graph.py",
+          "sha256": "bae5e3a4e0358f5ab36fffcb229bd10b7f3a9245d9f06ed56b437dc0743d9e47"
+        },
+        {
+          "path": "skills/function-extractor/scripts/_bootstrap.py",
+          "sha256": "ecbba7ddd61637fe57a4fe2f81500262b8dfb996ea314c5a9967967d2bef312f"
+        },
+        {
+          "path": "skills/function-extractor/scripts/fe",
+          "sha256": "5a1a6ec8b6f1832508b92c6fad3bc3163f5729f65ee7ca5ab1f88ac2e0b23f36"
+        },
+        {
+          "path": "skills/function-extractor/scripts/fe-environment",
+          "sha256": "4a6d4deee086843ac48a91db13c9d209417d14be0031edc1ef268b1e6db60eae"
+        },
+        {
+          "path": "skills/function-extractor/scripts/fe-environment-catalog",
+          "sha256": "576c0e51540b25cb1dbda0d6c216652bcd29bcc4073fa14a6983331c3d7ca63d"
+        },
+        {
+          "path": "skills/function-extractor/scripts/fe-environment-ensure",
+          "sha256": "2c94936a668252bb78a3f7fd1b5b7653f50e565d8546c6ec78d0f53d13b95434"
+        },
+        {
+          "path": "skills/function-extractor/scripts/fe-goal-check",
+          "sha256": "f4a211495f7f4c2c4695b3c29a4d21008c1125dd84eb636247b15b7fc522235b"
+        },
+        {
+          "path": "skills/function-extractor/scripts/fe-step-timing",
+          "sha256": "00b5df81a80477b33767f2bd77ea6a49135808afcebd7e1b8e7a0e27251a7f13"
+        }
+      ]
+    }
+  },
+  "authority": "NONE_MODULE_CATALOG_ONLY"
+}

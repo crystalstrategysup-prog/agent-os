@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/contracts/v1/contract-proposal.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "status",
+    "base_contract_sha256",
+    "observation_sha256",
+    "overlay",
+    "accepted",
+    "canonical_registry_mutated"
+  ],
+  "properties": {
+    "schema": {
+      "const": "function-extractor.contract-proposal/v1"
+    },
+    "version": {
+      "const": 1
+    },
+    "status": {
+      "const": "PROPOSED"
+    },
+    "base_contract_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "observation_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "overlay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expected_status",
+        "result_summary"
+      ],
+      "properties": {
+        "expected_status": {
+          "type": "string"
+        },
+        "result_summary": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "json-value.schema.json"
+          }
+        }
+      }
+    },
+    "accepted": {
+      "const": false
+    },
+    "canonical_registry_mutated": {
+      "const": false
+    }
+  }
+}

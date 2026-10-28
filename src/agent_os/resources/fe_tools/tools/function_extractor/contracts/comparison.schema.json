@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/contracts/v1/comparison.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "mismatches",
+    "normalized_trace_sha256",
+    "production_acceptance"
+  ],
+  "properties": {
+    "schema": {
+      "const": "function-extractor.comparison/v1"
+    },
+    "version": {
+      "const": 1
+    },
+    "mismatches": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "STATUS",
+          "RESULT_SUMMARY",
+          "GUARDS",
+          "PHASE_ORDER"
+        ]
+      }
+    },
+    "normalized_trace_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "production_acceptance": {
+      "const": false
+    }
+  }
+}

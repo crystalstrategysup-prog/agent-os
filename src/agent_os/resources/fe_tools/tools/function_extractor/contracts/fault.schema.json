@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/contracts/v1/fault.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "adapter"
+  ],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "maxLength": 80
+    },
+    "adapter": {
+      "type": "string",
+      "maxLength": 256
+    }
+  }
+}

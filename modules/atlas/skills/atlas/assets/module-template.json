@@ -1,0 +1,149 @@
+{
+  "schema": "atlas.module-template/v1",
+  "classification": "SYNTHETIC_DESIGN_TEMPLATE",
+  "evidence_state": "DESIGN",
+  "execution": "NOT_RUN",
+  "module_id": "example.inventory",
+  "purpose": "Own inventory reservations behind explicit methods.",
+  "architecture_ref": "architecture-template.json",
+  "state_owner": {
+    "id": "example.inventory.repository",
+    "owns": [
+      "inventory reservations",
+      "stock counters",
+      "operation outcomes"
+    ],
+    "forbidden": "Other modules must not write this state directly."
+  },
+  "interfaces": {
+    "provides": [
+      "example.inventory.reserve@1",
+      "example.inventory.observe@1"
+    ],
+    "consumes": [],
+    "caller_refs": [
+      "example.application.reserve-once"
+    ],
+    "compatibility": "Bind and qualify actual caller/provider contract revisions before integration."
+  },
+  "source": {
+    "binding": "REQUIRED_PROJECT_BINDING",
+    "root": null,
+    "revision": null,
+    "declared_inputs": []
+  },
+  "build": {
+    "method_key": "example.inventory.build",
+    "binding": "REQUIRED_PROJECT_BINDING",
+    "command": null,
+    "parameters": [
+      "source_revision",
+      "dependency_lock_revision",
+      "toolchain_revision",
+      "output_location"
+    ],
+    "declared_inputs": [
+      "owned source",
+      "declared dependencies/locks",
+      "toolchain/config",
+      "generated inputs if any"
+    ],
+    "independent_build": "NOT_ESTABLISHED_BY_TEMPLATE",
+    "artifact": {
+      "kind": "project-selected immutable artifact",
+      "identity": null,
+      "sha256": null
+    },
+    "evidence": []
+  },
+  "checks": {
+    "method_key": "example.inventory.check",
+    "binding": "REQUIRED_PROJECT_BINDING",
+    "required": [
+      "method input/omitted/null/false semantics",
+      "state ownership/idempotency/UNKNOWN boundaries",
+      "affected caller compatibility"
+    ],
+    "scope": "Select checks for actual implementation and declared criteria; no product tests run by this template.",
+    "evidence": []
+  },
+  "deployment": {
+    "unit": "REQUIRED_PROJECT_BINDING; shared modular-monolith unit is allowed",
+    "method_key": "example.inventory.deploy",
+    "binding": "REQUIRED_PROJECT_BINDING",
+    "target": null,
+    "artifact_sha256": null,
+    "compatibility": {
+      "api": "Qualify old/new caller/provider versions for the transition.",
+      "config": "Qualify actual config shape/defaults before cutover.",
+      "schema": "Use compatible expansion where appropriate; one schema owner and explicit later contraction.",
+      "state_owner": "Preserve the existing single owner; no implicit second ledger."
+    },
+    "migrations": {
+      "method_key": "example.inventory.migrate",
+      "binding": "REQUIRED_IF_SCHEMA_CHANGES",
+      "owner": "Existing project schema owner",
+      "plan": [],
+      "execution": "NOT_RUN"
+    },
+    "readiness": {
+      "method_key": "example.inventory.readiness",
+      "binding": "REQUIRED_PROJECT_BINDING",
+      "criteria": [
+        "selected artifact is installed",
+        "required processes are ready",
+        "declared runtime scenario qualifies"
+      ],
+      "execution": "NOT_RUN"
+    },
+    "cutover": {
+      "operation_identity": null,
+      "result": "NOT_RUN",
+      "reconcile_method": "example.inventory.deployment-observe"
+    },
+    "rollback": {
+      "method_key": "example.inventory.rollback",
+      "binding": "REQUIRED_PROJECT_BINDING",
+      "supported": "UNKNOWN",
+      "state_compatibility": "Old artifact must support the already changed schema/data. Binary replacement alone is not proof.",
+      "destructive_reverse_migration": "NEVER_AUTOMATIC",
+      "fallback": "Declare an accepted recovery/forward-fix path when rollback is unavailable.",
+      "execution": "NOT_RUN"
+    }
+  },
+  "timings": {
+    "status": "NOT_RUN",
+    "target_budget_seconds": null,
+    "cold": {
+      "environment": null,
+      "artifact_sha256": null,
+      "cache_state": null,
+      "clock_boundaries": null,
+      "stage_seconds": null,
+      "total_seconds": null
+    },
+    "warm": {
+      "environment": null,
+      "artifact_sha256": null,
+      "cache_state": null,
+      "clock_boundaries": null,
+      "stage_seconds": null,
+      "total_seconds": null
+    },
+    "notes": [
+      "Record actual measured build/transfer/migration/start/readiness boundaries.",
+      "Distinguish target budget from observed time.",
+      "Do not clear production caches solely to manufacture a cold measurement.",
+      "Do not invent seconds or count unmeasured stages as completed."
+    ]
+  },
+  "required_project_bindings": [
+    "actual source and dependency inventory",
+    "existing build/check/deploy method definitions",
+    "artifact and caller/provider compatibility",
+    "schema/state owner and migration/rollback conditions",
+    "authorized target/executor",
+    "actual qualified receipts and measured timings when those criteria are in scope"
+  ],
+  "scope_rule": "A local SOURCE/template task can complete at its declared scope. Deployment/measurement remain separate open work when NOT_RUN."
+}

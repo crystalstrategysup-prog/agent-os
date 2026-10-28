@@ -1,0 +1,44 @@
+{
+  "schema": "route-probe.ovl-forward-fixture/v1",
+  "case": "forward_success",
+  "route": "owner_private",
+  "evidence": "SIMULATED",
+  "entry": "app.ingest.telegram_owner_private_runtime:dispatch_once",
+  "opaque_modules": [
+    "app.core.config"
+  ],
+  "include_modules": [
+    "app.ingest.telegram_owner_private_runtime",
+    "app.ingest.telegram_owner_private_composition",
+    "app.ingest.telegram_owner_private_state",
+    "app.ingest.telegram_owner_private_forwarding",
+    "app.ingest.telegram_basic_native_transport",
+    "app.ingest.telegram_owner_private_route",
+    "app.ingest.telegram_owner_private_policy",
+    "app.ingest.telegram_owner_private_presentation",
+    "app.ingest.telegram_owner_private_upload",
+    "app.ingest.telegram_private_transport",
+    "app.ingest.telegram_private_binding",
+    "app.ingest.bot_bridge_core",
+    "app.ingest.telegram_basic_subscription",
+    "app.ingest.telegram_basic_media_policy",
+    "app.ingest.telegram_basic_upload_store",
+    "app.models",
+    "app.core.db"
+  ],
+  "include_entries": [
+    "tools.route_probe_ovl:observe_outcome",
+    "app.ingest.telegram_owner_private_composition:accept_webhook",
+    "app.ingest.telegram_owner_private_runtime:check_claim",
+    "app.ingest.telegram_basic_native_transport:BasicNativeTransport.send_forward"
+  ],
+  "capture_mode": "PARTIAL_STATIC",
+  "trace_modules": [
+    "app.ingest.telegram_owner_private_runtime",
+    "app.ingest.telegram_owner_private_composition",
+    "app.ingest.telegram_owner_private_state",
+    "app.ingest.telegram_owner_private_forwarding",
+    "app.ingest.telegram_basic_native_transport"
+  ],
+  "max_trace_events": 5000
+}

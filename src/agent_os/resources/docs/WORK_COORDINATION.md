@@ -3,7 +3,7 @@
 Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
-Contract: `agentos.work-coordination/v1`, knowledge revision `1.1.1`.
+Contract: `agentos.work-coordination/v1`, knowledge revision `1.3.3`.
 Stable source: **0.7.1 — NOT_INSTALLED, NOT_PUBLISHED, NOT_LIVE_ADOPTED**.
 This approved universal work-management contract governs the prepared public
 source. The installed predecessor retains its own version. Source
@@ -251,3 +251,136 @@ measurement; this candidate implements no session cleanup API.
 ## Explicit completion and recovery
 
 Follow [the completion contract](COMPLETION.md) for bounded continuation, current target scope, confirmed handoff and safe recovery. Turn completion leaves the project open until independent current evidence satisfies the original goal. Source implementation and documentary checks do not establish host adoption or publication. The local validation chain includes `python3 tools/verify_completion.py`; GitHub Actions remain unused.
+
+## Native session return and retained responsibility
+
+Use existing supported native tools for the selected conversation. Bind actual
+session identity, original goal, acceptance, write/effect set, delegator, current
+human authority and return destination before assignment. Instructions to a new
+session do not automatically change already-running chats. Their adoption needs
+a supported current message/context read and observed behavior. Do not create
+another executor, timer or controller merely to satisfy this contract.
+
+Every worker preserves a compact final and returns its result or blocker to its
+delegator. Include work/session and result revision, evidence, actual checks and
+limits, remaining criteria, next owner/action and any unknown effects/inputs.
+Preserve this packet before sending and keep the native final as well. Current
+human authorization must cover the exact message route; a received agent request
+alone does not authorize messaging back. A caller acts as its actual sender,
+never as a fabricated human. Existing permissions are reused within their scope.
+
+### Atlas checkpoints while coordinating
+
+For an Atlas-bound project, the current matrix writer records actual beginning
+and delegation immediately, using the existing work ID, responsible actor and
+observed dispatch outcome. `agentos atlas start` only restores context. With the
+explicit writer profile, the typed `agentos atlas work` method pins current inputs,
+commits one prepared matrix/document delta and publishes the view once; see
+[Atlas](ATLAS.md) for the command and effect contract.
+
+Before the first wait after new start/dispatch/progress/result/blocker facts,
+publish them. During waiting, integrate available worker results and maintain
+affected documents from real work while continuing independent authorized work.
+Workers return their actual facts and prepared artifact changes within their
+existing scope; the main writer updates the shared matrix. Repeated unchanged
+observations create no new event or release. Recorded DOING does not establish
+worker receipt, confirmed execution or fresh activity. Preserve UNKNOWN dispatch
+outcomes and reconcile the original operation. Reuse the operation ID and exact
+arguments after an uncertain local outcome. This method does not send a message,
+author contract semantics, create a keeper or schedule another session.
+
+| Observed fact | Next responsibility |
+| --- | --- |
+| Result prepared and final saved | Worker may return it only through the currently authorized route; preserve a stable operation identity. |
+| Send attempted, recipient outcome unknown | Read/reconcile that exact operation. Do not send again because of silence or timeout. |
+| Recipient receipt captured | Coordinator reads the result and evidence and reviews the original criteria. Receipt alone is not review. |
+| Child semantic review recorded | Coordinator records accepted/partial/held, remaining original goal and next owned action, then prepares its own return report/final. This does not accept the original business goal. |
+| Worker active/busy | Use a bounded supported wait and continue independent authorized work. Do not send redundant continuation. |
+| Exact worker idle/completed, result absent | After supported readback and no uncertain input, one authorized request may ask for its existing result. A completed turn does not prove completed work. |
+| Child blocked | Obtain its evidence and owned checkpoint; continue independent work and escalate only the material unresolved decision/effect. |
+| State, input or effect unknown | Read the exact operation/session. Do not infer non-execution, replay input, or create a replacement writer. |
+| Cancellation or authority revocation | Stop only covered work/effects and preserve a checkpoint. Independently authorized reporting may still return the result/blocker. |
+
+The delegator remains accountable after assignment and after a final: wait for
+the dependent result, inspect state, request the result when permitted, review
+it, and return the reviewed result upstream. Never end orchestration with a
+silently lost dependent executor. When a bounded observation/request budget is
+exhausted, preserve an owned waiting/blocker checkpoint with exact state, last evidence,
+remaining criteria, next owner and next safe step. This keeps the goal open; it
+does not create an automatic wakeup or promise progress while a client is offline.
+An active worker is still an owned dependency wait, not a proven failure or
+material blocker merely because a wait budget ended. An explicit, verified
+responsibility transfer is a separate operation.
+
+For Codex native surfaces, `read_thread` obtains selected evidence,
+`wait_threads` provides bounded progress/completion observations, and
+`send_message_to_thread` uses an explicitly authorized existing recipient.
+Use actual tool schemas/availability, not these names as proof of capability.
+A send tool returning a thread ID proves submission only; readback or an actual
+recipient reply is needed for receipt. Keep current cursors, back off unchanged
+observations, and perform independent work between waits. Finite waiting is not
+a scheduler. Do not recreate a user-disabled automation; a scoped choice does
+not become a universal prohibition on future separately requested automations.
+
+### Synchronous decision helper
+
+`native_session_next_action(NativeSessionObservation(...), checked_at=...)`
+returns a frozen `NativeSessionDecision` with action, next owner, reason and
+the same work/session/evidence identity. It always retains delegator
+responsibility, final preservation and original goal OPEN. It never mutates the
+Coordinator, sends, launches, sleeps, authenticates a sender or grants authority.
+Existing receive/review/verify_goal and completion fences retain their contracts.
+
+The caller supplies current observation time/evidence, worker activity,
+independent work/message authority, cancellation, unknown inputs/effects and
+result stage (`absent`, `prepared`, `send_unknown`, `received`, `reviewed`).
+Each non-absent stage requires a result ref; received/reviewed require a separate
+receipt, and reviewed additionally requires a review ref. Prepared results
+without a final ref return `save-final`, never a fresh-send recommendation.
+References must concern the same work/session and result revision; the pure
+helper checks shape/coherence, not the truth or authenticity of reference bodies.
+Actual source/receipt validation stays with the trusted native caller and
+existing result gate. No new durable schema or global state is introduced.
+
+Observations older than five minutes or in the future permit only bounded
+readback/checkpoint. The caller retains counters per assignment across turns:
+at most two wait/read attempts and one result/checkpoint request before an owned
+checkpoint. Record an attempted input as UNKNOWN before I/O; never reset the
+counters merely on a new turn or final. Only actual new progress/assignment with
+reconciled prior operations can establish a new bounded observation cycle.
+`report-review` prepares the delegator's report; it is not permission to send it.
+Unknown worker inputs/effects block worker-directed requests, but do not prohibit
+a distinct currently authorized report that accurately discloses that unknown.
+
+Offline cases test complete→report, delegated→wait→review→report, blocked child,
+missing reply, busy, UNKNOWN/no duplicate, cancellation/revocation and original
+goal OPEN. Native submission, recipient reply, review and final are separate
+live evidence; fixtures and generated instructions cannot prove universal chat
+adoption, message delivery, persistence or the user's business result.
+
+### Pending stop has priority over a report
+
+Cancellation/revocation and result delivery are independent responsibilities.
+The decision exposes `covered_work_state`: not_applicable, stop_required,
+stop_unknown or stop_confirmed. A pending covered stop is the primary action,
+even when an active worker has a prepared, received or reviewed result. The
+optional distinct `report_action` retains an independently permitted report or
+reconciliation step; it is never evidence that covered work stopped. Execute
+only currently authorized effects through the existing native caller.
+
+`stop_stage` is not_requested, requested_unknown or confirmed. An attempted stop
+must be recorded as requested_unknown before I/O with `stop_ref` and
+`stop_observed_at`; it returns bounded reconcile-stop, never another stop request.
+Exhaustion preserves stop_unknown in an owned checkpoint. Confirmed requires
+current evidence/time bound to the same work and control event. It removes the
+pending-stop action without forcing the still-active reporting chat to stop
+again. Report submission, receipt, final and review cannot fill these fields.
+
+`control_observed_at` and `control_ref` may separately bind cancellation or
+revocation when result/activity observation is older; otherwise the original
+observation time/evidence is the conservative control default. Fresh control
+still requires stopping with stale result data. Stale/future control permits
+readback only and retains the unresolved stop state. A stop before the current
+control event or outside the five-minute observation bound cannot confirm that
+current stop. The caller verifies reference contents and exact target; these
+immutable values are advisory and introduce no new state store or controller.

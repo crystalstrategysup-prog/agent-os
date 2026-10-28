@@ -1,0 +1,345 @@
+{
+  "route": {
+    "route_id": "avl-original",
+    "entry": "app.ingest.telegram_private_transport:deliver",
+    "graph_sha256": "080e1ee22053acb9219e28c3fe362abd31097400d717e46ee92e74eb21766459",
+    "source_pins": [
+      {
+        "path": "app/__init__.py",
+        "sha256": "6cf466d87285e4bf91820905dde3ab8b00a59697721269a366e2671a2dcf28ac"
+      },
+      {
+        "path": "app/active_taxonomy.py",
+        "sha256": "fe619e7a32cc188951e8cf0c941f3c51ca4d1951a03d57e3f955d26a58424d53"
+      },
+      {
+        "path": "app/core/__init__.py",
+        "sha256": "63b8abc953d042948285acef6a3bb6861f00457d634cadca830f01f93b39dba2"
+      },
+      {
+        "path": "app/core/access_grants.py",
+        "sha256": "d6c2077687c1e624c0330a3cdc240681738a9dcfb6ecc04636daa94d4fa18fa1"
+      },
+      {
+        "path": "app/core/ai_control.py",
+        "sha256": "aec073db53ae39dc67f2b05ee3eafb2caf0755e1b551e2dca255589c44553b87"
+      },
+      {
+        "path": "app/core/audit.py",
+        "sha256": "34a635fd69590a861e454b0a5ac56b181bc1564ed47a7a9369aac634c87bbc88"
+      },
+      {
+        "path": "app/core/db.py",
+        "sha256": "bb20e46df19fb77f7ccefd50e6013f73a63ec035fa82ec7f9dc5a27e3b27cf9e"
+      },
+      {
+        "path": "app/core/logging.py",
+        "sha256": "568868edd4b1b2ecdb50833da591af602fd661dc5a9e03281ed1f98772e6d7ff"
+      },
+      {
+        "path": "app/core/message_reply_outcomes.py",
+        "sha256": "2079a95623f2fc3b9c17b24e33b03e86c2b58533141951a1ddc02b4d16a8a0e4"
+      },
+      {
+        "path": "app/core/official_actor_catalog.py",
+        "sha256": "e262cd92591da61505b6974d48d523dec7ed8a63c396d495ef3494d36c29970e"
+      },
+      {
+        "path": "app/core/operator_authority.py",
+        "sha256": "9c14f6a46912e5380817997e1abe6b803fb6aad41b1124bd46c48d7a2dd277da"
+      },
+      {
+        "path": "app/core/platform_workspaces.py",
+        "sha256": "8ea259d1cab6fa16a6c667692b215592ec831414414abac0eb6555513ec332cf"
+      },
+      {
+        "path": "app/core/private_bot_source.py",
+        "sha256": "c20d8484b4447943ab79cbaf27c5f9a19cbec976973d5dcb85a5ab4f44918ca5"
+      },
+      {
+        "path": "app/core/processing_modes.py",
+        "sha256": "df48c58032ab07f131ec535f80f22a50f3c841216ab181eda0100f1ed579ea9f"
+      },
+      {
+        "path": "app/core/role_access_policy.py",
+        "sha256": "80b07b54a41d2234748bc08710c7f08af7b9b12e6b10535cd6249652d423a623"
+      },
+      {
+        "path": "app/core/roles.py",
+        "sha256": "238ddb37b251b3722e24ba6b1562a2c508f313484822390d398d00b75ef99315"
+      },
+      {
+        "path": "app/core/runtime_fingerprint.py",
+        "sha256": "1400eead8f4aeb329edd06cba4308665052613576a0e30d2b3f5c8e3d1e9b138"
+      },
+      {
+        "path": "app/core/scope_policy.py",
+        "sha256": "2aeb7e060c42a613bf493917350d06d93719f236d1df9ccb12c7c6ebb6608a5a"
+      },
+      {
+        "path": "app/core/telegram_account_bindings.py",
+        "sha256": "871f2039ab5140801dbf48c40c97d249a8c3a50fbf5f9fc7d05d51d7e5a05a07"
+      },
+      {
+        "path": "app/core/tenancy.py",
+        "sha256": "d5c79b315e88869ba1795c980f7a3ece19dd7a32e9866cb20bfe564a71c1f8df"
+      },
+      {
+        "path": "app/core/tenant_access.py",
+        "sha256": "6166bb61eed1fe0bd1de1c3db0f629794847b0fadaf3a6bb784b2ce57a7e9940"
+      },
+      {
+        "path": "app/core/tenant_labels.py",
+        "sha256": "a7959b30cc47a99414ef66597dd3b8c750f1085d8d2362c67a1959fe7aea641f"
+      },
+      {
+        "path": "app/core/tenant_launch.py",
+        "sha256": "49012d4aeccb017d6da62fb3d7887a202368f460cf55ad3fc1a498e96749066c"
+      },
+      {
+        "path": "app/core/tenant_scope.py",
+        "sha256": "a924e5ca2579e90fca47a8e6fcfda358db8cfdcf12823a99657ea18a99cbbfe0"
+      },
+      {
+        "path": "app/core/tenant_settings.py",
+        "sha256": "f523ec89062029bf2c2efcdeed16734ee78996e4146b91855693a45708f0dbd2"
+      },
+      {
+        "path": "app/governance/__init__.py",
+        "sha256": "90cb02e906aaae20d1af593bfeb65003bb93608f1488c457f8025150e6e365bc"
+      },
+      {
+        "path": "app/governance/cases.py",
+        "sha256": "0e3d0f167557b801ee4442cfcecb4dd60da90e51e531f6bbea6d47d546c8bb85"
+      },
+      {
+        "path": "app/governance/settings.py",
+        "sha256": "7c0f5f7271f8bc25d57d798af501a8fd713b976b20b74d3ca7f870f1f600d8e4"
+      },
+      {
+        "path": "app/ingest/__init__.py",
+        "sha256": "31e5ee2942c15c9c1e5c829a3a528566d74fe9163fc1fc6c8fd26b24ffa0c7ce"
+      },
+      {
+        "path": "app/ingest/bot_bridge_core.py",
+        "sha256": "15bb8b69a56e95df857352b88771962e1b972776846d0355182cecceedaecf05"
+      },
+      {
+        "path": "app/ingest/bot_bridge_message_ledger.py",
+        "sha256": "026a2d0bcb1a09bfee459b055fc0fba83e10e4dce547c253879c6390c57487d1"
+      },
+      {
+        "path": "app/ingest/keyword_matching.py",
+        "sha256": "ef5ca44fd5322fc7f60aab8a3fa03390e2d6b21f3b628c0d21c73654310273aa"
+      },
+      {
+        "path": "app/ingest/spam_retention.py",
+        "sha256": "998cc4c54e5dd7a8f501b5428cd9ef08458820ccb3b4e40fe48e3edb3eb2585f"
+      },
+      {
+        "path": "app/ingest/telegram_account_contracts.py",
+        "sha256": "a2fc461ecc800918f5e89ffde711a4a066cc973c2ad4f20ff5bfbfdae04f2e17"
+      },
+      {
+        "path": "app/ingest/telegram_account_credentials.py",
+        "sha256": "60728ee80286a8930ea2ad5bdd9440e08a1cd63ff1eaf354bfc0e77cf1064de5"
+      },
+      {
+        "path": "app/ingest/telegram_account_outbox.py",
+        "sha256": "d5831555cdfac4a37a4176064f7a72aa34d089946add538f142c2551657ca5c1"
+      },
+      {
+        "path": "app/ingest/telegram_account_owner.py",
+        "sha256": "97193be91d5e65171bd444a31dcd82bb5d89cc5ad98bade8bdfc432d99548e1d"
+      },
+      {
+        "path": "app/ingest/telegram_basic_answer_reaction.py",
+        "sha256": "070a713a883ea1a6fc541e095630227604cd3bf451072803de9988a87c22db76"
+      },
+      {
+        "path": "app/ingest/telegram_basic_case_admission.py",
+        "sha256": "840f7e55ae5ab1c56cd0e7ff7f26de3b50a1672a29bfdcbe7b770dbde2e04272"
+      },
+      {
+        "path": "app/ingest/telegram_basic_daily_greeting.py",
+        "sha256": "e7cfca03390407dfda6cddd062ad74fb8c8e4220411f3b6a4aa4d2334f4222ad"
+      },
+      {
+        "path": "app/ingest/telegram_basic_finite_admission.py",
+        "sha256": "8b1fb13b0f188bae002ff8932498dcfb21ac1660e5306ef38a35133b852a7795"
+      },
+      {
+        "path": "app/ingest/telegram_basic_group_budget.py",
+        "sha256": "d1ff870110680d478eeda2f92b75c4364ffb6ef7a1a41d9a36cbfec1ceb95bb5"
+      },
+      {
+        "path": "app/ingest/telegram_basic_human2257_supplier.py",
+        "sha256": "538fbcae084554f70a16118f095724eebb32497102383637c17bb321104b6390"
+      },
+      {
+        "path": "app/ingest/telegram_basic_human_group_reply.py",
+        "sha256": "e0d00a22719a8393984188339a6d80d684bd746aaacc61bba870eac5d6331e79"
+      },
+      {
+        "path": "app/ingest/telegram_basic_media_policy.py",
+        "sha256": "a863fe450970527096158ed46e1e5dd0ffa701e1bca75e450047df6483693d47"
+      },
+      {
+        "path": "app/ingest/telegram_basic_native_transport.py",
+        "sha256": "d283007aeb973b6f6bf0431c50bce46026657b2188124a5da9f8f3bf82e7132e"
+      },
+      {
+        "path": "app/ingest/telegram_basic_platform_projection.py",
+        "sha256": "86904b8110b0111b0b1a44ea2263614f4d6f03b937bff0eabc8dca42a122c79b"
+      },
+      {
+        "path": "app/ingest/telegram_basic_platform_reply.py",
+        "sha256": "592412ac8e3fe1c7a935be53dd82b585c622292ba6ab1d3adefd1a115d4ab70b"
+      },
+      {
+        "path": "app/ingest/telegram_basic_staff_reply.py",
+        "sha256": "3a01e684f16f917612f5fc0379aee23a7b5fc0eb606b35e248dd7377594cb2ce"
+      },
+      {
+        "path": "app/ingest/telegram_basic_upload_store.py",
+        "sha256": "cfae3f1e8d9f8a10a3f0a4eac0fe335f9cf1e983c0cd20871b5f470f4012f7ba"
+      },
+      {
+        "path": "app/ingest/telegram_owner_private_composition.py",
+        "sha256": "215e6ab3d49782e4100e2a40a96d46e49643018f79959bb95539b5b4c6fcc9ba"
+      },
+      {
+        "path": "app/ingest/telegram_owner_private_platform.py",
+        "sha256": "3412f95bc76a878e1c8eaa213e1f9c9b370a7825b362c54328d1400e277516a3"
+      },
+      {
+        "path": "app/ingest/telegram_owner_private_route.py",
+        "sha256": "7f791afc6fcf47d016217118d00609dc25cf36876f78087ee96d99e938549b8b"
+      },
+      {
+        "path": "app/ingest/telegram_owner_private_state.py",
+        "sha256": "5cbf7be44abf7df5e1ca01b1ed503ec2d6a1790a56db35ce43e8bae8ef594832"
+      },
+      {
+        "path": "app/ingest/telegram_private_binding.py",
+        "sha256": "7a63c5f3ae30d4743fb50c384f73b2a354347139d62c1601c43dc72caddfb8f4"
+      },
+      {
+        "path": "app/ingest/telegram_private_inbox.py",
+        "sha256": "650a65d257340b304238dd28009b7804b864ef480ef2616c72e53a0b6d77ba8b"
+      },
+      {
+        "path": "app/ingest/telegram_private_materializer.py",
+        "sha256": "5bf5f2939ae16069f84480b774d07920af75679bfa118999e21fdc84b92eec67"
+      },
+      {
+        "path": "app/ingest/telegram_private_transport.py",
+        "sha256": "135934ec41920e8dc5f5a76f137c7b91d132d5c46435b9d2f2e9d3df70d555d5"
+      },
+      {
+        "path": "app/ingest/telegram_private_worker.py",
+        "sha256": "42e2f50951e60dc2b83ffea77dfa0b1eda9659b535b3bab1f2c2e439586665af"
+      },
+      {
+        "path": "app/ingest/telegram_reply_presentation.py",
+        "sha256": "bdcb3b39b0ab30ed8fa32df4a12d9c25828d68778d5af6c6997e639f4aee8485"
+      },
+      {
+        "path": "app/ingest/telegram_service_events.py",
+        "sha256": "8f61607522eb80bca669829ef1ae1562e93d48cfd26d093b37aea4f0d8f89d3a"
+      },
+      {
+        "path": "app/llm/__init__.py",
+        "sha256": "3a0aadb500fc2b9e0e7c398f0f6cfa73a9929f226bab89e1fff59e36049121f7"
+      },
+      {
+        "path": "app/llm/canonical_processing.py",
+        "sha256": "0b7c1dbb966e4ed891838309e3362b3ca006de36dedc48b41f058ea26e8d45cc"
+      },
+      {
+        "path": "app/models.py",
+        "sha256": "9e0b763c740b62bb8b95d615525e4c49bc2be28b1305153f541b602089037143"
+      },
+      {
+        "path": "app/pipecase/__init__.py",
+        "sha256": "9075e05ae959b924bad9a874dfa9b3cdf04ea70c226f00623f0d1fc14fe9139f"
+      },
+      {
+        "path": "app/pipecase/case_id.py",
+        "sha256": "45fe7c06a2387fb718e466a01e7c4978fe01476531f0b492fa773df19c560869"
+      },
+      {
+        "path": "app/pipeline_protocol.py",
+        "sha256": "7063f7fa9708c9334004bf15e8d891d8e69a92ccbd3f5a3463a716031227e584"
+      },
+      {
+        "path": "app/pipeline_stage_ledger.py",
+        "sha256": "91d009a2e9aefd4b3c10ef4acc510ac44240a6f0a9041416b702cec3bb55865d"
+      },
+      {
+        "path": "app/real_message_pipeline_protocol.py",
+        "sha256": "3d9db6631edf840ea5c41b6f81873895afcf66c78fc3f08839e7321e166f51da"
+      },
+      {
+        "path": "app/ticketing/__init__.py",
+        "sha256": "2b6e4a4926527cb2061e379815a4d2dc70a4345d41f3d7d583d38a963ffc6ad8"
+      },
+      {
+        "path": "app/ticketing/basic_root_decision.py",
+        "sha256": "336da5ca3637cd1113aef516ed1bb90e2d0e85a78cd1f9a51074b9dae3c4bb73"
+      },
+      {
+        "path": "app/ticketing/chat_visibility.py",
+        "sha256": "b02bdeb8c4d16f8d522367bc1036e222862fd4197ffcd140a8038156ee3b972a"
+      },
+      {
+        "path": "app/ticketing/ticket_linking.py",
+        "sha256": "23d4b8f93bada0101999726393c62160c16a85b36240c570923bf863ddbb0704"
+      },
+      {
+        "path": "app/verticals/__init__.py",
+        "sha256": "79ba30b2d90d4595cbbe21dc2667097f7fef37c76b07945225df5b9861c94aa2"
+      },
+      {
+        "path": "app/verticals/definitions.py",
+        "sha256": "319ed41fb042f2fb5946825e2d887e0ce899f575a592a0e357fdaf217dc4db40"
+      },
+      {
+        "path": "tools/route_probe_avl.py",
+        "sha256": "88f8498f543f35457df25c0920b89175f06c35c476c6f2e2d18463752cf41a2f"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "avl-observations",
+      "kind": "rules",
+      "path": "tools/function_extractor/profiles/newcontract_avl.rules.json",
+      "sha256": "65c396577d5b3eac6c8e8fe31246576b4c22a2baf86f35dfef1b58293827be45"
+    },
+    {
+      "source_id": "owner-offline",
+      "kind": "rules",
+      "path": "tools/function_extractor/contracts/owner_offline.rules.json",
+      "sha256": "37f20aabde048c63d8528350a529431f9a3c120d77f9600ab7c24cec9732b95f"
+    }
+  ],
+  "revision": {
+    "id": "observed-source-profile-v1",
+    "source_root": "/srv/moy-gorod/worktrees/20261022_route_extractor",
+    "authority_bindings": [
+      {
+        "source_id": "avl-observations",
+        "sha256": "65c396577d5b3eac6c8e8fe31246576b4c22a2baf86f35dfef1b58293827be45",
+        "provenance": "OBSERVED",
+        "authority_ref": "CONTRACT_ENGINE_STAGE: explicit code-derived fixture observations; not normative approval or runtime authority"
+      },
+      {
+        "source_id": "owner-offline",
+        "sha256": "37f20aabde048c63d8528350a529431f9a3c120d77f9600ab7c24cec9732b95f",
+        "provenance": "APPROVED_INTERNAL",
+        "authority_ref": "Direct parent instruction / CONTRACT_ENGINE_STAGE: owner offline invariant requires audit+seccomp; no live authority"
+      }
+    ]
+  }
+}

@@ -1,0 +1,1085 @@
+{
+  "activity_visibility_increment": {
+    "additional_source_files": {
+      "src/agent_os/resources/skills/agentos-project-entry/SKILL.md": {
+        "bytes": 8489,
+        "sha256": "ea8687a7cf3ead7cc039aeeacbf003a69f607f0e7948b77be37eb2311fc3647a"
+      },
+      "tests/test_atlas_owner_visual_dom.cjs": {
+        "bytes": 22393,
+        "sha256": "ab139449f9a01fe99ac3d552af0e97734c387e80d7653ae39fe9c78016b788b8"
+      }
+    },
+    "base_commit": "3088db22f4fb9c2450e61fc71a750ffdc52c062c",
+    "changed_module_files": [
+      "README.md",
+      "skills/atlas/SKILL.md",
+      "skills/atlas/references/quickstart.md",
+      "skills/atlas/scripts/viewer.js"
+    ],
+    "live_installation": "NOT_INSTALLED; SEPARATE_TARGET_BASELINE_AND_RECEIPTS_REQUIRED",
+    "predecessor_source_manifest": {
+      "bytes": 30970,
+      "sha256": "1afb35b5648b14039a6b4281ea07d7948425f9cb18c5da6bb5a62b6e27ffd086"
+    },
+    "previous_selected_tree_sha256": "95736c5d74fb54a954622f339a43f4be1670bee4a2641dbe2a547205005f37b0",
+    "release_status": "SOURCE_INCREMENT_ONLY; NO_VERSION_BUMP_OR_WHEEL",
+    "scope": "Recorded-work lookup and empty-filter recovery in the existing six-column viewer; factual observation search and concise research/check recording instructions. Strict CURRENT evidence, CSS, product data and contracts are preserved.",
+    "source_preservation": "Historical source_* and predecessor provenance records retained; selected pins describe this actual source increment."
+  },
+  "combined_successor117": {
+    "base_wheel_sha256": "36a6e53906f8de057b1c8f0014b555257857455d45158d85d87a1883a75ed0e8",
+    "current_selected_packaged_files": {
+      "agent_os/resources/skills/atlas/SKILL.md": {
+        "bytes": 16357,
+        "sha256": "43eda62933c49bbda359f3dd8c1221f173f9d30cc5d2d0e4aa3d1acb905664df"
+      },
+      "agent_os/resources/skills/atlas/agents/openai.yaml": {
+        "bytes": 232,
+        "sha256": "b4ce709765684f0c9861dec45dfaf9c4bfd9cf5b04cc132ac0de602994d9af95"
+      },
+      "agent_os/resources/skills/atlas/assets/adapters/owner-hosts.json": {
+        "bytes": 8109,
+        "sha256": "08b47f82f2769cd3749b3af7d7a3246b7e60d02715d719c68eebe9bfdf098572"
+      },
+      "agent_os/resources/skills/atlas/assets/architecture-template.json": {
+        "bytes": 12342,
+        "sha256": "2339c5f2fbb5762c2d323e71c803cac1f227d4387304753b9f8dc76167f0eee8"
+      },
+      "agent_os/resources/skills/atlas/assets/module-template.json": {
+        "bytes": 5066,
+        "sha256": "5a4a9b2cd07342eedf1b953cc564241f1cf052b00c1cee643a86d34d5f30c4c3"
+      },
+      "agent_os/resources/skills/atlas/assets/semantic-catalog-template.json": {
+        "bytes": 2055,
+        "sha256": "b22b192d83d85dd6cad05c3edbe8f42578d43aa876af5f6faedfd7c3b7a7b331"
+      },
+      "agent_os/resources/skills/atlas/assets/upstream-template.json": {
+        "bytes": 1184,
+        "sha256": "cd79e27fc46f6bef47f2b9e1095435fb1c7ecf203288238a422d7e7c4fbffa8f"
+      },
+      "agent_os/resources/skills/atlas/references/catalogs.md": {
+        "bytes": 2999,
+        "sha256": "577f73722d882f7d74ccc6a0d1049b319f2c684b55dcc18831fd952ec3cd8211"
+      },
+      "agent_os/resources/skills/atlas/references/data-contract.md": {
+        "bytes": 23951,
+        "sha256": "9ac94c2eff9d136619d934308fb14e33112f847e3f78fef0d1cb987cc6f8782f"
+      },
+      "agent_os/resources/skills/atlas/references/document-sync.md": {
+        "bytes": 5878,
+        "sha256": "270489cdf90eba2289eff3540113beaf6f56e73518ee8850babd1301869b542d"
+      },
+      "agent_os/resources/skills/atlas/references/history-requalification.md": {
+        "bytes": 7185,
+        "sha256": "20b3e7c640cf9828e627a7f6094951ea6cdb736c6a8fcea8e925603f904eb5ad"
+      },
+      "agent_os/resources/skills/atlas/references/integration.md": {
+        "bytes": 23676,
+        "sha256": "aa83df72b3a5f86a3a537d0f9b038a0ff1520851f6fef02c2fc9aedafbbe535b"
+      },
+      "agent_os/resources/skills/atlas/references/modularity.md": {
+        "bytes": 9613,
+        "sha256": "de79c3c7c54c8b180bd8b380de5e480f113c2ac30a171eee4570c541f0620b7d"
+      },
+      "agent_os/resources/skills/atlas/references/operations.md": {
+        "bytes": 10590,
+        "sha256": "f87d4caf0aa41e01c0e8b87cbfd039ebf435f22fa3d1bc6b806670485a689839"
+      },
+      "agent_os/resources/skills/atlas/references/principles.md": {
+        "bytes": 4361,
+        "sha256": "b2549510f35da38caface852cdc46947e5d32dfe6a10c9074b4f280b77e21bed"
+      },
+      "agent_os/resources/skills/atlas/references/quickstart.md": {
+        "bytes": 7051,
+        "sha256": "78d4598f685fdf4326f3420456a9ac539496b16b89c4832cc4030094d3643122"
+      },
+      "agent_os/resources/skills/atlas/references/upstream-adapter.md": {
+        "bytes": 19230,
+        "sha256": "2404380cb733e3a76d983a8447955c48012b2acd09b1e6231019dd3368ee5018"
+      },
+      "agent_os/resources/skills/atlas/references/workflow.md": {
+        "bytes": 11623,
+        "sha256": "2c5da714fe41e4e05ea0244e99b72a1425c4822d483b15e0b1f2e4a813e8bca5"
+      },
+      "agent_os/resources/skills/atlas/references/workspace.md": {
+        "bytes": 16610,
+        "sha256": "cbd3a56f7f58fac2eb03243a42dfb3f15c11140a79412088ec8629307bae3454"
+      },
+      "agent_os/resources/skills/atlas/scripts/OPERATIONS.json": {
+        "bytes": 33423,
+        "sha256": "5638eedbdb6ef62e6008b82c2e9bef252ff83a3b3278a93c4a65bfeb4a753373"
+      },
+      "agent_os/resources/skills/atlas/scripts/WORKSPACE_OPERATIONS.json": {
+        "bytes": 19612,
+        "sha256": "cc8ec74386296359d249eb7231331bfa7ca65d28e0bb49712707b0230dc55d8e"
+      },
+      "agent_os/resources/skills/atlas/scripts/atlas.inventory.schema.json": {
+        "bytes": 2583,
+        "sha256": "98a0221e84b532c2392d63b25f1588f1ef3b97a8074ed6c8d4474731231338da"
+      },
+      "agent_os/resources/skills/atlas/scripts/atlas.project.schema.json": {
+        "bytes": 7078,
+        "sha256": "6e50c1bf7caeff2a9e4a071ae54005762cf3ee710f3dd40eeaa972375cb92fbf"
+      },
+      "agent_os/resources/skills/atlas/scripts/atlas.py": {
+        "bytes": 75467,
+        "sha256": "6bf860042540b060c2e4e3958cfbd2aee5f69cbfb9e0bc030c688a0351be19d4"
+      },
+      "agent_os/resources/skills/atlas/scripts/atlas.work.schema.json": {
+        "bytes": 16438,
+        "sha256": "dde3c1f4be188d302ca34295b93720fc1923cfd51d62de40731621772b5c9cf3"
+      },
+      "agent_os/resources/skills/atlas/scripts/catalog.py": {
+        "bytes": 13187,
+        "sha256": "a1beba566aa6de9d63d10bb5de18e274356ecf812f753cbbe6600f7972142f18"
+      },
+      "agent_os/resources/skills/atlas/scripts/checkpoint.py": {
+        "bytes": 54073,
+        "sha256": "95196bbeae7946f0d988731178354d3e0b712531c8f324287e9118f66f70f2a2"
+      },
+      "agent_os/resources/skills/atlas/scripts/history_requalification.py": {
+        "bytes": 21164,
+        "sha256": "fbfcf0ebd78bd24f8ed1b0446f71140ef7cb6716f7fddd55f6fc31a5f12ec61d"
+      },
+      "agent_os/resources/skills/atlas/scripts/import_matrix.py": {
+        "bytes": 63798,
+        "sha256": "570222fb3ec39b8b59aebcd00e93d866df87825868b091d4a7788b803e90b45f"
+      },
+      "agent_os/resources/skills/atlas/scripts/navigator.py": {
+        "bytes": 36046,
+        "sha256": "ad8a1da37daf561618fe63e4633071e27e9c293f5b98e32846bcb7151c479f43"
+      },
+      "agent_os/resources/skills/atlas/scripts/navigator.schema.json": {
+        "bytes": 11338,
+        "sha256": "bac14cb8820ab5c7de9f808bfd3da531fbaa8d22e1271b0bce2bd9bc544869a2"
+      },
+      "agent_os/resources/skills/atlas/scripts/sync_docs.py": {
+        "bytes": 21218,
+        "sha256": "c9934937390f6415c73d6a99ea36bbb1d007ff348bf7bce8cfb80e9d7a7dfbd9"
+      },
+      "agent_os/resources/skills/atlas/scripts/viewer.css": {
+        "bytes": 31683,
+        "sha256": "ac1d29d99f40d5401bfe1da6c5e8593bd61c5bec7c7e60869baa79833bf5ca0b"
+      },
+      "agent_os/resources/skills/atlas/scripts/viewer.js": {
+        "bytes": 174714,
+        "sha256": "6d94fe3c7a5165a20937811f8b77f734a9d1d6e932c3d72fb5a7450b611ba5b2"
+      },
+      "agent_os/resources/skills/atlas/scripts/workspace.py": {
+        "bytes": 27815,
+        "sha256": "ddb6fc8be5ecfe751ed98fa6f884643762595c774dcc5d513a4d15bbc0a43226"
+      }
+    },
+    "history_change_manifest_sha256": "e8ab2cdf6a96a9e20ee23af6f7c0bc8b52df73ca1779607c6b3f2c460a5b92fb",
+    "installation": "SEPARATE_RECEIPT_REQUIRED",
+    "retained_unpackaged_files": "Other files/source_* remain historical source provenance, not current installed pins.",
+    "scope": "Owner-local exact public-wheel repack: bounded history requalification and viewer117 + independently found actor/step start-evidence fix. No invented upstream checkout/build/signature.",
+    "viewer_result_manifest_sha256": "91f970aeb2d1f6c0bcd7d070b544135acdccf28045a71984ee6a1a6cb6dc069c",
+    "visual_business_acceptance": "NOT_RUN"
+  },
+  "copy_handoff_successor": {
+    "browser_clipboard_confirmation": "SEPARATE_BROWSER_READBACK_REQUIRED",
+    "contract": "atlas.copy-handoff+matrix-status/v1",
+    "provenance": "Build only from exact installed rc2004 wheel + pinned Atlas resources, no private project payload",
+    "release_base": "AgentOS 0.8.0rc2004 immutable wheel",
+    "release_base_wheel_sha256": "c4fac4a7246f45198a72d120e784ae1942dd471321d73c683ffc017f667dd09e",
+    "resource_pins": [
+      {
+        "bytes": 16357,
+        "path": "agent_os/resources/skills/atlas/SKILL.md",
+        "sha256": "43eda62933c49bbda359f3dd8c1221f173f9d30cc5d2d0e4aa3d1acb905664df"
+      },
+      {
+        "bytes": 7051,
+        "path": "agent_os/resources/skills/atlas/references/quickstart.md",
+        "sha256": "78d4598f685fdf4326f3420456a9ac539496b16b89c4832cc4030094d3643122"
+      },
+      {
+        "bytes": 154617,
+        "path": "agent_os/resources/skills/atlas/scripts/viewer.js",
+        "sha256": "57ace67698b92aae1eaf669492a95815cdaf3c3510f90c478f2211647806e57e"
+      },
+      {
+        "bytes": 8489,
+        "path": "agent_os/resources/skills/agentos-project-entry/SKILL.md",
+        "sha256": "ea8687a7cf3ead7cc039aeeacbf003a69f607f0e7948b77be37eb2311fc3647a"
+      }
+    ],
+    "runtime_installed_confirmation": "SEPARATE_RECEIPT_REQUIRED",
+    "scope": "versioned Atlas presentation and operator instructions only",
+    "source_worktree_base_commit": "3088db22f4fb9c2450e61fc71a750ffdc52c062c",
+    "viewer_css_sha256": "ea8e483e9357e7b3fadbf31bc87347d97afc2f1c0acb55f1537a5b1c9792bceb",
+    "work_matrix_source_authority": "UNCHANGED_THREE_PRODUCT_WRITERS"
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 2607,
+      "sha256": "0f8e0baa38305072bc0252075b794f003854462b0ec036bfa3df4093c0915bc8",
+      "source_bytes": 4205,
+      "source_sha256": "2eea44d8fadffa3bd8d8d94d81d3a7ba9604d66dce38a18c1d3d5eba657d19f7"
+    },
+    {
+      "path": "check.py",
+      "bytes": 8377,
+      "sha256": "451bea0edcb4b186f483f6e6625357c85d79e7e2f77f3d02c38b1e2e0e16d692",
+      "source_bytes": 8377,
+      "source_sha256": "451bea0edcb4b186f483f6e6625357c85d79e7e2f77f3d02c38b1e2e0e16d692"
+    },
+    {
+      "path": "examples/synthetic/CONTRACTS.md",
+      "bytes": 279,
+      "sha256": "111086f17e445ee9abe3d5b7a18f3167f8e48ade4d29a4918cc444e82533e257",
+      "source_bytes": 446,
+      "source_sha256": "2be1723b7692ff1c63428622afa8aabf5ca1435a7d964ae024b5600b00b36c7f"
+    },
+    {
+      "path": "examples/synthetic/DOCS_INDEX.json",
+      "bytes": 8082,
+      "sha256": "dbb2593557103c3746dfa40a96bf31ca7eb9772976756a1c7ec89772f0b408ba",
+      "source_bytes": 6764,
+      "source_sha256": "f92dd37a7b7de5d083fabd3b47a45083bd68ab7a7cb72483f0e21f18fe4bff68"
+    },
+    {
+      "path": "examples/synthetic/DOCS_INDEX.v1.json",
+      "bytes": 7519,
+      "sha256": "270021ced49d4dc485d646e7468fd138bac9c708d48087c1393fda07e6061590",
+      "source_bytes": 8261,
+      "source_sha256": "aa5d8113250c73057773b31887826bbdddd7f2049536b5b06e6d9831e3ab6238"
+    },
+    {
+      "path": "examples/synthetic/MATRIX_REFS.json",
+      "bytes": 493,
+      "sha256": "f38fb20e1bffdb318059f6066e1cc74ea63d8de90ad82a1945a0eaa18c4ad069",
+      "source_bytes": 571,
+      "source_sha256": "0e812fb79329d5f80698195621c34d9c4d5abf1a7f0bda687d9734c2deb8c71a"
+    },
+    {
+      "path": "examples/synthetic/OLD_PLAN.md",
+      "bytes": 146,
+      "sha256": "fdb62ae226c0cdcb2806a2c27e8a2f60c29c3773edbf0fe298cdd6f24fba4384",
+      "source_bytes": 206,
+      "source_sha256": "5d633f93d1f6937539408d0b2fca0a84cdf5c766358976f58472c1ddd768e705"
+    },
+    {
+      "path": "examples/synthetic/PLAN.schema.json",
+      "bytes": 318,
+      "sha256": "5b2e4f37ed753f4dc58d0698d11d86b0567681d052a306e8d77f46f901580c67",
+      "source_bytes": 318,
+      "source_sha256": "5b2e4f37ed753f4dc58d0698d11d86b0567681d052a306e8d77f46f901580c67"
+    },
+    {
+      "path": "examples/synthetic/PROJECT.md",
+      "bytes": 282,
+      "sha256": "85bf88fc0ad391e7aac5fae5877c4fa8a00097499ab9735d76bb8566e0a3d2be",
+      "source_bytes": 452,
+      "source_sha256": "568cb143eaed42624922586b2d356b6a7ac214fa974310469e3ddd2208d8206f"
+    },
+    {
+      "path": "examples/workflow/.atlas/INVENTORY.json",
+      "bytes": 1253,
+      "sha256": "674f90f2f54a87f8b7e71a785a036dfa11aabc4fe7eceb3da1296bdf01924363",
+      "source_bytes": 1294,
+      "source_sha256": "b895e81c5c962039b624d23fe2397838e7452e58ee221e0da563abf268ca3961"
+    },
+    {
+      "path": "examples/workflow/.atlas/project.json",
+      "bytes": 2584,
+      "sha256": "5ca25e83d1942a6dba9afedcd80d84f4ca448396d431b3dea3ffa9356f8c2d7a",
+      "source_bytes": 2745,
+      "source_sha256": "b4ce4be003a6986bfcf9db2d1687834f710fd6ce0e19235add0958b59baf7e3d"
+    },
+    {
+      "path": "examples/workflow/.atlas/work/W-01.json",
+      "bytes": 3229,
+      "sha256": "3a8f27293c203c4e106924a0f39a37f8242d7b155a5e0fc9f75855e115c58767",
+      "source_bytes": 3596,
+      "source_sha256": "fc01bacd0809c9f601047d8a9db588ddb61b7de20e374a46bfa70f4af1fd821f"
+    },
+    {
+      "path": "examples/workflow/.atlas/work/W-02.json",
+      "bytes": 2019,
+      "sha256": "9877c7df0c7ccbfd2c556f50fd994ff5ef8022959c1c741d864802712b9a569a",
+      "source_bytes": 2268,
+      "source_sha256": "713819b6c9b58268bc6e189b1008190e157030ea8f00a3b9905fff598ffbabbf"
+    },
+    {
+      "path": "examples/workflow/.atlas/work/W-03.json",
+      "bytes": 1664,
+      "sha256": "001b2f0874a16fa59f8df0f1439145bb8b1cdd599028eb8b61cc2d1fb2cc5662",
+      "source_bytes": 2005,
+      "source_sha256": "487ad7df49e88dabc93e69605a1e08e54a2a1a4b32bee53beb161c55f868173d"
+    },
+    {
+      "path": "examples/workflow/docs/CONTRACT-v1.md",
+      "bytes": 160,
+      "sha256": "0f28c3a5f7b3af1eab118d986559b5da06cd234493c9e0afbac05c9024d4d917",
+      "source_bytes": 227,
+      "source_sha256": "91200136274b7e38b5495e05fabc194723f3cf2351c2745a2e02781beef344af"
+    },
+    {
+      "path": "examples/workflow/docs/DOCS_INDEX.json",
+      "bytes": 3449,
+      "sha256": "28d93d503f4634f999506f8dd4c72bd3517f703b5fb45fffa0166b4ff8b081df",
+      "source_bytes": 3757,
+      "source_sha256": "9b6ecdb88371e84e3f9aa62e00897a2bc6cdc74e9e45dae465c51b88d4886e91"
+    },
+    {
+      "path": "examples/workflow/docs/PATCH-v2.md",
+      "bytes": 157,
+      "sha256": "2fef41382df4b13bf2db0139dae7bd4cba8a89d6ea8060faa5b4015259be5b35",
+      "source_bytes": 236,
+      "source_sha256": "35d86c852333baa7c7043583b6f663dbd8768bf256041356ff021a729b60efa4"
+    },
+    {
+      "path": "examples/workflow/docs/PROJECT.md",
+      "bytes": 138,
+      "sha256": "6284dc94fb6df7af0bf8df513f3971290ad11138d728ad0218cfc704ede875bb",
+      "source_bytes": 243,
+      "source_sha256": "484bd2291ce93514737385851b5962cd0ad949df69eecd3e6e39a4a0f8f841d7"
+    },
+    {
+      "path": "examples/workflow/receipts/activity.json",
+      "bytes": 208,
+      "sha256": "1d535ed6ce942df1797e69b97f587b49c048fb7d2cca987e6d82b2acda81ceec",
+      "source_bytes": 208,
+      "source_sha256": "1d535ed6ce942df1797e69b97f587b49c048fb7d2cca987e6d82b2acda81ceec"
+    },
+    {
+      "path": "examples/workflow/receipts/contract-review.json",
+      "bytes": 176,
+      "sha256": "8e25000f85d0628ec60459a3269f2883aa7d641d78d413d8fcb957ea047f25f2",
+      "source_bytes": 176,
+      "source_sha256": "8e25000f85d0628ec60459a3269f2883aa7d641d78d413d8fcb957ea047f25f2"
+    },
+    {
+      "path": "examples/workflow/receipts/source-test.json",
+      "bytes": 162,
+      "sha256": "5569d73e90a34a233f86a00fa0d6b98d87eb434d4fd320a562a3f583b1a3fbb7",
+      "source_bytes": 162,
+      "source_sha256": "5569d73e90a34a233f86a00fa0d6b98d87eb434d4fd320a562a3f583b1a3fbb7"
+    },
+    {
+      "path": "examples/workflow/src/batch.py",
+      "bytes": 33,
+      "sha256": "e1eb1c798d3a858909ccf30823aaad5829db6857aae2e8da6859b8663df35e18",
+      "source_bytes": 33,
+      "source_sha256": "e1eb1c798d3a858909ccf30823aaad5829db6857aae2e8da6859b8663df35e18"
+    },
+    {
+      "path": "skills/atlas/SKILL.md",
+      "bytes": 17378,
+      "sha256": "d7cd449b4ea4f790070ff1632848d4e539b81e69f2d8c864ef01f3b74c45c950",
+      "source_bytes": 14379,
+      "source_sha256": "c5c841e5cdfbd55edad3835840e9c5ce4e36f0cf733855896813040983ca18cf"
+    },
+    {
+      "path": "skills/atlas/agents/openai.yaml",
+      "bytes": 232,
+      "sha256": "b4ce709765684f0c9861dec45dfaf9c4bfd9cf5b04cc132ac0de602994d9af95",
+      "source_bytes": 395,
+      "source_sha256": "59ed0fb2a4bd1f2f9a9faf58f511532995984adb4b5d208dfadad4971caf5dc0"
+    },
+    {
+      "path": "skills/atlas/assets/adapters/owner-hosts.json",
+      "bytes": 8109,
+      "sha256": "08b47f82f2769cd3749b3af7d7a3246b7e60d02715d719c68eebe9bfdf098572",
+      "source_bytes": 8109,
+      "source_sha256": "08b47f82f2769cd3749b3af7d7a3246b7e60d02715d719c68eebe9bfdf098572"
+    },
+    {
+      "path": "skills/atlas/assets/architecture-template.json",
+      "bytes": 12342,
+      "sha256": "2339c5f2fbb5762c2d323e71c803cac1f227d4387304753b9f8dc76167f0eee8",
+      "source_bytes": 12342,
+      "source_sha256": "2339c5f2fbb5762c2d323e71c803cac1f227d4387304753b9f8dc76167f0eee8"
+    },
+    {
+      "path": "skills/atlas/assets/module-template.json",
+      "bytes": 5066,
+      "sha256": "5a4a9b2cd07342eedf1b953cc564241f1cf052b00c1cee643a86d34d5f30c4c3",
+      "source_bytes": 5066,
+      "source_sha256": "5a4a9b2cd07342eedf1b953cc564241f1cf052b00c1cee643a86d34d5f30c4c3"
+    },
+    {
+      "path": "skills/atlas/assets/semantic-catalog-template.json",
+      "bytes": 2055,
+      "sha256": "b22b192d83d85dd6cad05c3edbe8f42578d43aa876af5f6faedfd7c3b7a7b331",
+      "source_bytes": 2055,
+      "source_sha256": "b22b192d83d85dd6cad05c3edbe8f42578d43aa876af5f6faedfd7c3b7a7b331"
+    },
+    {
+      "path": "skills/atlas/assets/upstream-template.json",
+      "bytes": 1184,
+      "sha256": "cd79e27fc46f6bef47f2b9e1095435fb1c7ecf203288238a422d7e7c4fbffa8f",
+      "source_bytes": 1184,
+      "source_sha256": "cd79e27fc46f6bef47f2b9e1095435fb1c7ecf203288238a422d7e7c4fbffa8f"
+    },
+    {
+      "path": "skills/atlas/references/catalogs.md",
+      "bytes": 3000,
+      "sha256": "ebde1ad5418e9befb1f92caafd6e676537cab8bf6d0fff54478849f8348e1f94",
+      "source_bytes": 4763,
+      "source_sha256": "724023b116973c12056dac4b1968abf6972a64f87d35dabe2cac1a39f45da070"
+    },
+    {
+      "path": "skills/atlas/references/data-contract.md",
+      "bytes": 24467,
+      "sha256": "821c498bf1cb16b725d83d400fc75621e65e6b50d103bc4b5cc5fa585fc7e622",
+      "source_bytes": 35290,
+      "source_sha256": "06aa0e15cf5fe5d7b2d753b18d6362790e66f3a0085addf15e09198bd7982ee0"
+    },
+    {
+      "path": "skills/atlas/references/document-sync.md",
+      "bytes": 5878,
+      "sha256": "270489cdf90eba2289eff3540113beaf6f56e73518ee8850babd1301869b542d",
+      "source_bytes": 9008,
+      "source_sha256": "3aa4a2d726af42326d1bba623d3d8139c2c7ad1ed94a15cdebe72e9e1ed072a8"
+    },
+    {
+      "path": "skills/atlas/references/history-requalification.md",
+      "bytes": 7185,
+      "sha256": "20b3e7c640cf9828e627a7f6094951ea6cdb736c6a8fcea8e925603f904eb5ad",
+      "source_bytes": 7185,
+      "source_sha256": "20b3e7c640cf9828e627a7f6094951ea6cdb736c6a8fcea8e925603f904eb5ad"
+    },
+    {
+      "path": "skills/atlas/references/integration.md",
+      "bytes": 23676,
+      "sha256": "09a8abc068871275ca73d2f4ec52e0f41bda53154c3adddf5173355c1a645535",
+      "source_bytes": 25374,
+      "source_sha256": "2e2a4c0c8fe51c466035a1db3c613f02833d12a527f029db07152b78645319f8"
+    },
+    {
+      "path": "skills/atlas/references/modularity.md",
+      "bytes": 9613,
+      "sha256": "de79c3c7c54c8b180bd8b380de5e480f113c2ac30a171eee4570c541f0620b7d",
+      "source_bytes": 14720,
+      "source_sha256": "182fe4c346afd45230e87bd40da616564a1afe90f9f16b097a64f0b8a843c465"
+    },
+    {
+      "path": "skills/atlas/references/operating-modes.md",
+      "bytes": 5700,
+      "sha256": "6417cdb6e9f4b2372bb86029dfa86b0557a3079aa918039e7ad5422c99b70ba5",
+      "source_bytes": 5700,
+      "source_sha256": "6417cdb6e9f4b2372bb86029dfa86b0557a3079aa918039e7ad5422c99b70ba5"
+    },
+    {
+      "path": "skills/atlas/references/operations.md",
+      "bytes": 10591,
+      "sha256": "8a273b36cce1922e3fbc9321f4ab7e5bd9abed0af0c97a1644493c65f8b0aa17",
+      "source_bytes": 14748,
+      "source_sha256": "cbdb14f370464a9b87b966cbf2863bfb52c9d6f415c788c6dbd45af8560ff040"
+    },
+    {
+      "path": "skills/atlas/references/principles.md",
+      "bytes": 4361,
+      "sha256": "b2549510f35da38caface852cdc46947e5d32dfe6a10c9074b4f280b77e21bed",
+      "source_bytes": 7674,
+      "source_sha256": "8680f5eb148c8ac5eec9e605b61ed9d7cc0900ddb2a91f9e7c06075c8d5cf689"
+    },
+    {
+      "path": "skills/atlas/references/quickstart.md",
+      "bytes": 7051,
+      "sha256": "78d4598f685fdf4326f3420456a9ac539496b16b89c4832cc4030094d3643122",
+      "source_bytes": 4664,
+      "source_sha256": "af49ed8d6557354be39aecfdeec4f65fcec67061eb273e667d5e7d4514a158ad"
+    },
+    {
+      "path": "skills/atlas/references/selected-document-capacity.md",
+      "bytes": 3808,
+      "sha256": "564b35853316800dc35e2a8ef1d10616f3ace219f502178e016e2a9fcce48570",
+      "source_bytes": 1704,
+      "source_sha256": "13a53094ffc463d0db8543e74e4ba8c6ea1ac725e0b5ef7b378f127d7552f91f"
+    },
+    {
+      "path": "skills/atlas/references/source-relocation.md",
+      "bytes": 7197,
+      "sha256": "3cfc4eb04254028a577d27c0eeca3ebf70d49eb82cb1ddd93caed0934bb501e4",
+      "source_bytes": 6358,
+      "source_sha256": "a598d6e17be3aa3972df358d4260da50d5413aed486ab93e61796dbb94174f13"
+    },
+    {
+      "path": "skills/atlas/references/upstream-adapter.md",
+      "bytes": 19231,
+      "sha256": "fcd89059059a9be9c8a643fd60f050dd43a58fb61c1466f0b9cadf0995b5a112",
+      "source_bytes": 26766,
+      "source_sha256": "845c1c6ab2d33d4bef866a91dd17e13f1d34f2aed454b3792c03278a558e1b31"
+    },
+    {
+      "path": "skills/atlas/references/workflow.md",
+      "bytes": 11623,
+      "sha256": "2c5da714fe41e4e05ea0244e99b72a1425c4822d483b15e0b1f2e4a813e8bca5",
+      "source_bytes": 15495,
+      "source_sha256": "302b4d770a8ea305b62cafbf39a2254a8452e1a7bfb78a93e2d253ee05b4902a"
+    },
+    {
+      "path": "skills/atlas/references/workspace.md",
+      "bytes": 18976,
+      "sha256": "2102771540adb885b95f3144e2d427bf1962f7a4907f9aa4e4d365a48389bcb6",
+      "source_bytes": 6284,
+      "source_sha256": "6292e241496e3e309ff53fa25d76e397eb2f53729c9a00ae1b4dd23379267611"
+    },
+    {
+      "path": "skills/atlas/scripts/OPERATIONS.json",
+      "bytes": 39065,
+      "sha256": "9721e135bf25aaeb7f4a0824549bd5de890af4e99080b15ff841ac71101e119e",
+      "source_bytes": 33430,
+      "source_sha256": "c58ed5ac26b8d4e78356b1281472a6180a13627f70490ba9528aa73e19e49db0"
+    },
+    {
+      "path": "skills/atlas/scripts/WORKSPACE_OPERATIONS.json",
+      "bytes": 22072,
+      "sha256": "d2315e77b405458cb1fd9e6f98e62245b82081b52eb789c1107245fe021f06bf",
+      "source_bytes": 7080,
+      "source_sha256": "bfcc99454f1aa43063d4748aad43e637d88506af95b6fe5e5ada711f9594a76f"
+    },
+    {
+      "path": "skills/atlas/scripts/atlas.inventory.schema.json",
+      "bytes": 2583,
+      "sha256": "98a0221e84b532c2392d63b25f1588f1ef3b97a8074ed6c8d4474731231338da",
+      "source_bytes": 2583,
+      "source_sha256": "98a0221e84b532c2392d63b25f1588f1ef3b97a8074ed6c8d4474731231338da"
+    },
+    {
+      "path": "skills/atlas/scripts/atlas.project.schema.json",
+      "bytes": 7078,
+      "sha256": "6e50c1bf7caeff2a9e4a071ae54005762cf3ee710f3dd40eeaa972375cb92fbf",
+      "source_bytes": 7078,
+      "source_sha256": "6e50c1bf7caeff2a9e4a071ae54005762cf3ee710f3dd40eeaa972375cb92fbf"
+    },
+    {
+      "path": "skills/atlas/scripts/atlas.py",
+      "bytes": 77351,
+      "sha256": "bb7039bdc9773cec9866be609bb0ac8d9f5c18742c57408718042fb0afcfbd96",
+      "source_bytes": 66447,
+      "source_sha256": "fe1f6090729b89acdef1cc75b29ab30aab66d63ac57f67a18cd8a41f9fc9ba75"
+    },
+    {
+      "path": "skills/atlas/scripts/atlas.work.schema.json",
+      "bytes": 17105,
+      "sha256": "abf98f3ff6f161f92a8fd1e465452b362509c17d6cf849f5e0058911bfa3b10e",
+      "source_bytes": 16438,
+      "source_sha256": "dde3c1f4be188d302ca34295b93720fc1923cfd51d62de40731621772b5c9cf3"
+    },
+    {
+      "path": "skills/atlas/scripts/catalog.py",
+      "bytes": 13187,
+      "sha256": "a1beba566aa6de9d63d10bb5de18e274356ecf812f753cbbe6600f7972142f18",
+      "source_bytes": 13187,
+      "source_sha256": "a1beba566aa6de9d63d10bb5de18e274356ecf812f753cbbe6600f7972142f18"
+    },
+    {
+      "path": "skills/atlas/scripts/checkpoint.py",
+      "bytes": 56553,
+      "sha256": "3b32755c7df7da34c84fbebe412587a4e11dd127bac99882a7e0569819615aa6",
+      "source_bytes": 35034,
+      "source_sha256": "10406ab31000bfabcfcfbc6e53af504520933765008f23e87a4c5f97bf135801"
+    },
+    {
+      "path": "skills/atlas/scripts/display_fields.py",
+      "bytes": 5878,
+      "sha256": "a9cf33620dbea8232104bdb9e167b27f8f1ba9b03f0f42938d9922283273b8c6",
+      "source_bytes": 5878,
+      "source_sha256": "a9cf33620dbea8232104bdb9e167b27f8f1ba9b03f0f42938d9922283273b8c6"
+    },
+    {
+      "path": "skills/atlas/scripts/history_requalification.py",
+      "bytes": 21164,
+      "sha256": "fbfcf0ebd78bd24f8ed1b0446f71140ef7cb6716f7fddd55f6fc31a5f12ec61d",
+      "source_bytes": 21164,
+      "source_sha256": "fbfcf0ebd78bd24f8ed1b0446f71140ef7cb6716f7fddd55f6fc31a5f12ec61d"
+    },
+    {
+      "path": "skills/atlas/scripts/import_matrix.py",
+      "bytes": 63798,
+      "sha256": "570222fb3ec39b8b59aebcd00e93d866df87825868b091d4a7788b803e90b45f",
+      "source_bytes": 62724,
+      "source_sha256": "90dec6a59559f706726b593e86d976a3fe972124bcd7dbca2575678171d59304"
+    },
+    {
+      "path": "skills/atlas/scripts/navigator.py",
+      "bytes": 39322,
+      "sha256": "4063935ff654290f69c7a324e8b146f5ced3c9612f1f478f7f0eec4dcdb52bea",
+      "source_bytes": 27555,
+      "source_sha256": "a80ee32d194462b58769b91c3b8af0abb254dfb12d160b94ca0acbee7f996ee9"
+    },
+    {
+      "path": "skills/atlas/scripts/navigator.schema.json",
+      "bytes": 11958,
+      "sha256": "5f5e6386c4bdb0017d3b271b54027576a32252a6597667a2bb2f9fda42e7433e",
+      "source_bytes": 11338,
+      "source_sha256": "bac14cb8820ab5c7de9f808bfd3da531fbaa8d22e1271b0bce2bd9bc544869a2"
+    },
+    {
+      "path": "skills/atlas/scripts/source_relocation.py",
+      "bytes": 51388,
+      "sha256": "8ee1b0e1fd1bdc1a2d2eebd93e3ee76780da577d516b61b7d2cc375abfaa01a4",
+      "source_bytes": 45784,
+      "source_sha256": "544019b8443cb2383dcb1be54c733c8e0cfae4afaa06016df9905f97f765a2f2"
+    },
+    {
+      "path": "skills/atlas/scripts/sync_docs.py",
+      "bytes": 21218,
+      "sha256": "c9934937390f6415c73d6a99ea36bbb1d007ff348bf7bce8cfb80e9d7a7dfbd9",
+      "source_bytes": 21218,
+      "source_sha256": "c9934937390f6415c73d6a99ea36bbb1d007ff348bf7bce8cfb80e9d7a7dfbd9"
+    },
+    {
+      "path": "skills/atlas/scripts/viewer.css",
+      "bytes": 37102,
+      "sha256": "4534bca4bbead75497a9b8cc2b3cd91f065e41b02516f3ea95e30e8c1e0787f1",
+      "source_bytes": 6865,
+      "source_sha256": "01c73b9d3b0a80f86bd7785c51ebe9ade2438b7c727cce54e886ddbfa8cd200f"
+    },
+    {
+      "path": "skills/atlas/scripts/viewer.js",
+      "bytes": 227579,
+      "sha256": "f469eb693145c8df171ef1d1902e94bca6cee9e13da5d687481ea3fa8f84a4f5",
+      "source_bytes": 37585,
+      "source_sha256": "55c14b34565f9e378778c9a6ef9a93a70e773e0df98cb94fbe6b8b8ead7c54ea"
+    },
+    {
+      "path": "skills/atlas/scripts/work_profile.py",
+      "bytes": 3569,
+      "sha256": "092dc71cbc71091fd991fd8a161d97e7c73caec85f03821c032f8d63b4079d01",
+      "source_bytes": 3569,
+      "source_sha256": "092dc71cbc71091fd991fd8a161d97e7c73caec85f03821c032f8d63b4079d01"
+    },
+    {
+      "path": "skills/atlas/scripts/workspace.py",
+      "bytes": 28499,
+      "sha256": "7bf1cad5bf3147c3a3557d9786a0712c2c90fe428a73ec62e65425447a9b0531",
+      "source_bytes": 7086,
+      "source_sha256": "101b7de0e64c2ad620caa061120a62589b8e981a9cca2f653f2ae660894b5f60"
+    },
+    {
+      "path": "tests/test_atlas.py",
+      "bytes": 25667,
+      "sha256": "b5ec3abc4d98361ce9813bf05b0f06042ef8f47b946ae719b02c81980983a784",
+      "source_bytes": 25667,
+      "source_sha256": "b5ec3abc4d98361ce9813bf05b0f06042ef8f47b946ae719b02c81980983a784"
+    },
+    {
+      "path": "tests/test_atlas_ui.cjs",
+      "bytes": 18350,
+      "sha256": "aba97b1c7ffb4f55b3a712956b24f7224c0da149f7d54743361cb3ce38b8196d",
+      "source_bytes": 19351,
+      "source_sha256": "a30ce77348083eba1ac808bd3d796a372c2cdafca9173c5775e9945e0d4c5901"
+    },
+    {
+      "path": "tests/test_catalog.py",
+      "bytes": 4076,
+      "sha256": "3e7da127d8db0aa610a7a36543fa3da204f80c119ebf2a47162a305d430f40ae",
+      "source_bytes": 4076,
+      "source_sha256": "3e7da127d8db0aa610a7a36543fa3da204f80c119ebf2a47162a305d430f40ae"
+    },
+    {
+      "path": "tests/test_checkpoint.py",
+      "bytes": 19639,
+      "sha256": "48f160923349d64abec536ba4dd883c4ec82624e61b91249f69b7d7ff9ebf153",
+      "source_bytes": 19639,
+      "source_sha256": "48f160923349d64abec536ba4dd883c4ec82624e61b91249f69b7d7ff9ebf153"
+    },
+    {
+      "path": "tests/test_import_history_pages.py",
+      "bytes": 13982,
+      "sha256": "f89c784c1006ecb2230f6ce43f8aae4d6f151706ef6bc9234ba0f5e77e1fbcad",
+      "source_bytes": 13982,
+      "source_sha256": "f89c784c1006ecb2230f6ce43f8aae4d6f151706ef6bc9234ba0f5e77e1fbcad"
+    },
+    {
+      "path": "tests/test_import_matrix.py",
+      "bytes": 16010,
+      "sha256": "8f27cc0b9ed14ca414c1867288a842b85b667a165b6d24e194db6efb6fb2e6c7",
+      "source_bytes": 16010,
+      "source_sha256": "8f27cc0b9ed14ca414c1867288a842b85b667a165b6d24e194db6efb6fb2e6c7"
+    },
+    {
+      "path": "tests/test_navigator.py",
+      "bytes": 21391,
+      "sha256": "327722fdf830226305f24170dcfcd55227bdcf5248f2be22b74e0c898b84e8b0",
+      "source_bytes": 21415,
+      "source_sha256": "7ba3db9211032ab79db58311e717ea7e4c4e9febacb8f903badc6dec769195be"
+    },
+    {
+      "path": "tests/test_projection_archive.py",
+      "bytes": 16919,
+      "sha256": "94a47b069097bb12cbf5d7bc0b0015dee0ad044b4a4c23249f4a6149937bbcf8",
+      "source_bytes": 16919,
+      "source_sha256": "94a47b069097bb12cbf5d7bc0b0015dee0ad044b4a4c23249f4a6149937bbcf8"
+    },
+    {
+      "path": "tests/test_sync_docs.py",
+      "bytes": 11715,
+      "sha256": "1dbf546717934d225a6b050df87ebde169640e114bc0685d3f5b23a3d0eb8f9b",
+      "source_bytes": 11715,
+      "source_sha256": "1dbf546717934d225a6b050df87ebde169640e114bc0685d3f5b23a3d0eb8f9b"
+    },
+    {
+      "path": "tests/test_workspace.py",
+      "bytes": 11597,
+      "sha256": "81ee991d67489d27b89af166a783160d888cfeb2eeca6f7e893350004035d81e",
+      "source_bytes": 11597,
+      "source_sha256": "81ee991d67489d27b89af166a783160d888cfeb2eeca6f7e893350004035d81e"
+    },
+    {
+      "path": "tests/ui_dom.cjs",
+      "bytes": 9260,
+      "sha256": "0cd7fe5264e901c3c2e2e8d1d2c56692a5194d1ee1256519f9dc51fecf896d09",
+      "source_bytes": 9411,
+      "source_sha256": "7e16d8241aad5ee238858692bd1494bd9080511d63d968986c837fa92e2e1e30"
+    }
+  ],
+  "foundation_prerequisite": {
+    "candidate_version": "0.8.0rc2002+atlas.2",
+    "files": [
+      {
+        "path": "src/agent_os/project.py",
+        "qualification": "EXACT_RC2002_BYTES",
+        "selected_pin": {
+          "bytes": 52959,
+          "sha256": "fa8962cc0dad5d44210630b4ffeef44e77a494ebf65290ae008e13369007388c"
+        },
+        "source_path": "src/agent_os/project.py",
+        "source_pin": {
+          "bytes": 52959,
+          "sha256": "fa8962cc0dad5d44210630b4ffeef44e77a494ebf65290ae008e13369007388c"
+        }
+      },
+      {
+        "path": "src/agent_os/resources/schemas/project.schema.json",
+        "qualification": "EXACT_RC2002_BYTES",
+        "selected_pin": {
+          "bytes": 2379,
+          "sha256": "204b0048948a329709249d5f3f9dbe62afa50faf215d863a99355a20d145782d"
+        },
+        "source_path": "src/agent_os/resources/schemas/project.schema.json",
+        "source_pin": {
+          "bytes": 2379,
+          "sha256": "204b0048948a329709249d5f3f9dbe62afa50faf215d863a99355a20d145782d"
+        }
+      },
+      {
+        "path": "src/agent_os/resources/docs/PROCESS.md",
+        "qualification": "EXACT_RC2002_BYTES",
+        "selected_pin": {
+          "bytes": 11757,
+          "sha256": "f0a0cadea50304647f25d222290584aae2903e7a5fec09a35d574b6c435ee8e3"
+        },
+        "source_path": "src/agent_os/resources/docs/PROCESS.md",
+        "source_pin": {
+          "bytes": 11757,
+          "sha256": "f0a0cadea50304647f25d222290584aae2903e7a5fec09a35d574b6c435ee8e3"
+        }
+      },
+      {
+        "path": "docs/PROCESS.md",
+        "qualification": "EXACT_RC2002_BYTES",
+        "selected_pin": {
+          "bytes": 11757,
+          "sha256": "f0a0cadea50304647f25d222290584aae2903e7a5fec09a35d574b6c435ee8e3"
+        },
+        "source_path": "src/agent_os/resources/docs/PROCESS.md",
+        "source_pin": {
+          "bytes": 11757,
+          "sha256": "f0a0cadea50304647f25d222290584aae2903e7a5fec09a35d574b6c435ee8e3"
+        }
+      },
+      {
+        "path": "src/agent_os/resources/docs/CONTRACTS.md",
+        "qualification": "EXACT_RC2002_BYTES",
+        "selected_pin": {
+          "bytes": 9325,
+          "sha256": "e29a9a95128ae9d7dec42b107be3b9f992b06583a8877e225924b0d21e064cdd"
+        },
+        "source_path": "src/agent_os/resources/docs/CONTRACTS.md",
+        "source_pin": {
+          "bytes": 9325,
+          "sha256": "e29a9a95128ae9d7dec42b107be3b9f992b06583a8877e225924b0d21e064cdd"
+        }
+      },
+      {
+        "path": "docs/CONTRACTS.md",
+        "qualification": "EXACT_RC2002_BYTES",
+        "selected_pin": {
+          "bytes": 9325,
+          "sha256": "e29a9a95128ae9d7dec42b107be3b9f992b06583a8877e225924b0d21e064cdd"
+        },
+        "source_path": "src/agent_os/resources/docs/CONTRACTS.md",
+        "source_pin": {
+          "bytes": 9325,
+          "sha256": "e29a9a95128ae9d7dec42b107be3b9f992b06583a8877e225924b0d21e064cdd"
+        }
+      },
+      {
+        "all_other_json_values": "DEEP_EQUAL_TO_RC2002",
+        "path": "src/agent_os/resources/contracts/cli-contract-v1.json",
+        "qualification": "EXACT_BYTES_EXCEPT_DECLARED_VERSION_STRINGS",
+        "selected_pin": {
+          "bytes": 15057,
+          "sha256": "1799e3059a15d457aaa85b4bc47a54ef967d85ec81141d745a329400bf5fe64c"
+        },
+        "source_path": "src/agent_os/resources/contracts/cli-contract-v1.json",
+        "source_pin": {
+          "bytes": 15041,
+          "sha256": "4ec8a84924dfc9c5bcdbafe30320a3836cf258738bb47bc18c766b053c87fee6"
+        },
+        "version_pointers": [
+          "/distribution_version",
+          "/release"
+        ]
+      },
+      {
+        "all_other_json_values": "DEEP_EQUAL_TO_RC2002",
+        "path": "schemas/cli-contract-v1.json",
+        "qualification": "EXACT_BYTES_EXCEPT_DECLARED_VERSION_STRINGS",
+        "selected_pin": {
+          "bytes": 15057,
+          "sha256": "1799e3059a15d457aaa85b4bc47a54ef967d85ec81141d745a329400bf5fe64c"
+        },
+        "source_path": "src/agent_os/resources/contracts/cli-contract-v1.json",
+        "source_pin": {
+          "bytes": 15041,
+          "sha256": "4ec8a84924dfc9c5bcdbafe30320a3836cf258738bb47bc18c766b053c87fee6"
+        },
+        "version_pointers": [
+          "/distribution_version",
+          "/release"
+        ]
+      },
+      {
+        "all_other_json_values": "DEEP_EQUAL_TO_RC2002",
+        "path": "src/agent_os/resources/contracts/mcp-tools-v1.json",
+        "qualification": "EXACT_BYTES_EXCEPT_DECLARED_VERSION_STRINGS",
+        "selected_pin": {
+          "bytes": 6531,
+          "sha256": "4a01f307e5117270d6c4175ef9e99490dcd034a49eb33b6d5558a1bc438288a8"
+        },
+        "source_path": "src/agent_os/resources/contracts/mcp-tools-v1.json",
+        "source_pin": {
+          "bytes": 6523,
+          "sha256": "2cf33dcfb2d3b9dd2345243233b50133f14e008c0084c43fd6fe956916642ae0"
+        },
+        "version_pointers": [
+          "/serverInfo/version"
+        ]
+      },
+      {
+        "all_other_json_values": "DEEP_EQUAL_TO_RC2002",
+        "path": "schemas/mcp-tools-v1.json",
+        "qualification": "EXACT_BYTES_EXCEPT_DECLARED_VERSION_STRINGS",
+        "selected_pin": {
+          "bytes": 6531,
+          "sha256": "4a01f307e5117270d6c4175ef9e99490dcd034a49eb33b6d5558a1bc438288a8"
+        },
+        "source_path": "src/agent_os/resources/contracts/mcp-tools-v1.json",
+        "source_pin": {
+          "bytes": 6523,
+          "sha256": "2cf33dcfb2d3b9dd2345243233b50133f14e008c0084c43fd6fe956916642ae0"
+        },
+        "version_pointers": [
+          "/serverInfo/version"
+        ]
+      },
+      {
+        "all_other_json_values": "DEEP_EQUAL_TO_RC2002",
+        "path": "src/agent_os/resources/docs/COORDINATOR_KNOWLEDGE_INDEX.json",
+        "qualification": "EXACT_BYTES_EXCEPT_DECLARED_VERSION_STRINGS",
+        "selected_pin": {
+          "bytes": 2886,
+          "sha256": "54e6061a1ed1f9734e8234267e7f696dedd67a5d0333c1637589a3f868f98ced"
+        },
+        "source_path": "src/agent_os/resources/docs/COORDINATOR_KNOWLEDGE_INDEX.json",
+        "source_pin": {
+          "bytes": 2878,
+          "sha256": "b0464e67837ef038e55baf5e2f279a2652091358218c6a511adee53485c8fa19"
+        },
+        "version_pointers": [
+          "/core_version"
+        ]
+      },
+      {
+        "all_other_json_values": "DEEP_EQUAL_TO_RC2002",
+        "path": "docs/COORDINATOR_KNOWLEDGE_INDEX.json",
+        "qualification": "EXACT_BYTES_EXCEPT_DECLARED_VERSION_STRINGS",
+        "selected_pin": {
+          "bytes": 2886,
+          "sha256": "54e6061a1ed1f9734e8234267e7f696dedd67a5d0333c1637589a3f868f98ced"
+        },
+        "source_path": "src/agent_os/resources/docs/COORDINATOR_KNOWLEDGE_INDEX.json",
+        "source_pin": {
+          "bytes": 2878,
+          "sha256": "b0464e67837ef038e55baf5e2f279a2652091358218c6a511adee53485c8fa19"
+        },
+        "version_pointers": [
+          "/core_version"
+        ]
+      }
+    ],
+    "json_version_pointer_count_per_packaged_set": 4,
+    "official_release_pins_changed": false,
+    "package_version_source_pin": {
+      "bytes": 103,
+      "sha256": "71a2adb8f4d6a33c0b01afa0f4a794d5f1fec5b55549cc48047dca6461137f66"
+    },
+    "previous_candidate_version": "0.8.0rc2002+atlas.1",
+    "source_qualification": "SELECTED_CURRENT_PACKAGE_SOURCES_WITH_RECORDED_161_FILE_MATCH; NOT_FRESH_RUNTIME_ACCEPTANCE",
+    "version": "0.8.0rc2002"
+  },
+  "instruction_provenance_sha256": "dc4b00bedecbfc662988461cf54010505aa9bf1f5471e280265e75068acd2ded",
+  "instruction_scope": "Detect Atlas for development/continuation; existing start/read; exactly three confirmed-absent branches; temporary bootstrap return; actual evidence/doc/contract maintenance",
+  "lifecycle_successor": {
+    "base_commit": "5a735c2019fd214dcac66a2b94df5d48005cee89",
+    "base_version": "0.8.0rc2002+atlas.3",
+    "changed_module_files": [
+      "skills/atlas/SKILL.md",
+      "skills/atlas/references/integration.md",
+      "skills/atlas/references/quickstart.md",
+      "skills/atlas/references/workflow.md",
+      "skills/atlas/references/workspace.md",
+      "skills/atlas/scripts/WORKSPACE_OPERATIONS.json",
+      "skills/atlas/scripts/checkpoint.py",
+      "skills/atlas/scripts/navigator.py",
+      "skills/atlas/scripts/viewer.js",
+      "skills/atlas/scripts/workspace.py",
+      "tests/test_checkpoint.py"
+    ],
+    "live_installation": "SEPARATE_TARGET_RECEIPTS_REQUIRED",
+    "new_module_files": [
+      "skills/atlas/scripts/checkpoint.py",
+      "tests/test_checkpoint.py"
+    ],
+    "predecessor_source_manifest": {
+      "bytes": 28816,
+      "sha256": "c8ef15d39a8345bd7e6ee50276fd09534c5d820c0794fc85fd6a02079d881d57"
+    },
+    "previous_selected_tree_sha256": "07d101018968b2a39205a52fef5a8bb81d813abe8e2b5b76b6fae36b60c714ae",
+    "private_project_data": "EXCLUDED_FROM_PUBLIC_SOURCE",
+    "scope": "Explicit owning-writer lifecycle checkpoints, typed one-call workspace method, exact recovery, stable current HTML and recorded work visibility, concise instructions and affected synthetic tests. Existing visual CSS and business contracts are retained.",
+    "source_preservation": "Historical source_* and readable/visual provenance retained. New files have their initial lifecycle source pins.",
+    "version": "0.8.0rc2002+atlas.4"
+  },
+  "qualification": "ENGLISH_DERIVATIVE_WITH_LIFECYCLE_SUCCESSOR; EXECUTION_RECEIPTS_REMAIN_SEPARATE",
+  "readable_successor": {
+    "base_commit": "d777d1416d7761e4be6d79904a5de8880fc0f2f9",
+    "candidate_version": "0.8.0rc2002+atlas.2",
+    "core_manifest_sha256": "9a73c5621231056d2676dc8be6002e1ca23d8cdc59ae4bf34bc89bfd52319d92",
+    "instruction_manifest_sha256": "a33ec65350564c708917854f25517ae44a5a2e997a8f4bd347ab6c22eda6d776",
+    "predecessor_source_manifest": {
+      "bytes": 26893,
+      "sha256": "b36a2183d05f59a7c2142b3b9ea4ce222fc930126ce558b7cda35f45a9fd6927"
+    },
+    "previous_selected_tree_sha256": "3a7cd4cb5fe6aced851a6cefde452b9ef7f6ee3766f278817587216d80b293aa",
+    "scope": "Pinned source presentation, hierarchical roadmap, participants and history, full JSON exports, read-only views method, existing instructions and separate candidate output. No source work or acceptance rewrite.",
+    "source_preservation": "Original source_* pins and historical instruction/translation provenance retained.",
+    "viewer_manifest_sha256": "6e14ace5cffcbbbb6c7152cdac021ee6130b43a9aa3f040d6b70209c291af38b",
+    "views_manifest_sha256": "beadb384656a87cdb60b914dfbcb1b3140602b87f6a3d00b014e54a9d112b7a8"
+  },
+  "schema": "agent-os.atlas-source/v1",
+  "selected_file_count": 74,
+  "selected_tree_sha256": "40c4cd2db91f7a29bfe15a340f7d31e8c24b4ddaf5a19a7dce2486b8036363b9",
+  "source_commit_reported": "1b7cd88",
+  "source_file_count": 64,
+  "source_tree_sha256": "15b36a79f1133be8cb790d61f0dff6562262196b0eb8c3ea15c41a9700dd6bab",
+  "translation_provenance_sha256": "3acde774c32c8ca858a0050bb103429d56b1946d4922ec8daf1faca5afdd7216",
+  "translation_scope": "Reviewed English human prose and rebound synthetic evidence; stable API and behavior retained",
+  "tree_hash_contract": "SHA-256 of UTF-8 JSON path-to-{bytes,sha256}; sorted keys; compact separators",
+  "visual_successor": {
+    "base_commit": "97c1698de929d909b6eaa3b5af4ec4621dcad2a6",
+    "base_version": "0.8.0rc2002+atlas.2",
+    "changed_module_files": [
+      "skills/atlas/scripts/navigator.py",
+      "skills/atlas/scripts/viewer.css",
+      "skills/atlas/scripts/viewer.js"
+    ],
+    "private_reference_payload": "EXCLUDED_FROM_PUBLIC_SOURCE",
+    "reference_css_sha256": "2a27eaf1e0377db11407180813a1da72e9366a8a71a7c3865daff3e8482a198c",
+    "reference_html_sha256": "4e115f6427ea75d10e5a87c2549af1cbae138802cbb4ef8df162bb5d83aa4a64",
+    "scope": "Owner-approved six-column work-matrix presentation; existing data contracts and pure source/acceptance/activity models remain unchanged.",
+    "version": "0.8.0rc2002+atlas.3"
+  },
+  "entrypoint_successor": {
+    "schema": "atlas.entrypoint-release-increment/v1",
+    "version": "0.8.0rc2023",
+    "base_managed_version": "0.8.0rc2022",
+    "scope": "Optional typed documentation-depth profile; byte-preserved source policy and proportional Atlas entry. Existing target/lifecycle/secret/ownership controls retained.",
+    "files": {
+      "atlas_module.py": {
+        "sha256": "fb58b23c60e126e0abff24af73ab25f82e5fd0441d6d862bc85815c153328965",
+        "bytes": 13502
+      },
+      "resources/docs/ATLAS.md": {
+        "sha256": "1488ce0ea5897ec9548b98e8745e60cadbecb7d492710381168915eeac53dfc3",
+        "bytes": 18083
+      },
+      "resources/docs/ATLAS_SOURCE_POLICY.md": {
+        "sha256": "8d4a354b9a9f96cac8f22c1f5000a91782486c95a34648489a0ac0ac2635b329",
+        "bytes": 4280
+      },
+      "resources/skills/atlas/SKILL.md": {
+        "sha256": "863863f9bda1c953a302aaa00d762365c309439f197c1c04822ff095bed7be9d",
+        "bytes": 16945
+      },
+      "resources/skills/atlas/references/operating-modes.md": {
+        "sha256": "6417cdb6e9f4b2372bb86029dfa86b0557a3079aa918039e7ad5422c99b70ba5",
+        "bytes": 5700
+      },
+      "resources/skills/atlas/scripts/work_profile.py": {
+        "sha256": "092dc71cbc71091fd991fd8a161d97e7c73caec85f03821c032f8d63b4079d01",
+        "bytes": 3569
+      },
+      "resources/skills/atlas/scripts/workspace.py": {
+        "sha256": "7bf1cad5bf3147c3a3557d9786a0712c2c90fe428a73ec62e65425447a9b0531",
+        "bytes": 28499
+      },
+      "resources/skills/atlas/scripts/WORKSPACE_OPERATIONS.json": {
+        "sha256": "d2315e77b405458cb1fd9e6f98e62245b82081b52eb789c1107245fe021f06bf",
+        "bytes": 22072
+      }
+    },
+    "installation": "SEPARATE_EXACT_TARGET_RECEIPTS_REQUIRED",
+    "private_data": "EXCLUDED",
+    "historical_pins": "PRESERVED; this increment does not relabel old accepted or installed results"
+  },
+  "source_relocation_increment": {
+    "base_release": "0.8.0rc2029-3df9c4873760",
+    "candidate": "0.8.0rc2030",
+    "previous_manifest_sha256": "ddf46acea36cd534fbcfa5ba13c3df2d0ebec9a48b40db580a6a5d378faa9a59",
+    "previous_selected_tree_sha256": "6d7745e160a1de6608a971a246373e4db6285a81c07518d70aeaa1d77458ab6c",
+    "scope": "Local source-only native relocation increment; no upstream commit, installation or NEXT adoption claim.",
+    "origin_notes": "Original upstream/source fields retained. New local files use first captured local image pins. Two legacy rows lacking source_* now use their prior selected local pins only, with upstream origin UNKNOWN; exact prior manifest is retained.",
+    "legacy_rows_normalized_from_prior_selected_local_image": [
+      "skills/atlas/references/history-requalification.md",
+      "skills/atlas/scripts/history_requalification.py"
+    ],
+    "newly_inventoried_paths": [
+      "skills/atlas/references/operating-modes.md",
+      "skills/atlas/references/selected-document-capacity.md",
+      "skills/atlas/references/source-relocation.md",
+      "skills/atlas/scripts/display_fields.py",
+      "skills/atlas/scripts/source_relocation.py",
+      "skills/atlas/scripts/work_profile.py"
+    ]
+  },
+  "source_relocation_r1_increment": {
+    "candidate": "0.8.0rc2031",
+    "parent_candidate": "0.8.0rc2030",
+    "parent_manifest_sha256": "8f7dd6eeda36ae19ab79244920a6572c667373e88244c5dcd3565c41d7043a6b",
+    "parent_selected_tree_sha256": "21c210c1e2c98a8c3b0018cff372989cb982cbb2a8caa3dbc24bdd94111ca569",
+    "finding": "ATLAS-RC2030-R1-COMMITTED-RECEIPT-CLEANUP-RENEWAL",
+    "scope": "Terminal receipt cleanup only, strict current authority/source/head/toolchain/operation checks; no install or target adoption. Original origin fields and prior wheel/Library checkpoint retained."
+  },
+  "document_capacity_increment": {
+    "candidate": "0.8.0rc2032",
+    "base_candidate": "0.8.0rc2031",
+    "base_manifest_sha256": "c80e90c427091ae8e29db0cf220e02ce69fa612f794b088116cb9be4773c8719",
+    "base_selected_tree_sha256": "320ec270bf29f0725283ef870ee4a7e58645d17ae9ba463f3c311a547e1f258b",
+    "change_id": "NEXT-OBS-015-APPEND-ONLY-DOCUMENT-CAPACITY",
+    "navigator_version": "DN-01.4",
+    "max_documents": 1000,
+    "byte_bounds": "Unchanged runtime; OPERATIONS total-body metadata aligned to existing16MiB",
+    "scope": "Finite schema/runtime/contract successor only; no installation, actual NEXT or permission effects; all previous origin fields/versions preserved."
+  }
+}

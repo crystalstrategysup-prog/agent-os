@@ -1,0 +1,2197 @@
+{
+  "schema": "function-extractor.avl-scenarios/v1",
+  "source_sha": "233f9738e70f47aef1671a6deb7c92fee51e8923",
+  "production_native_calls": 0,
+  "historical_operation_replay": false,
+  "scenarios": [
+    {
+      "id": "T01",
+      "case": "success",
+      "status": "PASS",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "success",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "sent",
+          "error_category": null,
+          "post_count": 1
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "proof_scope": "actual_unmodified_source_with_synthetic_boundaries",
+      "guarded_replay": "EXECUTED",
+      "unit_result": "PASS",
+      "fixture_sha256": "e851924fa65fec4a9bfaf9c2bb3d141199f2206325dc46d857ff0c7e0e2e59d2",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T01]",
+      "guarded_result": {
+        "id": "T01",
+        "unit_result": "PASS",
+        "status": "PASS",
+        "scope": "actual_unmodified_source_with_synthetic_boundaries",
+        "guarded_replay": "EXECUTED",
+        "checks": {
+          "audit_seccomp": true,
+          "target_returned": true,
+          "child_joined_exit0": true,
+          "hook_expected": true,
+          "one_or_no_fake_post": true,
+          "receipt_state": true,
+          "receipt_category": true,
+          "original_target_state": true,
+          "actual_BNT_once": true
+        },
+        "trace": {
+          "path": ".agentos/route-probe/vl_routes/V3_GUARDED_VENV_CORRECTION/T01/trace.json",
+          "sha256": "ab3686632ef3319c04f8d895935aa80ffcbb4052641e26b149ab215f1e1b9764"
+        },
+        "sandbox": {
+          "audit": true,
+          "cpu_seconds": 15,
+          "max_fds": 128,
+          "memory_mb": 256,
+          "seccomp": true
+        },
+        "target_outcome": {
+          "result_summary": {
+            "state": "sent",
+            "type": "DeliveryReceipt"
+          },
+          "status": "RETURNED"
+        },
+        "simulated_boundary_counts": {
+          "post": 1,
+          "provider_native_calls": 0
+        }
+      },
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_success.json",
+        "sha256": "e851924fa65fec4a9bfaf9c2bb3d141199f2206325dc46d857ff0c7e0e2e59d2"
+      },
+      "bundle_role": "bridge",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "sent"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "sent"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "NONE"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T02",
+      "case": "telegram403",
+      "status": "PASS",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "telegram403",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "failed",
+          "error_category": "provider_rejected_403_recipient_blocked",
+          "post_count": 1
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "proof_scope": "actual_unmodified_source_with_synthetic_boundaries",
+      "additional_cases": [
+        "telegram400"
+      ],
+      "guarded_replay": "EXECUTED",
+      "unit_result": "PASS",
+      "fixture_sha256": "677d71a4541988f271a6dcf5ef1294373967993c0e2c43724a623441636fef16",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T02]",
+      "guarded_result": {
+        "id": "T02",
+        "unit_result": "PASS",
+        "status": "PASS",
+        "scope": "actual_unmodified_source_with_synthetic_boundaries",
+        "guarded_replay": "EXECUTED",
+        "checks": {
+          "audit_seccomp": true,
+          "target_returned": true,
+          "child_joined_exit0": true,
+          "hook_expected": true,
+          "one_or_no_fake_post": true,
+          "receipt_state": true,
+          "receipt_category": true,
+          "original_target_state": true,
+          "actual_BNT_once": true
+        },
+        "trace": {
+          "path": ".agentos/route-probe/vl_routes/V3_GUARDED_VENV_CORRECTION/T02/trace.json",
+          "sha256": "d62f7d3b7f10e7b45e1c69ecb3d31ed2a4b430973511375d1e28b5be567cd10c"
+        },
+        "sandbox": {
+          "audit": true,
+          "cpu_seconds": 15,
+          "max_fds": 128,
+          "memory_mb": 256,
+          "seccomp": true
+        },
+        "target_outcome": {
+          "result_summary": {
+            "state": "failed",
+            "type": "DeliveryReceipt"
+          },
+          "status": "RETURNED"
+        },
+        "simulated_boundary_counts": {
+          "post": 1,
+          "provider_native_calls": 0
+        }
+      },
+      "additional_guarded_results": [
+        {
+          "case": "telegram400",
+          "status": "PASS",
+          "checks": {
+            "target_returned": true,
+            "expected_receipt": true,
+            "expected_category": true,
+            "one_post": true,
+            "hook_clean": true,
+            "sandbox": true
+          },
+          "started_at": "2026-10-22T09:29:38.766209+00:00",
+          "finished_at": "2026-10-22T09:29:44.126675+00:00",
+          "trace": {
+            "path": ".agentos/route-probe/vl_routes/V3_ADDITIONAL_VARIANTS/telegram400.json",
+            "sha256": "58e1f162fef492cfd56f7d33ebbaf4571fdaf2466cf9ed71ce2291cb196a9034"
+          }
+        }
+      ],
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_telegram403.json",
+        "sha256": "677d71a4541988f271a6dcf5ef1294373967993c0e2c43724a623441636fef16"
+      },
+      "bundle_role": "bridge",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "failed"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "failed"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "provider_rejected_403_recipient_blocked"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T03",
+      "case": "telegram429",
+      "status": "PASS",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "telegram429",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "retry_wait",
+          "error_category": "flood_control",
+          "post_count": 1
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "proof_scope": "actual_unmodified_source_with_synthetic_boundaries",
+      "guarded_replay": "EXECUTED",
+      "unit_result": "PASS",
+      "fixture_sha256": "15a3b165a91ae2988bf3cf39573225c767123316c594c88456eea6e0f3251dab",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T03]",
+      "guarded_result": {
+        "id": "T03",
+        "unit_result": "PASS",
+        "status": "PASS",
+        "scope": "actual_unmodified_source_with_synthetic_boundaries",
+        "guarded_replay": "EXECUTED",
+        "checks": {
+          "audit_seccomp": true,
+          "target_returned": true,
+          "child_joined_exit0": true,
+          "hook_expected": true,
+          "one_or_no_fake_post": true,
+          "receipt_state": true,
+          "receipt_category": true,
+          "original_target_state": true,
+          "actual_BNT_once": true
+        },
+        "trace": {
+          "path": ".agentos/route-probe/vl_routes/V3_GUARDED_VENV_CORRECTION/T03/trace.json",
+          "sha256": "ba0502b35730cc41126b129d4dc767720031568e3819415d3f7128c5cdee8e60"
+        },
+        "sandbox": {
+          "audit": true,
+          "cpu_seconds": 15,
+          "max_fds": 128,
+          "memory_mb": 256,
+          "seccomp": true
+        },
+        "target_outcome": {
+          "result_summary": {
+            "retry_after": 7,
+            "state": "retry_wait",
+            "type": "DeliveryReceipt"
+          },
+          "status": "RETURNED"
+        },
+        "simulated_boundary_counts": {
+          "post": 1,
+          "provider_native_calls": 0
+        }
+      },
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_telegram429.json",
+        "sha256": "15a3b165a91ae2988bf3cf39573225c767123316c594c88456eea6e0f3251dab"
+      },
+      "bundle_role": "bridge",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "retry_wait",
+          "retry_after": 7
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "retry_wait"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "flood_control"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T04",
+      "case": "telegram5xx",
+      "status": "PASS",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "telegram5xx",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "unknown",
+          "error_category": "provider_indeterminate",
+          "post_count": 1
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "proof_scope": "actual_unmodified_source_with_synthetic_boundaries",
+      "guarded_replay": "EXECUTED",
+      "unit_result": "PASS",
+      "fixture_sha256": "1cab3e3af8f9645d6525dd564e29dfb7ee59648de623dd22b59f2e79599d7f2d",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T04]",
+      "guarded_result": {
+        "id": "T04",
+        "unit_result": "PASS",
+        "status": "PASS",
+        "scope": "actual_unmodified_source_with_synthetic_boundaries",
+        "guarded_replay": "EXECUTED",
+        "checks": {
+          "audit_seccomp": true,
+          "target_returned": true,
+          "child_joined_exit0": true,
+          "hook_expected": true,
+          "one_or_no_fake_post": true,
+          "receipt_state": true,
+          "receipt_category": true,
+          "original_target_state": true,
+          "actual_BNT_once": true
+        },
+        "trace": {
+          "path": ".agentos/route-probe/vl_routes/V3_GUARDED_VENV_CORRECTION/T04/trace.json",
+          "sha256": "74a5133d86995e50168fdc6084ae4a23366942615ae78aaf794ae3bf79092a49"
+        },
+        "sandbox": {
+          "audit": true,
+          "cpu_seconds": 15,
+          "max_fds": 128,
+          "memory_mb": 256,
+          "seccomp": true
+        },
+        "target_outcome": {
+          "result_summary": {
+            "state": "unknown",
+            "type": "DeliveryReceipt"
+          },
+          "status": "RETURNED"
+        },
+        "simulated_boundary_counts": {
+          "post": 1,
+          "provider_native_calls": 0
+        }
+      },
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_telegram5xx.json",
+        "sha256": "1cab3e3af8f9645d6525dd564e29dfb7ee59648de623dd22b59f2e79599d7f2d"
+      },
+      "bundle_role": "bridge",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "provider_indeterminate"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T05",
+      "case": "dns",
+      "status": "PASS",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "dns",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "unknown",
+          "error_category": "native_post_transport_or_receipt_unknown",
+          "post_count": 1
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "proof_scope": "actual_unmodified_source_with_synthetic_boundaries",
+      "guarded_replay": "EXECUTED",
+      "unit_result": "PASS",
+      "fixture_sha256": "8d8d29da9856e7c59111e30f1d3b15cf0c5cb71c2e04fd397621aed8eefddc77",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T05]",
+      "fault_boundary_note": "exact requests exception injected; no real DNS/TCP/TLS resolution performed",
+      "guarded_result": {
+        "id": "T05",
+        "unit_result": "PASS",
+        "status": "PASS",
+        "scope": "actual_unmodified_source_with_synthetic_boundaries",
+        "guarded_replay": "EXECUTED",
+        "checks": {
+          "audit_seccomp": true,
+          "target_returned": true,
+          "child_joined_exit0": true,
+          "hook_expected": true,
+          "one_or_no_fake_post": true,
+          "receipt_state": true,
+          "receipt_category": true,
+          "original_target_state": true,
+          "actual_BNT_once": true
+        },
+        "trace": {
+          "path": ".agentos/route-probe/vl_routes/V3_GUARDED_VENV_CORRECTION/T05/trace.json",
+          "sha256": "9806805ef78c4bba92e4f985f8a3f23291cdd3b5b01b2e6a3de4d70b3ac09cb9"
+        },
+        "sandbox": {
+          "audit": true,
+          "cpu_seconds": 15,
+          "max_fds": 128,
+          "memory_mb": 256,
+          "seccomp": true
+        },
+        "target_outcome": {
+          "result_summary": {
+            "state": "unknown",
+            "type": "DeliveryReceipt"
+          },
+          "status": "RETURNED"
+        },
+        "simulated_boundary_counts": {
+          "post": 1,
+          "provider_native_calls": 0
+        }
+      },
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_dns.json",
+        "sha256": "8d8d29da9856e7c59111e30f1d3b15cf0c5cb71c2e04fd397621aed8eefddc77"
+      },
+      "bundle_role": "bridge",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T06",
+      "case": "proxy",
+      "status": "PASS",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "proxy",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "unknown",
+          "error_category": "native_post_transport_or_receipt_unknown",
+          "post_count": 1
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "proof_scope": "actual_unmodified_source_with_synthetic_boundaries",
+      "guarded_replay": "EXECUTED",
+      "unit_result": "PASS",
+      "fixture_sha256": "1ddb67f72945e1c86e84533fab0b788deefb78fe40ac64ed08d6b138a611a5bd",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T06]",
+      "guarded_result": {
+        "id": "T06",
+        "unit_result": "PASS",
+        "status": "PASS",
+        "scope": "actual_unmodified_source_with_synthetic_boundaries",
+        "guarded_replay": "EXECUTED",
+        "checks": {
+          "audit_seccomp": true,
+          "target_returned": true,
+          "child_joined_exit0": true,
+          "hook_expected": true,
+          "one_or_no_fake_post": true,
+          "receipt_state": true,
+          "receipt_category": true,
+          "original_target_state": true,
+          "actual_BNT_once": true
+        },
+        "trace": {
+          "path": ".agentos/route-probe/vl_routes/V3_GUARDED_VENV_CORRECTION/T06/trace.json",
+          "sha256": "b00447e91683de8b6d53207b4f935f8b56a61bcfbe7202080d7a0223b7b417cd"
+        },
+        "sandbox": {
+          "audit": true,
+          "cpu_seconds": 15,
+          "max_fds": 128,
+          "memory_mb": 256,
+          "seccomp": true
+        },
+        "target_outcome": {
+          "result_summary": {
+            "state": "unknown",
+            "type": "DeliveryReceipt"
+          },
+          "status": "RETURNED"
+        },
+        "simulated_boundary_counts": {
+          "post": 1,
+          "provider_native_calls": 0
+        }
+      },
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_proxy.json",
+        "sha256": "1ddb67f72945e1c86e84533fab0b788deefb78fe40ac64ed08d6b138a611a5bd"
+      },
+      "bundle_role": "bridge",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T07",
+      "case": "tls",
+      "status": "PASS",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "tls",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "unknown",
+          "error_category": "native_post_transport_or_receipt_unknown",
+          "post_count": 1
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "proof_scope": "actual_unmodified_source_with_synthetic_boundaries",
+      "additional_cases": [
+        "tcp"
+      ],
+      "guarded_replay": "EXECUTED",
+      "unit_result": "PASS",
+      "fixture_sha256": "4651748cb86d79b29ed1909b192d10d2d760ca2d4146d3fbabbaa202c2cf766c",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T07]",
+      "fault_boundary_note": "exact requests exception injected; no real DNS/TCP/TLS resolution performed",
+      "guarded_result": {
+        "id": "T07",
+        "unit_result": "PASS",
+        "status": "PASS",
+        "scope": "actual_unmodified_source_with_synthetic_boundaries",
+        "guarded_replay": "EXECUTED",
+        "checks": {
+          "audit_seccomp": true,
+          "target_returned": true,
+          "child_joined_exit0": true,
+          "hook_expected": true,
+          "one_or_no_fake_post": true,
+          "receipt_state": true,
+          "receipt_category": true,
+          "original_target_state": true,
+          "actual_BNT_once": true
+        },
+        "trace": {
+          "path": ".agentos/route-probe/vl_routes/V3_GUARDED_VENV_CORRECTION/T07/trace.json",
+          "sha256": "10c9d57ae986b2413bc8ca9fee5fa291d3e78c0f466a90f8185467b37fcf2b25"
+        },
+        "sandbox": {
+          "audit": true,
+          "cpu_seconds": 15,
+          "max_fds": 128,
+          "memory_mb": 256,
+          "seccomp": true
+        },
+        "target_outcome": {
+          "result_summary": {
+            "state": "unknown",
+            "type": "DeliveryReceipt"
+          },
+          "status": "RETURNED"
+        },
+        "simulated_boundary_counts": {
+          "post": 1,
+          "provider_native_calls": 0
+        }
+      },
+      "additional_guarded_results": [
+        {
+          "case": "tcp",
+          "status": "PASS",
+          "checks": {
+            "target_returned": true,
+            "expected_receipt": true,
+            "expected_category": true,
+            "one_post": true,
+            "hook_clean": true,
+            "sandbox": true
+          },
+          "started_at": "2026-10-22T09:29:44.128146+00:00",
+          "finished_at": "2026-10-22T09:29:48.984565+00:00",
+          "trace": {
+            "path": ".agentos/route-probe/vl_routes/V3_ADDITIONAL_VARIANTS/tcp.json",
+            "sha256": "f3b05225803e24a8705a70d5ff486ae9a9638967658202cb545ac92e7b31f3de"
+          }
+        }
+      ],
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_tls.json",
+        "sha256": "4651748cb86d79b29ed1909b192d10d2d760ca2d4146d3fbabbaa202c2cf766c"
+      },
+      "bundle_role": "bridge",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T08",
+      "case": "connect",
+      "status": "PASS",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "connect",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "unknown",
+          "error_category": "native_post_transport_or_receipt_unknown",
+          "post_count": 1
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "proof_scope": "actual_unmodified_source_with_synthetic_boundaries",
+      "expected_note": "Conservative POST entry started=True; ConnectTimeout does not prove NOT_STARTED",
+      "guarded_replay": "EXECUTED",
+      "unit_result": "PASS",
+      "fixture_sha256": "0d07221a7d5f1b9dbcb699b4cbb393d57979815e103b81edd5e2309a7ef56ef2",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T08]",
+      "guarded_result": {
+        "id": "T08",
+        "unit_result": "PASS",
+        "status": "PASS",
+        "scope": "actual_unmodified_source_with_synthetic_boundaries",
+        "guarded_replay": "EXECUTED",
+        "checks": {
+          "audit_seccomp": true,
+          "target_returned": true,
+          "child_joined_exit0": true,
+          "hook_expected": true,
+          "one_or_no_fake_post": true,
+          "receipt_state": true,
+          "receipt_category": true,
+          "original_target_state": true,
+          "actual_BNT_once": true
+        },
+        "trace": {
+          "path": ".agentos/route-probe/vl_routes/V3_GUARDED_VENV_CORRECTION/T08/trace.json",
+          "sha256": "5cbd8486e4fa8a92561c51bf0a168633aa4b91eabb45fb8def5e0ce7519f3c35"
+        },
+        "sandbox": {
+          "audit": true,
+          "cpu_seconds": 15,
+          "max_fds": 128,
+          "memory_mb": 256,
+          "seccomp": true
+        },
+        "target_outcome": {
+          "result_summary": {
+            "state": "unknown",
+            "type": "DeliveryReceipt"
+          },
+          "status": "RETURNED"
+        },
+        "simulated_boundary_counts": {
+          "post": 1,
+          "provider_native_calls": 0
+        }
+      },
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_connect.json",
+        "sha256": "0d07221a7d5f1b9dbcb699b4cbb393d57979815e103b81edd5e2309a7ef56ef2"
+      },
+      "bundle_role": "bridge",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T09",
+      "case": "timeout",
+      "status": "PASS",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "timeout",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "unknown",
+          "error_category": "native_post_transport_or_receipt_unknown",
+          "post_count": 1
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "proof_scope": "actual_unmodified_source_with_synthetic_boundaries",
+      "guarded_replay": "EXECUTED",
+      "unit_result": "PASS",
+      "fixture_sha256": "0356ba1e59a833b055bfffbc24937985ebff996247ee318c7dc16d434a914307",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T09]",
+      "guarded_result": {
+        "id": "T09",
+        "unit_result": "PASS",
+        "status": "PASS",
+        "scope": "actual_unmodified_source_with_synthetic_boundaries",
+        "guarded_replay": "EXECUTED",
+        "checks": {
+          "audit_seccomp": true,
+          "target_returned": true,
+          "child_joined_exit0": true,
+          "hook_expected": true,
+          "one_or_no_fake_post": true,
+          "receipt_state": true,
+          "receipt_category": true,
+          "original_target_state": true,
+          "actual_BNT_once": true
+        },
+        "trace": {
+          "path": ".agentos/route-probe/vl_routes/V3_GUARDED_VENV_CORRECTION/T09/trace.json",
+          "sha256": "30e139fe53758c1cfabf07a42e1927786fe605e94fde43847cce2a323a7cdbec"
+        },
+        "sandbox": {
+          "audit": true,
+          "cpu_seconds": 15,
+          "max_fds": 128,
+          "memory_mb": 256,
+          "seccomp": true
+        },
+        "target_outcome": {
+          "result_summary": {
+            "state": "unknown",
+            "type": "DeliveryReceipt"
+          },
+          "status": "RETURNED"
+        },
+        "simulated_boundary_counts": {
+          "post": 1,
+          "provider_native_calls": 0
+        }
+      },
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_timeout.json",
+        "sha256": "0356ba1e59a833b055bfffbc24937985ebff996247ee318c7dc16d434a914307"
+      },
+      "bundle_role": "bridge",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T10",
+      "case": "broken_stream",
+      "status": "PASS",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "broken_stream",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "unknown",
+          "error_category": "native_post_transport_or_receipt_unknown",
+          "post_count": 1
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "proof_scope": "actual_unmodified_source_with_synthetic_boundaries",
+      "guarded_replay": "EXECUTED",
+      "unit_result": "PASS",
+      "fixture_sha256": "ea9a565bee43a2ab44d1bc271a59f1507fe483415e8b978193c48f5588b82cae",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T10]",
+      "guarded_result": {
+        "id": "T10",
+        "unit_result": "PASS",
+        "status": "PASS",
+        "scope": "actual_unmodified_source_with_synthetic_boundaries",
+        "guarded_replay": "EXECUTED",
+        "checks": {
+          "audit_seccomp": true,
+          "target_returned": true,
+          "child_joined_exit0": true,
+          "hook_expected": true,
+          "one_or_no_fake_post": true,
+          "receipt_state": true,
+          "receipt_category": true,
+          "original_target_state": true,
+          "actual_BNT_once": true
+        },
+        "trace": {
+          "path": ".agentos/route-probe/vl_routes/V3_GUARDED_VENV_CORRECTION/T10/trace.json",
+          "sha256": "6bf24dc184043a5e2203cf6e64329e70ea1772627bdebe871e213a557a2227d6"
+        },
+        "sandbox": {
+          "audit": true,
+          "cpu_seconds": 15,
+          "max_fds": 128,
+          "memory_mb": 256,
+          "seccomp": true
+        },
+        "target_outcome": {
+          "result_summary": {
+            "state": "unknown",
+            "type": "DeliveryReceipt"
+          },
+          "status": "RETURNED"
+        },
+        "simulated_boundary_counts": {
+          "post": 1,
+          "provider_native_calls": 0
+        }
+      },
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_broken_stream.json",
+        "sha256": "ea9a565bee43a2ab44d1bc271a59f1507fe483415e8b978193c48f5588b82cae"
+      },
+      "bundle_role": "bridge",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T11",
+      "case": "malformed_json",
+      "status": "PASS",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "malformed_json",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "unknown",
+          "error_category": "native_post_transport_or_receipt_unknown",
+          "post_count": 1
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "proof_scope": "actual_unmodified_source_with_synthetic_boundaries",
+      "guarded_replay": "EXECUTED",
+      "unit_result": "PASS",
+      "fixture_sha256": "8cfe6b9c6b16baf389631d6111af023984435b0f6ee24e8e8d290bae3c686d9c",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T11]",
+      "guarded_result": {
+        "id": "T11",
+        "unit_result": "PASS",
+        "status": "PASS",
+        "scope": "actual_unmodified_source_with_synthetic_boundaries",
+        "guarded_replay": "EXECUTED",
+        "checks": {
+          "audit_seccomp": true,
+          "target_returned": true,
+          "child_joined_exit0": true,
+          "hook_expected": true,
+          "one_or_no_fake_post": true,
+          "receipt_state": true,
+          "receipt_category": true,
+          "original_target_state": true,
+          "actual_BNT_once": true
+        },
+        "trace": {
+          "path": ".agentos/route-probe/vl_routes/V3_GUARDED_VENV_CORRECTION/T11/trace.json",
+          "sha256": "bf04d45bd1c893be16f6e05c582fcdb70d8c7a57ecee1866140df184255404f1"
+        },
+        "sandbox": {
+          "audit": true,
+          "cpu_seconds": 15,
+          "max_fds": 128,
+          "memory_mb": 256,
+          "seccomp": true
+        },
+        "target_outcome": {
+          "result_summary": {
+            "state": "unknown",
+            "type": "DeliveryReceipt"
+          },
+          "status": "RETURNED"
+        },
+        "simulated_boundary_counts": {
+          "post": 1,
+          "provider_native_calls": 0
+        }
+      },
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_malformed_json.json",
+        "sha256": "8cfe6b9c6b16baf389631d6111af023984435b0f6ee24e8e8d290bae3c686d9c"
+      },
+      "bundle_role": "bridge",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "native_post_transport_or_receipt_unknown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T12",
+      "case": "missing_receipt",
+      "status": "PASS",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "missing_receipt",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "unknown",
+          "error_category": "partial_or_invalid_receipt",
+          "post_count": 1
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "proof_scope": "actual_unmodified_source_with_synthetic_boundaries",
+      "guarded_replay": "EXECUTED",
+      "unit_result": "PASS",
+      "fixture_sha256": "728708669c9037b2d388a6ac6cb0f57fcbd4acd6793992491312dd2cd1491eed",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T12]",
+      "guarded_result": {
+        "id": "T12",
+        "unit_result": "PASS",
+        "status": "PASS",
+        "scope": "actual_unmodified_source_with_synthetic_boundaries",
+        "guarded_replay": "EXECUTED",
+        "checks": {
+          "audit_seccomp": true,
+          "target_returned": true,
+          "child_joined_exit0": true,
+          "hook_expected": true,
+          "one_or_no_fake_post": true,
+          "receipt_state": true,
+          "receipt_category": true,
+          "original_target_state": true,
+          "actual_BNT_once": true
+        },
+        "trace": {
+          "path": ".agentos/route-probe/vl_routes/V3_GUARDED_VENV_CORRECTION/T12/trace.json",
+          "sha256": "e561bea052d048083b0761ccebb68a4f4c5d0979cbd3494bc4f8940444021f1c"
+        },
+        "sandbox": {
+          "audit": true,
+          "cpu_seconds": 15,
+          "max_fds": 128,
+          "memory_mb": 256,
+          "seccomp": true
+        },
+        "target_outcome": {
+          "result_summary": {
+            "state": "unknown",
+            "type": "DeliveryReceipt"
+          },
+          "status": "RETURNED"
+        },
+        "simulated_boundary_counts": {
+          "post": 1,
+          "provider_native_calls": 0
+        }
+      },
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_missing_receipt.json",
+        "sha256": "728708669c9037b2d388a6ac6cb0f57fcbd4acd6793992491312dd2cd1491eed"
+      },
+      "bundle_role": "bridge",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "unknown"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "partial_or_invalid_receipt"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T13",
+      "case": "preclaim_db",
+      "status": "UNKNOWN",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "preclaim_db",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_worker:process_delivery_once",
+        "expected": {
+          "state": "RAISED",
+          "error_category": "FixtureDatabaseError",
+          "post_count": 0
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.core.db",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_group_budget",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_inbox",
+          "app.ingest.telegram_private_materializer",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_private_worker",
+          "app.ingest.telegram_reply_presentation",
+          "app.models"
+        ]
+      },
+      "entry": "app.ingest.telegram_private_worker:process_delivery_once",
+      "proof_scope": "actual_worker_entry_with_simulated_session_factory_exception_before_claim_no_postgresql_failure",
+      "guarded_replay": "REFUSED_BEFORE_CHILD",
+      "unit_result": "PASS",
+      "fixture_sha256": "5336d10b1036a484da8cf2b769126f39c6fc36ce745c268ff2a49975cd58dd46",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T13]",
+      "guarded_result": {
+        "id": "T13",
+        "unit_result": "PASS",
+        "status": "UNKNOWN",
+        "scope": "actual_worker_entry_with_simulated_session_factory_exception_before_claim_no_postgresql_failure",
+        "guarded_replay": "REFUSED_BEFORE_CHILD",
+        "reason": "graph_expansion_cap_before_child_after_absent_secret_graph_fix",
+        "latest_refusal_receipt": {
+          "path": ".agentos/route-probe/vl_routes/V3_WORKER_GRAPH_SUCCESSOR/RECEIPT.json",
+          "sha256": "1c71d8ebaf86fbf9880cb20dd3d4fb0bbff054c67a0fda2796fe9096609eceec"
+        }
+      },
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_preclaim_db.json",
+        "sha256": "5336d10b1036a484da8cf2b769126f39c6fc36ce745c268ff2a49975cd58dd46"
+      },
+      "bundle_role": "worker",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RAISED",
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "database_before_claim",
+            "event": "failed"
+          }
+        ]
+      },
+      "latest_guarded_refusal": {
+        "category": "graph_expansion_cap",
+        "receipt": ".agentos/route-probe/vl_routes/V3_WORKER_GRAPH_SUCCESSOR/RECEIPT.json"
+      }
+    },
+    {
+      "id": "T14",
+      "case": "db_commit_exception",
+      "status": "PASS",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "db_commit_exception",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "sent",
+          "error_category": null,
+          "post_count": 1,
+          "posthook_exception": "FixtureDatabaseError",
+          "commit_count": 0
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "proof_scope": "real_bridge_native_receipt_then_simulated_transaction_fault_not_actual_worker_commit",
+      "guarded_replay": "EXECUTED",
+      "unit_result": "PASS",
+      "fixture_sha256": "6c58c2c84ef89bbf48f73dc1dcda5e4f13f4393f9d5853d161dadefbfc6d79d2",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T14]",
+      "guarded_result": {
+        "id": "T14",
+        "unit_result": "PASS",
+        "status": "PASS",
+        "scope": "real_bridge_native_receipt_then_simulated_transaction_fault_not_actual_worker_commit",
+        "guarded_replay": "EXECUTED",
+        "checks": {
+          "audit_seccomp": true,
+          "target_returned": true,
+          "child_joined_exit0": true,
+          "hook_expected": true,
+          "one_or_no_fake_post": true,
+          "receipt_state": true,
+          "receipt_category": true,
+          "original_target_state": true,
+          "actual_BNT_once": true
+        },
+        "trace": {
+          "path": ".agentos/route-probe/vl_routes/V3_REMAINING_UNISSUED/T14/trace.json",
+          "sha256": "48d073fea154d52d16f5a6fd5968ced49daf31c35845281a6062990ed14efa01"
+        },
+        "sandbox": {
+          "audit": true,
+          "cpu_seconds": 15,
+          "max_fds": 128,
+          "memory_mb": 256,
+          "seccomp": true
+        },
+        "target_outcome": {
+          "result_summary": {
+            "state": "sent",
+            "type": "DeliveryReceipt"
+          },
+          "status": "RETURNED"
+        },
+        "simulated_boundary_counts": {
+          "post": 1,
+          "provider_native_calls": 0
+        }
+      },
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_db_commit_exception.json",
+        "sha256": "6c58c2c84ef89bbf48f73dc1dcda5e4f13f4393f9d5853d161dadefbfc6d79d2"
+      },
+      "bundle_role": "bridge",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "sent"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "sent"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "NONE"
+          },
+          {
+            "phase": "receipt_persistence",
+            "event": "unverified"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T15",
+      "case": "owner_loss",
+      "status": "PASS",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "owner_loss",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_transport:deliver",
+        "expected": {
+          "state": "failed",
+          "error_category": "native_pre_runtime_owner_not_admitted",
+          "post_count": 0
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "entry": "app.ingest.telegram_private_transport:deliver",
+      "proof_scope": "actual_unmodified_source_with_synthetic_boundaries",
+      "guarded_replay": "EXECUTED",
+      "unit_result": "PASS",
+      "fixture_sha256": "9a105a3cc2c74850308cb4e016f3bfb330efa6602de1c8c2809a5fcbb2bd75e4",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T15]",
+      "guarded_result": {
+        "id": "T15",
+        "unit_result": "PASS",
+        "status": "PASS",
+        "scope": "actual_unmodified_source_with_synthetic_boundaries",
+        "guarded_replay": "EXECUTED",
+        "checks": {
+          "audit_seccomp": true,
+          "target_returned": true,
+          "child_joined_exit0": true,
+          "hook_expected": true,
+          "one_or_no_fake_post": true,
+          "receipt_state": true,
+          "receipt_category": true,
+          "original_target_state": true,
+          "actual_BNT_once": true
+        },
+        "trace": {
+          "path": ".agentos/route-probe/vl_routes/V3_REMAINING_UNISSUED/T15/trace.json",
+          "sha256": "3cb878aa278cd1acc15238bbf0ba1e3576f09c2c54717388536959d27395d150"
+        },
+        "sandbox": {
+          "audit": true,
+          "cpu_seconds": 15,
+          "max_fds": 128,
+          "memory_mb": 256,
+          "seccomp": true
+        },
+        "target_outcome": {
+          "result_summary": {
+            "state": "failed",
+            "type": "DeliveryReceipt"
+          },
+          "status": "RETURNED"
+        },
+        "simulated_boundary_counts": {
+          "post": 0,
+          "provider_native_calls": 0
+        }
+      },
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_owner_loss.json",
+        "sha256": "9a105a3cc2c74850308cb4e016f3bfb330efa6602de1c8c2809a5fcbb2bd75e4"
+      },
+      "bundle_role": "bridge",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "DeliveryReceipt",
+          "state": "failed"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "failed"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "native_pre_runtime_owner_not_admitted"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T16",
+      "case": "duplicate",
+      "status": "PASS",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "duplicate",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_inbox:enqueue_operation",
+        "expected": {
+          "state": "REUSED",
+          "error_category": null,
+          "post_count": 0
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.core.db",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_inbox",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "entry": "app.ingest.telegram_private_inbox:enqueue_operation",
+      "proof_scope": "actual_enqueue_operation_with_actual_inmemory_sqlite_sequential_idempotency_not_postgresql_concurrency",
+      "guarded_replay": "EXECUTED",
+      "unit_result": "PASS",
+      "fixture_sha256": "fc0d23666a942a78a4f32582c986197518059c333d3562c6b9d4bb7efa11105e",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T16]",
+      "guarded_result": {
+        "id": "T16",
+        "unit_result": "PASS",
+        "status": "PASS",
+        "scope": "actual_enqueue_operation_with_actual_inmemory_sqlite_sequential_idempotency_not_postgresql_concurrency",
+        "guarded_replay": "EXECUTED",
+        "checks": {
+          "audit_seccomp": true,
+          "target_returned": true,
+          "child_joined_exit0": true,
+          "hook_expected": true,
+          "one_or_no_fake_post": true,
+          "actual_enqueue_called_twice": true,
+          "one_sqlite_row": true
+        },
+        "trace": {
+          "path": ".agentos/route-probe/vl_routes/V3_T16_SUMMARY_SUCCESSOR/trace.json",
+          "sha256": "a1913e23f630f5524c0ec69778903cf8d114898e1fcac6a3dc33e5541eb3a912"
+        },
+        "sandbox": {
+          "audit": true,
+          "cpu_seconds": 15,
+          "max_fds": 128,
+          "memory_mb": 256,
+          "seccomp": true
+        },
+        "target_outcome": {
+          "result_summary": {
+            "state": "queued",
+            "type": "TelegramPrivateBotOperation"
+          },
+          "status": "RETURNED"
+        },
+        "simulated_boundary_counts": {
+          "post": 0,
+          "provider_native_calls": 0
+        },
+        "pre_summary_fix_trace": {
+          "path": ".agentos/route-probe/vl_routes/V3_REMAINING_UNISSUED/T16/trace.json",
+          "sha256": "cda51ec823abdc5a6576a5f14ff68a3ca120c48acdec39f942f2044c017bab30"
+        },
+        "typed_comparison": "MATCH",
+        "summary_fix_receipt": {
+          "path": ".agentos/route-probe/vl_routes/V3_T16_SUMMARY_SUCCESSOR/RECEIPT.json",
+          "sha256": "8b4f03e7d98a8638f979ce2f97cd28368bfd8751c689c64fe8df0d42eac01eb7"
+        }
+      },
+      "additional_guarded_results": [
+        {
+          "case": "duplicate_conflict",
+          "status": "PASS",
+          "checks": {
+            "target_refused": true,
+            "strict_exception": true,
+            "one_row_preserved": true,
+            "no_fake_post": true,
+            "sandbox": true
+          },
+          "started_at": "2026-10-22T09:29:48.985667+00:00",
+          "finished_at": "2026-10-22T09:29:55.132549+00:00",
+          "trace": {
+            "path": ".agentos/route-probe/vl_routes/V3_ADDITIONAL_VARIANTS/duplicate_conflict.json",
+            "sha256": "1786c004738624e9d71b1da542eb5bbb71189bf8181190ef0d41c0706c4a8485"
+          }
+        }
+      ],
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_duplicate.json",
+        "sha256": "fc0d23666a942a78a4f32582c986197518059c333d3562c6b9d4bb7efa11105e"
+      },
+      "bundle_role": "ledger",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "TelegramPrivateBotOperation",
+          "state": "queued"
+        },
+        "phase_events": [
+          {
+            "phase": "existing_action_seed",
+            "event": "committed_sqlite"
+          },
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "ledger_result",
+            "event": "existing_action_reused"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T17",
+      "case": null,
+      "status": "UNKNOWN",
+      "production_qualification": false,
+      "open_reason": "PostgreSQL concurrent worker claims not executed",
+      "guarded_replay": "NOT_RUN",
+      "unit_result": "UNKNOWN",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T17]",
+      "guarded_result": {
+        "id": "T17",
+        "unit_result": "UNKNOWN",
+        "status": "UNKNOWN",
+        "scope": null,
+        "guarded_replay": "NOT_EXECUTED",
+        "reason": "PostgreSQL concurrent worker claims not executed",
+        "local_sqlite_proof": {
+          "status": "PASS_LOCAL_UNIT_ONLY",
+          "receipt": {
+            "path": ".agentos/route-probe/vl_routes/V3_SQLITE_CONCURRENCY_FIRST/RECEIPT.json",
+            "sha256": "66b1e9b2749912be079b52348e4f9b03ddaeb56e10969d3b6a13452d6b97511c"
+          },
+          "scope": "actual_shared_worker_TEST_binding_two_independent_connections_synchronized_before_original_claim_CAS_one_SENDING_no_POST",
+          "production_PG": "UNKNOWN",
+          "guarded_threads": "NOT_EXECUTED"
+        }
+      },
+      "fixture": null,
+      "bundle_role": null,
+      "entry": null,
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        }
+      },
+      "local_sqlite_proof": {
+        "status": "PASS_LOCAL_UNIT_ONLY",
+        "receipt": {
+          "path": ".agentos/route-probe/vl_routes/V3_SQLITE_CONCURRENCY_FIRST/RECEIPT.json",
+          "sha256": "66b1e9b2749912be079b52348e4f9b03ddaeb56e10969d3b6a13452d6b97511c"
+        },
+        "scope": "actual_shared_worker_TEST_binding_two_independent_connections_synchronized_before_original_claim_CAS_one_SENDING_no_POST",
+        "production_PG": "UNKNOWN",
+        "guarded_threads": "NOT_EXECUTED"
+      }
+    },
+    {
+      "id": "T18",
+      "case": "group_unknown",
+      "status": "UNKNOWN",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "group_unknown",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.telegram_private_worker:process_delivery_once",
+        "expected": {
+          "state": "platform_group_pending",
+          "error_category": null,
+          "post_count": 0
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.core.db",
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_group_budget",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_inbox",
+          "app.ingest.telegram_private_materializer",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_private_worker",
+          "app.ingest.telegram_reply_presentation",
+          "app.models"
+        ]
+      },
+      "entry": "app.ingest.telegram_private_worker:process_delivery_once",
+      "proof_scope": "actual_worker_and_sqlite_query_dependency_gate_preserves_both_rows_no_claim_no_native",
+      "guarded_replay": "REFUSED_BEFORE_CHILD",
+      "unit_result": "PASS",
+      "fixture_sha256": "cfbe315796e952ce9f86f6a6142172457a3be10d40ea38b6c4c7ec6fdc8792b5",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T18]",
+      "guarded_result": {
+        "id": "T18",
+        "unit_result": "PASS",
+        "status": "UNKNOWN",
+        "scope": "actual_worker_and_sqlite_query_dependency_gate_preserves_both_rows_no_claim_no_native",
+        "guarded_replay": "REFUSED_BEFORE_CHILD",
+        "reason": "graph_expansion_cap_before_child_after_absent_secret_graph_fix",
+        "latest_refusal_receipt": {
+          "path": ".agentos/route-probe/vl_routes/V3_WORKER_GRAPH_SUCCESSOR/RECEIPT.json",
+          "sha256": "1c71d8ebaf86fbf9880cb20dd3d4fb0bbff054c67a0fda2796fe9096609eceec"
+        }
+      },
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_group_unknown.json",
+        "sha256": "cfbe315796e952ce9f86f6a6142172457a3be10d40ea38b6c4c7ec6fdc8792b5"
+      },
+      "bundle_role": "worker",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "str"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "worker_result",
+            "event": "platform_group_pending"
+          }
+        ]
+      },
+      "latest_guarded_refusal": {
+        "category": "graph_expansion_cap",
+        "receipt": ".agentos/route-probe/vl_routes/V3_WORKER_GRAPH_SUCCESSOR/RECEIPT.json"
+      }
+    },
+    {
+      "id": "T19",
+      "case": "wrapper_classification",
+      "status": "PASS",
+      "production_qualification": false,
+      "fixture": {
+        "schema": "route-probe.avl-fixture/v1",
+        "case": "wrapper_classification",
+        "route": "platform_group",
+        "adapter": "tools.route_probe_avl:prepare",
+        "entry": "app.ingest.bot_bridge_core:invoke_once",
+        "expected": {
+          "state": "unknown",
+          "error_category": "transport_or_receipt_unknown",
+          "post_count": 1
+        },
+        "evidence": "SIMULATED",
+        "opaque_modules": [
+          "app.core.config",
+          "app.ingest.telegram_basic_subscription",
+          "app.ingest.telegram_basic_media_policy"
+        ],
+        "include_modules": [
+          "app.ingest.bot_bridge_core",
+          "app.ingest.telegram_basic_native_transport",
+          "app.ingest.telegram_basic_upload_store",
+          "app.ingest.telegram_private_binding",
+          "app.ingest.telegram_private_transport",
+          "app.ingest.telegram_reply_presentation"
+        ]
+      },
+      "entry": "app.ingest.bot_bridge_core:invoke_once",
+      "proof_scope": "actual_invoke_once_wrapper_with_real_bnt_and_simulated_classifier_fault_not_http_middleware",
+      "guarded_replay": "EXECUTED",
+      "unit_result": "PASS",
+      "fixture_sha256": "5b4a764972a785b12e27a9575a4d89189de43b89da3d6fcd8b699a7f34e7ebf7",
+      "assertion": "actual selected whole function executed; see named newunit test",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T19]",
+      "guarded_result": {
+        "id": "T19",
+        "unit_result": "PASS",
+        "status": "PASS",
+        "scope": "actual_invoke_once_wrapper_with_real_bnt_and_simulated_classifier_fault_not_http_middleware",
+        "guarded_replay": "EXECUTED",
+        "checks": {
+          "audit_seccomp": true,
+          "target_returned": true,
+          "child_joined_exit0": true,
+          "hook_expected": true,
+          "one_or_no_fake_post": true,
+          "receipt_state": true,
+          "receipt_category": true,
+          "actual_BNT_once": true
+        },
+        "trace": {
+          "path": ".agentos/route-probe/vl_routes/V3_REMAINING_UNISSUED/T19/trace.json",
+          "sha256": "19b49ac547b1aaf4e377335d6bd940837a86e761371cb4e6112dc045117bac72"
+        },
+        "sandbox": {
+          "audit": true,
+          "cpu_seconds": 15,
+          "max_fds": 128,
+          "memory_mb": 256,
+          "seccomp": true
+        },
+        "target_outcome": {
+          "result_summary": {
+            "type": "tuple"
+          },
+          "status": "RETURNED"
+        },
+        "simulated_boundary_counts": {
+          "post": 1,
+          "provider_native_calls": 0
+        }
+      },
+      "fixture_source": {
+        "path": "backend/tools/route_probe_fixtures/avl_wrapper_classification.json",
+        "sha256": "5b4a764972a785b12e27a9575a4d89189de43b89da3d6fcd8b699a7f34e7ebf7"
+      },
+      "bundle_role": "wrapper",
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        },
+        "expected_status": "RETURNED",
+        "result_summary": {
+          "type": "tuple"
+        },
+        "phase_events": [
+          {
+            "phase": "entry",
+            "event": "ENTER"
+          },
+          {
+            "phase": "http_post",
+            "event": "attempted"
+          },
+          {
+            "phase": "bridge_receipt",
+            "event": "unknown"
+          },
+          {
+            "phase": "receipt_category",
+            "event": "transport_or_receipt_unknown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T20",
+      "case": null,
+      "status": "UNKNOWN",
+      "production_qualification": false,
+      "open_reason": "Actual saved Message and SSE publisher branch not executed",
+      "guarded_replay": "NOT_RUN",
+      "unit_result": "UNKNOWN",
+      "test_id": "test_avl_v3_twenty_scenario_matrix[T20]",
+      "guarded_result": {
+        "id": "T20",
+        "unit_result": "UNKNOWN",
+        "status": "UNKNOWN",
+        "scope": null,
+        "guarded_replay": "NOT_EXECUTED",
+        "reason": "Actual saved Message and SSE publisher branch not executed"
+      },
+      "fixture": null,
+      "bundle_role": null,
+      "entry": null,
+      "expected": {
+        "schema": "function-extractor.contract/v1",
+        "version": 1,
+        "guards": {
+          "audit": true,
+          "seccomp": true
+        }
+      }
+    }
+  ],
+  "unit_receipt": {
+    "path": ".agentos/route-probe/vl_routes/V3_FIRST_RUN/RECEIPT.json",
+    "sha256": "b2581b221c5b6ded7f5564d6d37446d9b170497377872103b0b166d2a3dc14aa",
+    "summary": "21 passed,2 skipped,33 deselected in6.72s"
+  },
+  "guarded_matrix_status": "PARTIAL_16_IMPLEMENTED_GUARDED_4_OPEN",
+  "container_proof": false,
+  "real_provider_proof": false,
+  "historical_root_cause": "NOT_REPRODUCED",
+  "additional_variant_receipt": {
+    "path": ".agentos/route-probe/vl_routes/V3_ADDITIONAL_VARIANTS/RECEIPT.json",
+    "sha256": "f31b65ece213caa132dc9315550dba6c8317d8d90af9019cd73e6cfc9bf54765"
+  },
+  "bundle_map_contract": {
+    "schema": "function-extractor.bundle-map/v1",
+    "roles": [
+      "bridge",
+      "ledger",
+      "worker",
+      "wrapper"
+    ],
+    "rule": "each selectedrole mustmap to independently verified portablebundle with exact row.entry and tools.route_probe_avl:prepare; no defaultentryswitching",
+    "owner": "root CLI integrates --bundle-map; no engine implementation in adapter"
+  }
+}

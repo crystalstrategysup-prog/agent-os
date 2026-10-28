@@ -1,0 +1,113 @@
+{
+  "schema": "atlas.project/v1",
+  "id": "DEMO-WORKFLOW",
+  "title": "Atlas · work coordination example",
+  "objective": "Change a module through its contract while preserving history and evidence scope",
+  "scope_note": "SYNTHETIC: usage example. Historical activity evidence expires automatically.",
+  "authority_ref": "synthetic-owner-request; local example only",
+  "writer": "integrator-demo",
+  "mode": "native",
+  "source_ref": "synthetic-example",
+  "documents": {
+    "path": "docs/DOCS_INDEX.json",
+    "sha256": "28d93d503f4634f999506f8dd4c72bd3517f703b5fb45fffa0166b4ff8b081df",
+    "bytes": 3449
+  },
+  "work_files": [
+    ".atlas/work/W-01.json",
+    ".atlas/work/W-02.json",
+    ".atlas/work/W-03.json"
+  ],
+  "coverage": {
+    "inventory": {
+      "path": ".atlas/INVENTORY.json",
+      "sha256": "674f90f2f54a87f8b7e71a785a036dfa11aabc4fe7eceb3da1296bdf01924363",
+      "bytes": 1253
+    },
+    "bindings": [
+      {
+        "domain_id": "goals",
+        "item_id": "G-LIMIT",
+        "entity_ids": [
+          "DOC-PROJECT"
+        ],
+        "work_ids": []
+      },
+      {
+        "domain_id": "modules",
+        "item_id": "MOD-BATCH",
+        "entity_ids": [
+          "MOD-BATCH"
+        ],
+        "work_ids": []
+      },
+      {
+        "domain_id": "contracts",
+        "item_id": "API-BATCH-v1",
+        "entity_ids": [
+          "API-BATCH-v1"
+        ],
+        "work_ids": []
+      },
+      {
+        "domain_id": "documents",
+        "item_id": "DOC-PROJECT",
+        "entity_ids": [
+          "DOC-PROJECT"
+        ],
+        "work_ids": []
+      },
+      {
+        "domain_id": "documents",
+        "item_id": "DOC-CONTRACT",
+        "entity_ids": [
+          "DOC-CONTRACT"
+        ],
+        "work_ids": []
+      },
+      {
+        "domain_id": "documents",
+        "item_id": "DOC-PATCH",
+        "entity_ids": [
+          "DOC-PATCH"
+        ],
+        "work_ids": []
+      },
+      {
+        "domain_id": "source",
+        "item_id": "SRC-BATCH",
+        "entity_ids": [
+          "MOD-BATCH"
+        ],
+        "work_ids": [
+          "W-02"
+        ]
+      },
+      {
+        "domain_id": "works",
+        "item_id": "W-01",
+        "entity_ids": [],
+        "work_ids": [
+          "W-01"
+        ]
+      },
+      {
+        "domain_id": "works",
+        "item_id": "W-02",
+        "entity_ids": [],
+        "work_ids": [
+          "W-02"
+        ]
+      },
+      {
+        "domain_id": "works",
+        "item_id": "W-03",
+        "entity_ids": [],
+        "work_ids": [
+          "W-03"
+        ]
+      }
+    ]
+  },
+  "matrix_history": []
+}

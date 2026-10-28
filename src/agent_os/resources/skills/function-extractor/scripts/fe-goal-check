@@ -1,0 +1,109 @@
+#!/usr/bin/env python3
+"""Read-only goal-ledger integrity check; never grants authority or proves semantics."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+
+SCHEMA = 'function-extractor.goal-acceptance/v1'
+CLASSES = {'ACTIONABLE_IN_SCOPE', 'REQUIRES_AUTHORITY', 'EXTERNAL_UNVERIFIABLE', 'OUT_OF_SCOPE'}
+STATES = {'PASS', 'FAIL', 'UNKNOWN', 'BLOCKED'}
+MAX_BYTES = 4_000_000
+
+
+def digest(path):
+    if not path.is_file() or path.stat().st_size > MAX_BYTES:
+        raise ValueError('INPUT_FILE_BOUND')
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def evidence(rows, root):
+    if type(rows) is not list or len(rows) > 256:
+        raise ValueError('INVALID_EVIDENCE_LIST')
+    for row in rows:
+        if type(row) is not dict or set(row) != {'path', 'sha256'}:
+            raise ValueError('INVALID_EVIDENCE_REF')
+        name = row['path']
+        if type(name) is not str or not name or len(name) > 512:
+            raise ValueError('INVALID_EVIDENCE_PATH')
+        rel = Path(name)
+        if rel.is_absolute() or any(x in {'.', '..'} for x in name.split('/')):
+            raise ValueError('EVIDENCE_PATH_ESCAPE')
+        p = root
+        for part in rel.parts:
+            p = p / part
+            if p.is_symlink():
+                raise ValueError('EVIDENCE_SYMLINK')
+        if not p.is_file() or p.stat().st_nlink != 1 or digest(p) != row['sha256']:
+            raise ValueError('EVIDENCE_MISSING_OR_CHANGED')
+    return bool(rows)
+
+
+def check(doc, root, task_sha, skill_sha, source_ref):
+    if type(doc) is not dict or doc.get('schema') != SCHEMA:
+        raise ValueError('INVALID_LEDGER')
+    if (doc.get('task_sha256'), doc.get('skill_sha256'), doc.get('source_ref')) != (task_sha, skill_sha, source_ref):
+        raise ValueError('INPUT_PIN_MISMATCH')
+    conditions = doc.get('conditions')
+    if type(conditions) is not list or not 1 <= len(conditions) <= 128:
+        raise ValueError('CONDITIONS_REQUIRED')
+    ids, remaining, required_count = set(), [], 0
+    for c in conditions:
+        if type(c) is not dict or type(c.get('id')) is not str or not c['id'] or c['id'] in ids or type(c.get('required')) is not bool or c.get('status') not in STATES:
+            raise ValueError('INVALID_CONDITION')
+        ids.add(c['id'])
+        has_evidence = evidence(c.get('evidence'), root)
+        if c['status'] == 'PASS' and not has_evidence:
+            raise ValueError('PASS_WITHOUT_EVIDENCE')
+        required_count += c['required']
+        if c['required'] and c['status'] != 'PASS':
+            remaining.append('condition:' + c['id'])
+    if not required_count:
+        raise ValueError('REQUIRED_CONDITION_MISSING')
+    gaps = doc.get('gaps')
+    if type(gaps) is not list or len(gaps) > 128:
+        raise ValueError('INVALID_GAPS')
+    gap_ids = set()
+    for g in gaps:
+        if type(g) is not dict or type(g.get('id')) is not str or not g['id'] or g['id'] in gap_ids or type(g.get('required')) is not bool or g.get('classification') not in CLASSES or g.get('resolution') not in {'OPEN', 'RESOLVED'}:
+            raise ValueError('INVALID_GAP')
+        gap_ids.add(g['id'])
+        if not all(type(g.get(k)) is str and g[k].strip() for k in ['reason', 'next_action']):
+            raise ValueError('GAP_ACTION_REQUIRED')
+        has_evidence = evidence(g.get('evidence'), root)
+        if g['resolution'] == 'RESOLVED' and not has_evidence:
+            raise ValueError('RESOLVED_WITHOUT_EVIDENCE')
+        if g['resolution'] == 'OPEN' and (g['required'] or g['classification'] == 'ACTIONABLE_IN_SCOPE'):
+            remaining.append('gap:' + g['id'])
+    review = doc.get('review')
+    if type(review) is not dict or review.get('status') not in {'PENDING', 'REVIEWED'}:
+        raise ValueError('INVALID_REVIEW')
+    reviewed = evidence(review.get('evidence'), root)
+    if review['status'] != 'REVIEWED' or not reviewed:
+        remaining.append('independent_review')
+    return {'schema': 'function-extractor.goal-check/v1', 'status': 'INCOMPLETE' if remaining else 'ELIGIBLE_FOR_FINAL_REVIEW', 'remaining': remaining, 'semantic_acceptance_proven': False, 'grants_authority': False}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['ledger', 'evidence-root', 'task', 'skill', 'source-ref']:
+        parser.add_argument('--' + name, required=True)
+    args = parser.parse_args()
+    try:
+        root = Path(args.evidence_root).resolve(strict=True)
+        if not root.is_dir():
+            raise ValueError('EVIDENCE_ROOT_REQUIRED')
+        path = Path(args.ledger)
+        if path.is_symlink() or path.stat().st_size > MAX_BYTES:
+            raise ValueError('INVALID_LEDGER_FILE')
+        doc = json.loads(path.read_text())
+        result = check(doc, root, digest(Path(args.task)), digest(Path(args.skill)), args.source_ref)
+    except (ValueError, TypeError, KeyError, OSError, RecursionError):
+        print(json.dumps({'schema': 'function-extractor.goal-check/v1', 'status': 'INVALID', 'grants_authority': False}))
+        return 2
+    print(json.dumps(result, ensure_ascii=False))
+    return 3 if result['remaining'] else 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

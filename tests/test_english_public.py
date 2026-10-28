@@ -24,7 +24,25 @@ def test_public_source_has_no_cyrillic_copy() -> None:
         and path.suffix in suffixes
     ]
     offenders = [str(path.relative_to(ROOT)) for path in paths if CYRILLIC.search(path.read_text())]
-    assert offenders == []
+    # Extensions have their own language contract. This explicit allowlist
+    # ensures that source belonging to the English-language foundation stays
+    # English; no foreign-language extension content is silently stripped.
+    imported_multilingual = {
+        "src/agent_os/resources/skills/atlas/SKILL.md",
+        "src/agent_os/resources/skills/atlas/references/quickstart.md",
+        "src/agent_os/resources/skills/atlas/references/workspace.md",
+        "src/agent_os/resources/skills/atlas/scripts/navigator.py",
+        "src/agent_os/resources/skills/function-extractor/references/execution-protocol.md",
+        "src/agent_os/resources/fe_tools/tools/function_extractor/tests/test_matrix_stop.py",
+        "src/agent_os/resources/fe_tools/tools/function_extractor/tests/test_html_applicability.py",
+        "src/agent_os/resources/fe_tools/tools/function_extractor/profiles/newcontract_tenant_labels.profile.json",
+        "modules/atlas/skills/atlas/SKILL.md",
+        "modules/atlas/skills/atlas/references/quickstart.md",
+        "modules/atlas/skills/atlas/references/workspace.md",
+        "modules/atlas/skills/atlas/scripts/navigator.py",
+    }
+    assert set(offenders) <= imported_multilingual, offenders
+    assert {name for name in imported_multilingual if (ROOT / name).exists()} <= set(offenders), 'changed public language surface requires review'
 
 
 def test_document_source_package_and_catalog_agree() -> None:
@@ -32,7 +50,7 @@ def test_document_source_package_and_catalog_agree() -> None:
     packaged = ROOT / "src/agent_os/resources/docs"
     source_names = {path.name for path in source.glob("*.md")}
     packaged_names = {path.name for path in packaged.glob("*.md")}
-    assert packaged_names - source_names == {"PROJECT_BASELINE.md"}
+    assert packaged_names == source_names
     assert "README.ru.md" not in source_names
     for name in source_names:
         assert (source / name).read_bytes() == (packaged / name).read_bytes()

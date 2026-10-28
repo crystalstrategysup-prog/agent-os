@@ -1,0 +1,376 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/schemas/ce_contract_map.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "status",
+    "route",
+    "revision",
+    "sources",
+    "boundaries",
+    "rules",
+    "unresolved",
+    "content_digest"
+  ],
+  "properties": {
+    "schema": {
+      "const": "contract-map/v1"
+    },
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "status": {
+      "enum": [
+        "RESOLVED",
+        "PARTIAL",
+        "REFUSED"
+      ]
+    },
+    "route": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "route_id",
+            "entry",
+            "graph_sha256",
+            "source_pins"
+          ],
+          "properties": {
+            "route_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 180,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,179}$"
+            },
+            "entry": {
+              "type": "string",
+              "maxLength": 360,
+              "pattern": "^[A-Za-z_]\\w*(\\.[A-Za-z_]\\w*)*:[A-Za-z_]\\w*(\\.[A-Za-z_]\\w*)*$"
+            },
+            "graph_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "source_pins": {
+              "type": "array",
+              "maxItems": 80,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "revision": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 180,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,179}$"
+    },
+    "sources": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source_id",
+          "kind",
+          "sha256",
+          "path",
+          "provenance",
+          "authority_ref",
+          "metadata"
+        ],
+        "properties": {
+          "source_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,179}$"
+          },
+          "kind": {
+            "enum": [
+              "json_schema",
+              "openapi",
+              "python",
+              "local_doc",
+              "rules"
+            ]
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "provenance": {
+            "enum": [
+              "OFFICIAL",
+              "APPROVED_INTERNAL",
+              "OBSERVED",
+              "UNSPECIFIED"
+            ]
+          },
+          "authority_ref": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 1024
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "retrieved_at",
+              "version",
+              "primary_ref",
+              "primary_sha256",
+              "official_schema",
+              "machine_adapter"
+            ],
+            "properties": {
+              "retrieved_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 1024
+              },
+              "version": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 1024
+              },
+              "primary_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 1024
+              },
+              "primary_sha256": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "official_schema": {
+                "type": "boolean"
+              },
+              "machine_adapter": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "boundaries": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "boundary_id",
+          "symbol",
+          "kind"
+        ],
+        "properties": {
+          "boundary_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,179}$"
+          },
+          "symbol": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "kind": {
+            "enum": [
+              "python",
+              "schema",
+              "http",
+              "semantic"
+            ]
+          }
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "rule_id",
+          "boundary_id",
+          "kind",
+          "source_id",
+          "provenance",
+          "constraint",
+          "conflicts"
+        ],
+        "properties": {
+          "rule_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,179}$"
+          },
+          "boundary_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,179}$"
+          },
+          "kind": {
+            "enum": [
+              "input_schema",
+              "output_schema",
+              "trace_match",
+              "delivery_state",
+              "no_retry",
+              "semantic"
+            ]
+          },
+          "source_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,179}$"
+          },
+          "provenance": {
+            "enum": [
+              "OFFICIAL",
+              "APPROVED_INTERNAL",
+              "OBSERVED",
+              "UNSPECIFIED"
+            ]
+          },
+          "constraint": {
+            "type": [
+              "object",
+              "boolean"
+            ]
+          },
+          "conflicts": {
+            "type": "array",
+            "maxItems": 256,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 180,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,179}$"
+            },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "unresolved": {
+      "type": "array",
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "source_id",
+          "boundary_id",
+          "rule_id"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z_]{1,63}$"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 180,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,179}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "boundary_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 180,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,179}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rule_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 180,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,179}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "content_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

@@ -1,0 +1,820 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/contracts/v1/result.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "operation",
+    "status",
+    "data",
+    "errors"
+  ],
+  "properties": {
+    "schema": {
+      "const": "function-extractor.result/v1"
+    },
+    "version": {
+      "const": 1
+    },
+    "operation": {
+      "enum": [
+        "resolve_entry",
+        "extract_route",
+        "freeze_source",
+        "discover_boundaries",
+        "compile_fixture",
+        "build_sandbox",
+        "execute_route",
+        "inject_fault",
+        "compare_contract",
+        "render_route_report",
+        "propose_contract_update",
+        "verify_repeatability"
+      ]
+    },
+    "status": {
+      "enum": [
+        "RESOLVED",
+        "EXTRACTED",
+        "CACHED",
+        "UNRESOLVED",
+        "FROZEN",
+        "PLANNED",
+        "COMPILED",
+        "EXECUTED",
+        "UNKNOWN",
+        "REFUSED",
+        "PROPOSED",
+        "MATCH",
+        "MISMATCH",
+        "RENDERED",
+        "REPEATABLE"
+      ]
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "entry": {
+          "$ref": "json-value.schema.json"
+        },
+        "source": {
+          "$ref": "json-value.schema.json"
+        },
+        "graph": {
+          "$ref": "graph.schema.json"
+        },
+        "cache": {
+          "$ref": "cache.schema.json"
+        },
+        "bundle": {
+          "type": "string",
+          "maxLength": 4096
+        },
+        "manifest": {
+          "$ref": "manifest.schema.json"
+        },
+        "schema": {
+          "$ref": "json-value.schema.json"
+        },
+        "version": {
+          "$ref": "json-value.schema.json"
+        },
+        "boundaries": {
+          "$ref": "json-value.schema.json"
+        },
+        "executed": {
+          "const": false
+        },
+        "unresolved_caps": {
+          "$ref": "json-value.schema.json"
+        },
+        "fixture": {
+          "$ref": "fixture.schema.json"
+        },
+        "payload_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "timeout_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 30
+        },
+        "requirements": {
+          "$ref": "json-value.schema.json"
+        },
+        "enforcement_proven": {
+          "const": false
+        },
+        "container_proven": {
+          "const": false
+        },
+        "trace": {
+          "$ref": "trace.schema.json"
+        },
+        "applied": {
+          "type": "boolean"
+        },
+        "evidence": {
+          "$ref": "json-value.schema.json"
+        },
+        "comparison": {
+          "$ref": "comparison.schema.json"
+        },
+        "report": {
+          "type": "string",
+          "maxLength": 65536
+        },
+        "proposal": {
+          "$ref": "contract-proposal.schema.json"
+        },
+        "repeatability": {
+          "$ref": "repeatability.schema.json"
+        }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "enum": [
+          "ENGINE_UNAVAILABLE",
+          "DEADLINE_EXCEEDED",
+          "INVALID_OR_UNSAFE_INPUT",
+          "ENGINE_FAILURE",
+          "GRAPH_CAP",
+          "REPLAY_NOT_COMPLETED",
+          "UNSUPPORTED_FAULT_ADAPTER",
+          "UNSUPPORTED_TRACE_STATUS"
+        ]
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "resolve_entry"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "entry": {
+                "$ref": "json-value.schema.json"
+              },
+              "source": {
+                "$ref": "json-value.schema.json"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "resolve_entry"
+          },
+          "status": {
+            "not": {
+              "enum": [
+                "REFUSED",
+                "UNKNOWN",
+                "UNRESOLVED"
+              ]
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "required": [
+              "entry",
+              "source"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "extract_route"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "graph": {
+                "$ref": "graph.schema.json"
+              },
+              "cache": {
+                "$ref": "cache.schema.json"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "extract_route"
+          },
+          "status": {
+            "not": {
+              "enum": [
+                "REFUSED",
+                "UNKNOWN",
+                "UNRESOLVED"
+              ]
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "required": [
+              "graph",
+              "cache"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "freeze_source"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "bundle": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "manifest": {
+                "$ref": "manifest.schema.json"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "freeze_source"
+          },
+          "status": {
+            "not": {
+              "enum": [
+                "REFUSED",
+                "UNKNOWN",
+                "UNRESOLVED"
+              ]
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "required": [
+              "bundle",
+              "manifest"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "discover_boundaries"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "schema": {
+                "$ref": "json-value.schema.json"
+              },
+              "version": {
+                "$ref": "json-value.schema.json"
+              },
+              "boundaries": {
+                "$ref": "json-value.schema.json"
+              },
+              "executed": {
+                "const": false
+              },
+              "unresolved_caps": {
+                "$ref": "json-value.schema.json"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "discover_boundaries"
+          },
+          "status": {
+            "not": {
+              "enum": [
+                "REFUSED",
+                "UNKNOWN",
+                "UNRESOLVED"
+              ]
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "required": [
+              "schema",
+              "version",
+              "boundaries",
+              "executed",
+              "unresolved_caps"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "compile_fixture"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "fixture": {
+                "$ref": "fixture.schema.json"
+              },
+              "payload_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "compile_fixture"
+          },
+          "status": {
+            "not": {
+              "enum": [
+                "REFUSED",
+                "UNKNOWN",
+                "UNRESOLVED"
+              ]
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "required": [
+              "fixture",
+              "payload_sha256"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "build_sandbox"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "schema": {
+                "$ref": "json-value.schema.json"
+              },
+              "version": {
+                "$ref": "json-value.schema.json"
+              },
+              "bundle": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "entry": {
+                "$ref": "json-value.schema.json"
+              },
+              "timeout_seconds": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 30
+              },
+              "requirements": {
+                "$ref": "json-value.schema.json"
+              },
+              "enforcement_proven": {
+                "const": false
+              },
+              "container_proven": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "build_sandbox"
+          },
+          "status": {
+            "not": {
+              "enum": [
+                "REFUSED",
+                "UNKNOWN",
+                "UNRESOLVED"
+              ]
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "required": [
+              "schema",
+              "version",
+              "bundle",
+              "entry",
+              "timeout_seconds",
+              "requirements",
+              "enforcement_proven",
+              "container_proven"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "execute_route"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "trace": {
+                "$ref": "trace.schema.json"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "execute_route"
+          },
+          "status": {
+            "not": {
+              "enum": [
+                "REFUSED",
+                "UNKNOWN",
+                "UNRESOLVED"
+              ]
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "required": [
+              "trace"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "inject_fault"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "applied": {
+                "type": "boolean"
+              },
+              "fixture": {
+                "$ref": "fixture.schema.json"
+              },
+              "evidence": {
+                "$ref": "json-value.schema.json"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "inject_fault"
+          },
+          "status": {
+            "not": {
+              "enum": [
+                "REFUSED",
+                "UNKNOWN",
+                "UNRESOLVED"
+              ]
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "required": [
+              "applied",
+              "fixture",
+              "evidence"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "compare_contract"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "comparison": {
+                "$ref": "comparison.schema.json"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "compare_contract"
+          },
+          "status": {
+            "not": {
+              "enum": [
+                "REFUSED",
+                "UNKNOWN",
+                "UNRESOLVED"
+              ]
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "required": [
+              "comparison"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "render_route_report"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "report": {
+                "type": "string",
+                "maxLength": 65536
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "render_route_report"
+          },
+          "status": {
+            "not": {
+              "enum": [
+                "REFUSED",
+                "UNKNOWN",
+                "UNRESOLVED"
+              ]
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "required": [
+              "report"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "propose_contract_update"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "proposal": {
+                "$ref": "contract-proposal.schema.json"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "propose_contract_update"
+          },
+          "status": {
+            "not": {
+              "enum": [
+                "REFUSED",
+                "UNKNOWN",
+                "UNRESOLVED"
+              ]
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "required": [
+              "proposal"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "verify_repeatability"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "repeatability": {
+                "$ref": "repeatability.schema.json"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "verify_repeatability"
+          },
+          "status": {
+            "not": {
+              "enum": [
+                "REFUSED",
+                "UNKNOWN",
+                "UNRESOLVED"
+              ]
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "required": [
+              "repeatability"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

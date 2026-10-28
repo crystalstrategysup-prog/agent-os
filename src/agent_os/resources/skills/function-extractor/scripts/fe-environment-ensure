@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+"""Find existing qualified environment or build only from explicit offline pins."""
+import argparse,json,sys,runpy
+from pathlib import Path
+root,project=runpy.run_path(str(Path(__file__).with_name('_bootstrap.py')))['prepare'](__file__)
+sys.path.insert(0,str(root))
+from tools.function_extractor.runner.environment_catalog import ensure_environment
+p=argparse.ArgumentParser()
+p.add_argument('--source-root',type=Path,default=project)
+p.add_argument('--plan-json',type=Path)
+p.add_argument('--local-wheelhouse',type=Path)
+a=p.parse_args()
+plan=None
+if a.plan_json:
+ if a.plan_json.is_symlink() or not a.plan_json.is_file() or a.plan_json.stat().st_size>30000:
+  raise SystemExit('refused_untrusted_plan')
+ plan=json.loads(a.plan_json.read_text())
+result=ensure_environment(a.source_root,plan=plan,local_wheelhouse=a.local_wheelhouse)
+print(json.dumps(result,sort_keys=True,ensure_ascii=False))
+raise SystemExit(0 if result.get('status') in ('EXISTING_QUALIFIED','CREATED_PENDING_QUALIFICATION') else 2)

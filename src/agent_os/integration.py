@@ -90,7 +90,8 @@ def _recover_transaction(journal: Path, codex_home: Path, skills_home: Path, use
 
 
 def install(
-    codex_home: Path, skills_home: Path, user_home: Path, *, apply: bool = False
+    codex_home: Path, skills_home: Path, user_home: Path, *, apply: bool = False,
+    agents_only: bool = False,
 ) -> dict:
     from .overlay import validate_roots
 
@@ -153,6 +154,7 @@ def install(
         "For project changes read " + method + ". Use `agentos project questions`, then `enter`, "
         "register required documents, `ready`, approved checks and `close` or `checkpoint`.\n"
         "For coordination read " + str(resources / "docs/COORDINATOR_KNOWLEDGE_INDEX.json") + ". Verify selected references; keep parent open until checked user result and record remainder/next owner. This routing does not launch sessions or prove live adoption.\n"
+        "Native workers must preserve a final and return result/evidence/remainder/next owner to their delegator through an explicitly authorized supported route. Delegators retain responsibility through bounded wait, receipt and semantic review; an owned blocker checkpoint names the next owner instead of abandoning the child. Busy gets no redundant continuation; unknown inputs/effects are reconciled before replay. Prepared report, uncertain send, recipient receipt and semantic acceptance are separate. New instructions do not automatically update already-running chats.\n"
         "Core resources: " + str(resources) + "\n"
         "Private user overlay: " + str(user_home) + "\n"
         "Load only relevant verified overlay knowledge; absent/stale profiles do not block unrelated reads. Never preload history.\n"
@@ -178,6 +180,8 @@ def install(
     paths = {str(agents): updated}
     # Copy maintained skills into namespaced folders; never delete user skills.
     for src in sorted((resources / "skills").rglob("*")):
+        if agents_only:
+            break
         if not src.is_file():
             continue
         rel = src.relative_to(resources / "skills").as_posix()
@@ -190,6 +194,8 @@ def install(
         else {}
     )
     managed = previous.get("managed_files", {})
+    if not isinstance(managed, dict):
+        raise GateError("integration_managed_files_invalid")
     observed = {}
     for name, data in paths.items():
         path = Path(name)
@@ -215,7 +221,9 @@ def install(
         "activation_status": "MANUAL_WORKFLOW_NO_HOOKS",
         "native_hooks": "DISABLED",
         "hook_files_changed": False,
-        "managed_files": {p: sha(d) for p, d in paths.items()},
+        "managed_files": {**(managed if agents_only else {}),
+                          **{p: sha(d) for p, d in paths.items()}},
+        "agents_only": agents_only,
         "required_config": {},
         "note": "Read back AGENTS/skills in a new session. Existing hooks/config are untouched; never restore retired AgentOS hooks.",
     }
@@ -293,10 +301,13 @@ def command(argv: list[str], home: Path) -> tuple[dict, int]:
     p.add_argument("--codex-home", type=Path)
     p.add_argument("--skills-home", type=Path, default=Path.home() / ".agents/skills")
     p.add_argument("--apply", action="store_true")
+    p.add_argument("--agents-only", action="store_true",
+                   help="Update the managed instruction block without copying skills.")
     a = p.parse_args(argv)
     codex_home = a.codex_home
     if codex_home is None:
         env_home = os.environ.get("CODEX_HOME", "").strip()
         codex_home = Path(env_home) if env_home else Path.home() / ".codex"
-    result = install(codex_home, a.skills_home, home, apply=a.apply)
+    result = install(codex_home, a.skills_home, home, apply=a.apply,
+                     agents_only=a.agents_only)
     return result, 0 if result["status"] in {"PLANNED", "INSTALLED_MANUAL_WORKFLOW"} else 2

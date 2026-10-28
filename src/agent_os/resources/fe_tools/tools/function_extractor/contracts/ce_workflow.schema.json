@@ -1,0 +1,255 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/schemas/ce_workflow.schema.json",
+  "description": "Structural schema for current Contract Engine artifacts; runtime identity, path, provenance, credential and trace guards remain authoritative.",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "function-extractor.contract-workflow/v1"
+        },
+        "version": {
+          "type": "integer",
+          "const": 1
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "UNKNOWN"
+          ]
+        },
+        "counts": {
+          "type": "object",
+          "properties": {
+            "PASS": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "FAIL": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "UNKNOWN": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "PASS",
+            "FAIL",
+            "UNKNOWN"
+          ],
+          "additionalProperties": false
+        },
+        "cases": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "case_id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+                  },
+                  "executed_this_run": {
+                    "type": "boolean"
+                  },
+                  "cache_hit": {
+                    "type": "boolean"
+                  },
+                  "cache_key": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "fixture_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "entry": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z_][A-Za-z0-9_.]*:[A-Za-z_][A-Za-z0-9_.]*$"
+                  },
+                  "bundle_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                },
+                "required": [
+                  "case_id",
+                  "executed_this_run",
+                  "cache_hit",
+                  "cache_key",
+                  "fixture_sha256",
+                  "entry",
+                  "bundle_sha256"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "case_id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+                  },
+                  "executed_this_run": {
+                    "const": false
+                  },
+                  "cache_hit": {
+                    "const": false
+                  },
+                  "scope": {
+                    "enum": [
+                      "REPLAY",
+                      "VALIDATION_ONLY",
+                      "UNKNOWN",
+                      "AFTER_INCOMPLETE_STOP",
+                      "WHOLE_BUDGET_EXHAUSTED"
+                    ]
+                  }
+                },
+                "required": [
+                  "case_id",
+                  "executed_this_run",
+                  "cache_hit",
+                  "scope"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 40
+        },
+        "timing": {
+          "type": "object",
+          "properties": {
+            "bundle_verification_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "execution_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "validation_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "total_seconds": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "bundle_verification_seconds",
+            "execution_seconds",
+            "validation_seconds",
+            "total_seconds"
+          ],
+          "additionalProperties": false
+        },
+        "registry": {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "ce-evidence.sync/v1"
+            },
+            "status": {
+              "enum": [
+                "WRITTEN",
+                "UNCHANGED"
+              ]
+            },
+            "key": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "content_digest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "normative_modified": {
+              "const": false
+            }
+          },
+          "required": [
+            "schema",
+            "status",
+            "key",
+            "content_digest",
+            "normative_modified"
+          ],
+          "additionalProperties": false
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "contract_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "runner_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "profile_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "production_effects": {
+          "type": "integer",
+          "const": 0
+        },
+        "live_provider_observed": {
+          "const": false
+        },
+        "historical_cause": {
+          "const": "NOT_REPRODUCED"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "status",
+        "counts",
+        "cases",
+        "timing",
+        "registry",
+        "source_sha256",
+        "contract_sha256",
+        "runner_sha256",
+        "profile_sha256",
+        "production_effects",
+        "live_provider_observed",
+        "historical_cause"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "function-extractor.contract-workflow/v1"
+        },
+        "status": {
+          "const": "BLOCKED_LIVE_PROOF"
+        },
+        "production_effects": {
+          "type": "integer",
+          "const": 0
+        }
+      },
+      "required": [
+        "schema",
+        "status",
+        "production_effects"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

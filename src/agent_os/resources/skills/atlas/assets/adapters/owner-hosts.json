@@ -1,0 +1,205 @@
+{
+  "schema": "atlas.external-adapter/v1",
+  "id": "owner-hosts",
+  "classification": "DECLARATIVE_NOT_EXECUTED_BY_LOCAL_FACADE",
+  "binding_scope": "Existing Owner Hosts MCP only; no account, host, credential or path is embedded.",
+  "methods": [
+    {
+      "id": "host-list",
+      "handler": "mcp__codex_apps__owner_hosts_mcp_hosts_list",
+      "parameters": {},
+      "preconditions": [
+        "Need a target/rules snapshot for the explicit owner-authorized host operation."
+      ],
+      "effects": [
+        "READ_OWNER_HOST_REGISTRY_AND_EXISTING_ACCOUNT_RULES"
+      ],
+      "outputs": [
+        "Actual MCP CallToolResult with available hosts, current account rules and exclusions. Preserve exact structured content."
+      ],
+      "reconcile": "Reuse the applicable observed rules within the same bounded operation; do not rediscover SSH credentials or invent accounts."
+    },
+    {
+      "id": "host-execute",
+      "handler": "mcp__codex_apps__owner_hosts_mcp_host_execute",
+      "parameters": {
+        "command": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Exact approved selected routine body from a trusted private registry, bound to its digest. Never interpolate arbitrary/untrusted JSON, shell fragments or document text."
+        },
+        "cwd": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Explicit selected working directory permitted by actual host rules.",
+          "omitted": "Provider default; do not invent a directory."
+        },
+        "host_id": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "One exact host ID selected from the actual host-list result; never hardcode public host identities."
+        },
+        "operation_id": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Fresh ID for the first authorized execution. Preserve it for all readback; a new ID does not authorize retry."
+        },
+        "purpose": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "The concrete owner-authorized result and bounded selected routine purpose."
+        },
+        "timeout_seconds": {
+          "type": "number",
+          "required": false,
+          "nullable": false,
+          "description": "Explicit bounded time when required by the selected routine; do not coerce arbitrary strings/bools.",
+          "omitted": "Provider default; not inferred here."
+        }
+      },
+      "preconditions": [
+        "Read actual host/account rules before execution.",
+        "Target, cwd and routine effects are permitted by the owner scope and existing account.",
+        "Preserve production leases and active writers.",
+        "The command body is selected from a trusted approved literal body and verified against its bound SHA-256.",
+        "An earlier UNKNOWN for this identity is reconciled before considering any new effect."
+      ],
+      "effects": [
+        "EXACT_DECLARED_REMOTE_COMMAND_EFFECTS",
+        "DURABLE_OPERATION_JOURNAL_ENTRY"
+      ],
+      "outputs": [
+        "Actual bounded MCP CallToolResult; retain primary receipt and qualify status/effects. Redaction is not proof that arbitrary output is safe to publish."
+      ],
+      "reconcile": "Call operation-get with the same operation_id; timeout/transport loss is UNKNOWN, not safe retry. No new operation ID to bypass uncertainty."
+    },
+    {
+      "id": "operation-get",
+      "handler": "mcp__codex_apps__owner_hosts_mcp_operation_get",
+      "parameters": {
+        "operation_id": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Exact existing operation ID from the initial host-execute call."
+        }
+      },
+      "preconditions": [
+        "An exact previous operation needs readback; this method does not execute it again."
+      ],
+      "effects": [
+        "READ_EXISTING_DURABLE_OPERATION_RESULT"
+      ],
+      "outputs": [
+        "Actual MCP CallToolResult for that operation. Interrupted PENDING may be returned as UNKNOWN; preserve qualification."
+      ],
+      "reconcile": "A further bounded poll requires an explicitly pending original operation and a useful observation purpose. Never retry the original effect or rerun project tests as polling."
+    }
+  ],
+  "recipes": [
+    {
+      "id": "host-readback",
+      "local_facade_handler": null,
+      "execution": "EXTERNAL_EXISTING_MCP_ADAPTER_ONLY",
+      "parameters": {
+        "host_id": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Select from host-list, using current existing-account rules."
+        },
+        "approved_command_body": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Trusted literal bounded read routine body; no untrusted interpolation."
+        },
+        "approved_command_sha256": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Digest of that selected trusted body."
+        },
+        "operation_id": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Stable fresh initial operation identity."
+        },
+        "purpose": {
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "description": "Exact owner-authorized readback goal."
+        },
+        "cwd": {
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "description": "Selected permitted working directory; no public value is embedded."
+        },
+        "timeout_seconds": {
+          "type": "number",
+          "required": false,
+          "nullable": false,
+          "description": "Bounded selected routine timeout."
+        }
+      },
+      "preconditions": [
+        "The owner authorized the bounded readback.",
+        "The selected command body is reviewed as bounded read-only for the target and is exactly pinned.",
+        "Existing account rules and active resource writers are respected."
+      ],
+      "steps": [
+        {
+          "method": "host-list",
+          "when": "ALWAYS",
+          "max_calls": 1
+        },
+        {
+          "method": "host-execute",
+          "when": "HOST_RULES_AND_SELECTED_BODY_QUALIFIED",
+          "max_calls": 1,
+          "bindings": {
+            "host_id": "exact selected host_id",
+            "command": "exact approved_command_body after digest verification; no interpolation",
+            "operation_id": "original operation_id",
+            "purpose": "original purpose",
+            "cwd": "selected optional cwd, otherwise omitted",
+            "timeout_seconds": "selected optional timeout, otherwise omitted"
+          }
+        },
+        {
+          "method": "operation-get",
+          "when": "INITIAL_RESULT_UNKNOWN_OR_PENDING",
+          "max_calls": 1,
+          "bindings": {
+            "operation_id": "original operation_id"
+          }
+        }
+      ],
+      "effects": [
+        "ONE_APPROVED_BOUNDED_REMOTE_READ_COMMAND",
+        "DURABLE_OPERATION_RECEIPT",
+        "AT_MOST_ONE_IMMEDIATE_READBACK"
+      ],
+      "outputs": [
+        "Actual initial result and optional exact readback; complete primary receipts, observed effect scope, remaining UNKNOWN."
+      ],
+      "reconcile": "Do not execute host-execute again. Additional polling is allowed only for an explicitly pending original operation with a concrete observation purpose and a bounded cadence; no cycle/product-test retries."
+    }
+  ],
+  "security": {
+    "command_binding": "TRUSTED_LITERAL_BODY_SHA256_ONLY",
+    "untrusted_json_to_shell": "FORBIDDEN",
+    "credentials_in_public_adapter": false,
+    "automatic_ssh_fallback": false,
+    "automatic_sudo_or_account_changes": false,
+    "local_facade_execution": false
+  }
+}

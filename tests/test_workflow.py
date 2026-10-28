@@ -283,8 +283,8 @@ def test_F_descendant_failure_survives_cleanup_past_execution_deadline(tmp_path,
     original_stop = p._stop_check_group
     cleaned = []
 
-    def slow_cleanup(pgid, process):
-        result = original_stop(pgid, process)
+    def slow_cleanup(pgid, process, **kwargs):
+        result = original_stop(pgid, process, **kwargs)
         cleaned.append(result)
         if result and len(cleaned) == 1:
             time.sleep(1.15)
@@ -299,6 +299,33 @@ def test_F_descendant_failure_survives_cleanup_past_execution_deadline(tmp_path,
     assert cleaned and cleaned[0] is True
     assert code == 125
     assert "DESCENDANTS TERMINATED" in output
+
+
+@pytest.mark.skipif(os.name != "posix", reason="process-group checks require POSIX")
+def test_check_group_disappeared_before_signal_is_not_reported_terminated(tmp_path, monkeypatch):
+    observations = iter([True, False, False, False])
+    monkeypatch.setattr(p, '_group_alive', lambda _: next(observations, False))
+    code, output = p._bounded_check_process(
+        [sys.executable, '-c', "print('clean exit')"], tmp_path, os.environ.copy(), 5)
+    assert code == 0
+    assert 'clean exit' in output
+    assert 'DESCENDANTS' not in output
+
+
+@pytest.mark.parametrize('states,code,expected', [
+    ('123 Z\n123 Z+\n', 0, False),
+    ('123 Z\n123 S\n', 0, True),
+    ('123 S\n', 0, True),
+    ('123 Z\n', 1, True),
+    ('invalid observation\n', 0, True),
+])
+def test_darwin_group_state_requires_positive_zombie_evidence(monkeypatch, states, code, expected):
+    from types import SimpleNamespace
+    monkeypatch.setattr(p.sys, 'platform', 'darwin')
+    monkeypatch.setattr(p.os, 'killpg', lambda *args: None)
+    monkeypatch.setattr(p.subprocess, 'run', lambda *args, **kwargs:
+                        SimpleNamespace(returncode=code, stdout=states))
+    assert p._group_alive(123) is expected
 
 
 def test_B_ready_rechecks_pending_entry_under_project_lock(setup, monkeypatch):

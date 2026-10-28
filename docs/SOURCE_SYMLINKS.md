@@ -18,7 +18,10 @@ exact output shape and identity.
 
 ## Admission and identity
 
-The project must be the actual Git working-tree root. Local Git index reads
+The owning Git working-tree root must be contained in the admitted project root.
+Nested repositories and worktrees are supported; ownership is discovered from
+the alias parent and rechecked after inventory. The tracked target must remain
+inside that same owning repository at every lexical step. Local Git index reads
 must establish exactly one stage-0 entry with mode `120000`. The working link
 target bytes must match the index blob OID (SHA-1 or SHA-256 object format).
 The relative target is checked component by component through existing ordinary
@@ -69,3 +72,17 @@ production promotion follows from preparing this source fix.
 ## Historical: Mandatory handoff capture in0.7.0rc1
 
 When an approved write scope contains an admitted tracked directory alias, close and checkpoint save its exact snapshot metadata as regular JSON under `source-links/`, separate from canonical source paths. They never read bytes through the alias, never restore it as a file and never create a symlink. The original alias path is explicitly not restored; a required unknown dependency makes the recovery report PARTIAL even when all real files are captured. Capture retains admission rechecks through publication and validates the current source/docs against the capture snapshot. Link replacement (including identical target text), link index drift and target index drift refuse the terminal transition. This retains the documented ordinary substitution detection boundary; it does not claim atomic same-UID isolation.
+
+## Nested checkout aliases (0.8.0rc2019)
+
+An untracked relative sibling alias to an exact internal Git working-tree root
+may be inventoried as `internal_git_checkout_alias/v1`. This metadata-only case
+is restricted to a nongit alias parent: ordinary untracked directory aliases,
+links to subdirectories, nonsibling or external targets remain refused. The
+referent must have a nonempty stage-0 index and valid HEAD, both rechecked after
+inventory along with link/parent/referent identities. Canonical checkout files
+are enumerated normally; the alias is never followed or reconstructed. Metadata
+contains target, project-relative target_path, link_sha256, git_head and
+git_index_sha256. Nested tracked aliases add project-relative git_root; original
+project-root tracked metadata is unchanged. No task binding, inventory budget,
+write guard or production authorization changes follow from this feature.

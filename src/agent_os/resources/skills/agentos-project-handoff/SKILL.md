@@ -5,6 +5,17 @@ description: "Handoff a project without forcing the next agent to reconstruct in
 
 # agentos-project-handoff
 
+A native worker must return its result/evidence/remainder/next owner to the
+delegator through the currently authorized supported route and preserve its
+final. A prepared report is not a send; an uncertain send needs read-only
+reconciliation, a recipient receipt needs semantic review, and child acceptance
+does not accept the original goal. The delegator remains responsible through
+bounded waits and review, or a precise owned blocker checkpoint. A final must
+not silently discard a dependent executor. Busy gets no redundant continuation;
+unknown input/effects never justify a duplicate. Follow the native return section
+of `resources/docs/WORK_COORDINATION.md`; new instructions do not automatically
+update existing chats.
+
 For a read-only handoff lookup, first follow the packaged
 `resources/docs/HANDOFF_DISCOVERY.md` guide: use the selected project/index,
 verify the record before opening its folder, and distinguish current handoffs

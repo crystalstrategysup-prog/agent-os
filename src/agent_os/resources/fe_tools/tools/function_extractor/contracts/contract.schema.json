@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/contracts/v1/contract.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version"
+  ],
+  "properties": {
+    "schema": {
+      "const": "function-extractor.contract/v1"
+    },
+    "version": {
+      "const": 1
+    },
+    "expected_status": {
+      "enum": [
+        "RETURNED",
+        "RAISED",
+        "DENIED",
+        "REFUSED",
+        "TIMEOUT",
+        "TRACE_LIMIT"
+      ]
+    },
+    "result_summary": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "json-value.schema.json"
+      }
+    },
+    "guards": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "audit": {
+          "type": "boolean"
+        },
+        "seccomp": {
+          "type": "boolean"
+        }
+      }
+    },
+    "phase_events": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "phase",
+          "event"
+        ],
+        "properties": {
+          "phase": {
+            "type": "string",
+            "maxLength": 180
+          },
+          "event": {
+            "type": "string",
+            "maxLength": 180
+          }
+        }
+      }
+    }
+  }
+}

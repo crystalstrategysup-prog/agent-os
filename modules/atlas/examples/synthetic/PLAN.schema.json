@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Synthetic plan input",
+  "type": "object",
+  "required": [
+    "locality",
+    "period"
+  ],
+  "properties": {
+    "locality": {
+      "type": "string"
+    },
+    "period": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,241 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/schemas/ce_resolution_input.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "route",
+    "sources",
+    "revision"
+  ],
+  "properties": {
+    "schema": {
+      "const": "function-extractor.contract-resolution/v1"
+    },
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "route_id",
+        "entry",
+        "graph_sha256",
+        "source_pins"
+      ],
+      "properties": {
+        "route_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 180,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,179}$"
+        },
+        "entry": {
+          "type": "string",
+          "maxLength": 360,
+          "pattern": "^[A-Za-z_]\\w*(\\.[A-Za-z_]\\w*)*:[A-Za-z_]\\w*(\\.[A-Za-z_]\\w*)*$"
+        },
+        "graph_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "source_pins": {
+          "type": "array",
+          "maxItems": 80,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            }
+          }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source_id",
+          "kind",
+          "path",
+          "sha256"
+        ],
+        "properties": {
+          "source_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,179}$"
+          },
+          "kind": {
+            "enum": [
+              "json_schema",
+              "openapi",
+              "python",
+              "local_doc",
+              "rules"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "selector": {
+            "type": "object",
+            "maxProperties": 4
+          },
+          "provenance": {
+            "enum": [
+              "OFFICIAL",
+              "APPROVED_INTERNAL",
+              "OBSERVED",
+              "UNSPECIFIED"
+            ]
+          },
+          "authority_ref": {
+            "type": "string",
+            "maxLength": 1024
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "retrieved_at",
+              "version",
+              "primary_ref",
+              "primary_sha256",
+              "official_schema",
+              "machine_adapter"
+            ],
+            "properties": {
+              "retrieved_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 1024
+              },
+              "version": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 1024
+              },
+              "primary_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 1024
+              },
+              "primary_sha256": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "official_schema": {
+                "type": "boolean"
+              },
+              "machine_adapter": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source_root",
+        "authority_bindings"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 180,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,179}$"
+        },
+        "source_root": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "authority_bindings": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source_id",
+              "sha256",
+              "provenance",
+              "authority_ref"
+            ],
+            "properties": {
+              "source_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 180,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,179}$"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "provenance": {
+                "enum": [
+                  "OFFICIAL",
+                  "APPROVED_INTERNAL",
+                  "OBSERVED",
+                  "UNSPECIFIED"
+                ]
+              },
+              "authority_ref": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -31,6 +31,21 @@ and speech features are not prerequisites for this route.
 | `tools/install` | Offline wheel, venv, probe, atomic current switch, rollback | Makes no service or production change |
 | Connection scenarios | Versioned public goals, flows, and checks | Do not run a private provider, read secrets, or prove live readiness |
 
+## Terminal workflow receipt boundary
+
+`project.next_turn` serializes validation under the project lock and delegates
+only the exact terminal workflow receipt to `turns.advance_standalone_turn` under
+the user-turn lock. A different active task in the same project is validated as
+an existing task, then retained unchanged. It is not the owner of the old
+workflow's receipt. The old task's project/session/previous-turn metadata and the
+receipt's exact root/task/session/turn/status must match before the receipt can
+be replaced. Task bodies, active pointer, project revision and readiness/check
+history are not transition write surfaces. Recovery/pending and stale receipt
+guards remain; a new INTAKE_REQUIRED receipt grants no new authority or acceptance.
+The filesystem's cooperative single-user trust and existing atomic-write UNKNOWN
+semantics are unchanged. Public consumers use `project next-turn`, never direct
+receipt mutation or a lower-level bypass.
+
 ## Architecture decisions
 
 **ADR-001–007.** The public core is separate from private runtime. Source and

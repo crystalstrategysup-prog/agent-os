@@ -90,6 +90,58 @@
     "revision": {
       "type": "integer",
       "minimum": 1
+    },
+    "inventory_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "max_bytes",
+        "max_files"
+      ],
+      "properties": {
+        "schema": {
+          "const": "agentos.project-inventory-budget/v1"
+        },
+        "max_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 17179869184
+        },
+        "max_files": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 40000
+        }
+      }
+    },
+    "inventory_budget_revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2147483647
+    },
+    "task_metadata_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "max_bytes"
+      ],
+      "properties": {
+        "schema": {
+          "const": "agentos.project-task-metadata-budget/v1"
+        },
+        "max_bytes": {
+          "type": "integer",
+          "minimum": 4194304,
+          "maximum": 33554432
+        }
+      }
+    },
+    "task_metadata_budget_revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2147483647
     }
   }
 }

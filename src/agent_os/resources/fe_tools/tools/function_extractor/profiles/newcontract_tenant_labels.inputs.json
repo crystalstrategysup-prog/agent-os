@@ -1,0 +1,53 @@
+{
+  "route": {
+    "route_id": "tenant-labels",
+    "entry": "app.core.tenant_labels:tenant_display_label",
+    "graph_sha256": "a99e82c8b6aa9b1ba6a3284b93011635086bd0bb9dddca95cfa680ed2231a656",
+    "source_pins": [
+      {
+        "path": "app/__init__.py",
+        "sha256": "6cf466d87285e4bf91820905dde3ab8b00a59697721269a366e2671a2dcf28ac"
+      },
+      {
+        "path": "app/core/__init__.py",
+        "sha256": "63b8abc953d042948285acef6a3bb6861f00457d634cadca830f01f93b39dba2"
+      },
+      {
+        "path": "app/core/tenant_labels.py",
+        "sha256": "a7959b30cc47a99414ef66597dd3b8c750f1085d8d2362c67a1959fe7aea641f"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "tenant_labels-observations",
+      "kind": "rules",
+      "path": "tools/function_extractor/profiles/newcontract_tenant_labels.rules.json",
+      "sha256": "9930bc59bb58c162922d3cf051172b7e14f0f801220c3cad5bfa7bca9ca169ba"
+    },
+    {
+      "source_id": "owner-offline",
+      "kind": "rules",
+      "path": "tools/function_extractor/contracts/owner_offline.rules.json",
+      "sha256": "37f20aabde048c63d8528350a529431f9a3c120d77f9600ab7c24cec9732b95f"
+    }
+  ],
+  "revision": {
+    "id": "observed-source-profile-v1",
+    "source_root": "/srv/moy-gorod/worktrees/20261022_route_extractor",
+    "authority_bindings": [
+      {
+        "source_id": "tenant_labels-observations",
+        "sha256": "9930bc59bb58c162922d3cf051172b7e14f0f801220c3cad5bfa7bca9ca169ba",
+        "provenance": "OBSERVED",
+        "authority_ref": "CONTRACT_ENGINE_STAGE: explicit code-derived fixture observations; not normative approval or runtime authority"
+      },
+      {
+        "source_id": "owner-offline",
+        "sha256": "37f20aabde048c63d8528350a529431f9a3c120d77f9600ab7c24cec9732b95f",
+        "provenance": "APPROVED_INTERNAL",
+        "authority_ref": "Direct parent instruction / CONTRACT_ENGINE_STAGE: owner offline invariant requires audit+seccomp; no live authority"
+      }
+    ]
+  }
+}

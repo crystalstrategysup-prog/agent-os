@@ -1,0 +1,369 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/contracts/v1/graph.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "route-probe.graph/v1"
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "module": {
+          "type": "string"
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "file": {
+          "type": "string"
+        },
+        "line": {
+          "type": "integer"
+        },
+        "end_line": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "module",
+        "symbol",
+        "kind",
+        "file",
+        "line",
+        "end_line"
+      ]
+    },
+    "files": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2097152
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "bytes"
+        ]
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "maxItems": 20000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "module": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "line": {
+            "type": "integer"
+          },
+          "end_line": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "module",
+          "symbol",
+          "kind",
+          "file",
+          "line",
+          "end_line"
+        ]
+      }
+    },
+    "edges": {
+      "type": "array",
+      "maxItems": 160000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "target": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "file": {
+            "type": "string"
+          },
+          "line": {
+            "type": "integer"
+          },
+          "expression": {
+            "type": "string"
+          },
+          "resolution": {
+            "enum": [
+              "staticlocal",
+              "external",
+              "dynamic"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "target",
+          "file",
+          "line",
+          "expression",
+          "resolution",
+          "reason",
+          "kind"
+        ]
+      }
+    },
+    "branches": {
+      "type": "array",
+      "maxItems": 160000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "line": {
+            "type": "integer"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "expression": {
+            "type": "string"
+          },
+          "execution": {
+            "const": "not_evaluated"
+          }
+        },
+        "required": [
+          "source",
+          "file",
+          "line",
+          "kind",
+          "expression",
+          "execution"
+        ]
+      }
+    },
+    "unresolved": {
+      "type": "array",
+      "maxItems": 160000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "target": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "file": {
+            "type": "string"
+          },
+          "line": {
+            "type": "integer"
+          },
+          "expression": {
+            "type": "string"
+          },
+          "resolution": {
+            "enum": [
+              "staticlocal",
+              "external",
+              "dynamic"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "target",
+          "file",
+          "line",
+          "expression",
+          "resolution",
+          "reason",
+          "kind"
+        ]
+      }
+    },
+    "unresolved_caps": {
+      "type": "array",
+      "maxItems": 20000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "line": {
+            "type": "integer"
+          },
+          "target": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "source",
+          "line",
+          "target"
+        ]
+      }
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_files": {
+          "type": "integer"
+        },
+        "max_nodes": {
+          "type": "integer"
+        },
+        "max_depth": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "max_files",
+        "max_nodes",
+        "max_depth"
+      ]
+    },
+    "semantics": {
+      "type": "string"
+    },
+    "opaque_modules": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "string"
+      }
+    },
+    "additional_entrypoints": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "module": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "line": {
+            "type": "integer"
+          },
+          "end_line": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "module",
+          "symbol",
+          "kind",
+          "file",
+          "line",
+          "end_line"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "entry",
+    "files",
+    "nodes",
+    "edges",
+    "branches",
+    "unresolved",
+    "unresolved_caps",
+    "complete",
+    "limits",
+    "semantics"
+  ]
+}

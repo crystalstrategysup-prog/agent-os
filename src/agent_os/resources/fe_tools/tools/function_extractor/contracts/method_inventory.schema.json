@@ -1,0 +1,898 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Pinned selected-source method inventory; no runtime or wire acceptance",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "function-extractor.method-inventory/v1"
+        },
+        "version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "engine": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "const": "function-extractor.method-inventory"
+            },
+            "version": {
+              "const": 1,
+              "type": "integer"
+            },
+            "file_pins": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "cli.py": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "contract_engine.py": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "method_inventory.py": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "required": [
+                "cli.py",
+                "contract_engine.py",
+                "method_inventory.py"
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "version"
+          ]
+        },
+        "source_ref": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "commit": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{40}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "proof": {
+              "const": "FROZEN_MANIFEST_DECLARATION_NOT_CURRENT_GIT_OR_RUNTIME"
+            }
+          },
+          "required": [
+            "commit",
+            "proof"
+          ]
+        },
+        "production_effects": {
+          "const": 0,
+          "type": "integer"
+        },
+        "live_provider_observed": {
+          "const": false
+        },
+        "runtime_acceptance": {
+          "const": false
+        },
+        "content_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "status": {
+          "enum": [
+            "PARTIAL",
+            "INVENTORIED"
+          ]
+        },
+        "input_digests": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "manifest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "source_pins": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "policy": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "catalog": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "contract_map": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "budget": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "engine_identity": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "manifest",
+            "source_pins",
+            "policy",
+            "catalog",
+            "contract_map",
+            "budget",
+            "engine_identity"
+          ]
+        },
+        "source_pins": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512,
+                "pattern": "^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*\\.py$"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2000000
+              }
+            },
+            "required": [
+              "path",
+              "sha256",
+              "bytes"
+            ]
+          },
+          "maxItems": 160
+        },
+        "callsites": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^call-[a-f0-9]{24}$"
+              },
+              "file": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512,
+                "pattern": "^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*\\.py$"
+              },
+              "line": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "symbol": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "source_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "callee": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+              },
+              "policy_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:/-]{0,179}$"
+                },
+                "maxItems": 256
+              },
+              "provider": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:/-]{0,179}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "protocol": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:/-]{0,179}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "method": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "status": {
+                "enum": [
+                  "STATIC_POSSIBLE",
+                  "UNRESOLVED"
+                ]
+              },
+              "reason": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[A-Z_]+$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "file",
+              "line",
+              "symbol",
+              "source_sha256",
+              "callee",
+              "policy_ids",
+              "provider",
+              "protocol",
+              "method",
+              "status",
+              "reason"
+            ]
+          },
+          "maxItems": 2000
+        },
+        "methods": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "provider": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+              },
+              "protocol": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+              },
+              "method": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+              },
+              "callsite_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^call-[a-f0-9]{24}$"
+                },
+                "maxItems": 2000
+              },
+              "catalog_status": {
+                "enum": [
+                  "PARTIAL",
+                  "CONTRACT_GAP",
+                  "PROFILE_PRESENT"
+                ]
+              },
+              "contract_status": {
+                "enum": [
+                  "PARTIAL",
+                  "CONTRACT_GAP",
+                  "PROFILE_PRESENT"
+                ]
+              },
+              "source_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:/-]{0,179}$"
+                },
+                "maxItems": 128
+              },
+              "contract_source_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:/-]{0,179}$"
+                },
+                "maxItems": 128
+              },
+              "boundary_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:/-]{0,179}$"
+                },
+                "maxItems": 128
+              },
+              "scope": {
+                "anyOf": [
+                  {
+                    "const": "CATALOG_SCOPE_RECORDED_BY_DIGEST"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "scope_sha256": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "gap_text_digest": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "rule_refs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "rule_id": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:/-]{0,179}$"
+                    },
+                    "source_id": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:/-]{0,179}$"
+                    },
+                    "boundary_id": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:/-]{0,179}$"
+                    },
+                    "provenance": {
+                      "enum": [
+                        "OFFICIAL",
+                        "APPROVED_INTERNAL",
+                        "OBSERVED",
+                        "UNSPECIFIED"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "rule_id",
+                    "source_id",
+                    "boundary_id",
+                    "provenance"
+                  ]
+                },
+                "maxItems": 256
+              },
+              "gaps": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z_]+$"
+                },
+                "maxItems": 128
+              },
+              "wire_proof": {
+                "const": "UNKNOWN"
+              },
+              "runtime_adoption": {
+                "const": "UNKNOWN"
+              },
+              "evidence": {
+                "const": "STATIC_POSSIBLE"
+              }
+            },
+            "required": [
+              "provider",
+              "protocol",
+              "method",
+              "callsite_ids",
+              "catalog_status",
+              "contract_status",
+              "source_ids",
+              "contract_source_ids",
+              "boundary_ids",
+              "scope",
+              "scope_sha256",
+              "gap_text_digest",
+              "rule_refs",
+              "gaps",
+              "wire_proof",
+              "runtime_adoption",
+              "evidence"
+            ]
+          },
+          "maxItems": 128
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "policy_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:/-]{0,179}$"
+              },
+              "provider": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:/-]{0,179}$"
+              },
+              "protocol": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:/-]{0,179}$"
+              },
+              "file": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512,
+                "pattern": "^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*\\.py$"
+              },
+              "line": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "symbol": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+              },
+              "source_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "methods": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+                },
+                "maxItems": 128
+              },
+              "status": {
+                "const": "STATIC_POSSIBLE_NOT_DISPATCH"
+              }
+            },
+            "required": [
+              "policy_id",
+              "provider",
+              "protocol",
+              "file",
+              "line",
+              "symbol",
+              "source_sha256",
+              "methods",
+              "status"
+            ]
+          },
+          "maxItems": 40960,
+          "description": "Derived maximum: <=160 verified files times <=256 declaration rules; the engine additionally refuses an output exceeding4MB."
+        },
+        "unresolved": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "const": "CALLSITE"
+                  },
+                  "callsite_id": {
+                    "type": "string",
+                    "pattern": "^call-[a-f0-9]{24}$"
+                  },
+                  "file": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512,
+                    "pattern": "^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*\\.py$"
+                  },
+                  "line": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "pattern": "^[A-Z_]+$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "callsite_id",
+                  "file",
+                  "line",
+                  "reason"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "DECLARATION",
+                      "POLICY_PATH"
+                    ]
+                  },
+                  "policy_id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:/-]{0,179}$"
+                  },
+                  "file": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512,
+                    "pattern": "^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*\\.py$"
+                  },
+                  "line": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "pattern": "^[A-Z_]+$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "policy_id",
+                  "file",
+                  "line",
+                  "reason"
+                ]
+              }
+            ]
+          },
+          "maxItems": 40960
+        },
+        "proposals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "status": {
+                "const": "PROPOSED"
+              },
+              "provider": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+              },
+              "protocol": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+              },
+              "method": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+              },
+              "source_ids": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "contract_source_ids": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "boundary_ids": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "scope": {
+                "const": "UNSPECIFIED"
+              },
+              "expected": {
+                "type": "null"
+              },
+              "reason": {
+                "const": "NEW_STATIC_METHOD_NEEDS_EXPLICIT_PROFILE"
+              }
+            },
+            "required": [
+              "status",
+              "provider",
+              "protocol",
+              "method",
+              "source_ids",
+              "contract_source_ids",
+              "boundary_ids",
+              "scope",
+              "expected",
+              "reason"
+            ]
+          },
+          "maxItems": 128
+        },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "selected_files": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 160
+            },
+            "parsed_files": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512,
+                "pattern": "^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*\\.py$"
+              },
+              "maxItems": 160
+            },
+            "selected_policy_file_count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 160
+            },
+            "excluded_files": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512,
+                "pattern": "^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*\\.py$"
+              },
+              "maxItems": 160
+            },
+            "matched_callsites": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2000
+            },
+            "resolved_callsites": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2000
+            },
+            "unresolved_callsites": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2000
+            },
+            "requested_method_count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 128
+            },
+            "declared_capability_groups": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 256
+            },
+            "ast_nodes": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 200000
+            },
+            "whole_program_denominator": {
+              "type": "null"
+            },
+            "whole_program_status": {
+              "const": "UNKNOWN"
+            }
+          },
+          "required": [
+            "selected_files",
+            "parsed_files",
+            "selected_policy_file_count",
+            "excluded_files",
+            "matched_callsites",
+            "resolved_callsites",
+            "unresolved_callsites",
+            "requested_method_count",
+            "declared_capability_groups",
+            "ast_nodes",
+            "whole_program_denominator",
+            "whole_program_status"
+          ]
+        },
+        "scope": {
+          "const": "SELECTED_FROZEN_SOURCE_ONLY_NO_EXECUTION_OR_WIRE_PROOF"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "engine",
+        "production_effects",
+        "live_provider_observed",
+        "runtime_acceptance",
+        "content_digest",
+        "status",
+        "input_digests",
+        "source_pins",
+        "callsites",
+        "methods",
+        "capabilities",
+        "unresolved",
+        "proposals",
+        "coverage",
+        "scope"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "function-extractor.method-inventory/v1"
+        },
+        "version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "engine": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "const": "function-extractor.method-inventory"
+            },
+            "version": {
+              "const": 1,
+              "type": "integer"
+            },
+            "file_pins": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "cli.py": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "contract_engine.py": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "method_inventory.py": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "required": [
+                "cli.py",
+                "contract_engine.py",
+                "method_inventory.py"
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "version"
+          ]
+        },
+        "source_ref": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "commit": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{40}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "proof": {
+              "const": "FROZEN_MANIFEST_DECLARATION_NOT_CURRENT_GIT_OR_RUNTIME"
+            }
+          },
+          "required": [
+            "commit",
+            "proof"
+          ]
+        },
+        "production_effects": {
+          "const": 0,
+          "type": "integer"
+        },
+        "live_provider_observed": {
+          "const": false
+        },
+        "runtime_acceptance": {
+          "const": false
+        },
+        "content_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "status": {
+          "const": "REFUSED"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z_]+$"
+          },
+          "maxItems": 16,
+          "minItems": 1
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "status",
+        "errors",
+        "production_effects",
+        "live_provider_observed",
+        "runtime_acceptance"
+      ]
+    }
+  ]
+}

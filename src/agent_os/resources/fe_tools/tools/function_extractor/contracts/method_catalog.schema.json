@@ -1,0 +1,154 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "function-extractor.method-catalog/v1"
+    },
+    "version": {
+      "const": 1,
+      "type": "integer"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:/-]{0,179}$"
+          },
+          "primary_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "retrieved_at": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "representation_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "representation_kind": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "trust": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        },
+        "required": [
+          "id",
+          "primary_ref",
+          "version",
+          "retrieved_at",
+          "representation_sha256",
+          "representation_kind",
+          "trust"
+        ]
+      },
+      "maxItems": 128
+    },
+    "methods": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "provider": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+          },
+          "protocol": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+          },
+          "method": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+          },
+          "source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:/-]{0,179}$"
+            },
+            "maxItems": 128,
+            "uniqueItems": true
+          },
+          "contract_source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:/-]{0,179}$"
+            },
+            "maxItems": 128,
+            "uniqueItems": true
+          },
+          "boundary_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:/-]{0,179}$"
+            },
+            "maxItems": 128,
+            "uniqueItems": true
+          },
+          "scope": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "status": {
+            "enum": [
+              "PARTIAL",
+              "CONTRACT_GAP",
+              "PROFILE_PRESENT"
+            ]
+          },
+          "gaps": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            },
+            "maxItems": 128,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "provider",
+          "protocol",
+          "method",
+          "source_ids",
+          "contract_source_ids",
+          "boundary_ids",
+          "scope",
+          "status",
+          "gaps"
+        ]
+      },
+      "maxItems": 128
+    }
+  },
+  "required": [
+    "schema",
+    "version",
+    "sources",
+    "methods"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

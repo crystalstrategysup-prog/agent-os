@@ -137,3 +137,111 @@ or an authority grant. A filled instance belongs outside public core. The
 template requires dated evidence, canonical pointers, known data exceptions,
 an independent-copy or restore check, and a next action. “Unknown” is a valid
 state; the presence of a path is never treated as proof that data is preserved.
+
+
+### Local candidate project inventory budget
+
+`project inventory-budget --root P` is a readback; `--max-bytes N`, `--max-files F` or `--reset`
+is an explicit project metadata write. The exact three-field optional record is
+`{schema:"agentos.project-inventory-budget/v1", max_bytes:N, max_files:F}`.
+Only integers 1..17179869184 are valid byte budgets; file budgets are integers 1..40000. Defaults remain 134217728 bytes and 20000 files.
+Malformed/unknown records fail closed (`invalid_project_inventory_budget`).
+Changing the record changes the policy digest and rejects old READY/check
+receipts (`scope_changed_reenter_required`). No file hashes or retained evidence
+are suppressed, and no runtime/production authority is implied.
+
+Every effective setting change also increments project `inventory_budget_revision`
+(integer 1..2147483647, fail closed on exhaustion). Reset retains this generation,
+so returning to a previous byte budget cannot resurrect old READY/check receipts.
+Policy/snapshot include the generation after first use; untouched projects retain
+exact historical digests. A no-op neither increments nor invalidates.
+
+
+### Optional lock-bound inventory setter predicates (rc2016)
+
+Set/reset may supply BOTH `--expected-project-sha256 SHA256` and
+`--expected-budget-revision N`. The digest is exactly 64 lowercase hexadecimal
+characters over the current `.agentos/project.json` bytes; revision is an exact
+integer 0..2147483647 (0 for an untouched legacy project, booleans rejected in the
+typed API). Both current comparisons run inside the existing project write lock
+before any project metadata write, including a no-op. One predicate, malformed
+values, stale digest/revision or predicates on a read-only call fail closed.
+The typed API names are `expected_project_sha256`, `expected_budget_revision`.
+Omitting BOTH preserves legacy read/set/reset. Readback grants no authority.
+Re-read and reconcile after mismatch; never automatically retry a changed target.
+
+The finite maximum is 17179869184 bytes (16 GiB); default remains 134217728 bytes
+and default max_files remains 20000; explicit max_files is bounded at 40000. This raises a reader ceiling without allocating disk.
+All source files/content hashes and existing safety checks remain included. At
+either ceiling STOP; no automatic expansion, guard skip or evidence exclusions.
+Once a project stores a value above 4294967296, rc2015 cannot read that project.
+Preserve a compatible forward reader; automatic downgrade or metadata reset is
+forbidden. Isolated installer rollback does not prove project downgrade safety.
+
+
+### Optional finite per-project file budget (rc2017)
+
+`--max-files F` / typed `max_files=F` accepts exact integer1..40000, rejecting
+booleans/floats/overflow and malformed records. Global defaults remain20000 files
+and128MiB; max_bytes ceiling remains16GiB. The exact budget record keeps its
+three fields and schema version. Omitted max_files preserves EFFECTIVE current
+file budget on byte-only update; omitted max_bytes preserves EFFECTIVE current
+byte budget on count-only update. Both can be set together. Reset conflicts with
+either setter input and restores BOTH defaults through the existing monotonic
+generation; an untouched read keeps legacy default/digest bytes. Optional paired
+CAS predicates remain strictly typed and checked under the existing write lock
+before any project write/no-op; current Root mutation must supply BOTH.
+
+Source policy/readiness invalidation and historical evidence retention are
+unchanged. This does not change safeio walk/hash/alias/content checks or SKIP;
+every accepted file is fully hashed. Further byte/file guard refusal means STOP
+and qualification of the first boundary, never automatic expansion/exclusions.
+Whether40000 suffices for any real corpus is UNKNOWN until separately authorized
+Root source proof. Once a project stores max_files other than20000, rc2016 cannot
+read it: retain a compatible forward reader; no automatic downgrade/reset.
+
+
+### READY task metadata bound (rc2017)
+
+A finite file inventory does not guarantee that its full READY task fits the
+default4MiB task JSON reader; explicit rc2018 project task policy may select up to32MiB. READY serializes the complete future task with the
+existing UTF-8 JSON formatting and checks its exact byte length before the atomic
+task write or READY event. Above the effective task ceiling (4194304 by default) it fails with
+`ready_task_metadata_limit`, preserving the prior task and history. Exactly the selected task ceiling
+is accepted; the generic JSON reader stays4MiB. No source-map truncation, compression,
+external storage, recovery route or global metadata-limit expansion is introduced.
+
+Actual full corpus and task overhead must be qualified separately; synthetic
+40000-path success/failure is not a real-project compatibility claim. Other
+metadata writers and future receipt growth remain unchanged and retain their
+existing reader limits. A refusal remains an explicit compatibility boundary.
+
+
+## Explicit per-project TASK metadata budget (rc2018)
+
+`project task-metadata-budget --root P` reads optional task_metadata_budget.
+`--max-bytes N` or `--reset` explicitly changes project policy; optional PAIRED
+expected-project-sha256/expected-budget-revision are compared under existing lock
+before no-op/write. This command uses task_metadata_budget_revision, not inventory
+budget revision. Exact record: schema agentos.project-task-metadata-budget/v1,
+max_bytes integer4194304..33554432 (booleans/floats/extra fields rejected).
+Default4MiB for untouched projects. Changes increment policy generation/project
+revision and invalidate READY normally; reset retains generation. Byte-identical
+legacy digests when both policy fields were never present. Lowering/reset is
+refused when oversized tasks or unclassified retained preimages prevent bounded
+compatibility proof; never delete/reset history to force it.
+
+Only task.json and its typed lifecycle before/after/raw backup/readback rows use
+this ceiling. Global safeio/project/turn/events/requests/provider/privacy limits
+stay fixed. Full source map remains inline, no storage migration/compression or
+truncation. Inventory16GiB/40000 unchanged. Entry/current READY/check/close/checkpoint
+task writes are bounded before their task write, with exact readback. Existing
+external checks/handoff side effects retain their authority and unknown handling.
+
+Continuation embedded journal remains24MiB including base64 pre/postimages and
+retarget history: an allowed32MiB task can fail journal eligibility. Refusal small
+journal/request/permit caps and non-task row limits stay fixed; staged TASK raw
+rows alone follow project policy. Handoff objects still16MiB/scanners unchanged.
+No universal32MiB lifecycle guarantee. Ineligible route STOP, no auto cap increase,
+new recovery route or replay. Legacy reader cannot read task>4MiB; preserve a
+compatible forward reader/policy while such tasks/preimages exist. No auto downgrade.

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "schema",
+    "governance"
+  ],
+  "properties": {
+    "schema": {
+      "const": "agent-os.community-config/v5"
+    },
+    "governance": {
+      "type": "object",
+      "required": [
+        "intake_required",
+        "closeout_required"
+      ],
+      "properties": {
+        "intake_required": {
+          "const": true
+        },
+        "closeout_required": {
+          "const": true
+        }
+      }
+    }
+  }
+}

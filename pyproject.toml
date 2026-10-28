@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "crystal-agent-os"
-version = "0.8.0rc2"
+version = "0.8.0rc2042"
 description = "Documentation-first, local-first foundation for governed project agents."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -19,6 +19,7 @@ speech = ["openai>=2.0"]
 [project.scripts]
 agentos = "agent_os.cli:main"
 agentos-hook = "agent_os.hooks:main"
+atlasctl = "agent_os.atlas_module:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

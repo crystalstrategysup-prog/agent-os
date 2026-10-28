@@ -1,0 +1,538 @@
+{
+  "$id": "urn:function-extractor:ce_contract_observations:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "complete": {
+      "type": "boolean"
+    },
+    "content_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "dropped_observations": {
+      "maximum": 10000000,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "fixture_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "observations": {
+      "items": {
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "checks": {
+                  "contains": {
+                    "properties": {
+                      "reason_code": {
+                        "const": "CONTRACT_SCOPE_UNSUPPORTED"
+                      }
+                    },
+                    "required": [
+                      "reason_code"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "checks"
+              ]
+            },
+            "then": {
+              "properties": {
+                "boundary_id": {
+                  "const": "telegram.sendMessage.plain"
+                },
+                "direction": {
+                  "const": "input"
+                },
+                "phase": {
+                  "const": "REQUEST"
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "anchor": {
+            "additionalProperties": false,
+            "properties": {
+              "file": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "line": {
+                "maximum": 10000000,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "symbol": {
+                "maxLength": 180,
+                "minLength": 1,
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "file",
+              "sha256",
+              "symbol",
+              "line"
+            ],
+            "type": "object"
+          },
+          "binding_id": {
+            "maxLength": 180,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+            "type": "string"
+          },
+          "boundary_id": {
+            "maxLength": 180,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+            "type": "string"
+          },
+          "checks": {
+            "items": {
+              "additionalProperties": false,
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "reason_code": {
+                        "const": "CONTRACT_SCOPE_UNSUPPORTED"
+                      }
+                    },
+                    "required": [
+                      "reason_code"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "test_verdict": {
+                        "const": "UNKNOWN"
+                      }
+                    }
+                  }
+                }
+              ],
+              "properties": {
+                "provenance": {
+                  "enum": [
+                    "OFFICIAL",
+                    "APPROVED_INTERNAL",
+                    "OBSERVED",
+                    "UNSPECIFIED"
+                  ]
+                },
+                "reason_code": {
+                  "enum": [
+                    "SCHEMA_MATCH",
+                    "SCHEMA_INVALID",
+                    "SCHEMA_UNSUPPORTED_OR_BOUNDED",
+                    "CONTRACT_CONFLICT",
+                    "CONTRACT_UNSPECIFIED",
+                    "EVALUATOR_FAILURE",
+                    "CONTRACT_SCOPE_UNSUPPORTED"
+                  ]
+                },
+                "rule_id": {
+                  "maxLength": 180,
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+                  "type": "string"
+                },
+                "schema_sha256": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "source_id": {
+                  "maxLength": 180,
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+                  "type": "string"
+                },
+                "source_sha256": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                "test_verdict": {
+                  "enum": [
+                    "PASS",
+                    "FAIL",
+                    "UNKNOWN"
+                  ]
+                }
+              },
+              "required": [
+                "rule_id",
+                "source_id",
+                "source_sha256",
+                "schema_sha256",
+                "provenance",
+                "test_verdict",
+                "reason_code"
+              ],
+              "type": "object"
+            },
+            "maxItems": 64,
+            "minItems": 1,
+            "type": "array"
+          },
+          "direction": {
+            "enum": [
+              "input",
+              "output"
+            ]
+          },
+          "evidence_scope": {
+            "const": "OFFLINE_INTERCEPTED_TRANSIENT_VALUE_NOT_PROVIDER_PROOF"
+          },
+          "invocation_id": {
+            "maximum": 128,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "phase": {
+            "enum": [
+              "REQUEST",
+              "RESPONSE"
+            ]
+          },
+          "plan_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "schema": {
+            "const": "function-extractor.contract-observation/v1"
+          },
+          "status": {
+            "const": "EVALUATED"
+          },
+          "version": {
+            "const": 1
+          }
+        },
+        "required": [
+          "schema",
+          "version",
+          "status",
+          "plan_sha256",
+          "binding_id",
+          "boundary_id",
+          "direction",
+          "phase",
+          "anchor",
+          "invocation_id",
+          "checks",
+          "evidence_scope"
+        ],
+        "type": "object"
+      },
+      "maxItems": 128,
+      "minItems": 0,
+      "type": "array"
+    },
+    "plan": {
+      "additionalProperties": false,
+      "properties": {
+        "bindings": {
+          "items": {
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "required": [
+                    "applicability"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "boundary_id": {
+                      "const": "telegram.sendMessage.plain"
+                    },
+                    "direction": {
+                      "const": "input"
+                    },
+                    "phase": {
+                      "const": "REQUEST"
+                    }
+                  }
+                }
+              }
+            ],
+            "properties": {
+              "applicability": {
+                "const": "PLAIN_TEXT_ONLY"
+              },
+              "binding_id": {
+                "maxLength": 180,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+                "type": "string"
+              },
+              "boundary_id": {
+                "maxLength": 180,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+                "type": "string"
+              },
+              "direction": {
+                "enum": [
+                  "input",
+                  "output"
+                ]
+              },
+              "file": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "line": {
+                "maximum": 10000000,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "phase": {
+                "enum": [
+                  "REQUEST",
+                  "RESPONSE"
+                ]
+              },
+              "sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "symbol": {
+                "maxLength": 180,
+                "minLength": 1,
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "binding_id",
+              "boundary_id",
+              "direction",
+              "phase",
+              "file",
+              "sha256",
+              "symbol",
+              "line"
+            ],
+            "type": "object"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "type": "array"
+        },
+        "content_digest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "contract_map_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "graph_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "manifest_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "route_entry": {
+          "maxLength": 512,
+          "minLength": 3,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_.]*:[A-Za-z_][A-Za-z0-9_.]*$",
+          "type": "string"
+        },
+        "rule_ids": {
+          "items": {
+            "maxLength": 180,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+            "type": "string"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "rules": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "boundary_id": {
+                "maxLength": 180,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+                "type": "string"
+              },
+              "conflicts": {
+                "items": {
+                  "maxLength": 180,
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+                  "type": "string"
+                },
+                "maxItems": 64,
+                "minItems": 0,
+                "type": "array",
+                "uniqueItems": true
+              },
+              "constraint": {
+                "type": [
+                  "object",
+                  "boolean"
+                ]
+              },
+              "kind": {
+                "enum": [
+                  "input_schema",
+                  "output_schema"
+                ]
+              },
+              "provenance": {
+                "enum": [
+                  "OFFICIAL",
+                  "APPROVED_INTERNAL",
+                  "OBSERVED",
+                  "UNSPECIFIED"
+                ]
+              },
+              "rule_id": {
+                "maxLength": 180,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+                "type": "string"
+              },
+              "schema_sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "source_id": {
+                "maxLength": 180,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]*$",
+                "type": "string"
+              },
+              "source_sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "rule_id",
+              "boundary_id",
+              "kind",
+              "source_id",
+              "source_sha256",
+              "provenance",
+              "schema_sha256",
+              "constraint",
+              "conflicts"
+            ],
+            "type": "object"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "type": "array"
+        },
+        "schema": {
+          "const": "function-extractor.contract-observation-plan/v1"
+        },
+        "selected_rule_digest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "source_pins": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "bytes": {
+                "maximum": 2000000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "path": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256",
+              "bytes"
+            ],
+            "type": "object"
+          },
+          "maxItems": 160,
+          "minItems": 1,
+          "type": "array"
+        },
+        "status": {
+          "const": "COMPILED"
+        },
+        "version": {
+          "const": 1
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "status",
+        "route_entry",
+        "graph_sha256",
+        "manifest_sha256",
+        "contract_map_sha256",
+        "selected_rule_digest",
+        "rule_ids",
+        "source_pins",
+        "rules",
+        "bindings",
+        "content_digest"
+      ],
+      "type": "object"
+    },
+    "runner_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "function-extractor.contract-observations/v1"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "schema",
+    "version",
+    "plan",
+    "fixture_sha256",
+    "runner_sha256",
+    "observations",
+    "complete",
+    "dropped_observations",
+    "content_digest"
+  ],
+  "type": "object"
+}

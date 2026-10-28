@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://function-extractor.invalid/contracts/v1/cache.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "options",
+    "directories",
+    "graph_sha256"
+  ],
+  "properties": {
+    "schema": {
+      "const": "function-extractor.cache/v1"
+    },
+    "version": {
+      "const": 1
+    },
+    "options": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entry",
+        "max_files",
+        "max_nodes",
+        "max_depth",
+        "opaque_modules"
+      ],
+      "properties": {
+        "entry": {
+          "type": "string"
+        },
+        "max_files": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "max_nodes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+        },
+        "max_depth": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        },
+        "opaque_modules": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "directories": {
+      "type": "array",
+      "maxItems": 4096,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "dev",
+          "ino",
+          "mtime_ns",
+          "ctime_ns"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "dev": {
+            "type": "integer"
+          },
+          "ino": {
+            "type": "integer"
+          },
+          "mtime_ns": {
+            "type": "integer"
+          },
+          "ctime_ns": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "graph_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

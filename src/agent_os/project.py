@@ -13,15 +13,18 @@ import re
 import selectors
 import signal
 import subprocess
+import sys
 import time
 import uuid
 from datetime import UTC, datetime
 from pathlib import Path
 
 from . import __version__
+from . import task_metadata as tm
 from .doc_catalog import DOCS, FEATURES, TYPES, select
 from .safeio import (
     GateError,
+    MAX_JSON,
     atomic_bytes,
     atomic_json,
     digest,
@@ -90,11 +93,126 @@ def project_file(root: Path) -> Path:
     return within(root, ".agentos/project.json")
 
 
+INVENTORY_BUDGET_SCHEMA = "agentos.project-inventory-budget/v1"
+DEFAULT_INVENTORY_MAX_BYTES = 128 * 1024 * 1024
+MAX_INVENTORY_MAX_BYTES = 16 * 1024 * 1024 * 1024
+INVENTORY_MAX_FILES = 20000
+MAX_INVENTORY_MAX_FILES = 40000
+
+
+def inventory_budget(project: dict) -> dict:
+    """Validate an explicit finite opt-in; do not turn omitted fields into policy."""
+    if "inventory_budget_revision" in project and (
+        type(project["inventory_budget_revision"]) is not int
+        or not 1 <= project["inventory_budget_revision"] <= 2147483647
+    ):
+        raise GateError("invalid_project_inventory_budget_revision")
+    if "inventory_budget" not in project:
+        return {
+            "schema": INVENTORY_BUDGET_SCHEMA,
+            "max_bytes": DEFAULT_INVENTORY_MAX_BYTES,
+            "max_files": INVENTORY_MAX_FILES,
+        }
+    value = project["inventory_budget"]
+    if (
+        not isinstance(value, dict)
+        or set(value) != {"schema", "max_bytes", "max_files"}
+        or value["schema"] != INVENTORY_BUDGET_SCHEMA
+        or type(value["max_bytes"]) is not int
+        or not 1 <= value["max_bytes"] <= MAX_INVENTORY_MAX_BYTES
+        or type(value["max_files"]) is not int
+        or not 1 <= value["max_files"] <= MAX_INVENTORY_MAX_FILES
+    ):
+        raise GateError("invalid_project_inventory_budget")
+    return dict(value)
+
+
+def project_inventory_budget(
+    root: Path, max_bytes: int | None = None, *, reset: bool = False,
+    max_files: int | None = None,
+    expected_project_sha256: str | None = None,
+    expected_budget_revision: int | None = None,
+) -> dict:
+    """Explicit local project configuration; existing receipts remain historical."""
+    root = root_path(root)
+    if reset and (max_bytes is not None or max_files is not None):
+        raise GateError("inventory_budget_set_reset_conflict")
+    has_hash = expected_project_sha256 is not None
+    has_revision = expected_budget_revision is not None
+    if has_hash != has_revision:
+        raise GateError("inventory_budget_cas_pair_required")
+    if has_hash:
+        if (
+            type(expected_project_sha256) is not str
+            or re.fullmatch(r"[0-9a-f]{64}", expected_project_sha256) is None
+            or type(expected_budget_revision) is not int
+            or not 0 <= expected_budget_revision <= 2147483647
+        ):
+            raise GateError("inventory_budget_cas_invalid")
+        if max_bytes is None and max_files is None and not reset:
+            raise GateError("inventory_budget_cas_requires_write")
+    if max_bytes is not None or max_files is not None:
+        inventory_budget({"inventory_budget": {
+            "schema": INVENTORY_BUDGET_SCHEMA,
+            "max_bytes": DEFAULT_INVENTORY_MAX_BYTES if max_bytes is None else max_bytes,
+            "max_files": INVENTORY_MAX_FILES if max_files is None else max_files,
+        }})
+    if max_bytes is not None or max_files is not None or reset:
+        _require_entry_recovered(root)
+        with lock(within(root, ".agentos/write.lock")):
+            _require_entry_recovered(root)
+            project = load_project(root)
+            if has_hash:
+                # Both current predicates are checked under this existing lock,
+                # before even a no-op can reach the atomic project writer.
+                if sha(project_file(root).read_bytes()) != expected_project_sha256:
+                    raise GateError("inventory_budget_project_sha256_mismatch")
+                if project.get("inventory_budget_revision", 0) != expected_budget_revision:
+                    raise GateError("inventory_budget_revision_mismatch")
+            previous = project.get("inventory_budget")
+            effective = inventory_budget(project)
+            desired = None if reset else {
+                "schema": INVENTORY_BUDGET_SCHEMA,
+                "max_bytes": effective["max_bytes"] if max_bytes is None else max_bytes,
+                "max_files": effective["max_files"] if max_files is None else max_files,
+            }
+            changed = previous != desired
+            if changed:
+                generation = project.get("inventory_budget_revision", 0) + 1
+                if generation > 2147483647:
+                    raise GateError("project_inventory_budget_revision_exhausted")
+                project["inventory_budget_revision"] = generation
+                if reset:
+                    project.pop("inventory_budget", None)
+                else:
+                    project["inventory_budget"] = desired
+                project["revision"] += 1
+                atomic_json(project_file(root), project)
+    else:
+        project = load_project(root)
+        changed = False
+    return {
+        "schema": "agentos.project-inventory-budget-readback/v1",
+        "status": "PASS",
+        "root": str(root),
+        "project_id": project["id"],
+        "project_revision": project["revision"],
+        "explicit": "inventory_budget" in project,
+        "changed": changed,
+        "budget_revision": project.get("inventory_budget_revision", 0),
+        "effective": inventory_budget(project),
+        "readiness": "Existing READY/check receipts require matching policy; re-enter after a change.",
+        "external_authority_granted": False,
+    }
+
+
 def load_project(root: Path) -> dict:
     value = read_json(project_file(root))
     if value.get("schema") != "agentos.project/v1":
         raise GateError("unsupported_project_schema")
     select(value["types"], value["features"])
+    inventory_budget(value)
+    tm.budget(value)
     return value
 
 
@@ -103,7 +221,7 @@ def task_path(root: Path, task_id: str) -> Path:
 
 
 def load_task(root: Path, task_id: str) -> dict:
-    task = read_json(task_path(root, task_id))
+    task = tm.read_task(root, task_id)
     if task.get("schema") != "agentos.project-task/v1" or task.get("id") != task_id:
         raise GateError("unsupported_or_mismatched_task")
     return task
@@ -181,16 +299,20 @@ def _json_bytes(value: dict) -> bytes:
     return (json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
 
 
-def _entry_current(path: Path) -> bytes | None:
+def _entry_current(path: Path, max_bytes: int = MAX_JSON) -> bytes | None:
     if path.is_symlink():
         raise GateError("entry_symlink_refused")
     if not path.exists():
         return None
     if not path.is_file():
         raise GateError("entry_regular_file_required")
-    if path.stat().st_size > 4 * 1024 * 1024:
+    if path.stat().st_size > max_bytes:
         raise GateError("entry_file_limit")
-    return path.read_bytes()
+    with path.open("rb") as stream:
+        data = stream.read(max_bytes + 1)
+    if len(data) > max_bytes:
+        raise GateError("entry_file_limit")
+    return data
 
 
 def _entry_journal(root: Path) -> Path:
@@ -198,6 +320,10 @@ def _entry_journal(root: Path) -> Path:
 
 
 def _require_entry_recovered(root: Path) -> None:
+    from .interrupted_continuation import require_clear as interrupted_clear
+    interrupted_clear(root)
+    from .refusal_recovery import require_clear
+    require_clear(root)
     if _entry_journal(root).exists():
         raise GateError("entry_recovery_required")
 
@@ -235,7 +361,16 @@ def _recover_entry(root: Path, user_home: Path) -> None:
             path = allowed_turn
         else:
             raise GateError("entry_recovery_path_invalid")
-        current = _entry_current(path)
+        if row["root"] == "project" and re.fullmatch(r"\.agentos/tasks/task-[a-f0-9]{16}/task\.json", row["path"]):
+            try:
+                row_limit = tm.limit(root)
+            except (ValueError, GateError) as exc:
+                # An interrupted transaction must never rewrite an owner-edited
+                # project file, even when the edit is no longer valid JSON.
+                raise GateError("entry_recovery_conflict:" + str(within(root, ".agentos/project.json"))) from exc
+        else:
+            row_limit = MAX_JSON
+        current = _entry_current(path, row_limit)
         current_hash = sha(current) if current is not None else None
         if current_hash not in (row["before"], row["after"]):
             raise GateError("entry_recovery_conflict:" + str(path))
@@ -245,16 +380,16 @@ def _recover_entry(root: Path, user_home: Path) -> None:
                 raise GateError("entry_recovery_backup_mismatch")
             original = None
         else:
-            original = _entry_current(backup)
+            original = _entry_current(backup, row_limit)
             if original is None or sha(original) != row["before"]:
                 raise GateError("entry_recovery_backup_mismatch")
-        restore.append((path, current_hash, row["before"], original))
+        restore.append((path, current_hash, row["before"], original, row_limit))
     with lock(within(user_home, "state/turns.lock")):
-        for path, current_hash, _, _ in restore:
-            current = _entry_current(path)
+        for path, current_hash, _, _, row_limit in restore:
+            current = _entry_current(path, row_limit)
             if (sha(current) if current is not None else None) != current_hash:
                 raise GateError("entry_recovery_conflict:" + str(path))
-        for path, current_hash, before, original in reversed(restore):
+        for path, current_hash, before, original, row_limit in reversed(restore):
             if current_hash == before:
                 continue
             if original is None:
@@ -410,7 +545,14 @@ def enter(
     nonempty(session_id, "session_id", 200)
     nonempty(turn_id, "turn_id", 200)
     validate_roots(user_home)
-    with lock(within(root, ".agentos/write.lock")):
+    from .refusal_recovery import require_clear
+    from contextlib import ExitStack
+    require_clear(root)
+    from .interrupted_continuation import require_clear as interrupted_clear
+    interrupted_clear(root)
+    with lock(within(root, ".agentos/write.lock")), ExitStack() as recovery_locks:
+        interrupted_clear(root)
+        require_clear(root)
         if _entry_journal(root).exists():
             _recover_entry(root, user_home)
             raise GateError("entry_recovered_retry")
@@ -424,12 +566,31 @@ def enter(
         selection = select(
             project["types"], project["features"], answers["change_kind"]
         )
+        recovery_entry = False
+        interrupted_entry = False
         if resume_task:
             task = load_task(root, resume_task)
             if task["status"] == "CLOSED":
                 raise GateError("closed_task_is_immutable_start_new_task")
+            if task["status"] == "RECOVERY_REQUIRED":
+                # Keep the existing project -> user-turn lock order through the
+                # entire metadata entry transaction, before any answers/docs write.
+                recovery_locks.enter_context(lock(within(user_home, "state/turns.lock")))
+                validate_entry(user_home, session_id, turn_id, root)
+                from .refusal_recovery import validate_resume
+                validate_resume(root, user_home, task, session_id, turn_id, answers)
+                recovery_entry = True
+            if task["status"] == "CONTINUATION_REQUIRED":
+                recovery_locks.enter_context(lock(within(user_home,"state/turns.lock")))
+                from .interrupted_continuation import validate_resume
+                validate_resume(root,user_home,task,session_id,turn_id,answers,reuse=reuse)
+                task["interrupted_continuation"]={**task["interrupted_continuation"],"state":"CONSUMED","resumed_revision":task["revision"]+1}
+                interrupted_entry = True
             task["answers"] = answers
             task["revision"] += 1
+            if recovery_entry:
+                task["recovery"] = {**task["recovery"], "state": "CONSUMED",
+                                    "resumed_revision": task["revision"], "entered_turn_id": turn_id}
             task.pop("ready", None)
             task["receipts"] = []
         else:
@@ -496,7 +657,10 @@ def enter(
         transaction_id = uuid.uuid4().hex
         records = []
         for index, (scope, path, data) in enumerate(writes):
-            prior = _entry_current(path)
+            row_limit = tm.limit(root) if path == task_file else MAX_JSON
+            if len(data) > row_limit:
+                raise GateError("entry_file_limit")
+            prior = _entry_current(path, row_limit)
             if prior is not None:
                 atomic_bytes(
                     within(root, f".agentos/entry-backups/{transaction_id}/{index}"),
@@ -514,13 +678,19 @@ def enter(
             "id": transaction_id, "session_id": session_id, "files": records,
         })
         try:
-            atomic_json(task_file, task)
+            tm.write_task(root, task)
             atomic_json(project_file(root), project)
             created = scaffold(root, selection["required"], task["id"])
             atomic_bytes(event_path, event_bytes)
-            bind_turn(user_home, session_id, turn_id, root, task["id"], entered_at=turn_stamp)
+            if recovery_entry or interrupted_entry:
+                # The same canonical entry postimage, while its turn lock is
+                # already held; bind_turn would try to acquire that lock twice.
+                validate_entry(user_home, session_id, turn_id, root)
+                atomic_json(turn_file, turn_value)
+            else:
+                bind_turn(user_home, session_id, turn_id, root, task["id"], entered_at=turn_stamp)
             for _, path, data in writes:
-                if _entry_current(path) != data:
+                if _entry_current(path, tm.limit(root) if path == task_file else MAX_JSON) != data:
                     raise GateError("entry_readback_failed:" + str(path))
             result = {
                 "status": "INTAKE", "task_id": task["id"],
@@ -547,6 +717,9 @@ def next_turn(
     previous_turn: str,
     turn_id: str,
     task_id: str,
+    recovery_request: dict | None = None,
+    recovery_permit: dict | None = None,
+    recovery_observer=None,
 ) -> dict:
     from .turns import advance_standalone_turn
 
@@ -554,12 +727,37 @@ def next_turn(
     _require_entry_recovered(root)
     nonempty(session_id, "session_id", 200)
     identifier(task_id)
+    selected = load_task(root, task_id)
+    if selected["status"] == "RECOVERY_REQUIRED":
+        if recovery_request is None or recovery_permit is None:
+            raise GateError("recovery_advance_required")
+        if (session_id != selected["session_id"] or previous_turn != selected["turn_id"]
+                or recovery_permit.get("current_turn_id") != turn_id):
+            raise GateError("recovery_turn_identity_mismatch")
+        from .refusal_recovery import advance
+        return advance(root, user_home, task_id, recovery_request, recovery_permit, observer=recovery_observer)
+    if recovery_request is not None or recovery_permit is not None:
+        raise GateError("recovery_parameters_for_nonrecovery_task")
     with lock(within(root, ".agentos/write.lock")):
         _require_entry_recovered(root)
         project = load_project(root)
-        if project.get("active_task") != task_id:
-            raise GateError("standalone_turn_task_mismatch")
         task = load_task(root, task_id)
+        if project.get("active_task") != task_id:
+            # A terminal workflow can retain its own receipt after a different
+            # workflow became active here. Only that exact old binding may move;
+            # neither task nor the project's active pointer is rewritten.
+            active = project.get("active_task")
+            if (
+                not isinstance(active, str) or not active
+                or task.get("status") not in {"CHECKPOINT", "CLOSED"}
+                or task.get("project_id") != project.get("id")
+                or task.get("session_id") != session_id
+                or task.get("turn_id") != previous_turn
+            ):
+                raise GateError("standalone_turn_task_mismatch")
+            other = load_task(root, active)
+            if other.get("project_id") != project.get("id"):
+                raise GateError("standalone_turn_task_mismatch")
         if task["status"] not in {"CHECKPOINT", "CLOSED"}:
             raise GateError("standalone_turn_requires_finished_or_checkpointed_task")
         return advance_standalone_turn(
@@ -645,9 +843,16 @@ def document_check(root: Path, task: dict) -> dict:
 
 
 def source_snapshot(root: Path) -> dict:
-    load_project(root)
+    from .source_selection import SourceSelection
+
+    project = load_project(root)
+    budget = inventory_budget(project)
     links: dict[str, dict] = {}
-    items = filemap(root, skip=SKIP, tracked_directory_links=links)
+    selection = SourceSelection(root, [doc["path"] for doc in project["documents"].values()])
+    items = filemap(root, skip=SKIP, limit=budget["max_files"], max_bytes=budget["max_bytes"], tracked_directory_links=links, directory_excluder=selection.exclude_directory)
+    for cache in selection.excluded:
+        if items.get(cache["package_manifest"]) != cache["package_sha256"]:
+            raise GateError("generated_cache_provenance_changed")
     # Metadata/evidence and maintained document content have independent hashes.
     items = {
         p: h
@@ -658,15 +863,23 @@ def source_snapshot(root: Path) -> dict:
         and not any(x.endswith(".egg-info") for x in Path(p).parts)
     }
     snapshot = {"files": items, "sha256": digest(items), "file_count": len(items)}
+    if selection.excluded:
+        snapshot["source_selection"] = selection.record()
     links = {rel: metadata for rel, metadata in links.items() if rel in items}
     if links:
         snapshot["symlinks"] = links
+    if "inventory_budget" in project or "inventory_budget_revision" in project:
+        snapshot["inventory_budget"] = budget
+        snapshot["inventory_budget_revision"] = project.get("inventory_budget_revision", 0)
     return snapshot
 
 
 def _policy_digest(project: dict, task: dict) -> str:
+    from .source_selection import POLICY_VERSION
+
     return digest(
         {
+            "source_selection_version": POLICY_VERSION,
             "project_id": project["id"],
             "types": project["types"],
             "features": project["features"],
@@ -674,8 +887,24 @@ def _policy_digest(project: dict, task: dict) -> str:
             "answers": task["answers"],
             "selection": task["selection"],
             "revision": task["revision"],
+            **({
+                "inventory_budget": inventory_budget(project),
+                "inventory_budget_revision": project.get("inventory_budget_revision", 0),
+            } if "inventory_budget" in project or "inventory_budget_revision" in project else {}),
+            **({
+                "task_metadata_budget": tm.budget(project),
+                "task_metadata_budget_revision": project.get("task_metadata_budget_revision", 0),
+            } if "task_metadata_budget" in project or "task_metadata_budget_revision" in project else {}),
         }
     )
+
+
+def _ready_task_bytes(task: dict, root: Path | None = None) -> bytes:
+    """Keep READY task bytes readable by the unchanged bounded JSON reader."""
+    data = (json.dumps(task, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode("utf-8")
+    if len(data) > (MAX_JSON if root is None else tm.limit(root)):
+        raise GateError("ready_task_metadata_limit")
+    return data
 
 
 def ready(root: Path, task_id: str, reviewer: str) -> dict:
@@ -692,16 +921,22 @@ def ready(root: Path, task_id: str, reviewer: str) -> dict:
         docs = document_check(root, task)
         if docs["status"] != "PASS":
             return {"status": "BLOCKED", "errors": docs["errors"]}
+        source = source_snapshot(root)
+        from .source_selection import require_source_write_paths
+
+        require_source_write_paths(source, task["answers"]["write_paths"])
         task["ready"] = {
             "at": now(),
             "reviewer": reviewer,
             "docs": docs,
             "policy_digest": _policy_digest(project, task),
-            "source": source_snapshot(root),
+            "source": source,
         }
         task["status"] = "READY"
         task["receipts"] = []
-        atomic_json(task_path(root, task_id), task)
+        # Serialize and bound the exact bytes before any READY task/event write.
+        # No source-map truncation, external storage or metadata limit expansion.
+        tm.write_bytes(root, task_id, _ready_task_bytes(task, root))
         _event(root, task, "READY", {"reviewer": reviewer})
     return {
         "status": "READY",
@@ -747,12 +982,35 @@ def _group_alive(pgid: int) -> bool:
     except ProcessLookupError:
         return False
     except PermissionError:
-        # macOS may report EPERM for a group containing only unreaped zombies.
-        return True
+        if sys.platform != 'darwin':
+            return True
+    if sys.platform == 'darwin':
+        # killpg(0) may succeed or return EPERM for unreaped zombies. Only
+        # positive process-state evidence can classify those as non-running.
+        try:
+            result = subprocess.run(['/bin/ps', '-axo', 'pgid=,stat='],
+                                    capture_output=True, text=True, timeout=2)
+            if result.returncode == 0 and len(result.stdout) <= 512 * 1024:
+                states = []
+                for line in result.stdout.splitlines():
+                    row = line.split()
+                    if len(row) == 2 and row[0] == str(pgid):
+                        states.append(row[1])
+                if states and all(state.startswith('Z') for state in states):
+                    return False
+                if not states:
+                    try:
+                        os.killpg(pgid, 0)
+                    except ProcessLookupError:
+                        return False
+                    except PermissionError:
+                        pass
+        except (OSError, subprocess.TimeoutExpired):
+            pass
     return True
 
 
-def _stop_check_group(pgid: int, process: subprocess.Popen) -> bool:
+def _stop_check_group(pgid: int, process: subprocess.Popen, *, on_signal=None) -> bool:
     """Stop only the session created for this check; report if it survives."""
     process.poll()
     if not _group_alive(pgid):
@@ -764,6 +1022,8 @@ def _stop_check_group(pgid: int, process: subprocess.Popen) -> bool:
             return True
         except PermissionError:
             return False
+        if on_signal is not None:
+            on_signal()
         deadline = time.monotonic() + 0.5
         while time.monotonic() < deadline:
             process.poll()
@@ -806,6 +1066,11 @@ def _capture_check_process(process: subprocess.Popen, timeout: int) -> tuple[int
         eof = False
         exit_code: int | None = None
         descendants = False
+
+        def terminated_descendants():
+            nonlocal descendants
+            descendants = True
+
         handled_exit = False
         selector = selectors.DefaultSelector()
         selector.register(fd, selectors.EVENT_READ)
@@ -845,8 +1110,7 @@ def _capture_check_process(process: subprocess.Popen, timeout: int) -> tuple[int
             if parent_code is not None and not handled_exit:
                 handled_exit = True
                 if _group_alive(process.pid):
-                    descendants = True
-                    if not _stop_check_group(process.pid, process):
+                    if not _stop_check_group(process.pid, process, on_signal=terminated_descendants):
                         exit_code = 125
                         tail.extend(b"\nCHECK DESCENDANTS SURVIVED\n")
                         break
@@ -854,8 +1118,7 @@ def _capture_check_process(process: subprocess.Popen, timeout: int) -> tuple[int
                 exit_code = parent_code
                 break
         if _group_alive(process.pid):
-            descendants = True
-            if not _stop_check_group(process.pid, process):
+            if not _stop_check_group(process.pid, process, on_signal=terminated_descendants):
                 if exit_code in (None, 0):
                     exit_code = 125
                 tail.extend(b"\nCHECK DESCENDANTS SURVIVED\n")
@@ -897,6 +1160,10 @@ def run_check(root: Path, task_id: str, check_id: str) -> dict:
             raise GateError("check_not_in_stage_contract")
         before = source_snapshot(root)
         started = now()
+        receipt_id = uuid.uuid4().hex
+        # The exact fixed task fields are known before the external check runs.
+        tm.encoded({**task, "receipts": [*task["receipts"], receipt_id],
+                    "status": "VERIFYING"}, tm.limit(root))
         env = os.environ.copy()
         env["PYTHONDONTWRITEBYTECODE"] = "1"
         # shell=False/process groups are not a sandbox; use reviewed exact argv.
@@ -904,7 +1171,6 @@ def run_check(root: Path, task_id: str, check_id: str) -> dict:
             check["argv"], root, env, check.get("timeout", 120)
         )
         after = source_snapshot(root)
-        receipt_id = uuid.uuid4().hex
         log_rel = f".agentos/tasks/{task_id}/evidence/{receipt_id}.log"
         log = _scrub(output).encode()
         atomic_bytes(within(root, log_rel), log)
@@ -936,7 +1202,7 @@ def run_check(root: Path, task_id: str, check_id: str) -> dict:
         )
         task["receipts"].append(receipt_id)
         task["status"] = "VERIFYING"
-        atomic_json(task_path(root, task_id), task)
+        tm.write_task(root, task)
         _event(
             root,
             task,
@@ -1075,6 +1341,15 @@ def close(root: Path, task_id: str, review: dict, *, user_home: Path | None = No
             "pending_target_verification",
         }:
             raise GateError("external_deployment_requires_separate_target_receipt")
+        # Reject a known oversized postimage before any handoff publication.
+        # The returned handoff receipt is checked again by write_task below;
+        # failure after a handoff keeps its existing journal/receipt for review.
+        proposed_closeout = {"review": review, "assessment": assessment,
+                             "documents": document_check(root, task)}
+        if continuation is not None:
+            proposed_closeout["continuation"] = continuation
+        tm.encoded({**task, "status": "CLOSED", "closed_at": now(),
+                    "closeout": proposed_closeout}, tm.limit(root))
         handoff = None
         if task.get("handoff_required") or task["answers"].get("handoff_required"):
             from .handoff_lifecycle import deliver
@@ -1091,7 +1366,7 @@ def close(root: Path, task_id: str, review: dict, *, user_home: Path | None = No
             task["closeout"]["continuation"] = continuation
         if handoff is not None:
             task["closeout"]["handoff"] = handoff
-        atomic_json(task_path(root, task_id), task)
+        tm.write_task(root, task)
         report = (
             f"# Result {task_id}\n\nStatus: CLOSED (local stage).\n\n"
             + review["summary"]
@@ -1117,7 +1392,7 @@ def close(root: Path, task_id: str, review: dict, *, user_home: Path | None = No
     }
 
 
-def checkpoint(root: Path, task_id: str, reason: str, next_step: str, *, user_home: Path | None = None) -> dict:
+def checkpoint(root: Path, task_id: str, reason: str, next_step: str, *, user_home: Path | None = None, protected_sources: dict | None = None, capture_selection: dict | None = None) -> dict:
     _require_entry_recovered(root_path(root))
     nonempty(reason, "checkpoint_reason")
     nonempty(next_step, "checkpoint_next_step")
@@ -1128,11 +1403,18 @@ def checkpoint(root: Path, task_id: str, reason: str, next_step: str, *, user_ho
         task = load_task(root, task_id)
         if task["status"] == "CLOSED":
             raise GateError("closed_task_is_immutable")
+        if task["status"] == "RECOVERY_REQUIRED":
+            raise GateError("recovery_disposition_forbids_checkpoint_replay")
+        tm.encoded({**task, "status": "CHECKPOINT", "checkpoint": {
+            "at": now(), "reason": reason, "next_step": next_step,
+            "complete": False}}, tm.limit(root))
         handoff = None
+        if (protected_sources is not None or capture_selection is not None) and not (task.get("handoff_required") or task["answers"].get("handoff_required")):
+            raise GateError("protected_checkpoint_handoff_required")
         if task.get("handoff_required") or task["answers"].get("handoff_required"):
             from .handoff_lifecycle import deliver
 
-            handoff = deliver(root, task, {"summary": reason, "limitations": "Checkpoint is unfinished work, not a completion receipt.", "next_step": next_step}, {"status": "CHECKPOINT", "complete": False}, profile="checkpoint", user_home=user_home)
+            handoff = deliver(root, task, {"summary": reason, "limitations": "Checkpoint is unfinished work, not a completion receipt.", "next_step": next_step}, {"status": "CHECKPOINT", "complete": False}, profile="checkpoint", user_home=user_home, protected_sources=protected_sources, capture_selection=capture_selection)
         task["status"] = "CHECKPOINT"
         task["checkpoint"] = {
             "at": now(),
@@ -1141,7 +1423,7 @@ def checkpoint(root: Path, task_id: str, reason: str, next_step: str, *, user_ho
             "complete": False,
             **({"handoff": handoff} if handoff is not None else {}),
         }
-        atomic_json(task_path(root, task_id), task)
+        tm.write_task(root, task)
         _event(root, task, "CHECKPOINT", task["checkpoint"])
     return {"status": "CHECKPOINT", "complete": False, "task_id": task_id}
 
@@ -1168,6 +1450,16 @@ def make_parser() -> argparse.ArgumentParser:
     nxt.add_argument("--session", required=True)
     nxt.add_argument("--from-turn", required=True)
     nxt.add_argument("--turn", required=True)
+    nxt.add_argument("--recovery-request", type=Path)
+    nxt.add_argument("--recovery-permit", type=Path)
+    for action in ("refusal-acknowledge", "refusal-reconcile"):
+        recovery = sub.add_parser(action)
+        recovery.add_argument("--task", required=True)
+        recovery.add_argument("--request", type=Path, required=True)
+        recovery.add_argument("--permit", type=Path, required=True)
+    recovery_status = sub.add_parser("refusal-status")
+    recovery_status.add_argument("--task", required=True)
+    recovery_status.add_argument("--operation", required=True)
     doc = sub.add_parser("document")
     for name in ("id", "path", "owner", "source", "summary"):
         doc.add_argument("--" + name, required=True)
@@ -1181,11 +1473,29 @@ def make_parser() -> argparse.ArgumentParser:
     sub.add_parser("status")
     fin = sub.add_parser("close")
     fin.add_argument("--review", type=Path, required=True)
+    diagnostic = sub.add_parser("handoff-diagnostic")
+    diagnostic.add_argument("--revision", type=int, required=True)
+    diagnostic.add_argument("--attempt")
     cp = sub.add_parser("checkpoint")
     cp.add_argument("--reason", required=True)
     cp.add_argument("--next-step", required=True)
+    cp.add_argument("--capture-selection", type=Path, help="Explicit pinned checkpoint capture surfaces; full source identity retained")
+    cp.add_argument("--protected-sources", type=Path, help="Explicit pinned config-reference request; unfinished checkpoint only")
     sub.add_parser("gate")
     sub.add_parser("snapshot")
+    budget = sub.add_parser("inventory-budget", help="Read or explicitly set this project inventory byte/file budget")
+    budget_action = budget.add_mutually_exclusive_group()
+    budget_action.add_argument("--max-bytes", type=int)
+    budget_action.add_argument("--reset", action="store_true")
+    budget.add_argument("--max-files", type=int)
+    budget.add_argument("--expected-project-sha256")
+    budget.add_argument("--expected-budget-revision", type=int)
+    task_budget = sub.add_parser("task-metadata-budget", help="Read or explicitly set only project task JSON capacity")
+    task_budget_action = task_budget.add_mutually_exclusive_group()
+    task_budget_action.add_argument("--max-bytes", type=int)
+    task_budget_action.add_argument("--reset", action="store_true")
+    task_budget.add_argument("--expected-project-sha256")
+    task_budget.add_argument("--expected-budget-revision", type=int)
     for name, child in sub.choices.items():
         child.add_argument("--root", type=Path, default=Path.cwd())
         if name in {
@@ -1197,6 +1507,7 @@ def make_parser() -> argparse.ArgumentParser:
             "status",
             "close",
             "checkpoint",
+            "handoff-diagnostic",
             "gate",
         }:
             child.add_argument("--task", required=True)
@@ -1204,12 +1515,28 @@ def make_parser() -> argparse.ArgumentParser:
 
 
 def command(argv: list[str], user_home: Path) -> tuple[dict, int]:
+    if argv and argv[0] == "local":
+        from .project_lite import command as local_command
+        return local_command(argv[1:], user_home)
+    if argv and argv[0] == "interrupted-continuation":
+        from .interrupted_continuation import command as interrupted_command
+        return interrupted_command(argv[1:],user_home)
     if argv and argv[0] == "observe":
         from .observation import command as observation_command
 
         return observation_command(argv[1:], user_home)
     args = make_parser().parse_args(argv)
     root = args.root
+    if args.action in {"refusal-acknowledge", "refusal-reconcile", "refusal-status"}:
+        from . import refusal_recovery as recovery
+        root = root_path(root)
+        home = user_home.expanduser().resolve()
+        if args.action == "refusal-status":
+            return recovery.status(root, home, args.task, args.operation), 0
+        request = recovery.document(args.request)
+        permit = recovery.document(args.permit)
+        method = recovery.acknowledge if args.action == "refusal-acknowledge" else recovery.reconcile
+        return method(root, home, args.task, request, permit), 0
     if args.action == "init":
         result = initialize(
             root, args.name, args.type, args.feature, read_json_input(args.context)
@@ -1244,6 +1571,7 @@ def command(argv: list[str], user_home: Path) -> tuple[dict, int]:
             resume_task=args.resume_task,
         )
     elif args.action == "next-turn":
+        from .refusal_recovery import document as recovery_document
         result = next_turn(
             root,
             user_home,
@@ -1251,6 +1579,8 @@ def command(argv: list[str], user_home: Path) -> tuple[dict, int]:
             previous_turn=args.from_turn,
             turn_id=args.turn,
             task_id=args.task,
+            recovery_request=(recovery_document(args.recovery_request) if args.recovery_request else None),
+            recovery_permit=(recovery_document(args.recovery_permit) if args.recovery_permit else None),
         )
     elif args.action == "document":
         result = register_document(
@@ -1270,8 +1600,21 @@ def command(argv: list[str], user_home: Path) -> tuple[dict, int]:
         result = load_task(root, args.task)
     elif args.action == "snapshot":
         result = source_snapshot(root)
+    elif args.action == "inventory-budget":
+        result = project_inventory_budget(
+            root, args.max_bytes, reset=args.reset, max_files=args.max_files,
+            expected_project_sha256=args.expected_project_sha256,
+            expected_budget_revision=args.expected_budget_revision,
+        )
+    elif args.action == "task-metadata-budget":
+        result = tm.set_budget(root, args.max_bytes, reset=args.reset,
+            expected_project_sha256=args.expected_project_sha256,
+            expected_budget_revision=args.expected_budget_revision)
+    elif args.action == "handoff-diagnostic":
+        from .handoff_diagnostics import read_failure
+        result = read_failure(root_path(root), args.task, args.revision, args.attempt)
     elif args.action == "close":
         result = close(root, args.task, read_json_input(args.review))
     else:
-        result = checkpoint(root, args.task, args.reason, args.next_step)
+        result = checkpoint(root, args.task, args.reason, args.next_step, protected_sources=read_json_input(args.protected_sources) if args.protected_sources else None, capture_selection=read_json_input(args.capture_selection) if args.capture_selection else None)
     return result, (2 if result.get("status") in {"BLOCKED", "FAIL"} else 0)
