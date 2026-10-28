@@ -17,3 +17,18 @@
 
 Compatibility: Existing legacy `agentos project enter/ready` remains available and
 keeps its full authority checks; new `project local` is explicitly opt-in.
+
+## Safe CLI refusal classification (AgentOS rc2044)
+
+FE refusal keeps `schema: function-extractor.cli/v1`, `status: REFUSED`,
+`error_class` and exit2. One reviewed machine code is exposed as optional
+`error_code: graph_expansion_cap` for the engine's exact builtin `ValueError`
+with that single builtin string argument. This identifies a bounded static
+graph refusal; it does not prove source coverage or allow a retry/downgrade.
+Unknown reasons, subclasses and arbitrary exception text stay hidden. No
+exception string formatting, prefix matching or message passthrough is used.
+
+Preserve STRICT capture, graph limits, unresolved evidence and source pins.
+Do not raise caps, use opaque modules or select PARTIAL_STATIC just to obtain
+a passing result. Independently qualify a smaller causal boundary or report
+the original scope unproved; the diagnostic grants no execution authority.

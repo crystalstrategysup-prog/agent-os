@@ -48,7 +48,7 @@
         },
         {
           "path": "fe_tools/tools/function_extractor/cli.py",
-          "sha256": "24524b59351c994263c7f09b9b7800e03f77692fff637096986b43d000b9b6b4"
+          "sha256": "885130bf61167ad43715b0f73f50d445ca83b47e73cd36cd1feedd6cb2dfb3e9"
         },
         {
           "path": "fe_tools/backend/tools/route_probe_replay.py",

@@ -13,6 +13,10 @@ from .runner.bundle import canonical, materialize_bundle, pack_bundle
 from .runner.loader import load_engine
 
 
+# Reviewed machine codes only. Never forward arbitrary exception text.
+_SAFE_REFUSAL_CODES = frozenset({"graph_expansion_cap"})
+
+
 def _read(path, cap=2_000_000):
     from .workflow import public_path
     path = public_path(path)
@@ -388,7 +392,11 @@ def main(argv=None):
                   "diagnosis": diagnosis, **metadata})
             return 0 if trace["status"] in {"RETURNED", "RAISED", "DENIED"} else 2
     except Exception as exc:
-        _out({"schema": "function-extractor.cli/v1", "status": "REFUSED", "error_class": type(exc).__name__})
+        refusal = {"schema": "function-extractor.cli/v1", "status": "REFUSED", "error_class": type(exc).__name__}
+        if (type(exc) is ValueError and len(exc.args) == 1
+                and type(exc.args[0]) is str and exc.args[0] in _SAFE_REFUSAL_CODES):
+            refusal["error_code"] = exc.args[0]
+        _out(refusal)
         return 2
 
 
