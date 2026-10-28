@@ -1,3 +1,9 @@
+# 0.8.0rc2042 — public release qualification
+
+- Restore callable public version/skill validators and require exact declared skill locations and names. Preserve privacy markers and secret scanning.
+- Compare the integrated module registry with the current package version instead of a stale candidate literal.
+- Retain the reviewed bounded recovery v3 adapter without changing its observer, CAS, journal or capacity guards.
+
 # 0.8.0rc2041+agentas3 — bounded recovery adapter candidate
 
 - Add a v3 acknowledge/advance/reconcile entry using the existing supported-tool stdio bridge and original response accounting. Recovery and observer guards remain unchanged.
