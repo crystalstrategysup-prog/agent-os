@@ -196,6 +196,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--script-input", action="append", default=[], type=Path)
     parser.add_argument("--timeout", type=float, default=30)
     parser.add_argument("--max-output-bytes", type=int, default=24000)
+    if args in (["-h"], ["--help"]):
+        parser.parse_args(args)
     if "--" not in args:
         parser.error("explicit -- command separator required")
     split = args.index("--")

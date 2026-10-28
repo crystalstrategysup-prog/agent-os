@@ -26,6 +26,19 @@ def terminal_pairs(tmp_path):
     return rows
 
 
+@pytest.mark.parametrize("flag", ["-h", "--help"])
+def test_cli_standalone_help_without_launch(flag, tmp_path, monkeypatch, capsys):
+    calls = []
+    monkeypatch.setattr(observer.subprocess, "Popen", lambda *a, **k: calls.append(a))
+    monkeypatch.chdir(tmp_path)
+    with pytest.raises(SystemExit) as error:
+        observer.main([flag])
+    assert error.value.code == 0
+    assert "--output-root" in capsys.readouterr().out
+    assert not calls
+    assert not list(tmp_path.iterdir())
+
+
 def test_cli_refuses_unquoted_claim_before_launch(tmp_path, monkeypatch):
     calls = []
     monkeypatch.setattr(observer.subprocess, "Popen", lambda *a, **k: calls.append(a))

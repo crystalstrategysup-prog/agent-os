@@ -9,7 +9,8 @@ caller-owned single-writer output directory; do not share it with untrusted
 writers. Filesystem failure can prevent ledger persistence and must be reported
 as missing evidence, never success.
 
-The module CLI requires a literal `--` between options and command arguments:
+Standalone `-h` or `--help` displays usage without launching a command or writing
+evidence. Execution requires a literal `--` between options and command arguments:
 
 ```sh
 python -m agent_os.observed_command --purpose audit --claim 'selected check' \
