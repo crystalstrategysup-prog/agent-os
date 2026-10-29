@@ -171,7 +171,8 @@ class StdioRpc:
     def call(self, method: str, params: dict, *, deadline: float | None = None) -> dict:
         allowed = {"config/read": {"includeLayers", "cwd"}, "thread/start": {"cwd"},
                    "turn/start": {"threadId", "input"}, "model/list": {"cursor", "limit", "includeHidden"},
-                   "thread/read": {"threadId", "includeTurns"}}
+                   "thread/read": {"threadId", "includeTurns"},
+                   "thread/resume": {"threadId", "excludeTurns"}}
         if method not in allowed or set(params) != allowed[method]:
             raise LaunchError("provider_method_or_override_refused")
         if deadline is not None and (type(deadline) not in (int, float) or not math.isfinite(deadline)):
@@ -182,6 +183,10 @@ class StdioRpc:
                                          not isinstance(params["threadId"], str) or
                                          not re.fullmatch(r"[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}", params["threadId"])):
             raise LaunchError("exact_metadata_thread_read_required")
+        if method == "thread/resume" and (params["excludeTurns"] is not True or
+                not isinstance(params["threadId"], str) or not re.fullmatch(
+                    r"[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}", params["threadId"])):
+            raise LaunchError("exact_no_override_thread_resume_required")
         if method == "model/list" and (params["includeHidden"] is not True or type(params["limit"]) is not int
                                        or params["limit"] != MODEL_PAGE_SIZE
                                        or params["cursor"] is not None and (not isinstance(params["cursor"], str)
@@ -622,6 +627,94 @@ class CodexLaunchProvider:
             if not _model_scalar(actual[key]):
                 raise LaunchError("continuation_" + key + "_unknown", status="UNKNOWN")
         observed.update(self._model_description(config, current_thread=actual))
+        return observed
+
+    def describe_adoption(self, request: dict, retained: dict, attempt: str) -> dict:
+        """Historical candidate selection, explicitly not current thread evidence."""
+        if retained.get("sandbox") != "danger-full-access" or retained.get("approval_policy") != "never":
+            raise LaunchError("adoption_permission_profile_unsupported", status="UNKNOWN")
+        for key in ("model", "model_provider", "reasoning_effort"):
+            if not _model_scalar(retained.get(key)):
+                raise LaunchError("adoption_retained_settings_unknown", status="UNKNOWN")
+        observed, config = self._describe_policy(request, attempt)
+        observed.update(self._model_description(config, current_thread=retained))
+        metadata = observed["model_preflight"]
+        metadata.update(selection_source="retained_startup", model_source="retained_startup",
+                        reasoning_effort_source="retained_startup")
+        observed["model_metadata_source"] = "retained_startup_candidate_only"
+        self._adoption_admission = {"attempt": attempt, "request_sha256": digest(request),
+                                   "retained": dict(retained), "observed": observed,
+                                   "read_at": time.monotonic()}
+        return observed
+
+    def resume(self, request: dict, retained: dict, attempt: str) -> dict:
+        """Cold resume exactly one existing thread, without any setting override."""
+        admitted = getattr(self, "_adoption_admission", None)
+        if (not admitted or admitted["attempt"] != attempt or admitted["retained"] != retained
+                or admitted["request_sha256"] != digest(request)
+                or not 0 <= time.monotonic() - admitted["read_at"] <= 60):
+            raise LaunchError("current_adoption_preflight_required", status="UNKNOWN")
+        if self._thread_start_attempted:
+            raise LaunchError("thread_start_requires_reconciliation", status="UNKNOWN")
+        self._thread_start_attempted = True
+        response = self.rpc.call("thread/resume", {"threadId": retained["session_id"], "excludeTurns": True})
+        # Normalize before validation so every rejected resume preserves the
+        # actual bounded identity separately from the requested existing SID.
+        response_valid = isinstance(response, dict)
+        response = response if response_valid else {}
+        raw_thread = response.get("thread")
+        thread = raw_thread if isinstance(raw_thread, dict) else {}
+        actual_sid = thread.get("id")
+        if not isinstance(actual_sid, str) or not re.fullmatch(
+                r"[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}", actual_sid):
+            actual_sid = None
+        sandbox = response.get("sandbox")
+        sandbox_type = sandbox.get("type") if isinstance(sandbox, dict) else None
+        policy = response.get("approvalPolicy")
+        policy = policy if isinstance(policy, str) and policy in {"never", "on-request", "untrusted"} else None
+        cwd = response.get("cwd")
+        cwd = cwd if isinstance(cwd, str) and 0 < len(cwd) <= 4096 and not any(ord(c) < 32 for c in cwd) else None
+        observed = {"session_id": actual_sid, "expected_session_id": retained["session_id"],
+                    "resume_may_have_started": True, "model_metadata_source": "thread_resume_response"}
+        try:
+            observed.update(self._observation(request, attempt, source="provider_startup", policy=policy,
+                            mode=sandbox_type, network=None, workspace=cwd, session_id=actual_sid))
+            observed.update(expected_session_id=retained["session_id"],
+                            model_preflight=admitted["observed"]["model_preflight"])
+            for key, field in (("model", "model"), ("model_provider", "modelProvider"),
+                               ("reasoning_effort", "reasoningEffort")):
+                observed[key] = response.get(field) if _model_scalar(response.get(field)) else None
+            # The qualified full-access/never profile has no restricting roots
+            # or temporary/network members; unknown profiles are not normalized.
+            if (not response_valid or not isinstance(raw_thread, dict) or actual_sid is None
+                    or sandbox != {"type": "dangerFullAccess"} or policy != "never"):
+                raise LaunchError("resume_permission_or_identity_readback_unknown", status="UNKNOWN")
+            for key in ("session_id", "workspace", "model", "model_provider", "reasoning_effort", "sandbox", "approval_policy"):
+                if observed.get(key) != retained.get(key):
+                    raise LaunchError("resume_changed:" + key)
+            provider = admitted["observed"]["model_preflight"]["configured_provider"]
+            if provider is not None and provider != observed["model_provider"]:
+                raise LaunchError("resume_changed:model_provider")
+            # Do not retain arbitrary reviewer descriptions or private histories.
+            reviewer = response.get("approvalsReviewer")
+            roots = response.get("runtimeWorkspaceRoots")
+            observed["permission_readback"] = {"sandbox": {"type": "dangerFullAccess"}, "approval_policy": "never",
+                "historical_reviewer_and_runtime_roots": "UNKNOWN",
+                "current_reviewer": reviewer if _model_scalar(reviewer) else None,
+                "current_runtime_roots_sha256": digest(roots) if isinstance(roots, list) else None,
+                "hidden_instruction_equivalence": "NOT_PROVEN"}
+            current = self.describe_existing(request, observed, attempt)
+            observed["current_thread"] = current["current_thread"]
+            observed["model_binding"] = _continuation_model_binding(current, observed, clock=self.clock)
+            observed["model_binding"]["source"] = "thread_resume_response_and_thread_read"
+        except LaunchError as exc:
+            for key in ("model", "model_provider", "reasoning_effort"):
+                if not _model_scalar(observed.get(key)): observed[key] = None
+            exc.receipt = {"startup": observed}
+            raise
+        except (OSError, TimeoutError):
+            raise LaunchError("resume_current_readback_unavailable", status="UNKNOWN",
+                              receipt={"startup": observed}) from None
         return observed
 
     def create(self, request: dict, attempt: str) -> dict:

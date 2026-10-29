@@ -320,6 +320,31 @@ class CodexRunner:
                               receipt.get("session_id"), _bounded_output(json.dumps(receipt, ensure_ascii=False)),
                               0 if completed else 3)
 
+    def adopt_screen(self, name: str, prompt: str, adoption: dict, workspace: str | Path | None = None, *,
+                     launch_request: dict, adoption_guard, target_guard=None) -> DispatchResult:
+        """Guarded same-SID cold owning transport; never stop/reset old workers."""
+        from .config import AgentOSPaths
+        from .dispatch_gate import claim
+        from .screen_adoption import adopt_screen
+        from .session_launch import LaunchError, validate_request
+
+        validate_request(launch_request)
+        selected = validate_workspace(self.config, workspace)
+        if launch_request["original_goal"].strip() != prompt.strip() or launch_request["workspace"] != str(selected):
+            raise LaunchError("request_does_not_match_dispatch")
+        screen_binary, codex_binary = shutil.which("screen"), shutil.which(self.executable)
+        if os.name == "nt" or not screen_binary or not codex_binary:
+            raise LaunchError("screen_or_codex_binary_unavailable", status="UNAVAILABLE")
+        receipt = adopt_screen(AgentOSPaths.discover().home, name, launch_request, adoption,
+            screen_binary=Path(screen_binary).resolve(), codex_binary=Path(codex_binary).resolve(),
+            environment=self._environment(), adoption_guard=adoption_guard, target_guard=target_guard,
+            dispatch_claim=lambda: claim(prompt, workspace=selected, destination_session=adoption["session_id"]),
+            work_timeout=min(self.timeout, 1800))
+        completed = receipt.get("work", {}).get("status") == "completed"
+        return DispatchResult("turn_completed_unaccepted" if completed else "turn_failed_or_unknown",
+                              receipt.get("session_id"), _bounded_output(json.dumps(receipt, ensure_ascii=False)),
+                              0 if completed else 3)
+
     def continue_screen(self, screen: ScreenSession, prompt: str, *, target_guard=None,
                         continuation_id: str | None = None) -> DispatchResult:
         from .config import AgentOSPaths

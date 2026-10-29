@@ -94,7 +94,7 @@ class ScreenLaunchProvider:
     @classmethod
     def start(cls, home: Path, name: str, request: dict, *, screen_binary: Path,
               codex_binary: Path, environment: dict[str, str], timeout: float = 30,
-              work_timeout: float = 1800) -> "ScreenLaunchProvider":
+              work_timeout: float = 1800, retained_startup: dict | None = None) -> "ScreenLaunchProvider":
         validate_request(request)
         if os.name == "nt":
             raise LaunchError("screen_not_supported_on_windows", status="UNAVAILABLE")
@@ -117,6 +117,8 @@ class ScreenLaunchProvider:
             raise LaunchError("screen_name_exists_reconciliation_required", status="UNKNOWN") from exc
         bootstrap = {"request": request, "codex_binary": str(codex_binary),
                      "work_timeout": work_timeout, "codex_home": environment.get("CODEX_HOME")}
+        if retained_startup is not None:
+            bootstrap["adoption_retained_startup"] = retained_startup
         identity = {"schema": "agentos.screen-worker/v1", "worker_id": str(uuid.uuid4()),
                     "name": name, "request_sha256": digest(request), "created_at": time.time()}
         identity["bootstrap_sha256"] = digest(bootstrap)
@@ -178,7 +180,7 @@ class ScreenLaunchProvider:
                 "work_accepted": False}
 
     def _call(self, operation: str, payload: dict, *, timeout: float | None = None) -> dict:
-        if operation not in {"describe", "describe_existing", "create", "probe", "dispatch"}:
+        if operation not in {"describe", "describe_existing", "describe_adoption", "resume", "create", "probe", "dispatch"}:
             raise LaunchError("screen_operation_refused")
         raw = json.dumps(payload, ensure_ascii=False)
         if len(raw.encode()) > LIMIT:
@@ -218,6 +220,12 @@ class ScreenLaunchProvider:
     def describe_existing(self, request: dict, startup: dict, attempt: str) -> dict:
         _require_thread_readback_capability(self._state())
         return self._call("describe_existing", {"request": request, "startup": startup, "attempt": attempt})
+
+    def describe_adoption(self, request: dict, retained: dict, attempt: str) -> dict:
+        return self._call("describe_adoption", {"request": request, "retained": retained, "attempt": attempt})
+
+    def resume(self, request: dict, retained: dict, attempt: str) -> dict:
+        return self._call("resume", {"request": request, "retained": retained, "attempt": attempt})
 
     def create(self, request: dict, attempt: str) -> dict:
         return self._call("create", {"request": request, "attempt": attempt})
@@ -269,7 +277,7 @@ def _worker_locked(root: Path) -> int:
     validate_request(request)
     socket = os.environ.get("STY", "")
     state = {**identity, "socket": socket, "worker_pid": os.getpid(), "status": "STARTING", "session_id": None,
-             "protocol_capabilities": [THREAD_READBACK_CAPABILITY]}
+             "protocol_capabilities": [THREAD_READBACK_CAPABILITY, "cold-thread-adoption/v1"]}
     rpc = None
     try:
         if digest(bootstrap) != identity.get("bootstrap_sha256") or digest(request) != identity["request_sha256"]:
@@ -314,8 +322,23 @@ def _worker_locked(root: Path) -> int:
                         raise LaunchError("screen_existing_thread_not_bound")
                     last_attempt, probe_passed = payload["attempt"], False
                     result = provider.describe_existing(request, startup, last_attempt)
+                elif operation in {"describe_adoption", "resume"}:
+                    retained = bootstrap.get("adoption_retained_startup")
+                    if not isinstance(retained, dict) or payload.get("retained") != retained or startup is not None:
+                        raise LaunchError("screen_adoption_not_bound", status="UNKNOWN")
+                    if operation == "describe_adoption":
+                        last_attempt, probe_passed = payload["attempt"], False
+                        result = provider.describe_adoption(request, retained, last_attempt)
+                    else:
+                        if thread_start_attempted or payload.get("attempt") != last_attempt:
+                            raise LaunchError("screen_duplicate_or_unadmitted_resume", status="UNKNOWN")
+                        thread_start_attempted = True
+                        result = provider.resume(request, retained, last_attempt)
+                        startup = result
+                        state["session_id"] = result.get("session_id")
+                        atomic_json(root / "startup.json", result)
                 elif operation == "create":
-                    if thread_start_attempted or startup is not None or payload.get("attempt") != last_attempt:
+                    if bootstrap.get("adoption_retained_startup") is not None or thread_start_attempted or startup is not None or payload.get("attempt") != last_attempt:
                         raise LaunchError("screen_duplicate_or_unadmitted_thread_start", status="UNKNOWN")
                     thread_start_attempted = True
                     result = provider.create(request, last_attempt)
@@ -347,7 +370,7 @@ def _worker_locked(root: Path) -> int:
                 if exc.receipt:
                     response["provider_failure"] = exc.receipt
                     rejected_startup = exc.receipt.get("startup")
-                    if operation == "create" and isinstance(rejected_startup, dict):
+                    if operation in {"create", "resume"} and isinstance(rejected_startup, dict):
                         # A rejected startup may still have created a thread.
                         # Persist that identity without admitting it for work.
                         state["session_id"] = rejected_startup.get("session_id")

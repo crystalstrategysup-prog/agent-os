@@ -88,7 +88,7 @@ even a provisional Screen, so reusing an uncertain launch ID cannot start a
 second Screen with a different name.
 
 The bounded typed mailbox permits only `describe`, `describe_existing`,
-`create`, `probe` and `dispatch`. Each request/response binds worker ID, exact retained request digest,
+`describe_adoption`, `resume`, `create`, `probe` and `dispatch`. Each request/response binds worker ID, exact retained request digest,
 operation ID and connection ID. The bootstrap also binds the chosen executable,
 work timeout and expected Codex home. A worker lock and caller control lock
 serialize ownership; a worker cannot directly repeat thread creation or dispatch
@@ -243,3 +243,62 @@ worker without that capability returns UNKNOWN before a continuation journal,
 mailbox write, probe or dispatch. Installing this source does not reload workers.
 Any old failed/pending operation remains preserved; replacement/adoption needs
 its separate exact terminal/effects/writer reconciliation and supported guards.
+
+
+## Guarded same-SID cold transport adoption
+
+`CodexRunner.adopt_screen(name, next_prompt, adoption, workspace,
+launch_request=request, adoption_guard=held_guard, target_guard=current_targets)`
+creates a new owning Screen transport for the **same existing native SID**. It
+never stops, resets or reloads the old worker. A new unique registry/name is
+required; old failed/pending/journal records remain immutable. Existing
+`create_screen` and `continue_screen` retain their original roles.
+
+The adoption input contains `session_id`, `old_name` and `old_pins` (raw SHA-256
+of identity.json, bootstrap.json, startup.json, state.json and selected failed
+receipts). New request context must contain `adopted_original_contract`, exactly
+matching the old bootstrap's original_goal/scope/acceptance/context/authority.
+This is historical data, never renewed authority; the new request binds today's
+authorized next work. Same SID retains server conversation history; unknown
+hidden instructions are not claimed byte-identical.
+
+`adoption_guard(request, adoption)` must be a caller-owned context manager that
+holds a real controller ownership exclusion until the whole call exits and
+yields a live `check(query)` callable. A static receipt is insufficient. Query
+binds phase, attempt_id, request_sha256, adoption_sha256 and actual new_worker.
+The response repeats those identities with observed_at (maximum 60 seconds),
+nonempty stable owner_exclusion_token, owner_exclusion_held:true, exact session_id,
+terminal_effects_reconciled:true, old_owned_lineage_absent:true, terminal_turn_id
+and evidence_ref. Before transport `source_writer_state` must be FREE; before
+resume and before dispatch it must be NEW_WORKER_OWNED and new_worker_sha256 must
+match the supplied actual worker. The owning implementation must prove that
+writer lock belongs to the new exact lineage. Hold a separate controller lock,
+**not** a source-writer flock that the unchanged Codex wrapper needs to acquire.
+Local PID absence, original file pins, no pending and free old worker flock are
+additional checks; none alone proves quiescence or effect reconciliation.
+
+The initial supported permissions are deliberately limited to retained actual
+`danger-full-access` plus `never`. Resume must return the exact singleton sandbox
+`{"type":"dangerFullAccess"}` and approvalPolicy `never`. It has no restricting
+workspaceWrite root/temp/network members. Other permission profiles remain
+UNKNOWN until their complete provenance is supported. Current reviewer and
+runtime-root digest are recorded separately; their historical values remain
+UNKNOWN. The adapter never answers an approval request. Independent source,
+authority, target/lease and storage boundaries still apply.
+
+The new connection reads config policy and complete model catalog, selecting the
+retained model/effort as a historical candidate independently of global defaults.
+It sends only `thread/resume {threadId, excludeTurns:true}`: no setting, path,
+history, policy or instruction overrides. Actual resume SID/model/provider/effort/
+cwd/rights must match the retained startup, followed by fresh same-connection
+loaded-idle thread/read. Exact harmless tool probes and independent targets pass
+before a guarded destination claim and the new work. Missing/mismatched/unknown
+readback stops dependent work and preserves the resumed identity.
+
+An exclusive SID-keyed adoption journal is reserved before any transport effect.
+Any existing record, including UNKNOWN, blocks another launch ID/name/operation
+from replaying resume. There is no automatic reset or reconciliation override.
+The held controller guard can exit after failure because the durable SID block
+remains. Any later recovery needs separate exact effects reconciliation; this
+API does not claim to implement a reset route. Installation alone never upgrades
+an already loaded worker or accepts a business result.
