@@ -75,16 +75,23 @@ for line in sys.stdin:
   if mode in {'default-provider','unavailable-model','continuation-provider-drift','missing-actual-provider','null-actual-provider'}:
    result['config']['model_provider']=None
   if mode=='unavailable-model': result['config']['model']='fixture-unavailable'
-  if mode=='continuation-model-drift' and count>=2: result['config']['model']='fixture-alternate'
+  if mode in {'continuation-model-drift','continuation-default-drift'} and count>=2: result['config']['model']='fixture-alternate'
+  if mode=='continuation-default-drift' and count>=2: result['config']['model_reasoning_effort']='high'
   if mode=='continuation-provider-drift' and count>=2: result['config']['model_provider']='fixture-other-provider'
  elif method=='model/list':
   assert set(m['params'])=={'cursor','limit','includeHidden'}
   assert m['params']['includeHidden'] is True and m['params']['cursor'] is None
-  names=['fixture-model','fixture-alternate'] if mode=='continuation-model-drift' else ['fixture-model']
+  names=['fixture-model','fixture-alternate'] if mode in {'continuation-model-drift','continuation-default-drift'} else ['fixture-model']
   result={'data':[{'id':name,'model':name,'displayName':'Synthetic model','description':'Fixture only',
                    'hidden':False,'isDefault':name=='fixture-model','defaultReasoningEffort':'medium',
                    'supportedReasoningEfforts':[{'reasoningEffort':'medium','description':'Fixture medium'}]}
                   for name in names],'nextCursor':None}
+ elif method=='thread/read':
+  assert m['params']=={'threadId':'01a0a2b6-522a-7501-9a78-c093c781141e','includeTurns':False}
+  result={'thread':{'id':m['params']['threadId'],'cwd':cwd,'status':{'type':'idle'},
+                    'model':'fixture-alternate' if mode=='continuation-model-drift' else 'fixture-model',
+                    'modelProvider':'fixture-inherited-provider' if mode in {'default-provider','continuation-provider-drift'} else 'openai',
+                    'reasoningEffort':'medium'}}
  elif method=='thread/start':
   result={'thread':{'id':'01a0a2b6-522a-7501-9a78-c093c781141e'},'cwd':cwd,'approvalPolicy':'never',
           'model':'fixture-model','modelProvider':'openai','reasoningEffort':'medium',
@@ -248,10 +255,10 @@ print(json.dumps(receipt))
         assert continuation["original_startup"] == startup
         assert continuation["session_id"] == startup["session_id"] == receipt["session_id"]
         assert continuation["current_preflight"]["connection_id"] == startup["connection_id"]
-        assert continuation["model_binding"]["provider_resolution"] == "startup_resolved"
+        assert continuation["model_binding"]["provider_resolution"] == "retained_actual"
     methods = [event["method"] for event in _events(fixture) if "method" in event]
     assert methods == ["initialize", "initialized", "config/read", "model/list", "thread/start", "turn/start", "turn/start",
-                       "config/read", "model/list", "turn/start", "turn/start"]
+                       "config/read", "thread/read", "model/list", "turn/start", "turn/start"]
     work = list(map(json.loads, (Path(fixture["request"]["workspace"]) / "fixture-business.jsonl").read_text().splitlines()))
     assert len(work) == 2 and all("kg" in item["text"] for item in work)
     with pytest.raises(LaunchError, match="screen_continuation_requires_reconciliation"):
@@ -399,7 +406,7 @@ def test_screen_continuation_requalifies_catalog_and_blocks_changed_model_before
     assert error.value.code == "startup_changed:model"
     methods = [event["method"] for event in _events(fixture) if "method" in event]
     assert methods == ["initialize", "initialized", "config/read", "model/list", "thread/start", "turn/start", "turn/start",
-                       "config/read", "model/list"]
+                       "config/read", "thread/read", "model/list"]
     assert len((Path(fixture["request"]["workspace"]) / "fixture-business.jsonl").read_text().splitlines()) == 1
     journals = list((fixture["home"] / "state/screen-workers/fixture/continuations").glob("*.json"))
     assert len(journals) == 1
@@ -422,7 +429,7 @@ def test_screen_continuation_retains_actual_default_provider_and_refuses_explici
     assert error.value.status == "MISMATCH" and error.value.code == "startup_changed:model_provider"
     methods = [event["method"] for event in _events(fixture) if "method" in event]
     assert methods == ["initialize", "initialized", "config/read", "model/list", "thread/start", "turn/start", "turn/start",
-                       "config/read", "model/list"]
+                       "config/read", "thread/read", "model/list"]
     assert len((Path(fixture["request"]["workspace"]) / "fixture-business.jsonl").read_text().splitlines()) == 1
     journals = list((fixture["home"] / "state/screen-workers/fixture/continuations").glob("*.json"))
     assert len(journals) == 1
@@ -430,3 +437,42 @@ def test_screen_continuation_retains_actual_default_provider_and_refuses_explici
     assert stopped["status"] == "MISMATCH" and stopped["error"] == "startup_changed:model_provider"
     assert stopped["current_preflight"]["model_provider"] == "fixture-other-provider"
     assert stopped["original_startup"] == result["startup"]
+
+
+def test_screen_continuation_ignores_new_defaults_without_model_override(screen_fixture):
+    fixture = screen_fixture
+    fixture['environment']['FIXTURE_MODE'] = 'continuation-default-drift'
+    result = create_screen(**fixture, dispatch_claim=lambda: None)
+    continued = continue_managed(fixture['home'], result['screen']['socket'], 'Continue the existing fixture model.',
+                                screen_binary=fixture['screen_binary'], environment=fixture['environment'],
+                                dispatch_claim=lambda *args: None)
+    assert continued['work']['delivery'] == 'accepted'
+    assert continued['current_preflight']['current_thread']['model'] == result['startup']['model']
+    assert continued['current_preflight']['model_preflight']['current_config_defaults'] == {
+        'model': 'fixture-alternate', 'reasoning_effort': 'high'}
+    assert continued['original_startup'] == result['startup']
+    requests = [event for event in _events(fixture) if 'method' in event]
+    assert sum(event['method'] == 'thread/start' for event in requests) == 1
+    assert not any(event['method'] == 'thread/resume' for event in requests)
+    assert all(set(event['params']) == {'threadId', 'input'} for event in requests if event['method'] == 'turn/start')
+
+
+def test_screen_continuation_old_worker_no_capability_is_read_only_unknown(screen_fixture):
+    fixture = screen_fixture
+    receipt = create_screen(**fixture, dispatch_claim=lambda: None)
+    root = fixture['home'] / 'state/screen-workers/fixture'
+    path = root / 'state.json'
+    state = json.loads(path.read_text()); state.pop('protocol_capabilities')
+    atomic_json(path, state)  # Only synthetic fixture metadata imitates the old loaded protocol.
+    prior_request = (root / 'request.json').read_bytes()
+    prior_events = _events(fixture)
+    with pytest.raises(LaunchError) as error:
+        continue_managed(fixture['home'], receipt['screen']['socket'], 'Do not send an unsupported operation.',
+                         screen_binary=fixture['screen_binary'], environment=fixture['environment'],
+                         dispatch_claim=lambda *args: pytest.fail('Old worker cannot claim'))
+    assert error.value.status == 'UNKNOWN' and error.value.code == 'screen_current_thread_readback_unsupported'
+    assert (root / 'request.json').read_bytes() == prior_request
+    assert not (root / 'pending.json').exists()
+    assert not list((root / 'continuations').glob('*.json'))
+    assert json.loads(path.read_text()) == state
+    assert _events(fixture) == prior_events

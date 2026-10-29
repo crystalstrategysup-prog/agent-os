@@ -16,13 +16,22 @@ import time
 import uuid
 from pathlib import Path
 
-from .codex_launch import CodexLaunchProvider, StdioRpc, _WorkEvidenceItem, _model_binding, _safe_turn_failure
+from .codex_launch import CodexLaunchProvider, StdioRpc, _WorkEvidenceItem, _continuation_model_binding, _safe_turn_failure
 from .safeio import GateError, atomic_json, digest, lock, read_json, within
 from .session_launch import LaunchError, LaunchJournal, _observation, _targets, launch, validate_request
 
 NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,47}\Z")
 SOCKET = re.compile(r"(?P<pid>[1-9][0-9]*)\.(?P<name>[A-Za-z0-9][A-Za-z0-9_.-]{0,47})\Z")
 LIMIT = 128 * 1024
+THREAD_READBACK_CAPABILITY = "current-thread-readback/v1"
+
+
+def _require_thread_readback_capability(state: dict) -> None:
+    capabilities = state.get("protocol_capabilities")
+    if (not isinstance(capabilities, list) or len(capabilities) > 16
+            or THREAD_READBACK_CAPABILITY not in capabilities):
+        # Old loaded workers must never receive an unknown mailbox operation.
+        raise LaunchError("screen_current_thread_readback_unsupported", status="UNKNOWN")
 
 
 def _read(path: Path) -> dict:
@@ -169,7 +178,7 @@ class ScreenLaunchProvider:
                 "work_accepted": False}
 
     def _call(self, operation: str, payload: dict, *, timeout: float | None = None) -> dict:
-        if operation not in {"describe", "create", "probe", "dispatch"}:
+        if operation not in {"describe", "describe_existing", "create", "probe", "dispatch"}:
             raise LaunchError("screen_operation_refused")
         raw = json.dumps(payload, ensure_ascii=False)
         if len(raw.encode()) > LIMIT:
@@ -205,6 +214,10 @@ class ScreenLaunchProvider:
 
     def describe(self, request: dict, attempt: str) -> dict:
         return self._call("describe", {"request": request, "attempt": attempt})
+
+    def describe_existing(self, request: dict, startup: dict, attempt: str) -> dict:
+        _require_thread_readback_capability(self._state())
+        return self._call("describe_existing", {"request": request, "startup": startup, "attempt": attempt})
 
     def create(self, request: dict, attempt: str) -> dict:
         return self._call("create", {"request": request, "attempt": attempt})
@@ -255,7 +268,8 @@ def _worker_locked(root: Path) -> int:
     request = bootstrap["request"]
     validate_request(request)
     socket = os.environ.get("STY", "")
-    state = {**identity, "socket": socket, "worker_pid": os.getpid(), "status": "STARTING", "session_id": None}
+    state = {**identity, "socket": socket, "worker_pid": os.getpid(), "status": "STARTING", "session_id": None,
+             "protocol_capabilities": [THREAD_READBACK_CAPABILITY]}
     rpc = None
     try:
         if digest(bootstrap) != identity.get("bootstrap_sha256") or digest(request) != identity["request_sha256"]:
@@ -295,6 +309,11 @@ def _worker_locked(root: Path) -> int:
                 if operation == "describe":
                     last_attempt, probe_passed = payload["attempt"], False
                     result = provider.describe(request, last_attempt)
+                elif operation == "describe_existing":
+                    if startup is None or payload.get("startup") != startup:
+                        raise LaunchError("screen_existing_thread_not_bound")
+                    last_attempt, probe_passed = payload["attempt"], False
+                    result = provider.describe_existing(request, startup, last_attempt)
                 elif operation == "create":
                     if thread_start_attempted or startup is not None or payload.get("attempt") != last_attempt:
                         raise LaunchError("screen_duplicate_or_unadmitted_thread_start", status="UNKNOWN")
@@ -416,6 +435,7 @@ def continue_managed(home: Path, socket: str, prompt: str, *, screen_binary: Pat
         raise LaunchError("prompt_length_invalid")
     provider = ScreenLaunchProvider(root, screen_binary, environment)
     state = provider._state()
+    _require_thread_readback_capability(state)
     if state["socket"] != socket:
         raise LaunchError("screen_socket_identity_mismatch", status="UNKNOWN")
     request = _read(root / "bootstrap.json")["request"]
@@ -433,10 +453,11 @@ def continue_managed(home: Path, socket: str, prompt: str, *, screen_binary: Pat
             raise LaunchError("screen_continuation_requires_reconciliation", status="UNKNOWN", receipt=_read(journal))
         receipt = {"schema": "agentos.screen-continuation/v1", "attempt_id": attempt,
                    "request_sha256": digest(request), "prompt_sha256": digest(prompt),
-                   "session_id": startup["session_id"], "work_accepted": False, "status": "PREFLIGHT"}
+                   "session_id": startup["session_id"], "original_startup": startup,
+                   "work_accepted": False, "status": "PREFLIGHT"}
         atomic_json(journal, receipt)
         try:
-            observed = provider.describe(request, attempt)
+            observed = provider.describe_existing(request, startup, attempt)
             _observation(request, observed, attempt, startup=False, clock=time.time)
             receipt["current_preflight"] = observed
             receipt["original_startup"] = startup
@@ -444,7 +465,7 @@ def continue_managed(home: Path, socket: str, prompt: str, *, screen_binary: Pat
                 raise LaunchError("screen_continuation_environment_changed", status="UNKNOWN")
             # A current catalog/config read cannot relabel the original startup
             # as fresh actual runtime. Compare it with the retained readback.
-            receipt["model_binding"] = _model_binding(observed, startup)
+            receipt["model_binding"] = _continuation_model_binding(observed, startup)
             def guard(bound_request, phase):
                 bound_request["_launch_attempt_id"] = attempt
                 return target_guard(bound_request, phase)

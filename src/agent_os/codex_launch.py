@@ -170,13 +170,18 @@ class StdioRpc:
 
     def call(self, method: str, params: dict, *, deadline: float | None = None) -> dict:
         allowed = {"config/read": {"includeLayers", "cwd"}, "thread/start": {"cwd"},
-                   "turn/start": {"threadId", "input"}, "model/list": {"cursor", "limit", "includeHidden"}}
+                   "turn/start": {"threadId", "input"}, "model/list": {"cursor", "limit", "includeHidden"},
+                   "thread/read": {"threadId", "includeTurns"}}
         if method not in allowed or set(params) != allowed[method]:
             raise LaunchError("provider_method_or_override_refused")
         if deadline is not None and (type(deadline) not in (int, float) or not math.isfinite(deadline)):
             raise LaunchError("bounded_rpc_deadline_required")
         if method == "config/read" and params["includeLayers"] is not False:
             raise LaunchError("config_layers_not_requested")
+        if method == "thread/read" and (params["includeTurns"] is not False or
+                                         not isinstance(params["threadId"], str) or
+                                         not re.fullmatch(r"[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}", params["threadId"])):
+            raise LaunchError("exact_metadata_thread_read_required")
         if method == "model/list" and (params["includeHidden"] is not True or type(params["limit"]) is not int
                                        or params["limit"] != MODEL_PAGE_SIZE
                                        or params["cursor"] is not None and (not isinstance(params["cursor"], str)
@@ -341,6 +346,43 @@ def _model_binding(preflight: dict, startup: dict) -> dict:
             "source": "thread_start_response", "provider_compatibility": "NOT_PROVEN"}
 
 
+def _continuation_model_binding(preflight: dict, startup: dict, *, clock=time.time) -> dict:
+    """Bind a fresh loaded-thread read, never a config default or old startup."""
+    thread = preflight.get("current_thread", {})
+    stamp = preflight.get("observed_at")
+    if (preflight.get("model_metadata_source") != "thread_read_response"
+            or type(stamp) not in (int, float) or not 0 <= clock() - stamp <= 60):
+        raise LaunchError("current_thread_readback_required", status="UNKNOWN")
+    if thread.get("session_id") != startup.get("session_id"):
+        raise LaunchError("continuation_thread_identity_mismatch")
+    if preflight.get("connection_id") != startup.get("connection_id"):
+        raise LaunchError("screen_continuation_environment_changed", status="UNKNOWN")
+    if thread.get("status") != "idle":
+        raise LaunchError("continuation_thread_not_idle", status="UNKNOWN")
+    for key in ("model", "model_provider", "reasoning_effort"):
+        if not _model_scalar(thread.get(key)) or not _model_scalar(startup.get(key)):
+            raise LaunchError("continuation_" + key + "_unknown", status="UNKNOWN")
+        if thread[key] != startup[key]:
+            raise LaunchError("startup_changed:" + key)
+    if thread.get("workspace") != startup.get("workspace"):
+        raise LaunchError("screen_continuation_environment_changed", status="UNKNOWN")
+    metadata = preflight.get("model_preflight", {})
+    if (metadata.get("selection_source") != "thread_read_response"
+            or metadata.get("catalog_complete") is not True
+            or preflight.get("model") != thread["model"]
+            or preflight.get("reasoning_effort") != thread["reasoning_effort"]):
+        raise LaunchError("current_thread_catalog_binding_required", status="UNKNOWN")
+    configured_provider = metadata.get("configured_provider")
+    if configured_provider is not None and configured_provider != thread["model_provider"]:
+        raise LaunchError("startup_changed:model_provider")
+    if thread["reasoning_effort"] not in metadata.get("supported_reasoning_efforts", []):
+        raise LaunchError("startup_reasoning_effort_not_advertised", status="UNKNOWN")
+    return {"model": "PASS", "model_provider": "PASS", "reasoning_effort": "PASS",
+            "provider_resolution": "retained_actual" if configured_provider is None else "configured_match",
+            "provider_compatibility": "NOT_PROVEN", "source": "thread_read_response", "thread_status": "idle",
+            "execution_telemetry": "NOT_PROVEN"}
+
+
 def _safe_turn_failure(turn: dict) -> dict | None:
     """Finite diagnostic metadata only; never copy raw provider error text."""
     status = turn.get("status")
@@ -423,16 +465,20 @@ class CodexLaunchProvider:
                 "workspace": workspace, "sandbox": sandbox, "approval_policy": approval,
                 "ordinary_commands": ordinary, "capabilities": capabilities, "session_id": session_id}
 
-    def _model_description(self, config: dict) -> dict:
+    def _model_description(self, config: dict, *, current_thread: dict | None = None) -> dict:
         configured_model, configured_provider = config.get("model"), config.get("model_provider")
         configured_effort = config.get("model_reasoning_effort")
+        config_defaults = {key: value if _model_scalar(value) else None for key, value in
+                    (("model", configured_model), ("reasoning_effort", configured_effort))}
+        selected_model = configured_model if current_thread is None else current_thread["model"]
+        selected_effort = configured_effort if current_thread is None else current_thread["reasoning_effort"]
         if configured_provider is not None and not _model_scalar(configured_provider):
             raise LaunchError("inherited_model_provider_unknown", status="UNKNOWN")
         # Missing/null is the supported absence of an explicit override. Keep
         # it provisional; only thread/start may supply the actual identity.
-        if configured_model is not None and not _model_scalar(configured_model):
+        if selected_model is not None and not _model_scalar(selected_model):
             raise LaunchError("inherited_model_unknown", status="UNKNOWN")
-        if configured_effort is not None and not _model_scalar(configured_effort):
+        if selected_effort is not None and not _model_scalar(selected_effort):
             raise LaunchError("inherited_reasoning_effort_unknown", status="UNKNOWN")
         timeout = getattr(self.rpc, "timeout", 20)
         if type(timeout) not in (int, float) or not math.isfinite(timeout) or not 0 < timeout <= 45:
@@ -475,15 +521,15 @@ class CodexLaunchProvider:
             raise LaunchError("model_catalog_page_limit", status="UNKNOWN")
         if len({row["id"] for row in rows}) != len(rows) or len({row["model"] for row in rows}) != len(rows):
             raise LaunchError("model_catalog_ambiguous", status="UNKNOWN")
-        if configured_model is None:
+        if selected_model is None:
             defaults = [row for row in rows if row["is_default"]]
             if len(defaults) != 1:
                 raise LaunchError("inherited_model_default_unknown", status="UNKNOWN")
             selected, model_source = defaults[0], "catalog_default"
         else:
-            if any(row["id"] == configured_model and row["model"] != configured_model for row in rows):
+            if any(row["id"] == selected_model and row["model"] != selected_model for row in rows):
                 raise LaunchError("inherited_model_alias_unresolved", status="UNKNOWN")
-            matches = [row for row in rows if row["model"] == configured_model]
+            matches = [row for row in rows if row["model"] == selected_model]
             if len(matches) != 1:
                 # Absence is a refusal, not a claim that a custom provider's
                 # unqualified catalog proves its model cannot exist.
@@ -493,7 +539,7 @@ class CodexLaunchProvider:
         supported_efforts = selected["supported_reasoning_efforts"]
         if default_effort not in supported_efforts:
             raise LaunchError("model_catalog_default_effort_unknown", status="UNKNOWN")
-        if configured_effort is not None and configured_effort not in supported_efforts:
+        if selected_effort is not None and selected_effort not in supported_efforts:
             raise LaunchError("inherited_reasoning_effort_not_advertised", status="UNKNOWN")
         metadata = {"source": "same_connection_model_list", "catalog_scope": "connection_advertised_models",
                     "provider_compatibility": "NOT_PROVEN", "configured_model": configured_model,
@@ -504,11 +550,17 @@ class CodexLaunchProvider:
                     "catalog_default_reasoning_effort": default_effort, "supported_reasoning_efforts": supported_efforts,
                     "matched_catalog_id": selected["id"], "catalog_complete": True, "catalog_pages": page,
                     "catalog_model_count": len(rows), "catalog_sha256": digest(rows)}
+        if current_thread is not None:
+            metadata.update(selection_source="thread_read_response", current_config_defaults=config_defaults,
+                            configured_model=config_defaults["model"],
+                            configured_reasoning_effort=config_defaults["reasoning_effort"],
+                            selected_model=selected_model, selected_reasoning_effort=selected_effort,
+                            model_source="thread_read_response", reasoning_effort_source="thread_read_response")
         return {"model": selected["model"], "model_provider": configured_provider,
-                "reasoning_effort": configured_effort if configured_effort is not None else default_effort,
+                "reasoning_effort": selected_effort if selected_effort is not None else default_effort,
                 "model_preflight": metadata}
 
-    def describe(self, request: dict, attempt: str) -> dict:
+    def _describe_policy(self, request: dict, attempt: str) -> tuple[dict, dict]:
         self._model_admission = None
         if request["executor"]["provider"] != PROVIDER:
             raise LaunchError("codex_provider_selection_mismatch")
@@ -531,9 +583,45 @@ class CodexLaunchProvider:
         # Existing mode/capability admission still fails first. An unknown mode
         # or a known interactive mismatch does not require further discovery.
         validate_observation(request, observed, attempt, startup=False, clock=self.clock)
+        return observed, config
+
+    def describe(self, request: dict, attempt: str) -> dict:
+        observed, config = self._describe_policy(request, attempt)
         observed.update(self._model_description(config))
         self._model_admission = {"attempt": attempt, "request_sha256": digest(request),
                                  "observed": json.loads(json.dumps(observed)), "read_at": time.monotonic()}
+        return observed
+
+    def describe_existing(self, request: dict, startup: dict, attempt: str) -> dict:
+        observed, config = self._describe_policy(request, attempt)
+        if self.rpc.connection_id != startup.get("connection_id"):
+            raise LaunchError("screen_continuation_environment_changed", status="UNKNOWN")
+        try:
+            response = self.rpc.call("thread/read", {"threadId": startup["session_id"], "includeTurns": False})
+        except LaunchError as exc:
+            raise LaunchError("current_thread_readback_unavailable", status="UNKNOWN", receipt=exc.receipt) from None
+        thread = response.get("thread")
+        if not isinstance(thread, dict):
+            raise LaunchError("current_thread_readback_required", status="UNKNOWN")
+        if thread.get("id") != startup["session_id"]:
+            raise LaunchError("continuation_thread_identity_mismatch")
+        status = thread.get("status")
+        if not isinstance(status, dict) or status.get("type") not in {"idle", "active", "notLoaded", "systemError"}:
+            raise LaunchError("continuation_thread_state_unknown", status="UNKNOWN")
+        if status["type"] == "active":
+            raise LaunchError("continuation_thread_busy", status="BLOCKED")
+        if status["type"] != "idle":
+            raise LaunchError("continuation_thread_not_loaded", status="UNKNOWN")
+        actual = {"session_id": thread["id"], "status": "idle", "workspace": thread.get("cwd"),
+                  "model": thread.get("model"), "model_provider": thread.get("modelProvider"),
+                  "reasoning_effort": thread.get("reasoningEffort")}
+        # Do not retain thread previews, turns, instructions or other private data.
+        observed.update(current_thread=actual, model_metadata_source="thread_read_response",
+                        session_id=thread["id"])
+        for key in ("model", "model_provider", "reasoning_effort"):
+            if not _model_scalar(actual[key]):
+                raise LaunchError("continuation_" + key + "_unknown", status="UNKNOWN")
+        observed.update(self._model_description(config, current_thread=actual))
         return observed
 
     def create(self, request: dict, attempt: str) -> dict:

@@ -87,8 +87,8 @@ an old worker. The provider-neutral launch journal is reserved before starting
 even a provisional Screen, so reusing an uncertain launch ID cannot start a
 second Screen with a different name.
 
-The bounded typed mailbox permits only `describe`, `create`, `probe` and
-`dispatch`. Each request/response binds worker ID, exact retained request digest,
+The bounded typed mailbox permits only `describe`, `describe_existing`,
+`create`, `probe` and `dispatch`. Each request/response binds worker ID, exact retained request digest,
 operation ID and connection ID. The bootstrap also binds the chosen executable,
 work timeout and expected Codex home. A worker lock and caller control lock
 serialize ownership; a worker cannot directly repeat thread creation or dispatch
@@ -220,3 +220,26 @@ Screen; already created workers require separate supported reconciliation.
 - Codex App Server sources and exact local schema checks are linked in
   [SESSION_LAUNCH](SESSION_LAUNCH.md); schema availability alone is not a runtime
   thread/startup/probe or behavior result.
+
+
+## Existing-thread settings readback (rc2045)
+
+Creation still binds config/read plus the complete connection-local model catalog
+to actual thread/start metadata. Managed continuation reads the exact retained
+thread with thread/read {threadId, includeTurns:false} on its owning connection.
+A loaded idle thread's current configured model/provider/effort/cwd must match
+the retained startup. Global model/effort defaults are recorded separately and
+do not select a model for the existing thread. The same bounded current catalog
+must advertise its exact model and effort. Config policy and explicit provider
+checks remain; no configuration writes, model overrides or thread/resume occur.
+
+Missing/null model or effort, unsupported reads, notLoaded/systemError or stale
+readback is UNKNOWN; active threads are BLOCKED before probes/work. thread/read
+metadata is not per-turn execution telemetry. Historical startup is not relabelled
+as a current read. A fresh read grants no business or target authority.
+
+New workers advertise current-thread-readback/v1 in their status. A loaded older
+worker without that capability returns UNKNOWN before a continuation journal,
+mailbox write, probe or dispatch. Installing this source does not reload workers.
+Any old failed/pending operation remains preserved; replacement/adoption needs
+its separate exact terminal/effects/writer reconciliation and supported guards.
