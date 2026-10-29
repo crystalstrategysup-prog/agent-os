@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from agent_os.codex_launch import CodexLaunchProvider, StdioRpc
-from agent_os.safeio import atomic_json, digest
+from agent_os.safeio import atomic_json, digest, lock
 from agent_os.screen_adoption import adopt_screen, _old_readback
 from agent_os.session_launch import LaunchError
 from test_thread_continuation import ExistingRpc, SID
@@ -92,7 +92,10 @@ def old_registry(f):
          'codex_home':f['environment'].get('CODEX_HOME'),'request':f['request']},
         'failed.json':{'status':'MISMATCH','error':'startup_changed:model'}}
     for name,value in records.items():atomic_json(old/name,value)
-    (old/'worker.lock').touch()
+    # Reproduce the real worker lifecycle: normal exit removes its directory.
+    with lock(old/'worker.lock'):
+        assert (old/'worker.lock').is_dir()
+    assert not (old/'worker.lock').exists()
     original_contract={key:copy.deepcopy(f['request'].get(key)) for key in ('original_goal','scope','acceptance','context','authority')}
     f['request']['context']['adopted_original_contract']=original_contract
     adoption={'session_id':SID,'old_name':'old','old_pins':{name:hashlib.sha256((old/name).read_bytes()).hexdigest() for name in records}}
@@ -243,3 +246,29 @@ def test_adoption_postresume_read_timeout_preserves_safe_actual_startup(tmp_path
     assert actual['model']=='fixture-model' and actual['sandbox']=='danger-full-access'
     assert actual['approval_policy']=='never' and actual['model_metadata_source']=='thread_resume_response'
     assert 'PRIVATE_FIXTURE' not in json.dumps(error.value.receipt)
+
+
+def test_old_worker_real_directory_lock_lifecycle(screen_fixture):
+    f=screen_fixture; old,adoption=old_registry(f)
+    with lock(old/'worker.lock'):
+        holder=(old/'worker.lock'/'holder.json').read_bytes()
+        with pytest.raises(LaunchError,match='adoption_old_lock_requires_reconciliation'):
+            _old_readback(f['home'],adoption)
+        assert (old/'worker.lock'/'holder.json').read_bytes()==holder
+    assert not (old/'worker.lock').exists()
+    assert _old_readback(f['home'],adoption)[0]==old
+
+
+@pytest.mark.parametrize('kind',['file','directory','symlink'])
+def test_old_worker_unknown_lock_path_preserved(screen_fixture,kind):
+    f=screen_fixture;old,adoption=old_registry(f);path=old/'worker.lock'
+    if kind=='file':path.write_bytes(b'unrecognized')
+    elif kind=='directory':path.mkdir();(path/'unknown').write_bytes(b'preserve')
+    else:path.symlink_to(old/'absent-target')
+    before=path.lstat()
+    with pytest.raises(LaunchError,match='adoption_old_lock_requires_reconciliation'):
+        _old_readback(f['home'],adoption)
+    assert path.lstat()==before
+    if kind=='file':assert path.read_bytes()==b'unrecognized'
+    elif kind=='directory':assert (path/'unknown').read_bytes()==b'preserve'
+    else:assert path.is_symlink()

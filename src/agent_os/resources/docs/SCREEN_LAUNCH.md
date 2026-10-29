@@ -274,7 +274,11 @@ resume and before dispatch it must be NEW_WORKER_OWNED and new_worker_sha256 mus
 match the supplied actual worker. The owning implementation must prove that
 writer lock belongs to the new exact lineage. Hold a separate controller lock,
 **not** a source-writer flock that the unchanged Codex wrapper needs to acquire.
-Local PID absence, original file pins, no pending and free old worker flock are
+The old worker uses a `safeio.lock` directory lifecycle lock, removed on normal
+exit. After exact PID absence, adoption requires the canonical `worker.lock`
+path to be absent. Any existing file, directory or symlink remains UNKNOWN
+and untouched; an unlocked descriptor cannot substitute for lifecycle cleanup.
+Local PID absence, original file pins, no pending and absent old worker lock are
 additional checks; none alone proves quiescence or effect reconciliation.
 
 The initial supported permissions are deliberately limited to retained actual

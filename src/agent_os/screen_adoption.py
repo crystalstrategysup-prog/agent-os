@@ -1,7 +1,6 @@
 """Guarded cold owning-transport adoption; never stops or resets an old worker."""
 from __future__ import annotations
 
-import fcntl
 import hashlib
 import os
 import re
@@ -64,20 +63,12 @@ def _old_readback(home: Path, adoption: dict) -> tuple[Path, dict]:
             raise LaunchError("adoption_old_process_state_unknown", status="UNKNOWN") from None
         else:
             raise LaunchError("adoption_old_worker_still_present", status="UNKNOWN")
-    # No file creation: an old reader without a real lock file is unqualified.
+    # The worker holds safeio.lock: a directory removed on normal exit, not a
+    # persistent flock file. Existing paths require owning reconciliation;
+    # never remove/recreate them or infer safety from an unlocked descriptor.
     path = old / "worker.lock"
-    if path.is_symlink() or not path.is_file():
-        raise LaunchError("adoption_old_lock_invalid", status="UNKNOWN")
-    fd = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
-    try:
-        try:
-            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError:
-            raise LaunchError("adoption_old_worker_lock_held", status="UNKNOWN") from None
-        finally:
-            fcntl.flock(fd, fcntl.LOCK_UN)
-    finally:
-        os.close(fd)
+    if path.exists() or path.is_symlink():
+        raise LaunchError("adoption_old_lock_requires_reconciliation", status="UNKNOWN")
     return old, retained
 
 
