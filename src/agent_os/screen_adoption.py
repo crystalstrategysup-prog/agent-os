@@ -76,11 +76,14 @@ def _old_readback(home: Path, adoption: dict) -> tuple[Path, dict]:
 
 
 def _live_guard(check, request: dict, adoption: dict, attempt: str, phase: str,
-                worker: dict | None, owner_token: list, successor_binding: dict | None = None) -> dict:
+                worker: dict | None, owner_token: list, successor_binding: dict | None = None,
+                pre_resume_binding: dict | None = None) -> dict:
     query = {"phase": phase, "attempt_id": attempt, "request_sha256": digest(request),
              "adoption_sha256": digest(adoption), "new_worker": worker}
     if successor_binding is not None:
         query["successor_binding"] = dict(successor_binding)
+    if pre_resume_binding is not None:
+        query["pre_resume_binding"] = dict(pre_resume_binding)
     record = check(query)
     if (not isinstance(record, dict) or record.get("phase") != phase
             or record.get("attempt_id") != attempt or record.get("request_sha256") != digest(request)
@@ -100,6 +103,12 @@ def _live_guard(check, request: dict, adoption: dict, attempt: str, phase: str,
             record.get("successor_binding_sha256") != digest(successor_binding) or
             record.get("predecessor_and_later_operation_reviewed") is not True):
         raise LaunchError("successor_live_review_not_bound", status="UNKNOWN")
+    if pre_resume_binding is not None and (
+            record.get("pre_resume_binding_sha256") != digest(pre_resume_binding) or
+            any(record.get(k) is not True for k in
+                ("pre_resume_no_native_effects_verified", "same_canonical_owner_continuation_verified",
+                 "historical_transfer_preserved_not_accepted"))):
+        raise LaunchError("pre_resume_live_review_not_bound", status="UNKNOWN")
     reconciliation = adoption.get("pending_reconciliation")
     if reconciliation is not None and record.get("pending_reconciliation_sha256") != reconciliation.get("receipt_sha256"):
         raise LaunchError("adoption_live_reconciliation_not_bound", status="UNKNOWN")
@@ -150,7 +159,14 @@ def adopt_screen(home: Path, name: str, request: dict, adoption: dict, *, screen
     # SID, not launch/operation ID: a renamed attempt cannot replay UNKNOWN.
     with lock(root / (adoption["session_id"] + ".lock")):
         successor = None
-        if "successor" in adoption:
+        pre_resume = None
+        if "pre_resume_recovery" in adoption:
+            if "successor" in adoption or "pre_resume_history" in adoption:
+                raise LaunchError("pre_resume_mode_conflict", status="UNKNOWN")
+            from .screen_pre_resume import select_pre_resume
+            pre_resume = select_pre_resume(home, name, request, adoption)
+            journal = pre_resume.journal
+        elif "successor" in adoption:
             from .screen_successor import select_successor
             successor = select_successor(home, name, adoption)
             journal = successor.journal
@@ -162,14 +178,19 @@ def adopt_screen(home: Path, name: str, request: dict, adoption: dict, *, screen
             receipt = {"schema": "agentos.screen-adoption/v1", "session_id": adoption["session_id"],
                        "request_sha256": digest(request), "adoption_sha256": digest(adoption),
                        "status": "RESERVED", "resume_may_have_started": False, "work_accepted": False}
-            if successor is not None:
+            selection = successor or pre_resume
+            if selection is not None:
                 import json
-                successor.verify()
-                receipt.update(schema="agentos.screen-adoption-successor/v1", successor=successor.binding)
+                selection.verify()
+                if successor is not None:
+                    receipt.update(schema="agentos.screen-adoption-successor/v1", successor=successor.binding)
+                else:
+                    receipt["pre_resume"] = pre_resume.binding
                 try:
                     create_only_bytes(journal, (json.dumps(receipt, sort_keys=True) + "\n").encode())
                 except FileExistsError:
-                    raise LaunchError("successor_predecessor_already_consumed", status="UNKNOWN") from None
+                    code = "successor_predecessor_already_consumed" if successor is not None else "pre_resume_attempt_already_reserved"
+                    raise LaunchError(code, status="UNKNOWN") from None
             else:
                 atomic_json(journal, receipt)
             owner_token = []
@@ -178,14 +199,15 @@ def adopt_screen(home: Path, name: str, request: dict, adoption: dict, *, screen
                 inner = None
 
                 def guarded(self, attempt, phase):
-                    if successor is not None:
-                        successor.verify()
+                    if selection is not None:
+                        selection.verify()
                     _old_readback(home, adoption)
                     worker = self.inner._state() if self.inner is not None else None
                     record = _live_guard(check, request, adoption, attempt, phase, worker, owner_token,
-                                         successor.binding if successor is not None else None)
-                    if successor is not None:
-                        successor.verify()
+                                         successor.binding if successor is not None else None,
+                                         pre_resume.binding if pre_resume is not None else None)
+                    if selection is not None:
+                        selection.verify()
                     _old_readback(home, adoption)
                     if "pending_reconciliation" in adoption:
                         from .screen_reconciliation import verify_pending_reconciliation

@@ -88,6 +88,10 @@ def select_successor(home: Path, name: str, adoption: dict) -> SuccessorSelectio
     worker_root(home, name)
     path = within(home, "state/screen-adoptions/" + sid + ".json")
     pins = []
+    if "pre_resume_history" in adoption:
+        from .screen_pre_resume import history_root
+        path, history_pins = history_root(home, adoption)
+        pins.extend(history_pins)
     for _ in range(32):
         row, sha = _journal(path)
         result = _successful(row, sid)

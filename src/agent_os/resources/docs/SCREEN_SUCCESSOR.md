@@ -4,6 +4,10 @@ Cold adoption normally admits one attempt per SID. An UNKNOWN, in-flight or
 unreviewed prior attempt still blocks. A successful adoption followed by a
 distinct later failed dispatch needs a separate, explicit successor; resetting
 the original journal or replaying an operation is never a recovery method.
+The separate [pre-resume contract](SCREEN_PRE_RESUME.md) can preserve a proved
+metadata-only failed root and enter its successful reviewed child through an
+explicit `pre_resume_history` ref. It is not a general failed-root bypass and
+does not change this contract's successful predecessor requirements.
 
 Add `successor: {predecessor_sha256: RAW_SHA256}` to the existing adoption input.
 The hash selects the exact successful current chain tip, never an arbitrary

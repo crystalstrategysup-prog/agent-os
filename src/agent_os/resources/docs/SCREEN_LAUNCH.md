@@ -111,6 +111,10 @@ For a qualified completed dispatch with reviewed actual effects, the explicit
 [pending reconciliation API](SCREEN_RECONCILIATION.md) can publish a separate
 immutable receipt for guarded cold same-SID adoption. It never clears pending,
 resets FAILED/UNKNOWN, unblocks the old mailbox or replays an operation.
+A distinct [reviewed pre-resume disposition](SCREEN_PRE_RESUME.md) supports only
+the exact proved metadata-only transfer-readback failure. It preserves the
+failed SID/launch/provisional records and requires actual no-native/claim proof
+and current ownership; false/null markers alone never unblock an attempt.
 An operator must assess actual thread/tool/target effects before clearing or
 replacing state; this candidate exposes no automatic uncertainty-reset command.
 
