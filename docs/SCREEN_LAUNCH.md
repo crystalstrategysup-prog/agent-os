@@ -107,6 +107,10 @@ worker because its caller returned, or converts a mailbox ACK into execution
 proof. The public `ScreenLaunchProvider.status()` read returns failed/pending
 worker metadata and observed Screen availability without clearing the block.
 Response files retain the operation outcome if it arrives after caller timeout.
+For a qualified completed dispatch with reviewed actual effects, the explicit
+[pending reconciliation API](SCREEN_RECONCILIATION.md) can publish a separate
+immutable receipt for guarded cold same-SID adoption. It never clears pending,
+resets FAILED/UNKNOWN, unblocks the old mailbox or replays an operation.
 An operator must assess actual thread/tool/target effects before clearing or
 replacing state; this candidate exposes no automatic uncertainty-reset command.
 
@@ -280,6 +284,10 @@ path to be absent. Any existing file, directory or symlink remains UNKNOWN
 and untouched; an unlocked descriptor cannot substitute for lifecycle cleanup.
 Local PID absence, original file pins, no pending and absent old worker lock are
 additional checks; none alone proves quiescence or effect reconciliation.
+For a retained pending dispatch, `pending_reconciliation` may instead select the
+exact reviewed receipt described in [SCREEN_RECONCILIATION.md](SCREEN_RECONCILIATION.md).
+Pending remains present; current adoption guard responses also bind the receipt
+hash and reviewed turn. Every other ownership, environment and once gate remains.
 
 The initial supported permissions are deliberately limited to retained actual
 `danger-full-access` plus `never`. Resume must return the exact singleton sandbox

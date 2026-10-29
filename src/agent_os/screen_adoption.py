@@ -51,7 +51,10 @@ def _old_readback(home: Path, adoption: dict) -> tuple[Path, dict]:
     if state.get("worker_id") != identity.get("worker_id") or state.get("session_id") != sid or retained.get("session_id") != sid:
         raise LaunchError("adoption_old_identity_changed", status="UNKNOWN")
     if (old / "pending.json").exists():
-        raise LaunchError("adoption_pending_requires_reconciliation", status="UNKNOWN")
+        from .screen_reconciliation import verify_pending_reconciliation
+        verify_pending_reconciliation(home, adoption)
+    elif "pending_reconciliation" in adoption:
+        raise LaunchError("adoption_reconciled_pending_missing", status="UNKNOWN")
     for pid in (identity.get("screen_pid"), state.get("worker_pid")):
         if type(pid) is not int or pid <= 1:
             raise LaunchError("adoption_old_process_identity_unknown", status="UNKNOWN")
@@ -90,6 +93,9 @@ def _live_guard(check, request: dict, adoption: dict, attempt: str, phase: str,
         raise LaunchError("adoption_owner_changed", status="UNKNOWN")
     if not owner_token:
         owner_token.append(token)
+    reconciliation = adoption.get("pending_reconciliation")
+    if reconciliation is not None and record.get("pending_reconciliation_sha256") != reconciliation.get("receipt_sha256"):
+        raise LaunchError("adoption_live_reconciliation_not_bound", status="UNKNOWN")
     # This is an independent authority/terminal/effects route, not proof from a
     # cached PID, old READY marker, absent pending, or a lock-file existence.
     expected_writer = "FREE" if phase == "before_transport" else "NEW_WORKER_OWNED"
@@ -154,6 +160,12 @@ def adopt_screen(home: Path, name: str, request: dict, adoption: dict, *, screen
                     _old_readback(home, adoption)
                     worker = self.inner._state() if self.inner is not None else None
                     record = _live_guard(check, request, adoption, attempt, phase, worker, owner_token)
+                    _old_readback(home, adoption)
+                    if "pending_reconciliation" in adoption:
+                        from .screen_reconciliation import verify_pending_reconciliation
+                        reconciled = verify_pending_reconciliation(home, adoption)
+                        if record.get("terminal_turn_id") != reconciled["plan"]["turn_id"]:
+                            raise LaunchError("adoption_live_reconciled_turn_changed", status="UNKNOWN")
                     receipt[phase] = record
                     atomic_json(journal, receipt)
 
