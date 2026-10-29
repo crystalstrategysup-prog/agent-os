@@ -51,9 +51,13 @@ def _old_readback(home: Path, adoption: dict) -> tuple[Path, dict]:
     if state.get("worker_id") != identity.get("worker_id") or state.get("session_id") != sid or retained.get("session_id") != sid:
         raise LaunchError("adoption_old_identity_changed", status="UNKNOWN")
     if (old / "pending.json").exists():
-        from .screen_reconciliation import verify_pending_reconciliation
-        verify_pending_reconciliation(home, adoption)
-    elif "pending_reconciliation" in adoption:
+        if "late_probe_recovery" in adoption:
+            from .screen_late_probe import verify_late_probe
+            verify_late_probe(home, adoption)
+        else:
+            from .screen_reconciliation import verify_pending_reconciliation
+            verify_pending_reconciliation(home, adoption)
+    elif "pending_reconciliation" in adoption or "late_probe_recovery" in adoption:
         raise LaunchError("adoption_reconciled_pending_missing", status="UNKNOWN")
     for pid in (identity.get("screen_pid"), state.get("worker_pid")):
         if type(pid) is not int or pid <= 1:
@@ -77,13 +81,15 @@ def _old_readback(home: Path, adoption: dict) -> tuple[Path, dict]:
 
 def _live_guard(check, request: dict, adoption: dict, attempt: str, phase: str,
                 worker: dict | None, owner_token: list, successor_binding: dict | None = None,
-                pre_resume_binding: dict | None = None) -> dict:
+                pre_resume_binding: dict | None = None, late_probe_binding: dict | None = None) -> dict:
     query = {"phase": phase, "attempt_id": attempt, "request_sha256": digest(request),
              "adoption_sha256": digest(adoption), "new_worker": worker}
     if successor_binding is not None:
         query["successor_binding"] = dict(successor_binding)
     if pre_resume_binding is not None:
         query["pre_resume_binding"] = dict(pre_resume_binding)
+    if late_probe_binding is not None:
+        query["late_probe_binding"] = dict(late_probe_binding)
     record = check(query)
     if (not isinstance(record, dict) or record.get("phase") != phase
             or record.get("attempt_id") != attempt or record.get("request_sha256") != digest(request)
@@ -109,6 +115,13 @@ def _live_guard(check, request: dict, adoption: dict, attempt: str, phase: str,
                 ("pre_resume_no_native_effects_verified", "same_canonical_owner_continuation_verified",
                  "historical_transfer_preserved_not_accepted"))):
         raise LaunchError("pre_resume_live_review_not_bound", status="UNKNOWN")
+    if late_probe_binding is not None and (
+            worker is not None and worker.get("status") != "READY" or
+            record.get("late_probe_binding_sha256") != digest(late_probe_binding) or
+            record.get("terminal_turn_id") != late_probe_binding["terminal_turn_id"] or
+            any(record.get(k) is not True for k in ("late_probe_effects_only_verified",
+                "both_owned_lineages_absent", "fresh_same_connection_probes_required", "current_target_security_verified"))):
+        raise LaunchError("late_probe_live_review_not_bound", status="UNKNOWN")
     reconciliation = adoption.get("pending_reconciliation")
     if reconciliation is not None and record.get("pending_reconciliation_sha256") != reconciliation.get("receipt_sha256"):
         raise LaunchError("adoption_live_reconciliation_not_bound", status="UNKNOWN")
@@ -160,7 +173,12 @@ def adopt_screen(home: Path, name: str, request: dict, adoption: dict, *, screen
     with lock(root / (adoption["session_id"] + ".lock")):
         successor = None
         pre_resume = None
-        if "pre_resume_recovery" in adoption:
+        late_probe = None
+        if "late_probe_recovery" in adoption:
+            from .screen_late_probe import select_late_probe
+            late_probe = select_late_probe(home, name, request, adoption)
+            journal = late_probe.journal
+        elif "pre_resume_recovery" in adoption:
             if "successor" in adoption or "pre_resume_history" in adoption:
                 raise LaunchError("pre_resume_mode_conflict", status="UNKNOWN")
             from .screen_pre_resume import select_pre_resume
@@ -178,18 +196,21 @@ def adopt_screen(home: Path, name: str, request: dict, adoption: dict, *, screen
             receipt = {"schema": "agentos.screen-adoption/v1", "session_id": adoption["session_id"],
                        "request_sha256": digest(request), "adoption_sha256": digest(adoption),
                        "status": "RESERVED", "resume_may_have_started": False, "work_accepted": False}
-            selection = successor or pre_resume
+            selection = successor or pre_resume or late_probe
             if selection is not None:
                 import json
                 selection.verify()
                 if successor is not None:
                     receipt.update(schema="agentos.screen-adoption-successor/v1", successor=successor.binding)
-                else:
+                elif pre_resume is not None:
                     receipt["pre_resume"] = pre_resume.binding
+                else:
+                    receipt["late_probe"] = late_probe.binding
                 try:
                     create_only_bytes(journal, (json.dumps(receipt, sort_keys=True) + "\n").encode())
                 except FileExistsError:
-                    code = "successor_predecessor_already_consumed" if successor is not None else "pre_resume_attempt_already_reserved"
+                    code = ("successor_predecessor_already_consumed" if successor is not None else
+                            "pre_resume_attempt_already_reserved" if pre_resume is not None else "late_probe_attempt_already_reserved")
                     raise LaunchError(code, status="UNKNOWN") from None
             else:
                 atomic_json(journal, receipt)
@@ -205,7 +226,8 @@ def adopt_screen(home: Path, name: str, request: dict, adoption: dict, *, screen
                     worker = self.inner._state() if self.inner is not None else None
                     record = _live_guard(check, request, adoption, attempt, phase, worker, owner_token,
                                          successor.binding if successor is not None else None,
-                                         pre_resume.binding if pre_resume is not None else None)
+                                         pre_resume.binding if pre_resume is not None else None,
+                                         late_probe.binding if late_probe is not None else None)
                     if selection is not None:
                         selection.verify()
                     _old_readback(home, adoption)

@@ -64,3 +64,8 @@ exclusion, actual catalog/startup/settings readback, harmless probes, protected
 READY/claim and target controls remain mandatory. The successor journal is
 transport evidence only; completed delivery does not accept the business goal.
 Source fixtures do not prove real security disposition or installed adoption.
+
+An explicit `late_probe_history` reference may select a successful cold-continuation
+root after reviewed late pre-work probe effects. See [SCREEN_LATE_PROBE.md](SCREEN_LATE_PROBE.md).
+The continuation must independently satisfy the ordinary successful predecessor
+criteria; an old late observation never becomes capability or business PASS.

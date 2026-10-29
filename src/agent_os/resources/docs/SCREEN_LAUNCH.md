@@ -333,3 +333,7 @@ requires matching request/bootstrap/current worker capability and budget readbac
 an older loaded worker cannot silently accept it. Unknown timeout effects still
 require reconciliation before any retry. This field neither extends startup/work
 deadlines nor transfers an old transport's capability proof.
+
+Late pre-work harmless probe failures have an explicit effects-only disposition
+and once cold continuation contract in [SCREEN_LATE_PROBE.md](SCREEN_LATE_PROBE.md).
+Fresh normal probes remain mandatory; UNKNOWN journals are preserved.

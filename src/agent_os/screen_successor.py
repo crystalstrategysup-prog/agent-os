@@ -88,7 +88,13 @@ def select_successor(home: Path, name: str, adoption: dict) -> SuccessorSelectio
     worker_root(home, name)
     path = within(home, "state/screen-adoptions/" + sid + ".json")
     pins = []
-    if "pre_resume_history" in adoption:
+    if "late_probe_history" in adoption:
+        if "pre_resume_history" in adoption:
+            raise LaunchError("late_probe_history_mode_conflict", status="UNKNOWN")
+        from .screen_late_probe import history_root
+        path, history_pins = history_root(home, adoption)
+        pins.extend(history_pins)
+    elif "pre_resume_history" in adoption:
         from .screen_pre_resume import history_root
         path, history_pins = history_root(home, adoption)
         pins.extend(history_pins)
