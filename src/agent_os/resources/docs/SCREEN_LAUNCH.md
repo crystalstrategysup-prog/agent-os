@@ -322,3 +322,14 @@ The held controller guard can exit after failure because the durable SID block
 remains. Any later recovery needs separate exact effects reconciliation; this
 API does not claim to implement a reset route. Installation alone never upgrades
 an already loaded worker or accepts a business result.
+
+## Request-bound probe deadline
+
+`probe_budget_seconds` is optional, integer 1..240, default45. A newly created
+worker binds the effective value into its bootstrap digest and publishes it with
+`finite-probe-budget/v1`. Native probe observation uses that value; the parent
+RPC waits that value plus five seconds (legacy defaults45/50). An explicit budget
+requires matching request/bootstrap/current worker capability and budget readback;
+an older loaded worker cannot silently accept it. Unknown timeout effects still
+require reconciliation before any retry. This field neither extends startup/work
+deadlines nor transfers an old transport's capability proof.

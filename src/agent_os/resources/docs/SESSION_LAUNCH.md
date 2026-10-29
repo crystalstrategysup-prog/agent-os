@@ -383,3 +383,13 @@ send, recipient receipt and semantic review are different facts. Delegation and
 a final do not discharge responsibility for dependent work. Existing native
 sessions do not automatically adopt a new bootstrap or another session's
 instructions. No new launcher, timer or implicit extra worker is added here.
+
+## Finite probe observation budget
+
+The optional request field `probe_budget_seconds` is an integer from 1 through
+240 (booleans, null and fractional values refuse). Absence preserves the 45 second
+probe default. The explicit field is included in the immutable request digest;
+180 is a possible reviewed choice when existing-thread compaction needs bounded
+observation time. This changes no model, provider, permissions, work timeout,
+capability requirement or UNKNOWN reconciliation rule. A larger observation
+budget does not postpone actual command execution.

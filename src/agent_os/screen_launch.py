@@ -18,11 +18,12 @@ from pathlib import Path
 
 from .codex_launch import CodexLaunchProvider, StdioRpc, _WorkEvidenceItem, _continuation_model_binding, _safe_turn_failure
 from .safeio import GateError, atomic_json, digest, lock, read_json, within
-from .session_launch import LaunchError, LaunchJournal, _observation, _targets, launch, validate_request
+from .session_launch import LaunchError, LaunchJournal, _observation, _targets, launch, probe_budget_seconds, validate_request
 
 NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,47}\Z")
 SOCKET = re.compile(r"(?P<pid>[1-9][0-9]*)\.(?P<name>[A-Za-z0-9][A-Za-z0-9_.-]{0,47})\Z")
 LIMIT = 128 * 1024
+FINITE_PROBE_CAPABILITY = "finite-probe-budget/v1"
 THREAD_READBACK_CAPABILITY = "current-thread-readback/v1"
 
 
@@ -116,7 +117,8 @@ class ScreenLaunchProvider:
         except FileExistsError as exc:
             raise LaunchError("screen_name_exists_reconciliation_required", status="UNKNOWN") from exc
         bootstrap = {"request": request, "codex_binary": str(codex_binary),
-                     "work_timeout": work_timeout, "codex_home": environment.get("CODEX_HOME")}
+                     "work_timeout": work_timeout, "codex_home": environment.get("CODEX_HOME"),
+                     "probe_budget_seconds": probe_budget_seconds(request)}
         if retained_startup is not None:
             bootstrap["adoption_retained_startup"] = retained_startup
         identity = {"schema": "agentos.screen-worker/v1", "worker_id": str(uuid.uuid4()),
@@ -231,7 +233,18 @@ class ScreenLaunchProvider:
         return self._call("create", {"request": request, "attempt": attempt})
 
     def probe(self, request: dict, startup: dict, attempt: str) -> dict:
-        return self._call("probe", {"request": request, "startup": startup, "attempt": attempt}, timeout=50)
+        budget = probe_budget_seconds(request)
+        if "probe_budget_seconds" in request:
+            bootstrap = _read(self.root / "bootstrap.json")
+            state = self._state()
+            if (digest(bootstrap) != self.identity.get("bootstrap_sha256")
+                    or digest(request) != self.identity["request_sha256"]
+                    or bootstrap.get("probe_budget_seconds") != budget
+                    or state.get("probe_budget_seconds") != budget
+                    or not isinstance(state.get("protocol_capabilities"), list)
+                    or FINITE_PROBE_CAPABILITY not in state["protocol_capabilities"]):
+                raise LaunchError("screen_probe_budget_not_bound_or_unsupported", status="UNKNOWN")
+        return self._call("probe", {"request": request, "startup": startup, "attempt": attempt}, timeout=budget + 5)
 
     def dispatch(self, request: dict, startup: dict, envelope: str) -> dict:
         work_timeout = _read(self.root / "bootstrap.json")["work_timeout"]
@@ -277,11 +290,15 @@ def _worker_locked(root: Path) -> int:
     validate_request(request)
     socket = os.environ.get("STY", "")
     state = {**identity, "socket": socket, "worker_pid": os.getpid(), "status": "STARTING", "session_id": None,
-             "protocol_capabilities": [THREAD_READBACK_CAPABILITY, "cold-thread-adoption/v1"]}
+             "protocol_capabilities": [THREAD_READBACK_CAPABILITY, "cold-thread-adoption/v1", FINITE_PROBE_CAPABILITY],
+             "probe_budget_seconds": probe_budget_seconds(request)}
     rpc = None
     try:
         if digest(bootstrap) != identity.get("bootstrap_sha256") or digest(request) != identity["request_sha256"]:
             raise LaunchError("screen_bootstrap_not_bound", status="UNKNOWN")
+        if (bootstrap.get("probe_budget_seconds", 45) != probe_budget_seconds(request)
+                or ("probe_budget_seconds" in request and "probe_budget_seconds" not in bootstrap)):
+            raise LaunchError("screen_probe_budget_not_bound_or_unsupported", status="UNKNOWN")
         match = SOCKET.fullmatch(socket)
         if (not match or match["name"] != identity["name"] or not os.path.samefile(os.getcwd(), request["workspace"])
                 or os.environ.get("CODEX_HOME") != bootstrap.get("codex_home")):

@@ -21,7 +21,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from .safeio import digest
-from .session_launch import LaunchError, _observation as validate_observation
+from .session_launch import LaunchError, probe_budget_seconds, _observation as validate_observation
 
 PROVIDER = "codex-app-server-stdio"
 SUPPORTED_CAPABILITIES = {"filesystem_read", "filesystem_write", "network_http", "loopback_http"}
@@ -763,7 +763,8 @@ class CodexLaunchProvider:
                   + request["workspace"] + ". Do not escalate permissions, change settings, access credentials or perform business work. "
                   "Do not substitute an acknowledgement for command execution. Stop on failure.\n"
                   + "\n\n".join(command for command, _ in commands.values()))
-        turn_id, events = self._turn(startup["session_id"], prompt, self.probe_timeout)
+        turn_id, events = self._turn(startup["session_id"], prompt,
+                                     probe_budget_seconds(request) if "probe_budget_seconds" in request else self.probe_timeout)
         proven, evidence, unexpected = set(), [], False
         for event in events:
             item = event.get("params", {}).get("item", {})

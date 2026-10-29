@@ -33,6 +33,14 @@ class LaunchProvider(Protocol):
     def dispatch(self, request: dict, startup: dict, envelope: str) -> dict: ...
 
 
+def probe_budget_seconds(request: dict) -> int:
+    """Finite request-bound observation budget; absence preserves the 45s default."""
+    value = request.get("probe_budget_seconds", 45)
+    if type(value) is not int or not 1 <= value <= 240:
+        raise LaunchError("bounded_probe_budget_required")
+    return value
+
+
 def validate_request(request: dict) -> None:
     if not isinstance(request, dict) or request.get("schema") != "agentos.session-launch/v1":
         raise LaunchError("request_required", status="UNKNOWN")
@@ -40,6 +48,7 @@ def validate_request(request: dict) -> None:
         size = len(json.dumps(request, ensure_ascii=False))
     except (ValueError, TypeError, RecursionError) as exc:
         raise LaunchError("request_not_json_data") from exc
+    probe_budget_seconds(request)
     if size > 64000:
         raise LaunchError("request_size_limit")
     for key in ("launch_id", "original_goal", "scope", "authority"):

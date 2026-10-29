@@ -96,3 +96,14 @@ rc2050 success behavior and all other UNKNOWN/in-flight refusals stay unchanged.
 There is no generic failed-attempt retry path. Actual installation and recovery
 require separate root acceptance. Storage is cooperative and not an adversarial
 same-UID or crash-proof multi-file transaction boundary.
+
+## Explicit replacement probe budget
+
+In addition to a fresh `launch_id` and removal of the historical `transfer`, the
+reviewed `replacement_request` may explicitly set `probe_budget_seconds` to an
+integer1..240. Its absence keeps the old request value (default45); removing an
+existing explicit budget is not a permitted delta. The old request/bootstrap
+and exact replacement request, including their old/new effective budget, remain
+bound by the reconciliation query and receipt digests. All other request fields
+remain exact, including model/provider/settings, goal, authority and target gates.
+No late-probe or failed-work recovery authority is added by this exception.

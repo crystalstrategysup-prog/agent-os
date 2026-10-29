@@ -82,6 +82,10 @@ def _snapshot(home: Path, plan: dict, *, claim_absent: bool, quiescent: bool) ->
     expected = dict(request)
     expected.pop("transfer")
     expected["launch_id"] = replacement["launch_id"]
+    # Only an explicit validated finite probe budget is a permitted extra delta.
+    # It is included in the reviewed replacement request and query digests.
+    if "probe_budget_seconds" in replacement:
+        expected["probe_budget_seconds"] = replacement["probe_budget_seconds"]
     if replacement["launch_id"] == request["launch_id"] or replacement != expected:
         _fail("replacement_scope_or_launch_changed")
     launch_path = within(home, "state/session-launch/" + digest(request["launch_id"]) + ".json")
