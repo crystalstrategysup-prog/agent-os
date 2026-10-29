@@ -32,6 +32,32 @@ def version_matches(project_text: str, runtime_version: str) -> bool:
     )
 
 
+def release_contract_errors(root: Path, runtime_version: str) -> list[str]:
+    """Check authoritative AND packaged versions before claiming compatibility.
+
+    This source check supplements actual wheel installer/MCP startup probes;
+    an unrelated module import cannot prove the MCP version guard passed.
+    """
+    errors = []
+    for name in ("mcp-tools-v1.json", "cli-contract-v1.json"):
+        bodies = []
+        for directory in ("schemas", "src/agent_os/resources/contracts"):
+            path = root / directory / name
+            try:
+                raw = path.read_bytes()
+                value = json.loads(raw)
+                versions = ([value["serverInfo"]["version"]] if name.startswith("mcp-") else
+                            [value["distribution_version"], value["release"]])
+                if any(version != runtime_version for version in versions):
+                    errors.append("release_contract_version_mismatch:" + directory + "/" + name)
+                bodies.append(raw)
+            except (OSError, ValueError, KeyError, TypeError):
+                errors.append("release_contract_invalid:" + directory + "/" + name)
+        if len(bodies) == 2 and bodies[0] != bodies[1]:
+            errors.append("release_contract_mirror_mismatch:" + name)
+    return errors
+
+
 def skill_name(path: Path, text: str) -> str | None:
     """Return only a canonical skill name at its declared public location."""
     expected = EXTENSION_SKILLS.get(path.as_posix())
@@ -141,6 +167,7 @@ def verify() -> dict:
         errors.append("unexpected_module_skill_inventory")
     if not version_matches((ROOT / "pyproject.toml").read_text(), __version__):
         errors.append("version_mismatch")
+    errors.extend(release_contract_errors(ROOT, __version__))
     return {
         "status": "PASS" if not errors else "FAIL",
         "version": __version__,
