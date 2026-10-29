@@ -8,7 +8,7 @@ import stat
 import time
 from pathlib import Path
 
-from .safeio import atomic_json, digest, lock
+from .safeio import atomic_json, create_only_bytes, digest, lock
 from .screen_launch import LIMIT, ScreenLaunchProvider, _read, worker_root
 from .session_launch import LaunchError, LaunchJournal, launch, validate_request
 
@@ -76,9 +76,12 @@ def _old_readback(home: Path, adoption: dict) -> tuple[Path, dict]:
 
 
 def _live_guard(check, request: dict, adoption: dict, attempt: str, phase: str,
-                worker: dict | None, owner_token: list) -> dict:
-    record = check({"phase": phase, "attempt_id": attempt, "request_sha256": digest(request),
-                    "adoption_sha256": digest(adoption), "new_worker": worker})
+                worker: dict | None, owner_token: list, successor_binding: dict | None = None) -> dict:
+    query = {"phase": phase, "attempt_id": attempt, "request_sha256": digest(request),
+             "adoption_sha256": digest(adoption), "new_worker": worker}
+    if successor_binding is not None:
+        query["successor_binding"] = dict(successor_binding)
+    record = check(query)
     if (not isinstance(record, dict) or record.get("phase") != phase
             or record.get("attempt_id") != attempt or record.get("request_sha256") != digest(request)
             or record.get("adoption_sha256") != digest(adoption)):
@@ -93,6 +96,10 @@ def _live_guard(check, request: dict, adoption: dict, attempt: str, phase: str,
         raise LaunchError("adoption_owner_changed", status="UNKNOWN")
     if not owner_token:
         owner_token.append(token)
+    if successor_binding is not None and (
+            record.get("successor_binding_sha256") != digest(successor_binding) or
+            record.get("predecessor_and_later_operation_reviewed") is not True):
+        raise LaunchError("successor_live_review_not_bound", status="UNKNOWN")
     reconciliation = adoption.get("pending_reconciliation")
     if reconciliation is not None and record.get("pending_reconciliation_sha256") != reconciliation.get("receipt_sha256"):
         raise LaunchError("adoption_live_reconciliation_not_bound", status="UNKNOWN")
@@ -142,7 +149,12 @@ def adopt_screen(home: Path, name: str, request: dict, adoption: dict, *, screen
     journal = root / (adoption["session_id"] + ".json")
     # SID, not launch/operation ID: a renamed attempt cannot replay UNKNOWN.
     with lock(root / (adoption["session_id"] + ".lock")):
-        if journal.exists():
+        successor = None
+        if "successor" in adoption:
+            from .screen_successor import select_successor
+            successor = select_successor(home, name, adoption)
+            journal = successor.journal
+        elif journal.exists():
             raise LaunchError("adoption_sid_requires_reconciliation", status="UNKNOWN", receipt=_read(journal))
         with adoption_guard(request, adoption) as check:
             if not callable(check):
@@ -150,16 +162,30 @@ def adopt_screen(home: Path, name: str, request: dict, adoption: dict, *, screen
             receipt = {"schema": "agentos.screen-adoption/v1", "session_id": adoption["session_id"],
                        "request_sha256": digest(request), "adoption_sha256": digest(adoption),
                        "status": "RESERVED", "resume_may_have_started": False, "work_accepted": False}
-            atomic_json(journal, receipt)
+            if successor is not None:
+                import json
+                successor.verify()
+                receipt.update(schema="agentos.screen-adoption-successor/v1", successor=successor.binding)
+                try:
+                    create_only_bytes(journal, (json.dumps(receipt, sort_keys=True) + "\n").encode())
+                except FileExistsError:
+                    raise LaunchError("successor_predecessor_already_consumed", status="UNKNOWN") from None
+            else:
+                atomic_json(journal, receipt)
             owner_token = []
 
             class Adapter:
                 inner = None
 
                 def guarded(self, attempt, phase):
+                    if successor is not None:
+                        successor.verify()
                     _old_readback(home, adoption)
                     worker = self.inner._state() if self.inner is not None else None
-                    record = _live_guard(check, request, adoption, attempt, phase, worker, owner_token)
+                    record = _live_guard(check, request, adoption, attempt, phase, worker, owner_token,
+                                         successor.binding if successor is not None else None)
+                    if successor is not None:
+                        successor.verify()
                     _old_readback(home, adoption)
                     if "pending_reconciliation" in adoption:
                         from .screen_reconciliation import verify_pending_reconciliation

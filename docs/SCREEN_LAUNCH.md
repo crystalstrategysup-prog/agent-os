@@ -257,6 +257,10 @@ creates a new owning Screen transport for the **same existing native SID**. It
 never stops, resets or reloads the old worker. A new unique registry/name is
 required; old failed/pending/journal records remain immutable. Existing
 `create_screen` and `continue_screen` retain their original roles.
+For an exact successful predecessor followed by a distinct reconciled failed
+dispatch, [reviewed successor adoption](SCREEN_SUCCESSOR.md) is an explicit
+opt-in append-only chain. Existing failed/in-flight SID journals still refuse;
+the original journal is never reset or overwritten.
 
 The adoption input contains `session_id`, `old_name` and `old_pins` (raw SHA-256
 of identity.json, bootstrap.json, startup.json, state.json and selected failed

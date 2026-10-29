@@ -68,6 +68,10 @@ All live adoption guard responses must additionally bind
 reviewed turn. PID/lineage/writer exclusion, current target authority, original
 contract retention, model/provider/catalog/probes and SID once-journal still
 apply. Reconciliation does not reset a previous adoption attempt.
+An exact successful predecessor can instead be selected through the explicit
+[reviewed successor contract](SCREEN_SUCCESSOR.md), with its own immutable
+chain edge, later-operation binding and fresh guard review. Reconciliation
+alone never unblocks or resets an existing SID attempt.
 
 The receipt records `RECONCILED_FOR_COLD_ADOPTION`, the original UNKNOWN and
 pending preservation, with `replay_authorized: false`, `business_accepted: false`.
