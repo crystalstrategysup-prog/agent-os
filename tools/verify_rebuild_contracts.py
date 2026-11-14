@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Check maintained packaging contracts without changing project/user state."""
 from __future__ import annotations
+
 import ast
 import hashlib
 import json
-from pathlib import Path
 import tomllib
+from pathlib import Path
+
 from sync_atlas import synchronize
+from sync_resources import synchronize as synchronize_documents
 
 ROOT = Path(__file__).resolve().parents[1]
 RES = ROOT / "src/agent_os/resources"
@@ -35,9 +38,14 @@ def main():
     check(len(entries) == 1 and entries[0].get("advisory") is True
           and entries[0]["write_surfaces"] == [] and entries[0]["effect"] == "read_only",
           "diagnostic-advisory-contract")
-    for source in sorted((ROOT / "docs").glob("*.md")):
-        mirror = RES / "docs" / source.name
-        check(mirror.is_file() and mirror.read_bytes() == source.read_bytes(), "document-mirror:" + source.name)
+    try:
+        documents = synchronize_documents(ROOT)
+    except (ValueError, OSError) as exc:
+        check(False, "document-sync:" + str(exc))
+    else:
+        for name in documents["documents"]:
+            check(name not in documents["changed"], "document-mirror:" + name)
+        check(not documents["orphaned"], "document-mirror-orphans:" + ",".join(documents["orphaned"]))
     name = "COORDINATOR_KNOWLEDGE_INDEX.json"
     index = json.loads((ROOT / "docs" / name).read_bytes())
     check((ROOT / "docs" / name).read_bytes() == (RES / "docs" / name).read_bytes(), "coordinator-index-mirror")
