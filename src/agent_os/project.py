@@ -1439,6 +1439,7 @@ def checkpoint(root: Path, task_id: str, reason: str, next_step: str, *, user_ho
 def make_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="agentos project")
     sub = parser.add_subparsers(dest="action", required=True)
+    sub.add_parser("diagnose", help="Read bounded local metadata without initialization or repair")
     init = sub.add_parser("init")
     init.add_argument("--name", required=True)
     init.add_argument("--type", action="append", choices=TYPES, required=True)
@@ -1523,6 +1524,9 @@ def make_parser() -> argparse.ArgumentParser:
 
 
 def command(argv: list[str], user_home: Path) -> tuple[dict, int]:
+    if argv and argv[0] == "diagnose":
+        from .project_diagnostics import command as diagnostic_command
+        return diagnostic_command(argv[1:])
     if argv and argv[0] == "scoped-apply":
         from .scoped_admission import command as scoped_command
         return scoped_command(argv[1:], user_home)

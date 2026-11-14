@@ -1,6 +1,6 @@
 # Interfaces and compatibility
 
-Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+The current source version is declared by `pyproject.toml` and `agent_os.__version__`. Use the exact build and installation receipts for publication and host adoption. RC-labelled sections below are retained historical records, not current installation claims.
 
 
 ## Historical: Indexed handoff successor0.7.0rc1

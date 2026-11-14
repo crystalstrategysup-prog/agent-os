@@ -30,6 +30,13 @@ def dispatch(argv: list[str]) -> int | None:
     }:
         return None
     try:
+        if rest[:2] == ["project", "diagnose"]:
+            # This route needs only the explicit root, never a user home or init.
+            from .project_diagnostics import command
+
+            result, code = command(rest[2:])
+            print(json.dumps(result, ensure_ascii=False, separators=(",", ":")))
+            return code
         if rest[0] == "library":
             from .handoff_cli import command
 

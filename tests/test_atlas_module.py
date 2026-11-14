@@ -181,6 +181,76 @@ class AtlasModuleTests(unittest.TestCase):
         self.assertIn('session-capabilities', help_text)
         self.assertIn('--user-home', help_text)
 
+    def test_global_home_profile_and_help_do_not_select_or_read_a_registry(self):
+        before = files(self.home)
+        with patch.object(atlas_module, 'default_registry', side_effect=AssertionError('registry discovery')):
+            for suffix in (['profile', '--kind', 'audit'], ['--help'], ['native', '--help']):
+                with self.subTest(suffix=suffix):
+                    code, output, error = self.invoke(
+                        ['--home', str(self.home / 'never-created'), 'atlas', *suffix],
+                        function=atlas_module.dispatch)
+                    self.assertEqual((code, error), (0, ''))
+                    self.assertTrue(output)
+        self.assertEqual(files(self.home), before)
+        self.assertFalse((self.home / 'never-created').exists())
+
+    def test_global_home_allows_explicit_registry_but_keeps_implicit_denial(self):
+        selected, rows = self.registry(self.home / 'selected.json')
+        before = files(self.home)
+        with patch.object(atlas_module, 'default_registry', side_effect=AssertionError('implicit registry')):
+            code, output, error = self.invoke(
+                ['--user-home=' + str(self.home / 'unused'), 'atlas', '--registry', str(selected), 'list'],
+                function=atlas_module.dispatch)
+            self.assertEqual((code, error), (0, ''))
+            self.assertEqual(json.loads(output)['projects'], rows)
+            code, output, error = self.invoke(
+                ['--home', str(self.home / 'unused'), 'atlas', 'list'], function=atlas_module.dispatch)
+            self.assertEqual(code, 1)
+            self.assertEqual(json.loads(output)['code'], 'ATLAS_USE_EXPLICIT_REGISTRY')
+        self.assertEqual(files(self.home), before)
+
+    def test_native_uses_fixed_packaged_core_and_restores_arguments_and_modules(self):
+        project = self.home / 'native-project'
+        project.mkdir()
+        body = b'synthetic local document\n'
+        (project / 'document.md').write_bytes(body)
+        before = files(self.home)
+        previous_argv = sys.argv
+        previous_path = list(sys.path)
+        previous_modules = {name: sys.modules.get(name) for name in atlas_module._MODULE_NAMES}
+        with patch.object(atlas_module, 'default_registry', side_effect=AssertionError('registry discovery')):
+            code, output, error = self.invoke(
+                ['native', 'pins', '--root', str(project), '--path', 'document.md'])
+        self.assertEqual((code, error), (0, ''))
+        self.assertEqual(json.loads(output), {'schema': 'atlas.pins/v1', 'files': [
+            {'path': 'document.md', 'sha256': hashlib.sha256(body).hexdigest(), 'bytes': len(body)}]})
+        self.assertIs(sys.argv, previous_argv)
+        self.assertEqual(sys.path, previous_path)
+        self.assertEqual({name: sys.modules.get(name) for name in atlas_module._MODULE_NAMES}, previous_modules)
+        self.assertEqual(files(self.home), before)
+        code, output, error = self.invoke(['native', 'not-a-method'])
+        self.assertEqual((code, output), (2, ''))
+        self.assertIn('invalid choice', error)
+        self.assertIs(sys.argv, previous_argv)
+
+    def test_native_explicit_init_preserves_core_no_overwrite_refusal(self):
+        project = self.home / 'native-explicit-root'
+        project.mkdir()
+        argv = ['native', 'init', '--root', str(project), '--project-id', 'synthetic-native',
+                '--title', 'Synthetic native project', '--objective', 'Exercise only this isolated test root',
+                '--writer', 'synthetic-owner', '--authority-ref', 'synthetic-local-test', '--mode', 'native',
+                '--at', '2026-11-14T00:00:00Z']
+        with patch.object(atlas_module, 'default_registry', side_effect=AssertionError('registry discovery')):
+            code, output, error = self.invoke(argv)
+        self.assertEqual((code, error), (0, ''))
+        self.assertEqual(json.loads(output)['status'], 'INITIALIZED_PARTIAL')
+        before = files(project)
+        code, output, error = self.invoke(argv)
+        self.assertEqual((code, error), (1, ''))
+        self.assertEqual(json.loads(output)['status'], 'REFUSED')
+        self.assertEqual(files(project), before)
+        self.assertFalse((self.home / '.agentos-user').exists())
+
     def test_oversized_composite_outcome_recovery_and_pagination_are_retained(self):
         changed = ['W-' + str(index) + '-' + 'x' * 50 for index in range(999)]
         docs = {'status': 'NO_CHANGE', 'changed_paths': [], 'matrix_writes': 0,

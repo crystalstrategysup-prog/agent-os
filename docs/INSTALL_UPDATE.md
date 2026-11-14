@@ -1,6 +1,6 @@
 # Install, update, rollback, and recovery
 
-Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+The current source version is declared by `pyproject.toml` and `agent_os.__version__`. Use the exact build and installation receipts for publication and host adoption. RC-labelled sections below are retained historical records, not current installation claims.
 
 
 ## Historical: Indexed handoff successor0.7.0rc1
@@ -9,7 +9,7 @@ Candidate0.7.0rc1 introduces mandatory accepted terminal handoff for new/resumed
 
 ## Version and proof
 
-The source declares candidate `0.8.0rc2`. Verify the published tag or release asset
+Read the exact source version from `pyproject.toml` and the CLI. Verify the published tag or release asset
 separately; a version string does not prove publication. Review the exact
 source, patch, and manifest, run local checks, and read back the target runtime.
 Python 3.11+ and disjoint core and user roots are required. The commands below
@@ -24,8 +24,8 @@ existing AgentOS installation as the new core home.
 
 ```sh
 python3 tools/install.py install \
-  --wheel /absolute/crystal_agent_os-0.8.0rc2-py3-none-any.whl \
-  --sha256 ACTUAL_WHEEL_SHA256 --version 0.8.0rc2 \
+  --wheel /absolute/crystal_agent_os-VERSION-py3-none-any.whl \
+  --sha256 ACTUAL_WHEEL_SHA256 --version VERSION \
   --core-home "$HOME/.local/share/agentos-foundation" \
   --user-home "$HOME/.agentos-user"
 ```
@@ -48,6 +48,12 @@ compatibility before planning and before switching. Unknown schemas, corrupt
 JSON, and symlinks block install or rollback without moving `current`. Overlay
 import is a separate command. Installation makes no global PATH, service,
 authentication, model, or trust change.
+
+## Additive build provenance and reader compatibility
+
+The installer automatically examines an adjacent BUILD_RECEIPT.json or MANIFEST.json for an unambiguous exact wheel match. An explicit --build-manifest is an optional override. New installations preserve the selected build manifest and exact installer bytes in the immutable release, with independent hashes in the install receipt. Missing legacy provenance remains UNKNOWN and does not require a new setup step. Old receipts remain readable.
+
+The scoped-install capability declaration preserves known transaction schemas and task states across install and rollback. A candidate known to drop a current reader is refused before switching; undeclared legacy capabilities remain UNKNOWN. No implicit migration, journal reset, hook restoration, or wholesale project scan is performed.
 
 ## User overlay and profiles
 

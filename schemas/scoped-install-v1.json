@@ -1,0 +1,11 @@
+{
+  "schema": "agentos.scoped-install/v1",
+  "readable_transaction_schemas": [
+    "agentos.scoped-transaction/v1"
+  ],
+  "readable_task_states": [
+    "SCOPED_APPLIED"
+  ],
+  "implicit_migration": false,
+  "unsupported_downgrade": "preserve_and_hold"
+}

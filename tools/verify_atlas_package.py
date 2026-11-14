@@ -74,6 +74,69 @@ def sources(root):
     return result
 
 
+def source_identity(root, source, commit=None):
+    """Bind selected build bytes to HEAD without claiming a dirty tree is that commit.
+
+    This reads only Git object metadata for the package inputs. It neither
+    initializes a repository nor inventories unrelated project/user state.
+    """
+    identity = {
+        'schema': 'agentos.build-source-identity/v1',
+        'status': 'UNKNOWN', 'source_commit': None, 'git_tree': None,
+        'dirty': None, 'dirty_scope': 'SELECTED_PACKAGE_INPUTS',
+        'source_files_sha256': hashlib.sha256(
+            canonical({p: pin(raw) for p, raw in source.items()})).hexdigest(),
+        'selected_files': len(source), 'changed_files': None,
+        'untracked_files': None, 'deleted_files': None,
+    }
+    if commit is not None and (not isinstance(commit, str)
+                               or not re.fullmatch(r'[0-9a-f]{40}', commit)):
+        return identity
+    reference = 'HEAD' if commit is None else commit
+    try:
+        observed = subprocess.run(
+            ['git', '-C', str(root), 'rev-parse', '--show-toplevel', reference, reference + '^{tree}'],
+            capture_output=True, timeout=15)
+        lines = observed.stdout.decode('utf-8').splitlines()
+        if (observed.returncode or len(lines) != 3
+                or Path(lines[0]).resolve() != Path(root).resolve()
+                or not all(re.fullmatch(r'[0-9a-f]{40}', item) for item in lines[1:])):
+            return identity
+        tree = subprocess.run(
+            ['git', '-C', str(root), 'ls-tree', '-rz', '--full-tree', lines[1], '--',
+             'src/agent_os', 'pyproject.toml', 'README.md', 'LICENSE', 'LICENSE.txt',
+             'LICENSE.md', 'NOTICE'], capture_output=True, timeout=15)
+        if tree.returncode or len(tree.stdout) > 16 * 1024 * 1024:
+            return identity
+        committed = {}
+        for row in tree.stdout.split(b'\0'):
+            if not row:
+                continue
+            metadata, name = row.split(b'\t', 1)
+            mode, kind, oid = metadata.decode('ascii').split()
+            name = name.decode('utf-8')
+            if '__pycache__' in Path(name).parts or Path(name).suffix in ('.pyc', '.pyo'):
+                continue
+            if mode not in ('100644', '100755') or kind != 'blob':
+                return identity
+            committed[name] = oid
+        changed = sum(
+            p in committed and hashlib.sha1(
+                b'blob ' + str(len(raw)).encode('ascii') + b'\0' + raw).hexdigest()
+            != committed[p] for p, raw in source.items())
+        untracked = len(set(source) - set(committed))
+        deleted = len(set(committed) - set(source))
+        dirty = bool(changed or untracked or deleted)
+        identity.update(status='DIRTY' if dirty else 'COMMITTED',
+                        source_commit=lines[1], git_tree=lines[2], dirty=dirty,
+                        changed_files=changed, untracked_files=untracked,
+                        deleted_files=deleted)
+    except (OSError, subprocess.SubprocessError, UnicodeError, ValueError):
+        # An unavailable repository is explicit UNKNOWN, never a guessed commit.
+        pass
+    return identity
+
+
 def selected_sync(root):
     spec = importlib.util.spec_from_file_location('_atlas_selected_sync', root / 'tools/sync_atlas.py')
     module = importlib.util.module_from_spec(spec)
@@ -150,6 +213,7 @@ def build_candidate(root, selected, source, version, output=None):
                                **pin(interpreter.resolve().read_bytes()), **observed},
                'source_date_epoch': selection['source_date_epoch'],
                'source_files': {p: pin(raw) for p, raw in source.items()},
+               'source_identity': source_identity(root, source),
                'dependency_installation': 'NOT_PERFORMED', 'publication': 'NOT_PERFORMED'}
     try:
         with tempfile.TemporaryDirectory(prefix='agentos-atlas-candidate-source-') as name:
@@ -224,6 +288,23 @@ def verify(root, source, version, project, output=None):
             'CANDIDATE_BUILD_RECEIPT_REQUIRED')
     expected_source = {p: pin(raw) for p, raw in source.items()}
     require(receipt.get('source_files') == expected_source, 'CANDIDATE_SOURCE_CHANGED')
+    identity_recheck = 'UNKNOWN'
+    if 'source_identity' in receipt:
+        identity = receipt['source_identity']
+        require(isinstance(identity, dict)
+                and identity.get('schema') == 'agentos.build-source-identity/v1'
+                and identity.get('source_files_sha256') == hashlib.sha256(canonical(expected_source)).hexdigest(),
+                'CANDIDATE_SOURCE_IDENTITY_CONFLICT')
+        commit = identity.get('source_commit')
+        if commit is not None:
+            require(isinstance(commit, str) and re.fullmatch(r'[0-9a-f]{40}', commit),
+                    'CANDIDATE_SOURCE_IDENTITY_CONFLICT')
+            observed = source_identity(root, source, commit)
+            if observed['status'] != 'UNKNOWN':
+                require(identity == observed, 'CANDIDATE_SOURCE_IDENTITY_CONFLICT')
+                identity_recheck = 'MATCHED_RECORDED_COMMIT'
+        # An unrelated later HEAD or a source archive without Git metadata does
+        # not invalidate the already pinned source/wheel bytes.
     wheels = list(output.glob('*.whl'))
     require(len(wheels) == 1, 'CANDIDATE_WHEEL_COUNT')
     wheel = wheels[0]
@@ -310,6 +391,8 @@ def verify(root, source, version, project, output=None):
             'wheel': {'path': str(wheel), **pin(raw_wheel)},
             'build_receipt': {'path': str(output / 'BUILD_RECEIPT.json'), **pin(receipt_raw)},
             'source_files': len(source), 'source_files_sha256': hashlib.sha256(canonical(expected_source)).hexdigest(),
+            'source_identity': receipt.get('source_identity', {'status': 'UNKNOWN'}),
+            'source_identity_recheck': identity_recheck,
             'wheel_members': len(payload), 'record_rows': len(records),
             'packaged_source_files': len(expected_package), 'entry_points': project['scripts'],
             'probe': probe, 'runtime_installation': 'NOT_PERFORMED', 'publication': 'NOT_PERFORMED'}

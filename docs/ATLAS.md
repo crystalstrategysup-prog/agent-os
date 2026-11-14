@@ -295,3 +295,7 @@ No project registry or intake is read for the READ_ONLY path.
 ## DN-01.4 finite native document growth
 
 AgentOSrc2032 supports up to1000selected document records, including archived, under the unchanged2MiB/file,16MiBaggregate,8MiBinput,32MiBworkflow/snapshot and48MiBHTML bounds. Schema, runtime and OPERATIONS agree;1001refuses. Existing native indexes append identities while retaining all published versions and immutable releases. No guard override, deletion/repath, mode switch, lazy archive or automatic growth is added. See bundled references/selected-document-capacity.md and data-contract.md. Source/package acceptance, installation, project CAS publication, selector activation and business acceptance remain separate.
+
+## Native CLI route
+
+Use agentos atlas native --help for the existing native operation interface. For an already bound project, agentos atlas native run project-audit --root ROOT --project .atlas/project.json reads its current native context without creating a registry. The facade retains native effect boundaries. Global --home is accepted for registry-free help/profile/native routes; registry-backed operations still require an explicit registry selection. See [optional project diagnostics](PROJECT_DIAGNOSTICS.md) for a bounded metadata overview.

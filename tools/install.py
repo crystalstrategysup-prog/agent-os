@@ -119,6 +119,276 @@ def wheel_coordination_schemas(wheel: Path) -> list[str]:
     return value["readable_coordination_schemas"]
 
 
+SCOPED_INSTALL = {
+    "schema": "agentos.scoped-install/v1",
+    "readable_transaction_schemas": ["agentos.scoped-transaction/v1"],
+    "readable_task_states": ["SCOPED_APPLIED"],
+    "implicit_migration": False,
+    "unsupported_downgrade": "preserve_and_hold",
+}
+# Canonical pre-declaration source commits 7d56569 and b157dbf. Recognize
+# implementation bytes, not version names or an arbitrary file's presence.
+LEGACY_SCOPED_MODULES = {
+    "1d8c7453ec94abbd5d1caafdfc60270fb9d8fcaf074f998dcbbee40e0b845658",
+    "cafc523e29714c1a79924b6f17651166c7c44a15210431479a1660df24e1ad95",
+}
+LEGACY_SCOPED_DEPENDENCIES = {
+    "agent_os/project.py": "fd3682442cf54fedeae50a7b5cde739ed84eafb74e7dde684bc3cfd1c21348db",
+    "agent_os/resources/schemas/project-task-v1.schema.json":
+        "ebde2ca75c054b9c33e074b276ae6de23fee7e3f512c47593c2a0769faf8fbc9",
+}
+
+
+def wheel_scoped_schemas(wheel: Path) -> list[str] | None:
+    """Recognize declared/known readers; unknown legacy code remains UNKNOWN."""
+    declaration = "agent_os/resources/contracts/scoped-install-v1.json"
+    implementation = "agent_os/scoped_admission.py"
+    try:
+        with ZipFile(wheel) as archive:
+            names = archive.namelist()
+
+            def member(name, limit):
+                if names.count(name) != 1 or archive.getinfo(name).file_size > limit:
+                    raise InstallError("wheel_scoped_capabilities_invalid")
+                return archive.read(name)
+
+            if declaration in names:
+                value = json.loads(member(declaration, 4096), object_pairs_hook=unique_object)
+                if value != SCOPED_INSTALL or implementation not in names:
+                    raise InstallError("wheel_scoped_capabilities_invalid")
+                if names.count(implementation) != 1 or not archive.getinfo(implementation).file_size:
+                    raise InstallError("wheel_scoped_capabilities_invalid")
+                return list(SCOPED_INSTALL["readable_transaction_schemas"])
+            if implementation not in names:
+                return []
+            if names.count(implementation) != 1:
+                raise InstallError("wheel_scoped_capabilities_invalid")
+            if (archive.getinfo(implementation).file_size > 1024 * 1024
+                    or any(name not in names for name in LEGACY_SCOPED_DEPENDENCIES)):
+                return None
+            if hashlib.sha256(member(implementation, 1024 * 1024)).hexdigest() not in LEGACY_SCOPED_MODULES:
+                return None
+            if any(archive.getinfo(name).file_size > 1024 * 1024 for name in LEGACY_SCOPED_DEPENDENCIES):
+                return None
+            pins = {name: hashlib.sha256(member(name, 1024 * 1024)).hexdigest()
+                    for name in LEGACY_SCOPED_DEPENDENCIES}
+            if pins != LEGACY_SCOPED_DEPENDENCIES:
+                return None
+            return list(SCOPED_INSTALL["readable_transaction_schemas"])
+    except (BadZipFile, UnicodeError, json.JSONDecodeError, KeyError) as exc:
+        raise InstallError("wheel_scoped_capabilities_invalid") from exc
+
+
+def unique_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise InstallError("metadata_duplicate_key")
+        result[key] = value
+    return result
+
+
+def bounded_file(path: Path, limit: int) -> bytes:
+    if path.is_symlink() or not path.is_file() or path.stat().st_size > limit:
+        raise InstallError("provenance_regular_bounded_file_required")
+    with path.open("rb") as stream:
+        raw = stream.read(limit + 1)
+    if len(raw) > limit:
+        raise InstallError("provenance_file_bound")
+    return raw
+
+
+def build_provenance(raw: bytes | None, wheel: Path, version: str) -> dict:
+    """Bind existing build metadata to this wheel; metadata grants no authority."""
+    result = {"schema": "agentos.install-provenance/v1", "status": "UNKNOWN",
+              "source_commit": None, "source_dirty": None,
+              "source_identity_status": "UNKNOWN", "source_files_sha256": None,
+              "build_manifest_schema": None, "build_manifest_sha256": None,
+              "build_versions": None, "source_date_epoch": None}
+    if raw is None:
+        return result
+    if len(raw) > 8 * 1024 * 1024:
+        raise InstallError("provenance_file_bound")
+    value = json.loads(raw, object_pairs_hook=unique_object)
+    if not isinstance(value, dict) or value.get("version") != version:
+        raise InstallError("build_manifest_identity_mismatch")
+    schema = value.get("schema")
+    expected = {"sha256": digest(wheel), "size": wheel.stat().st_size}
+    if schema == "agentos.public-release/v1":
+        artifacts = value.get("artifacts")
+        artifact = artifacts.get(wheel.name) if isinstance(artifacts, dict) else None
+        if artifact != expected:
+            raise InstallError("build_manifest_wheel_mismatch")
+        commit = value.get("source_commit")
+        identity_status, dirty, source_hash = "COMMITTED_ARCHIVE_DECLARED", False, None
+        versions = value.get("build_versions")
+    elif schema == "agent-os.atlas-candidate-build/v1":
+        if (value.get("status") != "BUILD_SUCCEEDED"
+                or value.get("qualification") != "LOCAL_CANDIDATE_ONLY"
+                or value.get("wheel") != {"name": wheel.name, "bytes": expected["size"],
+                                         "sha256": expected["sha256"]}):
+            raise InstallError("build_manifest_wheel_mismatch")
+        source = value.get("source_files")
+        if not isinstance(source, dict) or not source or len(source) > 100_000:
+            raise InstallError("build_manifest_source_invalid")
+        for name, item in source.items():
+            if (not isinstance(name, str) or Path(name).is_absolute()
+                    or ".." in Path(name).parts or "\\" in name
+                    or not name or name != Path(name).as_posix()
+                    or any(ord(c) < 32 for c in name)
+                    or not isinstance(item, dict) or set(item) != {"bytes", "sha256"}
+                    or type(item["bytes"]) is not int or item["bytes"] < 0
+                    or not isinstance(item["sha256"], str)
+                    or not re.fullmatch(r"[0-9a-f]{64}", item["sha256"])):
+                raise InstallError("build_manifest_source_invalid")
+        source_hash = hashlib.sha256(
+            (json.dumps(source, sort_keys=True, indent=2) + "\n").encode()).hexdigest()
+        try:
+            with ZipFile(wheel) as archive:
+                names = [n for n in archive.namelist()
+                         if n.startswith("agent_os/") and not n.endswith("/")]
+                if len(names) != len(set(names)):
+                    raise InstallError("build_manifest_source_invalid")
+                actual = {"src/" + n: {"bytes": archive.getinfo(n).file_size,
+                                       "sha256": hashlib.sha256(archive.read(n)).hexdigest()}
+                          for n in names}
+        except BadZipFile as exc:
+            raise InstallError("build_manifest_wheel_invalid") from exc
+        if not actual or actual != {p: item for p, item in source.items()
+                                    if p.startswith("src/agent_os/")}:
+            raise InstallError("build_manifest_package_source_mismatch")
+        identity = value.get("source_identity")
+        commit, dirty, identity_status = None, None, "UNKNOWN"
+        if identity is not None:
+            if (not isinstance(identity, dict)
+                    or identity.get("schema") != "agentos.build-source-identity/v1"
+                    or identity.get("source_files_sha256") != source_hash
+                    or identity.get("selected_files") != len(source)
+                    or identity.get("dirty_scope") != "SELECTED_PACKAGE_INPUTS"):
+                raise InstallError("build_manifest_source_identity_invalid")
+            commit, dirty, identity_status = (identity.get("source_commit"),
+                                             identity.get("dirty"), identity.get("status"))
+            if (not isinstance(identity_status, str)
+                    or (identity_status == "COMMITTED" and dirty is not False)
+                    or (identity_status == "DIRTY" and dirty is not True)
+                    or (identity_status == "UNKNOWN" and (dirty is not None or commit is not None))
+                    or identity_status not in {"COMMITTED", "DIRTY", "UNKNOWN"}):
+                raise InstallError("build_manifest_source_identity_invalid")
+            counts = [identity.get(k) for k in ('changed_files', 'untracked_files', 'deleted_files')]
+            if identity_status == "UNKNOWN":
+                if identity.get("git_tree") is not None or counts != [None, None, None]:
+                    raise InstallError("build_manifest_source_identity_invalid")
+            elif (not isinstance(identity.get("git_tree"), str)
+                  or not re.fullmatch(r"[0-9a-f]{40}", identity["git_tree"])
+                  or any(type(count) is not int or count < 0 for count in counts)
+                  or bool(sum(counts)) != dirty):
+                raise InstallError("build_manifest_source_identity_invalid")
+        interpreter = value.get("interpreter")
+        versions = interpreter.get("build_versions") if isinstance(interpreter, dict) else None
+    else:
+        raise InstallError("build_manifest_schema_unsupported")
+    if commit is not None and (not isinstance(commit, str)
+                              or not re.fullmatch(r"[0-9a-f]{40}", commit)):
+        raise InstallError("build_manifest_commit_invalid")
+    if identity_status != "UNKNOWN" and commit is None:
+        raise InstallError("build_manifest_commit_invalid")
+    if (not isinstance(versions, dict) or not versions or len(versions) > 32
+            or any(not isinstance(k, str) or not re.fullmatch(r"[A-Za-z0-9_.-]{1,100}", k)
+                   or not isinstance(v, str) or not re.fullmatch(r"[A-Za-z0-9_.+!-]{1,100}", v)
+                   for k, v in versions.items())):
+        raise InstallError("build_manifest_versions_invalid")
+    epoch = value.get("source_date_epoch")
+    if type(epoch) is not int or epoch < 315532800:
+        raise InstallError("build_manifest_epoch_invalid")
+    result.update(status="RECORDED" if commit is not None else "UNKNOWN",
+                  source_commit=commit, source_dirty=dirty,
+                  source_identity_status=identity_status, source_files_sha256=source_hash,
+                  build_manifest_schema=schema, build_manifest_sha256=hashlib.sha256(raw).hexdigest(),
+                  build_versions=versions, source_date_epoch=epoch)
+    return result
+
+
+def select_build_manifest(explicit: Path | None, wheel: Path, version: str):
+    """Use existing adjacent build metadata automatically, without a new setup step.
+
+    Unrelated or unreadable metadata is not a requirement for legacy packages.
+    A document that explicitly claims this wheel must agree with its identity.
+    """
+    if explicit is not None:
+        raw = bounded_file(explicit.expanduser().absolute(), 8 * 1024 * 1024)
+        return raw, build_provenance(raw, wheel, version), "EXPLICIT"
+    matches = []
+    for name in ("BUILD_RECEIPT.json", "MANIFEST.json"):
+        path = wheel.parent / name
+        if not path.exists() and not path.is_symlink():
+            continue
+        try:
+            raw = bounded_file(path, 8 * 1024 * 1024)
+            value = json.loads(raw, object_pairs_hook=unique_object)
+        except (OSError, ValueError):
+            continue
+        if not isinstance(value, dict):
+            continue
+        if value.get("schema") == "agentos.public-release/v1":
+            artifacts = value.get("artifacts")
+            selected = isinstance(artifacts, dict) and wheel.name in artifacts
+        elif value.get("schema") == "agent-os.atlas-candidate-build/v1":
+            artifact = value.get("wheel")
+            selected = isinstance(artifact, dict) and artifact.get("name") == wheel.name
+        else:
+            selected = False
+        if selected:
+            matches.append((raw, build_provenance(raw, wheel, version), "ADJACENT:" + name))
+    if not matches:
+        return None, build_provenance(None, wheel, version), "UNKNOWN"
+    if len(matches) == 2:
+        left, right = matches[0][1], matches[1][1]
+        for field in ("source_commit", "source_dirty", "source_files_sha256",
+                      "build_versions", "source_date_epoch"):
+            if left[field] is not None and right[field] is not None and left[field] != right[field]:
+                raise InstallError("adjacent_build_manifest_identity_conflict")
+        # Prefer identified source over an old receipt with UNKNOWN; otherwise
+        # the local receipt provides the strongest package-file binding.
+        if left["source_commit"] is None and right["source_commit"] is not None:
+            return matches[1]
+    return matches[0]
+
+
+def verify_provenance(path: Path, manifest: dict, wheel: Path) -> None:
+    if "provenance" not in manifest:
+        return  # Historical immutable releases retain unknown provenance.
+    provenance = manifest["provenance"]
+    if not isinstance(provenance, dict):
+        raise InstallError("release_provenance_invalid")
+    installer_raw = bounded_file(path / "INSTALLER.py", 1024 * 1024)
+    if hashlib.sha256(installer_raw).hexdigest() != provenance.get("installer_sha256"):
+        raise InstallError("release_installer_provenance_mismatch")
+    raw = None
+    if provenance.get("build_manifest_sha256") is not None:
+        raw = bounded_file(path / "BUILD_MANIFEST.json", 8 * 1024 * 1024)
+    expected = build_provenance(raw, wheel, manifest["version"])
+    expected["installer_sha256"] = hashlib.sha256(installer_raw).hexdigest()
+    if provenance != expected:
+        raise InstallError("release_build_provenance_mismatch")
+
+
+def preserve_scoped_reader(root: Path, old: str, selected: dict) -> str:
+    if old == "none":
+        return "NO_PREVIOUS_RELEASE"
+    path = release(root, old)
+    # Recovery must not require a healthy current runtime or provenance
+    # sidecars. Its verified wheel/INSTALL identity is sufficient reader
+    # evidence; execute() fully verifies the target before activating it.
+    current = read_manifest(path, verify_payload=False)
+    wanted = wheel_scoped_schemas(path / current["wheel_name"])
+    provided = selected["scoped_transaction_schemas"]
+    if provided is None or wanted is None:
+        return "UNKNOWN"
+    if not set(wanted).issubset(provided):
+        raise InstallError("scoped_reader_incompatible_preserve_and_hold")
+    return "PRESERVED"
+
+
 def release(root: Path, identifier: str) -> Path:
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._+-]{0,119}", identifier):
         raise InstallError("invalid_release_id")
@@ -179,6 +449,11 @@ def read_manifest(
         data["coordination_schemas"] = supported_coordination
         if data.get("continuation_schemas", []) != wheel_continuation_schemas(wheel):
             raise InstallError("release_continuation_capabilities_mismatch")
+        scoped = wheel_scoped_schemas(wheel)
+        if data.get("scoped_transaction_schemas", scoped) != scoped:
+            raise InstallError("release_scoped_capabilities_mismatch")
+        data["scoped_transaction_schemas"] = scoped
+        verify_provenance(path, data, wheel)
         _verify_owned_payload(
             path,
             wheel,
@@ -579,6 +854,10 @@ def execute(args: argparse.Namespace) -> dict:
     separate(root, user)
     separate(Path(__file__).resolve().parent.parent, root)
     old = current_id(root)
+    installer_raw = bounded_file(Path(__file__), 1024 * 1024)
+    installer_hash = hashlib.sha256(installer_raw).hexdigest()
+    build_raw = None
+    build_selection = "EXISTING_RELEASE"
     if args.action == "rollback":
         target = release(root, args.release_id)
         manifest = read_manifest(target, verify_payload=False)
@@ -591,6 +870,7 @@ def execute(args: argparse.Namespace) -> dict:
         if manifest.get("coordination_schemas", supported) != supported:
             raise InstallError("release_completion_capabilities_mismatch")
         manifest["coordination_schemas"] = supported
+        manifest["scoped_transaction_schemas"] = wheel_scoped_schemas(target / manifest["wheel_name"])
     else:
         wheel = args.wheel.expanduser().absolute()
         if wheel.is_symlink() or not wheel.is_file() or wheel.suffix != ".whl":
@@ -613,9 +893,24 @@ def execute(args: argparse.Namespace) -> dict:
         check_user_compatibility(user, manifest, check_continuations=False)
         manifest["continuation_schemas"] = wheel_continuation_schemas(wheel)
         manifest["coordination_schemas"] = wheel_coordination_schemas(wheel)
+        manifest["scoped_transaction_schemas"] = wheel_scoped_schemas(wheel)
+        build_raw, manifest["provenance"], build_selection = select_build_manifest(
+            getattr(args, "build_manifest", None), wheel, args.version)
+        manifest["provenance"]["installer_sha256"] = installer_hash
     check_user_compatibility(user, manifest)
+    reader_compatibility = preserve_scoped_reader(root, old, manifest)
     if args.action == "rollback":
-        read_manifest(target)
+        manifest = read_manifest(target)
+    elif target.exists():
+        stored = read_manifest(target)
+        if build_raw is not None:
+            retained, supplied = stored.get("provenance", {}), manifest["provenance"]
+            for field in ("source_commit", "source_dirty", "source_files_sha256",
+                          "build_versions", "source_date_epoch"):
+                if retained.get(field) is not None and supplied[field] is not None and retained[field] != supplied[field]:
+                    raise InstallError("immutable_release_provenance_conflict")
+            build_selection = "EXISTING_RELEASE_UNCHANGED"
+        manifest = stored
     plan = {
         "status": "PLANNED",
         "action": args.action,
@@ -627,6 +922,11 @@ def execute(args: argparse.Namespace) -> dict:
         "service_changes": [],
         "network_required": False,
         "activation_proven": False,
+        "scoped_transaction_schemas": manifest["scoped_transaction_schemas"],
+        "scoped_reader_compatibility": reader_compatibility,
+        "build_manifest_selection": build_selection,
+        "provenance": manifest.get("provenance", {"status": "UNKNOWN"}),
+        "executing_installer_sha256": installer_hash,
     }
     if not args.apply:
         return plan
@@ -662,6 +962,15 @@ def execute(args: argparse.Namespace) -> dict:
                 shutil.copyfile(wheel, target / wheel.name)
                 if digest(target / wheel.name) != manifest["wheel_sha256"]:
                     raise InstallError("wheel_changed_during_copy")
+                with (target / "INSTALLER.py").open("xb") as stream:
+                    stream.write(installer_raw)
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                if build_raw is not None:
+                    with (target / "BUILD_MANIFEST.json").open("xb") as stream:
+                        stream.write(build_raw)
+                        stream.flush()
+                        os.fsync(stream.fileno())
                 run([sys.executable, "-I", "-m", "venv", str(target / ".venv")])
                 run(
                     [
@@ -688,6 +997,10 @@ def execute(args: argparse.Namespace) -> dict:
         evidence = probe(target, manifest["version"])
         with continuation_lock(user), coordination_locks(user):
             check_user_compatibility(user, manifest)
+            verified = read_manifest(target)
+            preserve_scoped_reader(root, old, verified)
+            if hashlib.sha256(bounded_file(Path(__file__), 1024 * 1024)).hexdigest() != installer_hash:
+                raise InstallError("installer_changed_during_install")
             activate(root, identifier, old)
         return {
             **plan,
@@ -719,6 +1032,8 @@ def parser() -> argparse.ArgumentParser:
             s.add_argument("--wheel", type=Path, required=True)
             s.add_argument("--sha256", required=True)
             s.add_argument("--version", required=True)
+            s.add_argument("--build-manifest", type=Path,
+                           help="Override automatic adjacent BUILD_RECEIPT.json / MANIFEST.json selection")
         else:
             s.add_argument("--release-id", required=True)
     return p

@@ -2,7 +2,7 @@
   "schema": "agentos.modules/v1",
   "modules": {
     "agentos": {
-      "version": "0.8.0rc2041",
+      "version": "0.8.0rc2042+atlas.5",
       "pins": [
         {
           "path": "contracts/continuation-capabilities-v2.json",

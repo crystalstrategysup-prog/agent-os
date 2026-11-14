@@ -1,9 +1,16 @@
-# Guarded session onboarding
+# AgentOS developer onboarding
 
-Read README.md and AGENTS.md, then only the relevant architecture, contracts and workflow documents. Ordinary questions, searches and read-only audits need no project registration. Actual changes require current documentation, explicit questions/enter, READY, exact approved checks and an honest close or checkpoint. Reuse verified answers.
+## Getting started
+Resolve the selected immutable installation and read its version, resources and install receipt. Resolve the canonical source commit independently. Begin from the current project router and declared Atlas binding. Use explicit CLI workflow IDs for CLI work; do not impersonate native session events.
 
-For session creation read docs/SESSION_LAUNCH.md and docs/SCREEN_LAUNCH.md from the verified current core. Select an exact already approved executable/version in its inherited context; configuration, model catalog, actual startup and harmless probes must agree before work. Legacy clients lacking support return an explicit gap.
+## Navigation
+Read DOSSIER, ARCHITECTURE, CONTRACTS and the current task stage. PROCESS defines admission and terminal evidence. ATLAS describes the facade and native/workspace boundaries. SCOPED_ADMISSION and REFUSAL_RECOVERY define finite recovery. INSTALL_UPDATE defines release activation. Select only relevant documents and keep private facts outside the package.
 
-After managed installation use the new interpreter to plan/apply managed integration, preserving owner bytes. Fresh and existing chats each need current applicable instructions through their supported loading point. There is no automatic voice injection, policy enforcement or hook activation.
+## Commands
+Use agentos modules to verify its declared module pins and agentos doctor for local configuration health. Use agentos project diagnose, or --root ROOT, when a concise read-only view of existing bindings and document freshness is useful. It is optional, advisory and requires no setup or task entry. The current directory is the default root. Use the existing explicit project and Atlas routines for changes; a diagnostic report never grants write authority.
 
-Troubleshooting: distinguish source availability, artifact installation, process binary/version, selected context, delivery and behavior. Preserve working clients and inspect exact evidence before changing a target.
+## Troubleshooting
+Missing registry means that exact registry is absent, not that Atlas is absent everywhere. A missing command, stale document pin or divergent installed source is an explicit gap. Read the exact operation receipt before replay. Preserve existing writer state and return a concrete next action. Do not initialize a duplicate matrix or rebuild from an unverified old checkout.
+
+## Short working loop
+Reuse the verified current context, perform the authorized task, run its relevant existing checks, then update the owning knowledge with evidence. Missing information affects only dependent actions. Avoid repeated full inventories, duplicate matrices, extra intake forms and approvals for facts already established. See [Project diagnostics](../PROJECT_DIAGNOSTICS.md).

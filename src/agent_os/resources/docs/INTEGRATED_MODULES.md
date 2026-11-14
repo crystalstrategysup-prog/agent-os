@@ -1,4 +1,4 @@
-# AgentOS LITE + Atlas + Function Extractor modules (rc2036 candidate)
+# AgentOS LITE, Atlas and Function Extractor modules
 
 - `agentos modules` reads a pinned installed module manifest; it grants NO execution rights.
 - `agentos project local record/status/sync` keeps source-only accounting under the project's

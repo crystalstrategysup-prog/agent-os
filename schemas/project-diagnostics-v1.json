@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Bounded advisory project diagnostics",
+  "type": "object",
+  "required": [
+    "schema",
+    "status",
+    "effect",
+    "advisory",
+    "root",
+    "limits",
+    "coverage",
+    "project",
+    "documents",
+    "task",
+    "transactions",
+    "atlas",
+    "links",
+    "findings",
+    "finding_counts",
+    "next_action"
+  ],
+  "properties": {
+    "schema": {
+      "const": "agentos.project-diagnostics/v1"
+    },
+    "status": {
+      "enum": [
+        "OBSERVED",
+        "FINDINGS",
+        "INCOMPLETE",
+        "NOT_QUALIFIED"
+      ]
+    },
+    "effect": {
+      "const": "READ_ONLY"
+    },
+    "advisory": {
+      "const": true
+    },
+    "root": {
+      "type": "object"
+    },
+    "limits": {
+      "type": "object"
+    },
+    "coverage": {
+      "type": "object",
+      "required": [
+        "scope",
+        "complete",
+        "truncated",
+        "source_inventory",
+        "live_activity",
+        "external_bindings",
+        "files_read",
+        "bytes_read",
+        "omitted"
+      ],
+      "properties": {
+        "scope": {
+          "const": "SELECTED_LOCAL_METADATA_ONLY"
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "source_inventory": {
+          "const": "NOT_SCANNED"
+        },
+        "live_activity": {
+          "const": "NOT_CHECKED"
+        },
+        "external_bindings": {
+          "const": "NOT_CHECKED"
+        },
+        "files_read": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bytes_read": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "omitted": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "project": {
+      "type": "object"
+    },
+    "documents": {
+      "type": "object"
+    },
+    "task": {
+      "type": "object"
+    },
+    "transactions": {
+      "type": "object"
+    },
+    "atlas": {
+      "type": "object"
+    },
+    "links": {
+      "type": "object"
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "required": [
+          "code",
+          "severity",
+          "subject",
+          "remediation"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "INFO",
+              "WARNING",
+              "ERROR"
+            ]
+          },
+          "subject": {
+            "type": "string"
+          },
+          "remediation": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "finding_counts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "next_action": {
+      "type": "object",
+      "required": [
+        "code",
+        "subject",
+        "route",
+        "detail"
+      ],
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

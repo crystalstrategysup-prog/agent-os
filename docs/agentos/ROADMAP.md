@@ -1,9 +1,14 @@
-# Guarded launch correction roadmap
+# AgentOS engineering roadmap
 
-1. Establish original goal, authority, affected architecture and measurable criteria.
-2. Review exact public/private candidate deltas; keep unresolved facts explicit.
-3. Implement the reviewed public correction and its versioned documentation. Private owner changes remain external and are reconciled separately.
-4. Run affected bounded checks, exact resource/privacy review, actual positive/negative launcher probes and isolated artifact installation/rollback.
-5. Publish only exact reviewed public assets under the canonical repository and verify tag/assets; perform separately authorized target installation, integration readback and fresh-entry probes.
+## Stages
+1. Pin exact installed source and current canonical branch; preserve the known working reader.
+2. Integrate required branch changes and repair reproduced entry, diagnostics, provenance and compatibility gaps with bounded tests.
+3. Build and review one reproducible successor; rehearse installation and rollback, then perform authorized managed adoption with readback.
+4. Populate project-owned knowledge from verified evidence and apply the same workflow sequentially to the assigned project portfolio.
+5. Feed confirmed general defects into core contracts and regression tests; keep domain fixes and unresolved external causes in their owning projects.
 
-Existing workers are observed without automatic restart. Known credentials or provider failures require their own current authority. A source test or completed child does not accept the parent/business result. Every partial result states the remaining criterion and its next owner.
+## Dependencies
+Source and reader identity precede installation. Documentation and task readiness precede implementation. Tests and independent review precede publication and target adoption. Each project requires its actual source/runtime binding and writer reconciliation; one project's PASS does not accept another.
+
+## Next stage
+Complete the registered rebuild stage, record its exact source/package proof and first real project diagnostic readbacks. Preserve pending project and business criteria with a named next owner rather than closing the overall assignment on a package build.

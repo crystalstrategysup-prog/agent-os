@@ -1,6 +1,6 @@
 # 0.7.1 guarded-launch release candidate
 
-Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+The current source version is declared by `pyproject.toml` and `agent_os.__version__`. Use the exact build and installation receipts for publication and host adoption. RC-labelled sections below are retained historical records, not current installation claims.
 
 
 Public-only patch successor of the published 0.7.0 baseline and reviewed curator launch/context source. Actual artifact hashes, publication and target adoption require separate receipts.

@@ -5,7 +5,7 @@ classification described in [SOURCE_ARCHIVES.md](SOURCE_ARCHIVES.md). Recognized
 cache omission is not a scanner exemption. Canonical conflicts fail closed;
 historical refused payloads and receipts are never rewritten or replayed.
 
-Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+The current source version is declared by `pyproject.toml` and `agent_os.__version__`. Use the exact build and installation receipts for publication and host adoption. RC-labelled sections below are retained historical records, not current installation claims.
 
 
 Stable source `0.7.1`. This POSIX local adapter implements the provider-neutral

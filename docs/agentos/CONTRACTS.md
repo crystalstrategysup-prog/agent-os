@@ -1,9 +1,15 @@
-# Guarded session contracts
+# AgentOS engineering interfaces and contracts
 
-Keep explicit schema identities and mirrored packaged resources. The existing CLI and session-discovery contracts remain compatible; a legacy launch lacking required qualification must return a clear unsupported/unknown outcome instead of dispatching work.
+## Interfaces
+The optional read-only interface is agentos project diagnose --root ROOT. It emits a versioned bounded report containing root identity, declared document hashes, task/Atlas state, findings and an actionable next step. It makes no file, process, network or target change. Existing project entry/READY/check/close and LITE routes retain their meanings.
+The Atlas facade exposes the existing native implementation through an explicit native route, with the same arguments and effect boundaries. A global user-home option never silently selects an Atlas registry.
 
-The new request binds exact executor/version, inherited settings, workspace, required capabilities, original goal/acceptance/answers and current authority. Only configuration reads, bounded model-list pagination, thread start without override setters and exact text turns are allowed. Match canonical model identifiers; retain an unconfigured provider as unconfigured until actual startup identifies it. Never guess defaults or silently change model, provider, auth or permissions.
+## Schemas
+Project inspection uses agentos.project-diagnostics/v1. Findings have stable codes, severity, subject and remediation; missing, unreadable, stale, pending and verified states remain distinct. Output contains metadata and hashes, not document bodies or secrets. Exact limits and supported fields are documented with the implementation and tested with synthetic roots.
+Existing project/task/turn, scoped-file-admission, refusal-recovery v1/v2/v3 and Atlas schemas remain compatible. New source/build provenance is additive and independently hash-bound; old install receipts remain readable under their existing verification rules.
 
-Admission receipts distinguish configuration, startup, tool probes, delivery and semantic acceptance. Screen identity includes actual PID/STY/socket/workspace and current connection; continuation rechecks these facts and the retained goal. A durable user event followed by a non-user event proves message acceptance only. Missing facts remain UNKNOWN.
+## Compatibility
+Preserve all installed scoped reader behavior while integrating main recovery v3. An update must not drop required installed state readers. Rollback preserves the external overlay and must not reset journals. A module inventory PASS states its actual coverage and never substitutes for whole-package or business acceptance.
 
-Sources: docs/CONTRACTS.md, schemas/cli-contract-v1.json and the reviewed public launcher/context contract. Public contracts contain no owner/host values.
+## Errors
+Unsafe or oversized input is not read; missing, stale and incomplete metadata produces advisory findings. An opened root exits 0 even when findings exist. Only inability to open the selected root safely, an unqualified platform or invalid arguments exits 2. Diagnosis is never an intake/READY prerequisite and does not block independent work. Reading an unregistered project is supported and reports missing bindings without initializing them. UNKNOWN side effects use the original operation readback; a new operation ID does not authorize a retry. A source patch or successful build never turns an unresolved production incident into fixed.

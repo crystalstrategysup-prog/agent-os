@@ -1,13 +1,13 @@
 # AgentOS documentation
 
-Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+The current source version is declared by `pyproject.toml` and `agent_os.__version__`. Use the exact build and installation receipts for publication and host adoption. RC-labelled sections below are retained historical records, not current installation claims.
 
 
-## 0.8.0rc2 public source candidate
+## Current source and evidence
 
 Stable 0.7.1 carries the reviewed indexed results, coordinator and model-policy source contracts. Live adoption and physical session cleanup are separate/unimplemented boundaries. See [indexed handoff](INDEXED_HANDOFF.md).
 
-The public source declares `0.8.0rc2`; publication, installation and target verification remain separate. Ordinary questions and read-only work need
+The public source version is declared in `pyproject.toml`; publication, installation and target verification remain separate. Ordinary questions and read-only work need
 no project intake; real project changes follow a documentation-first stage.
 Native AgentOS hooks are excluded. Check publication and installation with
 separate readback.
@@ -43,3 +43,7 @@ Use the [main-coordinator knowledge index](COORDINATOR_KNOWLEDGE_INDEX.json) and
 ## Historical model-selection candidate 0.7.0rc3
 
 Read [MODEL_SELECTION](MODEL_SELECTION.md) for catalog-bound latest Sol, minimal sufficient effort, explicit escalation/quality evidence and independent actual metadata. This is source-only; no runtime switch or private preference apply.
+
+## Optional project overview
+
+[Project diagnostics](PROJECT_DIAGNOSTICS.md) gives one bounded read-only view of existing project bindings, document freshness and the next affected action. It does not add a task-entry requirement.

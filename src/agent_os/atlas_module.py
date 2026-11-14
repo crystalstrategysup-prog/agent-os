@@ -215,9 +215,29 @@ def main(argv: list[str] | None = None) -> int:
     selected = list(sys.argv[1:] if argv is None else argv)
     if not selected:
         print(json.dumps({'schema': 'agentos.atlas-help/v1', 'status': 'HELP',
-                          'commands': ['list', 'views', 'refresh', 'work', 'checkpoint'],
+                          'commands': ['list', 'views', 'refresh', 'work', 'checkpoint', 'profile', 'native'],
                           'registry': 'EXPLICIT_FOR_PROJECT_OPERATIONS'}))
         return 0
+    if selected[0] == 'native':
+        # Fixed packaged core, same explicit arguments/effects; no shell or registry.
+        captured = io.StringIO()
+        previous_argv = sys.argv
+        try:
+            with _workspace(), contextlib.redirect_stdout(captured):
+                try:
+                    sys.argv = ['agentos atlas native', *selected[1:]]
+                    result = importlib.import_module('atlas').main()
+                    code = int(result) if result is not None else 0
+                except SystemExit as exc:
+                    code = exc.code if isinstance(exc.code, int) else 1
+                finally:
+                    sys.argv = previous_argv
+        except (AtlasModuleError, ImportError, OSError) as exc:
+            print(json.dumps({'status': 'REFUSED', 'code': str(exc) if isinstance(exc, AtlasModuleError)
+                              else type(exc).__name__}, sort_keys=True))
+            return 1
+        sys.stdout.write(_render(captured.getvalue(), code, selected))
+        return code
     if selected and selected[0] == 'source-relocate':
         # Explicit native route. No registry lookup or implicit project choice.
         try:
@@ -250,7 +270,7 @@ def main(argv: list[str] | None = None) -> int:
         except (AtlasModuleError, ImportError, OSError, ValueError) as exc:
             print(json.dumps({'status': 'REFUSED', 'code': str(exc)}))
             return 1
-    if not any(arg == '--registry' or arg.startswith('--registry=') for arg in selected):
+    if selected[0] not in ('--help', '-h') and not any(arg == '--registry' or arg.startswith('--registry=') for arg in selected):
         selected = ['--registry', str(default_registry()), *selected]
     captured = io.StringIO()
     try:
@@ -282,6 +302,12 @@ def dispatch(argv: list[str]) -> int | None:
         else:
             break
     if index and index < len(argv) and argv[index] == 'atlas':
+        selected = argv[index + 1:]
+        if (not selected or selected[0] in ('profile', 'native', 'source-relocate', '--help', '-h')
+                or any(arg == '--registry' or arg.startswith('--registry=') for arg in selected)):
+            # A global AgentOS home never selects an Atlas registry. Explicit
+            # native/project selection and registry-free help/profile are safe.
+            return main(selected)
         print(json.dumps({'status': 'REFUSED', 'code': 'ATLAS_USE_EXPLICIT_REGISTRY'}))
         return 1
     return None
