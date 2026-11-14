@@ -6,6 +6,7 @@ import hashlib
 import json
 from pathlib import Path
 import tomllib
+from sync_atlas import synchronize
 
 ROOT = Path(__file__).resolve().parents[1]
 RES = ROOT / "src/agent_os/resources"
@@ -42,6 +43,14 @@ def main():
     check((ROOT / "docs" / name).read_bytes() == (RES / "docs" / name).read_bytes(), "coordinator-index-mirror")
     for row in index["documents"]:
         check(digest(ROOT / "docs" / row["path"]) == row["sha256"], "coordinator-pin:" + row["id"])
+    check((ROOT / "docs/ATLAS_SOURCE.json").read_bytes() ==
+          (RES / "docs/ATLAS_SOURCE.json").read_bytes(), "atlas-source-manifest-mirror")
+    try:
+        atlas = synchronize(ROOT, apply=False)
+    except (ValueError, OSError, UnicodeError, KeyError, TypeError) as exc:
+        check(False, "atlas-source-sync:" + str(exc))
+    else:
+        check(atlas["status"] == "PASS", "atlas-source-sync")
     modules = json.loads((RES / "contracts/agentos-modules-v1.json").read_bytes())
     check(modules["modules"]["agentos"]["version"] == version, "module-version")
     for module, spec in modules["modules"].items():

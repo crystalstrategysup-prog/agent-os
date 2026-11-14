@@ -593,8 +593,8 @@
     },
     {
       "path": "skills/atlas/scripts/import_matrix.py",
-      "bytes": 63798,
-      "sha256": "570222fb3ec39b8b59aebcd00e93d866df87825868b091d4a7788b803e90b45f",
+      "bytes": 70624,
+      "sha256": "c15d1d0027c087e7f4fa711ded357333c37af3bc67cf320e459d775e46906e9b",
       "source_bytes": 62724,
       "source_sha256": "90dec6a59559f706726b593e86d976a3fe972124bcd7dbca2575678171d59304"
     },
@@ -649,8 +649,8 @@
     },
     {
       "path": "skills/atlas/scripts/workspace.py",
-      "bytes": 28499,
-      "sha256": "7bf1cad5bf3147c3a3557d9786a0712c2c90fe428a73ec62e65425447a9b0531",
+      "bytes": 29330,
+      "sha256": "0a79e91c8f9898a73f1bfbf9d940a4c05c2309ee15ed938f9d74d8b9cb645ed7",
       "source_bytes": 7086,
       "source_sha256": "101b7de0e64c2ad620caa061120a62589b8e981a9cca2f653f2ae660894b5f60"
     },
@@ -979,7 +979,7 @@
   },
   "schema": "agent-os.atlas-source/v1",
   "selected_file_count": 74,
-  "selected_tree_sha256": "40c4cd2db91f7a29bfe15a340f7d31e8c24b4ddaf5a19a7dce2486b8036363b9",
+  "selected_tree_sha256": "c306cdca4b8082433d62316ec8f59ac8e89ac01b672fbf4263c7ec623c93c22f",
   "source_commit_reported": "1b7cd88",
   "source_file_count": 64,
   "source_tree_sha256": "15b36a79f1133be8cb790d61f0dff6562262196b0eb8c3ea15c41a9700dd6bab",
@@ -1081,5 +1081,24 @@
     "max_documents": 1000,
     "byte_bounds": "Unchanged runtime; OPERATIONS total-body metadata aligned to existing16MiB",
     "scope": "Finite schema/runtime/contract successor only; no installation, actual NEXT or permission effects; all previous origin fields/versions preserved."
+  },
+  "selected_pin_reconciliation": {
+    "verified_at_commit": "b157dbfe557dc6c43fb45ff7be7dc36512ac110d",
+    "inherited_from_commit": "b157dbfe557dc6c43fb45ff7be7dc36512ac110d",
+    "predecessor_manifest_sha256": "5a8903fea0ebcdad0f9e3d109d800f93b36878c9abc134f2d61b80b903359a93",
+    "previous_selected_tree_sha256": "40c4cd2db91f7a29bfe15a340f7d31e8c24b4ddaf5a19a7dce2486b8036363b9",
+    "unchanged_source_files": [
+      {
+        "path": "skills/atlas/scripts/import_matrix.py",
+        "bytes": 70624,
+        "sha256": "c15d1d0027c087e7f4fa711ded357333c37af3bc67cf320e459d775e46906e9b"
+      },
+      {
+        "path": "skills/atlas/scripts/workspace.py",
+        "bytes": 29330,
+        "sha256": "0a79e91c8f9898a73f1bfbf9d940a4c05c2309ee15ed938f9d74d8b9cb645ed7"
+      }
+    ],
+    "historical_source_preserved": true
   }
 }
