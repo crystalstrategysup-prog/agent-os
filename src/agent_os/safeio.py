@@ -186,6 +186,77 @@ def separated(a: Path, b: Path) -> None:
         raise GateError("core_and_user_roots_must_be_disjoint")
 
 
+_INVENTORY_CHUNK_BYTES = 1024 * 1024
+
+
+def _inventory_identity(metadata: os.stat_result) -> tuple[int, ...]:
+    """Read stability evidence, never a content-hash cache key."""
+    return (
+        metadata.st_dev,
+        metadata.st_ino,
+        metadata.st_mode,
+        metadata.st_size,
+        metadata.st_mtime_ns,
+        metadata.st_ctime_ns,
+    )
+
+
+def _hash_inventory_file(
+    path: Path, expected: os.stat_result, max_bytes: int, rel: str
+) -> str:
+    """Hash every byte with bounded memory and refuse observed file changes.
+
+    Each descriptor is checked against the earlier path observation, and both
+    descriptor and path are checked again after the complete read. This does not
+    make a multi-file inventory atomic or defend against a hostile same-UID peer.
+    """
+    flags = os.O_RDONLY | getattr(os, "O_BINARY", 0)
+    # NONBLOCK prevents a substituted FIFO from waiting for a writer before its
+    # descriptor can be rejected. It has no effect on a regular file.
+    flags |= getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+    try:
+        fd = os.open(path, flags)
+    except OSError as exc:
+        try:
+            current = path.lstat()
+        except (FileNotFoundError, NotADirectoryError):
+            raise GateError("inventory_file_changed:" + rel) from exc
+        if _inventory_identity(current) != _inventory_identity(expected):
+            raise GateError("inventory_file_changed:" + rel) from exc
+        raise
+    try:
+        before = os.fstat(fd)
+        if not stat.S_ISREG(before.st_mode):
+            raise GateError("regular_inventory_file_required:" + rel)
+        if _inventory_identity(before) != _inventory_identity(expected):
+            raise GateError("inventory_file_changed:" + rel)
+        hasher = hashlib.sha256()
+        consumed = 0
+        while True:
+            # One extra byte distinguishes exact-budget EOF from excess input.
+            chunk = os.read(fd, min(_INVENTORY_CHUNK_BYTES, max_bytes - consumed + 1))
+            if not chunk:
+                break
+            consumed += len(chunk)
+            if consumed > max_bytes:
+                raise GateError("tree_inventory_limit")
+            hasher.update(chunk)
+        after = os.fstat(fd)
+        try:
+            current = path.lstat()
+        except (FileNotFoundError, NotADirectoryError) as exc:
+            raise GateError("inventory_file_changed:" + rel) from exc
+        if (
+            consumed != expected.st_size
+            or _inventory_identity(after) != _inventory_identity(expected)
+            or _inventory_identity(current) != _inventory_identity(expected)
+        ):
+            raise GateError("inventory_file_changed:" + rel)
+        return hasher.hexdigest()
+    finally:
+        os.close(fd)
+
+
 def filemap(
     root: Path,
     *,
@@ -233,7 +304,9 @@ def filemap(
             total += size
             if len(result) >= limit or total > max_bytes:
                 raise GateError("tree_inventory_limit")
-            result[rel] = sha(path.read_bytes())
+            result[rel] = _hash_inventory_file(
+                path, metadata, max_bytes - total + size, rel
+            )
     for recheck in rechecks:
         recheck()
     return result

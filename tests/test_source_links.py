@@ -47,13 +47,13 @@ def linked(tmp_path):
 
 def test_exact_ru_shape_is_metadata_only_and_source_bound(linked, monkeypatch):
     root, link, target = linked
-    original = Path.read_bytes
+    original = safeio._hash_inventory_file
 
-    def no_alias_read(path):
+    def no_alias_read(path, *args):
         assert path != link and link not in path.parents
-        return original(path)
+        return original(path, *args)
 
-    monkeypatch.setattr(Path, "read_bytes", no_alias_read)
+    monkeypatch.setattr(safeio, "_hash_inventory_file", no_alias_read)
     snapshot = p.source_snapshot(root)
     rel = "backend/app/contracts"
     metadata = snapshot["symlinks"][rel]
@@ -69,7 +69,7 @@ def test_exact_ru_shape_is_metadata_only_and_source_bound(linked, monkeypatch):
     }
     assert snapshot["files"][rel] == digest(metadata)
     assert snapshot["files"]["backend/contracts/spec.json"] == sha(
-        original(target / "spec.json")
+        (target / "spec.json").read_bytes()
     )
     assert not any(name.startswith(rel + "/") for name in snapshot["files"])
     assert p.source_snapshot(root) == snapshot
@@ -366,12 +366,12 @@ def test_unsafe_aliases_refuse(linked, tmp_path, scenario):
 )
 def test_substitution_during_inventory_refuses(linked, monkeypatch, mutation):
     root, link, target = linked
-    original = Path.read_bytes
+    original = safeio._hash_inventory_file
     mutated = False
 
-    def mutate(path):
+    def mutate(path, *args):
         nonlocal mutated
-        data = original(path)
+        data = original(path, *args)
         if path == target / "spec.json" and not mutated:
             mutated = True
             if mutation in {"link", "same_link_replaced"}:
@@ -392,9 +392,10 @@ def test_substitution_during_inventory_refuses(linked, monkeypatch, mutation):
                 git(root, "rm", "--cached", "--", "backend/contracts/spec.json")
         return data
 
-    monkeypatch.setattr(Path, "read_bytes", mutate)
+    monkeypatch.setattr(safeio, "_hash_inventory_file", mutate)
     with pytest.raises(GateError, match="tracked_symlink_(identity|index)_changed"):
         p.source_snapshot(root)
+    assert mutated, "the race must occur on the actual inventory read path"
 
 
 def test_git_metadata_limits_and_failure_fail_closed(linked, monkeypatch):

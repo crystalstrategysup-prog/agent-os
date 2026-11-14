@@ -9,6 +9,7 @@ import test_foundation
 from test_foundation import documents, review, start
 
 from agent_os import project as p
+from agent_os import safeio
 from agent_os.handoff import Library, local_principal
 from agent_os.handoff_store import HandoffError, scan_secrets
 from agent_os.safeio import GateError
@@ -34,13 +35,13 @@ def package(root, generator="@eventcatalog/core", cache=".astro"):
 def test_known_generator_cache_without_body_reads(setup, monkeypatch, cache):
     root, _, _ = setup
     base, generated = package(root, sorted(GENERATORS[cache])[0], cache)
-    original = Path.read_bytes
+    original = safeio._hash_inventory_file
 
-    def guarded(path):
+    def guarded(path, *args):
         assert generated not in path.parents, "cache body must not be read"
-        return original(path)
+        return original(path, *args)
 
-    monkeypatch.setattr(Path, "read_bytes", guarded)
+    monkeypatch.setattr(safeio, "_hash_inventory_file", guarded)
     snapshot = p.source_snapshot(root)
     assert not any(x.startswith("portal/" + cache + "/") for x in snapshot["files"])
     assert {"portal/package.json", "portal/package-lock.json", "portal/src/page.astro"} <= snapshot["files"].keys()
