@@ -73,7 +73,11 @@ class WorkspaceTests(unittest.TestCase):
         self.assertEqual(started["packet"]["work"]["evidence"], [])
         pointer = json.loads((self.root / ".atlas/output/CURRENT.json").read_text())
         expected = self.root / ".atlas/output/releases" / pointer["release"] / "index.html"
-        self.assertEqual(started["view_path"], str(expected))
+        stable = self.root / ".atlas/output/index.html"
+        self.assertEqual(started["view_path"], str(stable))
+        self.assertEqual(started["current_view"]["status"], "CURRENT")
+        self.assertEqual(started["current_view"]["immutable_path"], str(expected))
+        self.assertEqual(stable.read_bytes(), expected.read_bytes())
         self.assertEqual(started["current"], pointer)
         self.assertTrue(expected.is_file())
         before = self.tree()
@@ -83,18 +87,24 @@ class WorkspaceTests(unittest.TestCase):
         self.assertEqual(self.cli("reconcile", "example")["status"], "READ_ONLY")
         page = self.cli("history", "example", "--limit", "1")
         self.assertEqual(len(page["revisions"]), 1)
-        self.assertEqual(page["view_path"], str(expected))
+        self.assertEqual(page["view_path"], str(stable))
+        self.assertEqual(page["current_view"]["immutable_path"], str(expected))
         self.assertEqual(before, self.tree())
         self.assertEqual(source, (self.root / "source/matrix.json").read_bytes())
 
     def test_material_change_new_view_and_actual_history_cursor(self):
         first = self.cli("refresh", "example")
+        first_immutable = Path(first["current_view"]["immutable_path"])
+        first_bytes = first_immutable.read_bytes()
         self.append()
         second = self.cli("finish", "example")
         self.assertEqual(second["status"], "IMPORTED_PARTIAL")
         self.assertIn("A", second["changed_work_ids"])
-        self.assertNotEqual(first["view_path"], second["view_path"])
-        self.assertTrue(Path(first["view_path"]).is_file())
+        self.assertEqual(first["view_path"], second["view_path"])
+        self.assertNotEqual(first["current_view"]["immutable_path"], second["current_view"]["immutable_path"])
+        self.assertNotEqual(first["current"]["release"], second["current"]["release"])
+        self.assertEqual(first_immutable.read_bytes(), first_bytes)
+        self.assertEqual(Path(second["view_path"]).read_bytes(), Path(second["current_view"]["immutable_path"]).read_bytes())
         first_page = self.cli("history", "example", "--limit", "1")
         self.assertEqual(len(first_page["revisions"]), 1)
         self.assertIsNotNone(first_page["next_cursor"])
@@ -192,10 +202,27 @@ class WorkspaceTests(unittest.TestCase):
         self.assertEqual(self.cli("audit", "example", code=1)["status"], "REFUSED")
         self.assertEqual(before, self.tree())
         current.write_bytes(pointer)
-        Path(refreshed["view_path"]).write_text("CORRUPT INDEX")
+        Path(refreshed["current_view"]["immutable_path"]).write_text("CORRUPT INDEX")
         before = self.tree()
         self.assertEqual(self.cli("packet", "example", "--work", "A", code=1)["status"], "REFUSED")
         self.assertEqual(before, self.tree())
+
+    def test_stale_alias_falls_back_without_read_side_repair(self):
+        refreshed = self.cli("refresh", "example")
+        alias = Path(refreshed["view_path"])
+        immutable = refreshed["current_view"]["immutable_path"]
+        for corrupt in (True, False):
+            with self.subTest(corrupt=corrupt):
+                if corrupt:
+                    alias.write_text("CORRUPT ALIAS")
+                else:
+                    alias.unlink()
+                before = self.tree()
+                packet = self.cli("packet", "example", "--work", "A")
+                self.assertEqual(packet["status"], "CONTEXT_LOADED")
+                self.assertEqual(packet["view_path"], immutable)
+                self.assertEqual(packet["current_view"]["status"], "STALE" if corrupt else "MISSING")
+                self.assertEqual(before, self.tree())
 
     def test_no_release_history_and_reconcile_are_read_only(self):
         before = self.tree()

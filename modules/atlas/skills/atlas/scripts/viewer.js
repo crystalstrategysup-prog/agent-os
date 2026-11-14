@@ -1992,6 +1992,7 @@
       if (hasChildren) identity.append(node('span', '· ' + row.children.length + ' вложенных', 'branch-count')); heading.append(identity);
       if (snapshot.atlas.localized_fields) for(const field of ['objective','scope_note']){const value=displayField(presentation,row.id,'work.'+field);if(value.value!==undefined&&value.status!=='ORIGINAL'){const note=node('p',displayText(presentation,row.id,'work.'+field),'cell-note');note.dataset.displayField=field;note.title=value.status;heading.append(note);}}
       if (!matrix) {
+        heading.append(workBadges(item));
         const nativeSummary = node('details', null, 'native-row-summary'); nativeSummary.append(node('summary', 'Результат / следующий шаг'));
         if (item.parent_id) links(nativeSummary, 'Дочерняя работа для', [item.parent_id], 'work');
         nativeSummary.append(node('p', workDisplayField(item,'outcome') || displayText(presentation,item.id,'work.objective') || ''), node('p', 'Record owner: ' + textValue(item.writer)), node('p', 'Accepted criteria ' + criterionProgress(item)));
