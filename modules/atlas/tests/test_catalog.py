@@ -142,6 +142,51 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(record["parameters"][1]["required"], "UNKNOWN")
         self.assertEqual(json.loads(record["input"])["requestBody"], {"$ref": "#/components/requestBodies/A"})
 
+    def test_reference_descriptions_follow_version_and_nearest_override(self):
+        schema = {"$ref": "#/components/schemas/Text", "description": "Schema annotation", "minLength": 2}
+        for version in ("3.0.3", "3.1.1"):
+            for outer in (False, True):
+                with self.subTest(version=version, outer=outer):
+                    components = {"schemas": {"Text": {"type": "string", "description": "Shared schema"}}}
+                    references = {}
+                    definitions = {
+                        "parameters": {"name": "limit", "in": "query", "required": False, "schema": schema},
+                        "requestBodies": {"required": False, "content": {"application/json": {"schema": schema}}},
+                        "responses": {"content": {"application/json": {"schema": schema}}},
+                    }
+                    for kind, definition in definitions.items():
+                        components[kind] = {
+                            "Base": {**definition, "description": "Base " + kind},
+                            "Middle": {"$ref": "#/components/" + kind + "/Base", "description": "Middle " + kind},
+                        }
+                        references[kind] = {"$ref": "#/components/" + kind + "/Middle",
+                            "required": True, "summary": "Ignored for these object types", "schema": False}
+                        if outer:
+                            references[kind]["description"] = "Outer " + kind
+                    source = {"openapi": version, "components": components, "paths": {"/x": {"post": {
+                        "parameters": [references["parameters"]], "requestBody": references["requestBodies"],
+                        "responses": {"4XX": references["responses"]}}}}}
+                    before = catalog.compact(source)
+                    record = catalog.from_openapi(source, "DOC-API", "api.json")["contracts"][0]
+                    inputs = json.loads(record["input"])
+                    meaning = json.loads(record["errors"][0]["meaning"])
+                    prefix = ("Outer " if outer else "Middle ") if version.startswith("3.1.") else "Base "
+                    self.assertEqual(inputs["parameters"][0]["description"], prefix + "parameters")
+                    self.assertEqual(record["parameters"][0]["description"], "location=query; " + prefix + "parameters")
+                    self.assertEqual(inputs["requestBody"]["description"], prefix + "requestBodies")
+                    self.assertEqual(record["parameters"][1]["description"], prefix + "requestBodies")
+                    self.assertEqual(meaning["description"], prefix + "responses")
+                    # Reference Object siblings cannot replace arbitrary fields or
+                    # apply Reference Object rules to a nested Schema Object.
+                    self.assertIs(record["parameters"][0]["required"], False)
+                    self.assertIs(record["parameters"][1]["required"], False)
+                    self.assertEqual(json.loads(record["parameters"][0]["type"]), schema)
+                    self.assertEqual(inputs["requestBody"]["content"]["application/json"]["schema"], schema)
+                    self.assertEqual(meaning["content"]["application/json"]["schema"], schema)
+                    self.assertNotIn("summary", inputs["parameters"][0])
+                    self.assertNotIn("required", meaning)
+                    self.assertEqual(catalog.compact(source), before)
+
     def test_unsupported_versions_are_not_reported_as_compiled(self):
         for version in ("2.0", "3.2.0", "4.0.0", "garbage", None):
             with self.subTest(version=version):
