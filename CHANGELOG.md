@@ -10,6 +10,8 @@
   regression checks with the current stable-view and immutable-history contract.
 - Document module ownership, lightweight routes and project API workflows;
   reconcile current resource pins without rewriting historical provenance.
+- Explain explicit contract-to-work bindings before catalog pinning and the
+  original specification needed beyond compact API cards and packets.
 - Source/package qualification only; no target installation or running-client
   adoption is inferred from these changes.
 

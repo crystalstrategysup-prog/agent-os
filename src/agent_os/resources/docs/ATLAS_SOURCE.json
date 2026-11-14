@@ -418,8 +418,8 @@
     },
     {
       "path": "skills/atlas/references/catalogs.md",
-      "bytes": 5323,
-      "sha256": "9c865756ce8734d01e25d098f552838b84ca28b99ffb7e79c113468c5533921f",
+      "bytes": 7093,
+      "sha256": "a4f49e0fa6fe59383dc8402ea8f8b6f30242b1685379270b968069f8606c0aa7",
       "source_bytes": 4763,
       "source_sha256": "724023b116973c12056dac4b1968abf6972a64f87d35dabe2cac1a39f45da070"
     },
@@ -979,7 +979,7 @@
   },
   "schema": "agent-os.atlas-source/v1",
   "selected_file_count": 74,
-  "selected_tree_sha256": "e9c42dbeb8e3affabf31611d219ad9178bf7ca981e6e2dcfc3956418028202f7",
+  "selected_tree_sha256": "78cd9626388e2777f58866972878f34d31f23bd01b7331cd363e8b84c4217adb",
   "source_commit_reported": "1b7cd88",
   "source_file_count": 64,
   "source_tree_sha256": "15b36a79f1133be8cb790d61f0dff6562262196b0eb8c3ea15c41a9700dd6bab",
@@ -1118,7 +1118,7 @@
       "bytes": 49086,
       "sha256": "ce214153307be61277071ab2e80175f0667e1423e6e59d003bc55400e12d528d"
     },
-    "scope": "Bounded OpenAPI declaration fidelity; native activity badges; current-view regression and contract alignment. Historical source_* values retained.",
+    "scope": "Bounded OpenAPI declaration fidelity; native activity badges; current-view regression and contract alignment. Historical source_* values retained. Explicit work binding and compact-card completeness guidance from an isolated packaged API workflow.",
     "qualification": "SOURCE_CANDIDATE; PACKAGING_AND_TARGET_ADOPTION_REQUIRE_SEPARATE_RECEIPTS"
   }
 }
