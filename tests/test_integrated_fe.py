@@ -3,12 +3,12 @@ import os
 from pathlib import Path
 import subprocess
 import sys
-from agent_os import fe_module
+from agent_os import __version__, fe_module
 from agent_os.module_registry import verify
 
 def test_pinned_module_registry_and_release():
     result=verify()
-    assert result['status']=='PASS' and result['release']=='0.8.0rc2041'
+    assert result['status']=='PASS' and result['release']==__version__
     assert set(result['modules'])=={'agentos','atlas','function-extractor'}
 
 def test_fe_version_works_without_platform_checkout(monkeypatch, tmp_path):

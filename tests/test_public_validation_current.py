@@ -8,13 +8,15 @@ spec.loader.exec_module(validator)
 
 
 def test_current_and_future_matching_versions_are_not_pinned_to_rc2():
-    for version in ["0.8.0rc2033", "0.9.0"]:
+    for version in ["0.8.0rc2033", "0.8.0rc2041+agentas3", "0.8.0rc2042", "0.9.0"]:
         assert validator.version_matches('[project]\nversion = "' + version + '"\n', version)
 
 
 def test_mismatched_or_absent_version_is_rejected():
     assert not validator.version_matches('[project]\nversion = "0.9.0"', "0.8.0rc2033")
     assert not validator.version_matches('[project]\nname = "example"', "0.8.0rc2033")
+    assert not validator.version_matches('not valid toml', "0.8.0rc2042")
+    assert not validator.version_matches('[project]\nversion = "arbitrary"', "arbitrary")
 
 
 def test_atlas_is_allowed_only_at_declared_mirror_locations():
@@ -27,3 +29,7 @@ def test_atlas_is_allowed_only_at_declared_mirror_locations():
 def test_unknown_or_malformed_skill_is_rejected():
     assert validator.skill_name(Path("x/SKILL.md"), "---\nname: arbitrary\ndescription: bad\n---\n") is None
     assert validator.skill_name(Path("x/SKILL.md"), "not a skill") is None
+    text = "---\nname: agentos-project-entry\ndescription: Canonical skill\n---\n"
+    assert validator.skill_name(Path("src/agent_os/resources/skills/agentos-project-entry/SKILL.md"), text) == "agentos-project-entry"
+    assert validator.skill_name(Path("src/agent_os/resources/skills/agentos-other/SKILL.md"), text) is None
+    assert validator.skill_name(Path("src/agent_os/resources/skills/agentos-project-entry/nested/SKILL.md"), text) is None

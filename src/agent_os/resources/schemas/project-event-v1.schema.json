@@ -103,6 +103,95 @@
                   "diagnostic_receipt"
                 ],
                 "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "diagnostic_receipt": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "maximum": 16384,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "path": {
+                        "pattern": "^\\.agentos/tasks/task-[0-9a-f]{16}/diagnostics/[0-9a-f]{32}\\.json$",
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "path",
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "full_goal": {
+                    "const": "OPEN"
+                  },
+                  "native_origin": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "observation_ref": {
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,299}$",
+                        "type": "string"
+                      },
+                      "observation_sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      },
+                      "thread_id": {
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                        "type": "string"
+                      },
+                      "turn_id": {
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "thread_id",
+                      "turn_id",
+                      "observation_ref",
+                      "observation_sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "operation_id": {
+                    "pattern": "^[0-9a-f]{32}$",
+                    "type": "string"
+                  },
+                  "original_attempt_id": {
+                    "pattern": "^[0-9a-f]{32}$",
+                    "type": "string"
+                  },
+                  "partial_objects": {
+                    "const": "UNKNOWN"
+                  },
+                  "refusal_witness_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "schema": {
+                    "const": "agentos.refusal-recovery-receipt/v3"
+                  }
+                },
+                "required": [
+                  "operation_id",
+                  "refusal_witness_sha256",
+                  "full_goal",
+                  "partial_objects",
+                  "schema",
+                  "original_attempt_id",
+                  "diagnostic_receipt",
+                  "native_origin"
+                ],
+                "type": "object"
               }
             ]
           }

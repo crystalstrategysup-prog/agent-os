@@ -1,6 +1,28 @@
+# 0.8.0rc2042+atlas.5 — combined engineering candidate
+
+Preserve scoped file admission and integrate the canonical recovery v3 source. Diagnostic and provenance qualification is recorded separately.
+
 # Scoped admission candidate
 
 0.8.0rc2041+scoped1 adds finite same-task file application with pinned metadata, protected-path checks, durable reconciliation and separate scoped acceptance. No whole-project READY is inferred. See docs/SCOPED_ADMISSION.md.
+
+# 0.8.0rc2042 — public release qualification
+
+- Restore callable public version/skill validators and require exact declared skill locations and names. Preserve privacy markers and secret scanning.
+- Compare the integrated module registry with the current package version instead of a stale candidate literal.
+- Retain the reviewed bounded recovery v3 adapter without changing its observer, CAS, journal or capacity guards.
+
+# 0.8.0rc2041+agentas3 — bounded recovery adapter candidate
+
+- Add a v3 acknowledge/advance/reconcile entry using the existing supported-tool stdio bridge and original response accounting. Recovery and observer guards remain unchanged.
+- Retain the exact missing historical-origin capability when the selected provider cannot reach the origin within its existing finite horizon. No invented cursor, saved-observation fallback or limit increase.
+- Source/package candidate only. Independent final-byte review, installation and actual recovery remain separate.
+
+# 0.8.0rc2041+agentas2 — source-only recovery v3 candidate
+
+- Add a separate workflow/native-turn recovery v3 branch; preserve v1/v2 behavior.
+- Retain raw workflow IDs, whole modern witness and exact metadata CAS. Require the existing selected supported native observer for v3; native B must advance to a different active turn after the origin becomes inactive.
+- This source checkpoint is uninstalled and pending independent review. It grants no real recovery or managed adoption authority.
 
 # 0.8.0rc2041+agentas1 — installed source candidate
 

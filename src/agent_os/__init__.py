@@ -1,3 +1,3 @@
 """Public AgentOS foundation. User data never belongs in this package."""
 
-__version__ = "0.8.0rc2041+scoped2"
+__version__ = "0.8.0rc2042+atlas.5"
