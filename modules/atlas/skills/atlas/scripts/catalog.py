@@ -7,11 +7,13 @@ import os
 from pathlib import Path
 import re
 import tempfile
+from urllib.parse import unquote
 
 import navigator as nav
 
 VERSION = "ATLAS-CATALOG-1.0.0"
 METHODS = ("get", "put", "post", "delete", "options", "head", "patch", "trace")
+MAX_REF_HOPS = 64
 
 
 def identity(prefix, value):
@@ -22,8 +24,8 @@ def compact(value):
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False)
 
 
-def field(value, pointer, fallback="UNKNOWN: not declared in selected source"):
-    if value is None or value == [] or value == {} or value == "":
+def field(value, pointer, fallback="UNKNOWN: not declared in selected source", *, preserve_empty=False):
+    if value is None or (not preserve_empty and (value == [] or value == {} or value == "")):
         return fallback
     text = value if isinstance(value, str) else compact(value)
     if len(text) <= 18000:
@@ -50,51 +52,122 @@ def card(key, title, mid, doc, source, pointer, version):
             "docs": [doc], "evidence_state": "FACT", "execution": "NOT_RUN"}
 
 
-def local_ref(document, value):
-    if not isinstance(value, dict) or "$ref" not in value:
-        return value
-    ref = value["$ref"]
+def local_object(document, ref):
+    """Resolve one document-local JSON pointer without opening any resource."""
     if not isinstance(ref, str) or not ref.startswith("#/"):
-        return value
+        return None
     found = document
     try:
-        for token in ref[2:].split("/"):
-            found = found[token.replace("~1", "/").replace("~0", "~")]
-    except (KeyError, TypeError):
-        return value
-    return found if isinstance(found, dict) and "$ref" not in found else value
+        for token in unquote(ref[2:], errors="strict").split("/"):
+            if re.search(r"~(?![01])", token):
+                return None
+            token = token.replace("~1", "/").replace("~0", "~")
+            if isinstance(found, list):
+                if not re.fullmatch(r"0|[1-9][0-9]*", token):
+                    return None
+                found = found[int(token)]
+            else:
+                found = found[token]
+    except (KeyError, IndexError, TypeError, ValueError, UnicodeError):
+        return None
+    return found if isinstance(found, dict) else None
+
+
+def local_ref(document, value):
+    """Retain the original reference when a bounded local chain is unresolved."""
+    current, seen = value, set()
+    for hops in range(MAX_REF_HOPS + 1):
+        if not isinstance(current, dict) or "$ref" not in current:
+            return current
+        ref = current["$ref"]
+        if hops == MAX_REF_HOPS or not isinstance(ref, str) or ref in seen:
+            return value
+        seen.add(ref)
+        current = local_object(document, ref)
+        if current is None:
+            return value
+    return value
+
+
+def path_item(document, value, pointer, source_path):
+    """Collect referenced path declarations and their actual source pointers."""
+    result, origins, seen = {}, {}, set()
+    for hops in range(MAX_REF_HOPS + 1):
+        nav.require(isinstance(value, dict), "OPENAPI_PATH_ITEM_OBJECT")
+        own = {key: item for key, item in value.items() if key != "$ref"}
+        # OpenAPI leaves overlapping referenced/sibling fields undefined.
+        nav.require(not result.keys() & own.keys(), "OPENAPI_PATH_ITEM_REF_CONFLICT")
+        result.update(own)
+        origins.update({key: pointer + "/" + key.replace("~", "~0").replace("/", "~1") for key in own})
+        if "$ref" not in value:
+            return result, origins
+        ref = value["$ref"]
+        nav.require(hops < MAX_REF_HOPS and isinstance(ref, str) and ref not in seen,
+                    "OPENAPI_PATH_ITEM_REF_UNRESOLVED")
+        seen.add(ref)
+        value = local_object(document, ref)
+        nav.require(value is not None, "OPENAPI_PATH_ITEM_REF_UNRESOLVED")
+        pointer = source_path + ref
+    raise nav.Invalid("OPENAPI_PATH_ITEM_REF_UNRESOLVED")
+
+
+def operation_parameters(document, paths, operation):
+    """Override only known name/location identities; retain every unknown ref."""
+    result, known = [], {}
+    for items in (paths.get("parameters", []), operation.get("parameters", [])):
+        nav.require(isinstance(items, list), "OPENAPI_PARAMETERS_ARRAY")
+        for item in items:
+            item = local_ref(document, item)
+            nav.require(isinstance(item, dict), "OPENAPI_PARAMETER_OBJECT")
+            key = None
+            if "$ref" not in item and isinstance(item.get("name"), str) and isinstance(item.get("in"), str):
+                key = (item["name"], item["in"])
+            if key is not None and key in known:
+                result[known[key]] = item
+            else:
+                if key is not None:
+                    known[key] = len(result)
+                result.append(item)
+    return result
 
 
 def from_openapi(document, doc, source_path):
     nav.require(isinstance(document, dict) and isinstance(document.get("paths"), dict) and "openapi" in document, "OPENAPI_SOURCE_REQUIRED")
+    nav.require(isinstance(document["openapi"], str) and re.fullmatch(r"3\.(?:0|1)\.[0-9]+", document["openapi"]),
+                "OPENAPI_VERSION_UNSUPPORTED")
     catalog = empty_catalog()
-    for route, paths in sorted(document["paths"].items()):
-        if not isinstance(paths, dict):
+    for route, declared_path in sorted(document["paths"].items()):
+        if route.startswith("x-"):
             continue
+        nav.require(route.startswith("/"), "OPENAPI_PATH_REQUIRED")
+        path_pointer = source_path + "#/paths/" + route.replace("~", "~0").replace("/", "~1")
+        paths, origins = path_item(document, declared_path, path_pointer, source_path)
         for method in METHODS:
             operation = paths.get(method)
             if not isinstance(operation, dict):
                 continue
-            pointer = source_path + "#/paths/" + route.replace("~", "~0").replace("/", "~1") + "/" + method
+            pointer = origins[method]
             tags = operation.get("tags") or ["Untagged API"]
             mid = module(catalog, str(tags[0]), doc)
             c = card(method.upper() + " " + route, method.upper() + " " + route + " · " + str(operation.get("summary") or operation.get("operationId") or "operation"), mid, doc, operation, pointer, document.get("info", {}).get("version", "UNKNOWN"))
-            parameters = {}
-            for item in [*paths.get("parameters", []), *operation.get("parameters", [])]:
-                item = local_ref(document, item)
-                if isinstance(item, dict):
-                    parameters[(item.get("name", "UNKNOWN"), item.get("in", "UNKNOWN"))] = item
-            for (name, where), p in parameters.items():
+            parameters = operation_parameters(document, paths, operation)
+            for p in parameters:
+                name, where = p.get("name", "UNKNOWN"), p.get("in", "UNKNOWN")
                 required = "UNKNOWN" if "$ref" in p else p.get("required", False)
-                c["parameters"].append({"name": str(name), "type": field(p.get("schema") or p.get("content"), pointer + "/parameters", "UNKNOWN: unresolved parameter schema"),
+                schema = None if "$ref" in p else p["schema"] if "schema" in p else p.get("content")
+                c["parameters"].append({"name": str(name), "type": field(schema, pointer + "/parameters", "UNKNOWN: unresolved parameter schema", preserve_empty="schema" in p),
                                          "required": required if type(required) is bool else "UNKNOWN", "description": "location=" + str(where) + "; " + field(p.get("description"), pointer + "/parameters", "No description declared")})
             body = local_ref(document, operation.get("requestBody", {}))
+            nav.require(isinstance(body, dict), "OPENAPI_REQUEST_BODY_OBJECT")
             if body:
-                c["parameters"].append({"name": "requestBody", "type": field(body.get("content"), pointer + "/requestBody/content"), "required": body.get("required", False) if type(body.get("required", False)) is bool else "UNKNOWN", "description": field(body.get("description"), pointer + "/requestBody", "OpenAPI request body declaration; referenced schemas remain in the retained document")})
-            c["input"] = field({"method": method.upper(), "path": route, "parameters": list(parameters.values()), "requestBody": body}, pointer)
+                required = "UNKNOWN" if "$ref" in body else body.get("required", False)
+                c["parameters"].append({"name": "requestBody", "type": field(body.get("content"), pointer + "/requestBody/content"), "required": required if type(required) is bool else "UNKNOWN", "description": field(body.get("description"), pointer + "/requestBody", "OpenAPI request body declaration; referenced schemas remain in the retained document")})
+            c["input"] = field({"method": method.upper(), "path": route, "parameters": parameters, "requestBody": body}, pointer)
             c["output"] = field(operation.get("responses"), pointer + "/responses")
-            for code, response in operation.get("responses", {}).items():
-                if code == "default" or (str(code).isdigit() and int(code) >= 400):
+            responses = operation.get("responses", {})
+            nav.require(isinstance(responses, dict), "OPENAPI_RESPONSES_OBJECT")
+            for code, response in responses.items():
+                if code in ("default", "4XX", "5XX") or (str(code).isdigit() and int(code) >= 400):
                     c["errors"].append({"code": str(code), "meaning": field(local_ref(document, response), pointer + "/responses/" + str(code))})
             if "security" in operation or "security" in document:
                 c["auth"] = "Declared OpenAPI security; runtime enforcement not tested: " + field(operation.get("security", document.get("security")), pointer + "/security", "Explicit empty security declaration")
