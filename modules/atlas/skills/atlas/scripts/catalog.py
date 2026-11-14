@@ -76,9 +76,18 @@ def local_object(document, ref):
 def local_ref(document, value):
     """Retain the original reference when a bounded local chain is unresolved."""
     current, seen = value, set()
+    version = document.get("openapi", "")
+    allow_description = isinstance(version, str) and version.startswith("3.1.")
+    description = None
     for hops in range(MAX_REF_HOPS + 1):
         if not isinstance(current, dict) or "$ref" not in current:
+            if isinstance(current, dict) and description is not None:
+                return {**current, "description": description}
             return current
+        # Parameter, Request Body and Response Reference Objects allow only
+        # description overrides here. Schema Objects are retained, not resolved.
+        if allow_description and description is None and isinstance(current.get("description"), str):
+            description = current["description"]
         ref = current["$ref"]
         if hops == MAX_REF_HOPS or not isinstance(ref, str) or ref in seen:
             return value

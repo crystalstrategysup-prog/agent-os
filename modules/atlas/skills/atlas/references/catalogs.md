@@ -65,6 +65,13 @@ parameters and request bodies remains `UNKNOWN`. Distinct unresolved parameter
 references remain separate; only parameters with a known `(name, in)` identity
 can be overridden by the operation's parameter declaration.
 
+For locally resolved parameter, request-body, and response references in OpenAPI
+3.1, a Reference Object's `description` overrides the target description; the
+override nearest to the operation wins along a reference chain. OpenAPI 3.0
+ignores these reference siblings. Arbitrary sibling fields do not override the
+target. Nested Schema Objects retain their original keywords, including `$ref`
+and its siblings; the compiler does not evaluate JSON Schema.
+
 Local Path Item references are followed to enumerate the operations and preserve
 their source pointers. A referenced Path Item may add fields absent from its
 siblings. Overlapping fields have [undefined behavior in OpenAPI](https://spec.openapis.org/oas/v3.1.1.html#path-item-object) and return
