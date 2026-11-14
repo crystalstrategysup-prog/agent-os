@@ -42,7 +42,7 @@ or changing files; calling it is not a prerequisite for answering a question.
 
 ## Modular project and API work
 
-Use the [module map and project API workflow](docs/INTEGRATED_MODULES.md) to
+Use the [module map and project API workflow](docs/MODULAR_PROJECT_API.md) to
 select the owner and the smallest sufficient route. The foundation keeps local
 execution evidence; Atlas derives views from selected project documents;
 Function Extractor remains an isolated optional tool; projects own their API

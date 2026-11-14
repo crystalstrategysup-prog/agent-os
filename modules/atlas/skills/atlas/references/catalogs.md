@@ -4,6 +4,9 @@
 It reads a local file and returns JSON. It does not execute product commands,
 HTTP, SSH, dependency installation, or external references.
 
+Sections: [work packets](#bind-a-work-packet), [result meaning](#meaning-of-the-result),
+[supported OpenAPI](#openapi-boundaries), [size and history](#size-and-history).
+
 Three source forms are supported:
 
 | Format | Content transferred |
@@ -30,10 +33,37 @@ python3 -B "$atlas_scripts/catalog.py" --root "$project_root" --source docs/cata
 ```
 
 `document_id` is the logical ID of a document already registered in `UPSTREAM.documents`.
-Pin the prepared catalog by `path/bytes/sha256` in `UPSTREAM.semantic_catalog`.
-The writer saves this one delta and calls `refresh`; the importer binds card
-versions to specific document versions. The exact format of additional work and
-patch links is described in [upstream-adapter.md](upstream-adapter.md).
+Prepare any work bindings below, then pin the final catalog bytes by
+`path/bytes/sha256` in `UPSTREAM.semantic_catalog`. The writer saves this one
+delta and calls `refresh`; the importer binds cards to document versions.
+
+## Bind a work packet
+
+Compilation does not know which existing work item needs each contract.
+Before pinning the catalog, fill its `work_bindings` array with explicit links
+from existing source work IDs to generated contract IDs. Set `work_bindings`
+to an array like this, replacing the example IDs with actual selected IDs:
+
+```json
+[
+  {
+    "work_id": "WORK-ORDERS",
+    "entity_ids": ["CTR-60c1988d2d193d9b7d023f95"]
+  }
+]
+```
+
+Select the contract ID from the compiled `contracts` entries; do not invent an
+ID or derive work ownership from its tag. A packet expands declared contract
+dependencies, modules and their documents. Add other document IDs explicitly
+when that work needs them. If the catalog remains unbound, its cards are visible
+globally but a work-specific `packet` may correctly contain no contracts,
+modules or documents. After refresh, read the selected work packet and check
+its entity IDs. Recompute the catalog pin after any binding edit.
+
+See [Declarative relationship catalogue](upstream-adapter.md#declarative-relationship-catalogue)
+for the full binding and patch-link contract. This step preserves the existing
+writer and work matrix; it creates no second plan or new execution authority.
 
 ## Meaning of the result
 
@@ -43,6 +73,13 @@ is a documentation group, not an established data owner. Missing authorization,
 input, or result remains `UNKNOWN`. External `$ref` values are not loaded; their
 requiredness is not invented. A large value is replaced with an exact pointer
 and the SHA of its canonical serialization; the full source remains alongside it.
+
+A compact card or CLI packet is not a self-contained API client specification.
+Nested schemas, successful response references, security-scheme definitions,
+server URLs and unprojected descriptions may require the original OpenAPI.
+Packet documents identify retained files by path, SHA and bytes, rather than
+embedding every body. Read those pinned sources before constructing an API call;
+neither a catalog import nor a work binding grants permission to execute it.
 
 The catalog does not reopen historically accepted work or assign new product
 checks. The scope of earlier acceptance comes from its original receipt. New

@@ -5,7 +5,13 @@ Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labe
 
 ## 0.8.0rc2 public source candidate
 
-Stable 0.7.1 carries the reviewed indexed results, coordinator and model-policy source contracts. Live adoption and physical session cleanup are separate/unimplemented boundaries. See [indexed handoff](INDEXED_HANDOFF.md).
+Start with the [module map and project API workflow](MODULAR_PROJECT_API.md),
+[current interfaces](CONTRACTS.md) and the relevant module's contract. The current
+version comes from source metadata and artifact receipts, not a historical
+section heading. Live adoption and physical session cleanup remain separate
+work. The indexed results, coordinator and model-policy contracts introduced in
+stable 0.7.1 remain in [indexed handoff](INDEXED_HANDOFF.md),
+[coordination](WORK_COORDINATION.md) and [model selection](MODEL_SELECTION.md).
 
 The public source declares `0.8.0rc2`; publication, installation and target verification remain separate. Ordinary questions and read-only work need
 no project intake; real project changes follow a documentation-first stage.

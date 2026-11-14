@@ -223,9 +223,13 @@ a matched document pin in the published snapshot.
 
 `current_view.status = CURRENT` selects the stable `output/index.html` for
 `view_path` and section URLs. It is byte-identical to the verified immutable HTML.
-Reloading this URL shows later successful publications. Other current-view states
-retain the verified immutable path with their explicit qualifier; `views` does
-not repair them. `artifacts.html` and `artifacts.json` always name the immutable
+Reloading this URL shows later successful publications. A `STALE` alias makes
+`views` return `REFUSED` with `OUTPUT_FILE_HASH`; it does not repair corruption.
+Other qualified current-view states retain the verified immutable path.
+General read commands such as `packet` and `audit` may also return that verified
+immutable fallback for a stale alias, with `current_view.status = STALE`.
+They still refuse a corrupt CURRENT or immutable release and never repair on
+read. `artifacts.html` and `artifacts.json` always name the immutable
 release, suitable for history and downloads. A downloaded file or immutable URL
 does not advance to a new release when reloaded. Neither URL watches source code
 or automatically refreshes the browser.

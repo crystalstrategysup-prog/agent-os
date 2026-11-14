@@ -148,10 +148,14 @@ def test_substitution_before_open_is_refused(tmp_path, monkeypatch, replacement)
     destination.write_bytes(b"different")
 
     def substitute():
-        path.unlink()
         if replacement == "regular":
+            # Keep the old inode allocated: immediate unlink/recreate can reuse
+            # its inode and indistinguishable timestamp on fast filesystems.
+            path.rename(tmp_path / "original-held.bin")
             path.write_bytes(b"original")
-        elif replacement == "directory":
+        else:
+            path.unlink()
+        if replacement == "directory":
             path.mkdir()
         elif replacement == "symlink":
             path.symlink_to(destination.name)

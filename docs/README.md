@@ -5,7 +5,7 @@ Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labe
 
 ## 0.8.0rc2 public source candidate
 
-Start with the [module map and project API workflow](INTEGRATED_MODULES.md),
+Start with the [module map and project API workflow](MODULAR_PROJECT_API.md),
 [current interfaces](CONTRACTS.md) and the relevant module's contract. The current
 version comes from source metadata and artifact receipts, not a historical
 section heading. Live adoption and physical session cleanup remain separate

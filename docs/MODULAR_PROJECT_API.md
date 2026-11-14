@@ -56,14 +56,20 @@ establishes them.
    `UPSTREAM.documents` entry. Compilation reads data and returns
    `atlas.semantic-catalog/v1`; it performs no HTTP request or external `$ref`
    retrieval. Unresolved references remain explicit.
-4. **Bind the derived view.** The owning writer pins the prepared catalog by
-   `path/bytes/sha256` in `UPSTREAM.semantic_catalog` and refreshes the selected
-   projection. Stable operation IDs, module documents and source pointers
-   keep changes attributable. An OpenAPI tag is not a state owner declaration.
+4. **Bind the derived view and selected work.** Add explicit `work_bindings`
+   from existing work IDs to generated contract IDs when task packets need API
+   context; the catalog guide gives the exact shape. Without these links a
+   global catalog may be present while the selected work packet is empty.
+   The owning writer pins the final catalog bytes by `path/bytes/sha256` in
+   `UPSTREAM.semantic_catalog`, refreshes and checks the selected packet IDs.
+   Declared dependencies pull in modules and source documents; unrelated
+   documents need explicit links. Tags do not establish work or state ownership.
 5. **Verify the changed contract in the project.** Check relevant request,
    response, authorization, compatibility and consumer behavior using the
    project's tests and authorized environment. A catalog declaration is
-   `FACT` about source and `execution=NOT_RUN` about product execution.
+   `FACT` about source and `execution=NOT_RUN` about product execution. Read
+   retained pinned OpenAPI files for schemas, successful response refs, server
+   URLs and security-scheme definitions omitted from compact cards/packets.
 6. **Return evidence once.** Report source revision, affected contracts,
    observed checks, remaining unknowns and next owner. Existing accepted work
    is not reopened merely because it was imported into Atlas.
