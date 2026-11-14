@@ -75,7 +75,7 @@ def wheel_continuation_schemas(wheel: Path) -> list[str]:
                 return []
             if archive.namelist().count(name) != 1 or archive.getinfo(name).file_size > 4096:
                 raise InstallError("wheel_continuation_capabilities_invalid")
-            value = json.loads(archive.read(name))
+            value = json.loads(archive.read(name), object_pairs_hook=unique_object)
     except (BadZipFile, UnicodeError, json.JSONDecodeError) as exc:
         raise InstallError("wheel_continuation_capabilities_invalid") from exc
     if isinstance(value, dict) and value.get('schema') == 'agentos.continuation-capabilities/v2':
@@ -105,7 +105,7 @@ def wheel_coordination_schemas(wheel: Path) -> list[str]:
                 return ["agentos.work-coordination/v1"]
             if archive.namelist().count(name) != 1 or archive.getinfo(name).file_size > 4096:
                 raise InstallError("wheel_completion_capabilities_invalid")
-            value = json.loads(archive.read(name))
+            value = json.loads(archive.read(name), object_pairs_hook=unique_object)
     except (BadZipFile, UnicodeError, json.JSONDecodeError) as exc:
         raise InstallError("wheel_completion_capabilities_invalid") from exc
     expected = {
