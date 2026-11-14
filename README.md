@@ -40,6 +40,21 @@ No registration, answers file, profile interview, observe receipt or closeout is
 Optional `agentos workflow route --kind audit` explains the route without reading overlay
 or changing files; calling it is not a prerequisite for answering a question.
 
+## Modular project and API work
+
+Use the [module map and project API workflow](docs/INTEGRATED_MODULES.md) to
+select the owner and the smallest sufficient route. The foundation keeps local
+execution evidence; Atlas derives views from selected project documents;
+Function Extractor remains an isolated optional tool; projects own their API
+implementation and compatibility. Local accounting is opt-in and does not
+replace an already active task or grant external authority.
+
+Atlas imports OpenAPI 3.0.x/3.1.x JSON, explicit record catalogs and operation
+registries without calling the described API. Keep the original specification,
+source IDs and unresolved references. Swagger 2.0, YAML and OpenAPI 3.2 require
+an explicit separately validated conversion; the compiler does not treat them
+as supported input. A successful catalog import does not prove runtime behavior.
+
 ## Connection scenarios
 
 The public foundation includes an indexed catalog of versioned connection
@@ -92,7 +107,7 @@ agentos project enter --root /absolute/path/to/project \
 ## Interfaces and boundaries
 
 - The stdio MCP server exposes six narrow planning/status tools. `tools/list` includes versioned input and output schemas; it does not expose arbitrary shell, SSH, file contents or credentials. See [MCP contract](schemas/mcp-tools-v1.json).
-- The [CLI contract](schemas/cli-contract-v1.json), [data schemas](src/agent_os/resources/schemas/) and [contracts guide](docs/CONTRACTS.md) describe the machine-readable surfaces. No HTTP server is provided, so OpenAPI is not applicable to this release.
+- The [CLI contract](schemas/cli-contract-v1.json), [data schemas](src/agent_os/resources/schemas/) and [contracts guide](docs/CONTRACTS.md) describe the machine-readable surfaces. AgentOS has no HTTP server; Atlas can index project-owned OpenAPI declarations through its separate catalog compiler.
 - Codex AGENTS and namespaced skills can be integrated while preserving other owners' content. **No native hooks are created or restored.** Read back effective instructions in a fresh client session; do not claim a universal tool sandbox.
 - The optional Telegram Session Hub remains owner-allowlisted and disabled by default. Read [compatibility](docs/COMPATIBILITY.md) before replacing any existing connector.
 - Existing model routing, current-evidence result assessment, Full Inventory and update advisory remain available through the CLI. Their contracts and limits are in [architecture](docs/ARCHITECTURE.md), [result evidence](docs/RESULT_EVIDENCE.md), [Full Inventory](docs/FULL_INVENTORY.md) and [update checks](docs/UPDATE_CHECK.md).

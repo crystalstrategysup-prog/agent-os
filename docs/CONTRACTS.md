@@ -3,9 +3,10 @@
 Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 
-## Historical: Indexed handoff successor0.7.0rc1
+## Current interface map
 
-Library Python/CLI APIs and v1 manifest/root schemas are defined in INDEXED_HANDOFF.md. The six MCP tools remain unchanged; no library MCP bridge is claimed. See [indexed handoff](INDEXED_HANDOFF.md).
+The [module map and API workflow](INTEGRATED_MODULES.md) identifies the owner of
+each surface and the route for project-owned HTTP contracts.
 
 Machine-readable contracts are `schemas/mcp-tools-v1.json` (with an identical
 wheel copy), `schemas/cli-contract-v1.json`, the project task and event schemas,
@@ -13,9 +14,17 @@ and the packaged schemas under `src/agent_os/resources/schemas/`. Tests compare
 MCP `inputSchema` and `outputSchema` with `tools/list` and returned
 `structuredContent`, and task/event schemas with actual local lifecycle records.
 
-CLI, Python, and MCP report candidate version `0.8.0rc2`; the RC1 background in this
-document is historical. The stdio MCP protocol version is `2025-06-18`. There is no HTTP API or OpenAPI specification. Project events are
-local JSONL with JSON Schema, not AsyncAPI.
+CLI, Python, and MCP report the current package version, verified against
+`pyproject.toml`, `agent_os.__version__` and the CLI contract during rebuild
+checks. Historical RC labels below do not select that version. The stdio MCP
+protocol version is `2025-06-18`. AgentOS has no HTTP server or core OpenAPI
+specification. Atlas can import selected project-owned OpenAPI 3.0.x/3.1.x JSON
+as a source catalog; this is distinct from executing or validating that API.
+Project events are local JSONL with JSON Schema, not AsyncAPI.
+
+Library Python/CLI APIs and v1 manifest/root schemas are defined in
+[indexed handoff](INDEXED_HANDOFF.md). The six MCP tools remain unchanged; no
+library MCP bridge is claimed.
 
 F15B adds `agentos setup probe ssh-vnc --host ALIAS [--vnc-port PORT]
 [--ssh-only] [--apply]`. Without `--apply` it returns a network-free plan. With it, the
