@@ -27,6 +27,15 @@ class InstallError(ValueError):
     pass
 
 
+def unique_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise InstallError("metadata_duplicate_key")
+        result[key] = value
+    return result
+
+
 def digest(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
