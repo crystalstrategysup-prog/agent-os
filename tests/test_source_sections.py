@@ -15,11 +15,11 @@ def selection(path="source.py", start=1, end=2):
 
 
 def test_exact_ranges_and_hash_without_writes(tmp_path):
-    raw = "first\nвторая\nlast".encode()
+    raw = "first\n\u0432\u0442\u043e\u0440\u0430\u044f\nlast".encode()
     (tmp_path / "source.py").write_bytes(raw)
     result = read_sections(tmp_path, selection())
     row = result["sections"][0]
-    assert row["text"] == "first\nвторая\n"
+    assert row["text"] == "first\n\u0432\u0442\u043e\u0440\u0430\u044f\n"
     assert row["source_sha256"] == hashlib.sha256(raw).hexdigest()
     assert row["file_lines"] == 3
     assert result["coverage"] == "selected_ranges_only"
