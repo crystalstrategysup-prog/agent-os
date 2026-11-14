@@ -2,8 +2,9 @@
 
 AgentOS keeps execution evidence, project knowledge and domain implementation in
 separate modules. Read only the module contract needed for the current change.
-`agentos modules` reports the installed manifest and its selected file pins; it
-does not start a provider or grant execution rights. Its pin set is not a claim
+`agentos modules` checks selected pins from the installed module manifest and
+reports versions, check counts and mismatches. It does not start a provider or
+grant execution rights. Its pin set is not a claim
 that every file in the installation was independently verified.
 
 ## Owners and interfaces

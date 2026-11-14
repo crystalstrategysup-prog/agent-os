@@ -8,7 +8,7 @@ Three source forms are supported:
 
 | Format | Content transferred |
 |---|---|
-| `openapi` | Each declared HTTP method/path, path and operation parameters, request body, responses, errors, security declarations, and tag groups. |
+| `openapi` | OpenAPI 3.0.x and 3.1.x JSON: HTTP methods under `paths`, path and operation parameters, request body, responses, errors, security declarations, and tag groups. |
 | `record-catalog` | Explicit `contracts` records: interfaces, known parameters, result, authorization, ownership, and preserved UNKNOWN values. |
 | `operation-registry` | `operations`, `additional_entries`, `workers`: declared inputs, outputs, source pointers, and execution boundaries. |
 
@@ -47,6 +47,42 @@ and the SHA of its canonical serialization; the full source remains alongside it
 The catalog does not reopen historically accepted work or assign new product
 checks. The scope of earlier acceptance comes from its original receipt. New
 checks are needed for the changed area and its criteria.
+
+## OpenAPI boundaries
+
+The selected source must be JSON with an `openapi` version of `3.0.x` or `3.1.x`
+and a `paths` object. Other versions return `OPENAPI_VERSION_UNSUPPORTED`;
+a Swagger 2.0 document without `openapi` returns `OPENAPI_SOURCE_REQUIRED`.
+Swagger 2.0, YAML, and other OpenAPI versions need an explicit adapter before
+they can be compiled. This reader extracts declarations; it does not validate
+every OpenAPI rule or recursively catalog callbacks and webhooks.
+
+Document-local JSON Pointer references are resolved without opening another
+file or URL. Resolution stops after 64 reference hops. Parameter, request-body,
+and error-response references that are missing, cyclic, external, or longer
+than the bound are retained as source declarations. Requiredness of unresolved
+parameters and request bodies remains `UNKNOWN`. Distinct unresolved parameter
+references remain separate; only parameters with a known `(name, in)` identity
+can be overridden by the operation's parameter declaration.
+
+For locally resolved parameter, request-body, and response references in OpenAPI
+3.1, a Reference Object's `description` overrides the target description; the
+override nearest to the operation wins along a reference chain. OpenAPI 3.0
+ignores these reference siblings. Arbitrary sibling fields do not override the
+target. Nested Schema Objects retain their original keywords, including `$ref`
+and its siblings; the compiler does not evaluate JSON Schema.
+
+Local Path Item references are followed to enumerate the operations and preserve
+their source pointers. A referenced Path Item may add fields absent from its
+siblings. Overlapping fields have [undefined behavior in OpenAPI](https://spec.openapis.org/oas/v3.1.1.html#path-item-object) and return
+`OPENAPI_PATH_ITEM_REF_CONFLICT`. An unresolved Path Item reference returns
+`OPENAPI_PATH_ITEM_REF_UNRESOLVED` because its operations cannot be enumerated
+reliably. These refusals do not produce a partial successful catalog.
+
+Explicit parameter schemas such as `false`, `true`, and `{}` are preserved.
+The error list retains `4XX`, `5XX`, explicit error status codes, and `default`;
+all response declarations also remain in the output field. A range and a more
+specific status code are both retained, without inventing runtime behavior.
 
 ## Size and history
 

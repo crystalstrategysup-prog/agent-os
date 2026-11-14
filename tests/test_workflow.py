@@ -240,11 +240,29 @@ def test_F_file_inventory_rejects_fifo_without_opening_it(tmp_path):
 
 @pytest.mark.skipif(os.name != "posix", reason="Unix sockets require POSIX")
 def test_F_file_inventory_rejects_socket(tmp_path):
+    import errno
     import socket
+    import stat
     import tempfile
 
     with tempfile.TemporaryDirectory(prefix="aos-", dir="/tmp") as short_root:
         endpoint = Path(short_root) / "endpoint.sock"
+        if sys.platform.startswith("linux") and hasattr(os, "mknod"):
+            # This contract concerns filesystem type, not socket transport.
+            # A real socket inode needs no live endpoint or network capability.
+            try:
+                os.mknod(endpoint, stat.S_IFSOCK | 0o600)
+            except OSError as exc:
+                if exc.errno not in (errno.EPERM, errno.EACCES, errno.ENOSYS,
+                                     errno.ENOTSUP, errno.EOPNOTSUPP, errno.EINVAL):
+                    raise
+                # Other Linux environments may permit bind but not mknod.
+                # Keep the original real-socket fixture; never skip the check.
+            else:
+                assert stat.S_ISSOCK(endpoint.lstat().st_mode)
+                with pytest.raises(GateError, match="regular_inventory_file_required"):
+                    filemap(Path(short_root))
+                return
         server = socket.socket(socket.AF_UNIX)
         try:
             server.bind(str(endpoint))

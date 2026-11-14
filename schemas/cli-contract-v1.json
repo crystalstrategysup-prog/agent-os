@@ -836,12 +836,12 @@
       "contract": "Existing bundled native Atlas command contracts; no registry initialization"
     }
   ],
-  "distribution_version": "0.8.0rc2042+atlas.5",
+  "distribution_version": "0.8.0rc2042+atlas.6",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.8.0rc2042+atlas.5",
+  "release": "0.8.0rc2042+atlas.6",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",

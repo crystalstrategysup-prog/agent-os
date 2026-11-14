@@ -22,8 +22,10 @@ def test_release_and_mcp_versions_have_one_identity():
     package_version = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"][
         "version"
     ]
-    assert __version__ == "0.8.0rc2042"
     assert package_version == __version__.replace("-beta.", "b")
+    cli = json.loads((ROOT / "schemas/cli-contract-v1.json").read_text())
+    assert cli["release"] == __version__
+    assert cli["distribution_version"] == package_version
     initialized = response({"jsonrpc": "2.0", "id": 1, "method": "initialize"})
     assert initialized["result"]["serverInfo"] == MCP_CONTRACT["serverInfo"]
     assert initialized["result"]["serverInfo"]["version"] == __version__

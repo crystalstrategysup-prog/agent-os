@@ -1,3 +1,18 @@
+# 0.8.0rc2042+atlas.6 — modular source normalization candidate
+
+- Preserve supported OpenAPI declarations, bounded local Path Item references,
+  unresolved requiredness, explicit schemas, response ranges and OpenAPI 3.1
+  description overrides. Unsupported versions are refused explicitly.
+- Hash complete inventory content with bounded memory and actual byte budgets;
+  reject observed file substitution or changes during reads.
+- Refuse ambiguous duplicate capability keys and orphaned packaged documents.
+- Restore separate native Atlas recorded-state/activity indicators and align
+  regression checks with the current stable-view and immutable-history contract.
+- Document module ownership, lightweight routes and project API workflows;
+  reconcile current resource pins without rewriting historical provenance.
+- Source/package qualification only; no target installation or running-client
+  adoption is inferred from these changes.
+
 # 0.8.0rc2042+atlas.5 — combined engineering candidate
 
 Preserve scoped file admission and integrate the canonical recovery v3 source. Diagnostic and provenance qualification is recorded separately.

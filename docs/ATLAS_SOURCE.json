@@ -418,8 +418,8 @@
     },
     {
       "path": "skills/atlas/references/catalogs.md",
-      "bytes": 3000,
-      "sha256": "ebde1ad5418e9befb1f92caafd6e676537cab8bf6d0fff54478849f8348e1f94",
+      "bytes": 5323,
+      "sha256": "9c865756ce8734d01e25d098f552838b84ca28b99ffb7e79c113468c5533921f",
       "source_bytes": 4763,
       "source_sha256": "724023b116973c12056dac4b1968abf6972a64f87d35dabe2cac1a39f45da070"
     },
@@ -516,8 +516,8 @@
     },
     {
       "path": "skills/atlas/references/workspace.md",
-      "bytes": 18976,
-      "sha256": "2102771540adb885b95f3144e2d427bf1962f7a4907f9aa4e4d365a48389bcb6",
+      "bytes": 19267,
+      "sha256": "1a755812be9ca1f54a9a79fa8e1fcf85066495affe26dc16a1e2118949f68e8d",
       "source_bytes": 6284,
       "source_sha256": "6292e241496e3e309ff53fa25d76e397eb2f53729c9a00ae1b4dd23379267611"
     },
@@ -565,8 +565,8 @@
     },
     {
       "path": "skills/atlas/scripts/catalog.py",
-      "bytes": 13187,
-      "sha256": "a1beba566aa6de9d63d10bb5de18e274356ecf812f753cbbe6600f7972142f18",
+      "bytes": 17279,
+      "sha256": "5c6cee4c873c67eeb57ce11ae80c4a6d8aac2db4deeaa4b59ef07dc2eab79c07",
       "source_bytes": 13187,
       "source_sha256": "a1beba566aa6de9d63d10bb5de18e274356ecf812f753cbbe6600f7972142f18"
     },
@@ -635,8 +635,8 @@
     },
     {
       "path": "skills/atlas/scripts/viewer.js",
-      "bytes": 227579,
-      "sha256": "f469eb693145c8df171ef1d1902e94bca6cee9e13da5d687481ea3fa8f84a4f5",
+      "bytes": 227621,
+      "sha256": "d08396742c6580f34bca0eccd440a217b2bc1bbfc4ae1db80ee2a0f366a2b10e",
       "source_bytes": 37585,
       "source_sha256": "55c14b34565f9e378778c9a6ef9a93a70e773e0df98cb94fbe6b8b8ead7c54ea"
     },
@@ -663,15 +663,15 @@
     },
     {
       "path": "tests/test_atlas_ui.cjs",
-      "bytes": 18350,
-      "sha256": "aba97b1c7ffb4f55b3a712956b24f7224c0da149f7d54743361cb3ce38b8196d",
+      "bytes": 18554,
+      "sha256": "96aff719f9ac8c1a47a1e5a064404f5526014f70b8825e3d099797d4e581b082",
       "source_bytes": 19351,
       "source_sha256": "a30ce77348083eba1ac808bd3d796a372c2cdafca9173c5775e9945e0d4c5901"
     },
     {
       "path": "tests/test_catalog.py",
-      "bytes": 4076,
-      "sha256": "3e7da127d8db0aa610a7a36543fa3da204f80c119ebf2a47162a305d430f40ae",
+      "bytes": 18275,
+      "sha256": "1a87a8b6c64c65f6e05822cab0dfbdb194c7ecd0fe7bafe94c20418acb90ed8b",
       "source_bytes": 4076,
       "source_sha256": "3e7da127d8db0aa610a7a36543fa3da204f80c119ebf2a47162a305d430f40ae"
     },
@@ -719,8 +719,8 @@
     },
     {
       "path": "tests/test_workspace.py",
-      "bytes": 11597,
-      "sha256": "81ee991d67489d27b89af166a783160d888cfeb2eeca6f7e893350004035d81e",
+      "bytes": 13276,
+      "sha256": "28be922cf842d4e359cf5f2263ac54a917bb7557ce005d708a33fec25ba5f85b",
       "source_bytes": 11597,
       "source_sha256": "81ee991d67489d27b89af166a783160d888cfeb2eeca6f7e893350004035d81e"
     },
@@ -979,7 +979,7 @@
   },
   "schema": "agent-os.atlas-source/v1",
   "selected_file_count": 74,
-  "selected_tree_sha256": "c306cdca4b8082433d62316ec8f59ac8e89ac01b672fbf4263c7ec623c93c22f",
+  "selected_tree_sha256": "e9c42dbeb8e3affabf31611d219ad9178bf7ca981e6e2dcfc3956418028202f7",
   "source_commit_reported": "1b7cd88",
   "source_file_count": 64,
   "source_tree_sha256": "15b36a79f1133be8cb790d61f0dff6562262196b0eb8c3ea15c41a9700dd6bab",
@@ -1100,5 +1100,25 @@
       }
     ],
     "historical_source_preserved": true
+  },
+  "normalization_increment": {
+    "base_commit": "92bcbd50a2e91c7eb28ce2265445ea10d6b0ef41",
+    "candidate_version": "0.8.0rc2042+atlas.6",
+    "changed_module_files": [
+      "skills/atlas/references/catalogs.md",
+      "skills/atlas/references/workspace.md",
+      "skills/atlas/scripts/catalog.py",
+      "skills/atlas/scripts/viewer.js",
+      "tests/test_atlas_ui.cjs",
+      "tests/test_catalog.py",
+      "tests/test_workspace.py"
+    ],
+    "previous_selected_tree_sha256": "c306cdca4b8082433d62316ec8f59ac8e89ac01b672fbf4263c7ec623c93c22f",
+    "predecessor_source_manifest": {
+      "bytes": 49086,
+      "sha256": "ce214153307be61277071ab2e80175f0667e1423e6e59d003bc55400e12d528d"
+    },
+    "scope": "Bounded OpenAPI declaration fidelity; native activity badges; current-view regression and contract alignment. Historical source_* values retained.",
+    "qualification": "SOURCE_CANDIDATE; PACKAGING_AND_TARGET_ADOPTION_REQUIRE_SEPARATE_RECEIPTS"
   }
 }

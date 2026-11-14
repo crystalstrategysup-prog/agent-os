@@ -115,7 +115,7 @@ def test_generic_index_pins_contract_and_inherited_documents():
     index = json.loads(src.read_text())
     assert index["status"] == "PUBLIC_RELEASE_CANDIDATE_NOT_ADOPTED"
     assert index["core_version"] == "0.8.0rc2002+atlas.4"  # preserved historical index
-    assert index["knowledge_version"] == "1.3.3"
+    assert index["knowledge_version"] == "1.3.4"
     assert index["role_id"] == "main-coordinator"
     for item in index["documents"]:
         assert Path(item["path"]).name == item["path"]
