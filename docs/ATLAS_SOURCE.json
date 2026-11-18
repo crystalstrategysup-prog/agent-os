@@ -369,8 +369,8 @@
     },
     {
       "path": "skills/atlas/SKILL.md",
-      "bytes": 17378,
-      "sha256": "d7cd449b4ea4f790070ff1632848d4e539b81e69f2d8c864ef01f3b74c45c950",
+      "bytes": 18065,
+      "sha256": "7e1a63fdd5b7fdb6ab7ae0bc2bf2ccba0928a20d08ff67aff9dbdb2e94f2dcff",
       "source_bytes": 14379,
       "source_sha256": "c5c841e5cdfbd55edad3835840e9c5ce4e36f0cf733855896813040983ca18cf"
     },
@@ -481,8 +481,8 @@
     },
     {
       "path": "skills/atlas/references/quickstart.md",
-      "bytes": 7051,
-      "sha256": "78d4598f685fdf4326f3420456a9ac539496b16b89c4832cc4030094d3643122",
+      "bytes": 7653,
+      "sha256": "9cebbca45ef7b4e7a8ca5156eb14b63d630a6556e3b938c0737b67911da8ca30",
       "source_bytes": 4664,
       "source_sha256": "af49ed8d6557354be39aecfdeec4f65fcec67061eb273e667d5e7d4514a158ad"
     },
@@ -509,8 +509,8 @@
     },
     {
       "path": "skills/atlas/references/workflow.md",
-      "bytes": 11623,
-      "sha256": "2c5da714fe41e4e05ea0244e99b72a1425c4822d483b15e0b1f2e4a813e8bca5",
+      "bytes": 12158,
+      "sha256": "86efd4d1ae885182eb60b46786b32c88a4e49720cde774134a88974e86c57dca",
       "source_bytes": 15495,
       "source_sha256": "302b4d770a8ea305b62cafbf39a2254a8452e1a7bfb78a93e2d253ee05b4902a"
     },
@@ -979,7 +979,7 @@
   },
   "schema": "agent-os.atlas-source/v1",
   "selected_file_count": 74,
-  "selected_tree_sha256": "78cd9626388e2777f58866972878f34d31f23bd01b7331cd363e8b84c4217adb",
+  "selected_tree_sha256": "e1887b6bd01c54c50c98dd9adf1735f0dbbb7adc8db8faef13dc0580d6753eff",
   "source_commit_reported": "1b7cd88",
   "source_file_count": 64,
   "source_tree_sha256": "15b36a79f1133be8cb790d61f0dff6562262196b0eb8c3ea15c41a9700dd6bab",
@@ -1081,5 +1081,20 @@
     "max_documents": 1000,
     "byte_bounds": "Unchanged runtime; OPERATIONS total-body metadata aligned to existing16MiB",
     "scope": "Finite schema/runtime/contract successor only; no installation, actual NEXT or permission effects; all previous origin fields/versions preserved."
+  },
+  "causal_debugging_increment": {
+    "schema": "agent-os.atlas-instruction-increment/v1",
+    "version": "0.8.0rc2055",
+    "base_commit": "af332457c41d1b0f5cb9aa2d1be9c11280ade48e",
+    "previous_selected_tree_sha256": "78cd9626388e2777f58866972878f34d31f23bd01b7331cd363e8b84c4217adb",
+    "selected_tree_sha256": "e1887b6bd01c54c50c98dd9adf1735f0dbbb7adc8db8faef13dc0580d6753eff",
+    "changed_files": [
+      "skills/atlas/SKILL.md",
+      "skills/atlas/references/quickstart.md",
+      "skills/atlas/references/workflow.md"
+    ],
+    "scope": "Route engineering start and continuation to the actual canonical PROCESS causal-debugging body; restore experiment state without replaying unchanged accepted work.",
+    "historical_source_pins": "PRESERVED",
+    "runtime_behavior": "REQUIRES_SEPARATE_OBSERVATION"
   }
 }

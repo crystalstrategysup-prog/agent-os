@@ -21,6 +21,15 @@ Perform repeatable actions through standard procedures with explicit parameters.
 Read [quickstart.md](references/quickstart.md) for daily work,
 [modularity.md](references/modularity.md) for module/API/build/deployment boundaries,
 and [operations.md](references/operations.md) for exact methods and parameters.
+At start and continuation, read the body returned by the effect-free
+`agentos workflow guidance`. If unavailable, read the exact **Causal debugging**
+section of AgentOS `docs/PROCESS.md`, or installed `resources/docs/PROCESS.md`
+located with `agentos resources`. Reuse that same current body if the entry
+already materialized it. Apply it to malfunction work, restoring the journal,
+fixed conditions, current configuration and next experiment from the assigned
+packet. Ordinary feature work needs no invented failure or reversal cycle.
+This is the single diagnostic method, not another Atlas workflow. Missing or
+unreadable content is a context gap; a path/hash/ACK alone is not pickup.
 An existing WM-UI matrix uses [upstream-adapter.md](references/upstream-adapter.md):
 one explicit binding and `refresh`, then a packet; the source keeps its writer.
 Declare work/doc/module/contract/patch links in a pinned semantic catalog and

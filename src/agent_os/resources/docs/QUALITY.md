@@ -1,6 +1,31 @@
 # Verification strategy
 
-Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current source candidate: `0.8.0rc2055` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+
+## Causal-debugging increment
+
+The normative method lives only in PROCESS.md. Check actual source and installed
+`workflow guidance`, engineering route/context delivery, content/digest binding,
+stale receipt rejection, ordinary-read independence and managed integration.
+`tests/test_causal_guidance_loading.py` covers source loading; an independently
+installed wheel and a new session are separate required layers.
+
+Use `tools/verify_causal_debug.py prepare --output NEW_DIRECTORY --scenario NAME`
+to create a disposable executable exercise. The five names are `single_limit`,
+`broken_baseline`, `factor_interaction`, `not_reproduced` and `protected_access`.
+Give each fresh session only its ordinary workspace task and the standard
+installed client bootstrap. Do not reveal the scenario name, reviewer oracle,
+expected factors, experiment sequence or a previous agent's reasoning.
+Retain the exact task, bootstrap identity, session provenance and raw execution
+observations; then run `validate --output DIRECTORY` and independently review
+the journal, predictions, conclusions and limits. The local validator checks
+cooperative evidence integrity, not hostile same-UID tampering or semantics.
+
+An automatic PASS is not agent acceptance. Review whether every experiment
+distinguishes hypotheses, whether protection boundaries survived, whether a
+synthetic alternative is kept distinct from a denied protected target, and
+whether historical nonreproduction remains unknown. Installation and previously
+running workers' adoption also require separate evidence.
 
 
 ## Historical: Indexed handoff successor0.7.0rc1

@@ -18,6 +18,15 @@ Answer questions, searches, read-only audits, and API discovery directly under
 existing read access, including from an unregistered directory. None requires
 init, intake, observation, an answers file, a profile interview, or closeout.
 
+On new entry and same-scope resume, read the actual body from the effect-free
+`agentos workflow guidance`, or reuse that same current body materialized by
+entry/context. If the CLI is unavailable, read **Causal debugging** in the
+normative `resources/docs/PROCESS.md`, located with `agentos resources`, or the
+selected source `docs/PROCESS.md`. For malfunction work, restore the existing
+journal, conditions, current configuration and next experiment. A path/digest/ACK
+without its body does not load the method. This adds no intake requirement to
+ordinary reading or reversal experiment to a feature task without a malfunction.
+
 For a change, inspect the README, dossier, roadmap, stage, architecture, and
 contracts. Reuse verified facts; create only missing applicable docs before
 product writes. `questions` and `enter` need current authority. JSON stdin via

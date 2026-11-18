@@ -148,6 +148,138 @@ authority does not authorize a send. Local READY does not authorize production.
 If a target capability is absent, stop only that action and continue other
 authorized preparation. There is no universal `--authorized` override.
 
+<!-- agentos:causal-debugging:start -->
+
+## Causal debugging
+
+Use this method within the existing diagnosis, implementation and acceptance
+cycle for a malfunction in UI, API, services, data, performance or operational
+constraints. It does not create a second workflow, new task gate or permission.
+Read this section when starting or continuing such work; restore the experiment
+and its evidence from the existing work packet rather than restarting diagnosis.
+The canonical text is this section of `docs/PROCESS.md`, mirrored byte-for-byte
+in installed `resources/docs/PROCESS.md` (located with `agentos resources`).
+Read the actual bounded section returned by the effect-free
+`agentos workflow guidance`; if the CLI is unavailable, read this exact section
+from the selected source or installed resource. Entry/context output that already
+materializes the same current body may be reused. A link, hash or receipt for
+instruction delivery alone does not prove agent behavior. Ordinary feature work
+without a malfunction does not require an invented failure or reversal cycle.
+
+### Define and reproduce the failure
+
+Record the user's action, expected result, actual result and an observable
+success/failure criterion before choosing a cause. Reproduce with the exact
+relevant environment, source/runtime version, data or fixture, configuration,
+initial state and load. Record actual effective settings and actual execution,
+including the first failing boundary, safe error/code and exit or response.
+Keep source, installed version and already-loaded worker code distinct.
+
+If reproduction fails or is unavailable, say so explicitly. Preserve the incident
+as unresolved; a suspected cause remains a hypothesis. Select the next bounded
+observation or safe reproduction that distinguishes the remaining explanations.
+Do not invent a failure, infer recovery from a healthy process, or claim causality
+from timing, a matching error label or one successful run.
+
+### Establish a working baseline
+
+Obtain a configuration in which the same scenario meets its success criterion.
+When artificial operational limits are suspected, use an authorized isolated
+environment and sufficient **finite** values to establish that baseline. Record
+which limits changed and their effective values; an explicit request is not
+proof that a setting took effect. Keep data, scenario and required semantics
+equivalent. Reuse a qualified baseline only while its relevant inputs match.
+
+Preserve authentication, authorization/access boundaries, isolation, data
+integrity and every mandatory protection. An operational experiment must not
+disable a security guard, expand private-data access, change credentials, enable
+native hooks or bypass a target refusal. A limit serving a protective purpose
+cannot be reclassified merely because it blocks progress. Use approved test
+identities and synthetic or otherwise authorized data. If a safe experiment
+cannot be made, state the exact boundary and leave the dependent cause unknown;
+continue independent authorized work. This method grants no production mutation.
+
+If the intended baseline also fails, localize its **first failure** and restore a
+working baseline before testing the suspected restriction. Do not put restrictions
+back over a broken baseline and interpret the resulting failures as their effect.
+For a necessary limit adjustment on an actual target, retain its existing explicit
+setter, ownership, authority, readback and rollback requirements.
+
+### Isolate the factor and demonstrate reversal
+
+Choose each experiment to discriminate between named hypotheses or to verify a
+specific correction. State the differing predicted outcomes before executing it.
+Change one factor while holding data, scenario, initial state, versions, other
+settings, observation method and load fixed. Reset mutable state equivalently
+between runs and record any unavoidable difference. If many factors are involved,
+a bounded binary search may locate a group; then isolate the individual factor.
+If an effect requires a combination, test the combinations explicitly and name
+the interaction. Group removal or changing several settings at once is not proof
+of a single cause.
+
+Demonstrate a reversible sequence: **working configuration → failure → restoration
+→ repeated failure**, with primary evidence for all four steps. For example,
+with two actually overlapping requests and unchanged data/authentication, a finite
+admission limit of 2 succeeds, 1 rejects the second request, 2 restores success,
+and 1 repeats that rejection. Observe actual overlap and admission state; merely
+requesting concurrency or reading a configured value does not establish either.
+Connect the controlled factor to the first failing boundary and the user's
+criterion. Temporal correlation and a single successful retry are insufficient.
+
+Use only reversible, authorized effects. A failed or unknown external operation
+is not permission to replay it for this sequence: reconcile its original operation
+identity through the existing route first. When reversal cannot safely be tested,
+retain partial observations, explain the limitation and keep the causal claim
+unconfirmed. A synthetic reversal establishes only that experiment's scope;
+claiming the historical or target incident's cause requires matching evidence.
+
+### Keep a compact experiment journal
+
+Keep the journal with the existing work/bug/incident record, linked by the current
+writer. Do not create a competing status ledger or copy private payloads into
+public reports. Record every discriminating run, including failed baselines:
+
+| Step | Factor and actual value | Fixed conditions | Expected result | Actual result | Error and first failing location | Evidence reference | Conclusion and next step |
+|---|---|---|---|---|---|---|---|
+| Experiment/run ID | Effective setting or controlled input | Exact relevant pins, fixture, initial state and load | Prediction before the run | Observed criterion and response/exit | Safe code and boundary, or none | Primary retained receipt/artifact | What changed in knowledge; next discriminating action |
+
+Label **hypothesis**, **observation**, **confirmed conclusion** and **unknown**
+separately. A receipt proves only its actual scope. Retain failed observations
+alongside later successes and record the reason for any repeated check. If a run
+adds no information, revise the experiment instead of collecting the same symptoms
+again. Identify bottlenecks in diagnosis itself: slow tools or remote calls,
+unprepared data, redundant checks and unnecessary sequential execution. Prepare
+stable inputs once and parallelize independent observations without changing a
+controlled experiment or creating competing writers.
+
+### Correct, verify and continue
+
+After establishing the cause, make the smallest correction that satisfies the
+contract. Re-run the original user scenario, relevant boundaries and regressions,
+and exercise rollback where applicable. A mitigation may be useful before proof;
+identify it as a mitigation and keep the cause unresolved. Do not present an
+isolated or synthetic success as a working-product fix.
+
+Report these stages separately, with the exact source, artifact and evidence:
+
+| Stage | Evidence needed for the stated scope |
+|---|---|
+| PREPARED | Reviewable correction and its exact basis exist. |
+| LOCALLY_VERIFIED | The local scenario and relevant checks actually passed. |
+| INSTALLED | The authorized target installation and readback are confirmed. |
+| TARGET_VERIFIED | The original scenario actually passed in the target environment. |
+
+These are reporting stages, not replacements for existing task/Atlas statuses.
+On continuation, restore the user criterion, reproduction/baseline pins, journal,
+current effective configuration, confirmed/unknown findings and next experiment.
+Recheck changed dependencies; reuse unchanged applicable evidence. Installation,
+document pickup and agent behavior remain distinct. Qualify changes to this method
+with fresh-session behavior on one restriction, a failing baseline, interacting
+factors, non-reproduction and a protected data/access boundary. Evaluate the
+experiment chosen and conclusions drawn, not just the presence of this text.
+
+<!-- agentos:causal-debugging:end -->
+
 ## 6. Close only a registered task
 
 Update documents to reflect the result and register their new hashes. Run the

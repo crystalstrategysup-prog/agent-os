@@ -10,7 +10,7 @@
         },
         {
           "path": "skills/agentos-project-entry/SKILL.md",
-          "sha256": "ea8687a7cf3ead7cc039aeeacbf003a69f607f0e7948b77be37eb2311fc3647a"
+          "sha256": "fc7f44b4a73f9d7f50516ab503169d56b8c78f348489b7d462ab12c3aea55acb"
         }
       ]
     },
@@ -19,7 +19,7 @@
       "pins": [
         {
           "path": "skills/atlas/SKILL.md",
-          "sha256": "d7cd449b4ea4f790070ff1632848d4e539b81e69f2d8c864ef01f3b74c45c950"
+          "sha256": "7e1a63fdd5b7fdb6ab7ae0bc2bf2ccba0928a20d08ff67aff9dbdb2e94f2dcff"
         },
         {
           "path": "skills/atlas/scripts/atlas.py",

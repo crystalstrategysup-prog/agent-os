@@ -151,6 +151,14 @@ criteria, and owner.
 
 ## Evidence and checks
 
+At start/resume, read the actual body from `agentos workflow guidance`, reusing
+the same current body if already returned by entry. If the CLI is unavailable,
+read **Causal debugging** in AgentOS `docs/PROCESS.md`, also shipped as
+`resources/docs/PROCESS.md`. Apply this single method to malfunction work and
+link the experiment journal in the work packet. Carry its scoped findings, fixed
+conditions, current configuration and next experiment into the existing
+checkpoint; do not create a separate diagnostic workflow or acceptance.
+
 Link evidence to the claim, exact relevant inputs, scope/environment, time,
 actor, and primary receipt. Distinguish documentary description, source review,
 isolated tests, installed state, runtime, and user acceptance. Determine needed

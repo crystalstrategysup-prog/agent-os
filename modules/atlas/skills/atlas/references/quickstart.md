@@ -6,6 +6,15 @@ Check the selected project's instructions, registry entry and Atlas binding befo
 continuing development. Missing tools or an unreadable binding are a gap, not proof
 of absent Atlas. Do not search unrelated roots.
 
+On start and resume, run the effect-free `agentos workflow guidance` and read its
+body, or reuse that same current body already materialized by entry. If the CLI
+is unavailable, read **Causal debugging** in AgentOS `docs/PROCESS.md` (installed
+`resources/docs/PROCESS.md`, located with `agentos resources`). Apply it when
+working on a malfunction. Restore the existing journal, fixed conditions,
+current configuration and next experiment; keep its evidence linked to the
+assigned work. A hash or ACK is not the method's content. Ordinary feature work
+requires no artificial failure or reversal cycle.
+
 **Atlas exists:** read its writer and assigned work, then use the configured
 start route. For a registered WM-UI project:
 

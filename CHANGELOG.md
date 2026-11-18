@@ -1,3 +1,24 @@
+# 0.8.0rc2055 — causal debugging and engineering instruction delivery
+
+- Embed the causal-debugging method in the existing PROCESS: observable user
+  criterion, reproduced conditions, working finite baseline, one-factor and
+  interaction experiments, reversible confirmation, compact evidence journal,
+  bounded diagnosis, minimal fix and separate verification stages.
+- Add effect-free `workflow guidance` with the actual canonical body and hashes.
+  Engineering workflow/context entry and continuation carry that same body;
+  context receipts become stale when the guidance changes. Ordinary reads keep
+  their existing fast path and need no project intake.
+- Route managed client instructions, Atlas, entry, implementation, handoff and
+  verification skills to that single method. Preserve historical source pins
+  and record the scoped Atlas instruction increment.
+- Add executable isolated service exercises for a single operational limit,
+  a broken baseline, interacting factors, nonreproduction and protected access,
+  plus negative evidence and loading checks. Fresh-session semantic review
+  remains separate from unit-test, package and installation evidence.
+- Preserve native hooks disabled, authorization, access controls, isolation,
+  data integrity, existing workers and unrelated client settings. Use local
+  release checks and direct authenticated Git publication; no GitHub Actions.
+
 # 0.8.0rc2042 — public release qualification
 
 - Restore callable public version/skill validators and require exact declared skill locations and names. Preserve privacy markers and secret scanning.

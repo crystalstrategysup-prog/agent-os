@@ -109,6 +109,20 @@ The MCP entry plan states that entry is required for project changes and that
 read-only intake is unnecessary; native hooks are disabled. The exact JSON
 shape and version are in the schemas and packaged copies.
 
+`workflow guidance` is a read-only, argument-free materialization of the canonical
+`PROCESS.md#causal-debugging` section. Its `agentos.engineering-guidance/v1` response
+contains actual `content`, `content_bytes`, `content_sha256`, `document_sha256`,
+`version`, and `source`. It reads no user overlay, creates no task, executes no
+experiment and grants no authority. `behavior_compliance` remains `NOT_PROVEN`.
+Missing, duplicate, reversed, empty or oversized section markers are refusals;
+the document and section bounds are 128 KiB and 16 KiB. `--kind` and `--effect`
+belong to `workflow route` and are rejected by `guidance`.
+
+Engineering `workflow route` responses and `context build` for `project-change`
+or `continuation` carry the same object as additive `foundation_guidance`.
+Ordinary read routes retain their previous result and require no guidance read.
+These are instruction-delivery surfaces, not a native interception mechanism.
+
 ## Optional extensions
 
 `extensions/registry.json` describes `agentos.extension-registry/v1` entries:

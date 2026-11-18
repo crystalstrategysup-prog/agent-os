@@ -322,6 +322,15 @@
     },
     {
       "effect": "read_only",
+      "name": "workflow guidance",
+      "status_values": [
+        "MATERIALIZED",
+        "BLOCKED"
+      ],
+      "write_surfaces": []
+    },
+    {
+      "effect": "read_only",
       "name": "workflow route",
       "status_values": [
         "PASS",
@@ -810,12 +819,12 @@
       "contract": "atlas.source-relocation/v1"
     }
   ],
-  "distribution_version": "0.8.0rc2054",
+  "distribution_version": "0.8.0rc2055",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.8.0rc2054",
+  "release": "0.8.0rc2055",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",

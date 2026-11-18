@@ -94,6 +94,12 @@ def build(home: Path, request: dict) -> dict:
                 "purpose": purpose, "home_read": False, "intake_required": False,
                 "authority_granted": False, "behavior_compliance": "NOT_PROVEN"}
 
+    foundation_guidance = None
+    if purpose in {"project-change", "continuation"}:
+        from .engineering_guidance import load
+
+        foundation_guidance = load()
+
     depends_on_profiles = bool(keys or index_keys)
     selected = (profile_adapter.context(home) if depends_on_profiles
                 else {"status": "NOT_REQUESTED", "entries": []})
@@ -156,6 +162,8 @@ def build(home: Path, request: dict) -> dict:
         raise GateError("context_selection_changed_during_read")
     if any(sha(_bytes(home, path)) != expected for path, expected in sources.items()):
         raise GateError("context_dependency_changed_during_read")
+    if foundation_guidance is not None and load() != foundation_guidance:
+        raise GateError("context_foundation_guidance_changed_during_read")
     body = {
         "schema": "agentos.context-capsule/v1", "status": "MATERIALIZED",
         "session_id": session, "turn_id": turn, "purpose": purpose,
@@ -169,6 +177,8 @@ def build(home: Path, request: dict) -> dict:
         "authority_granted": False, "native_hooks": "DISABLED",
         "behavior_compliance": "NOT_PROVEN",
     }
+    if foundation_guidance is not None:
+        body["foundation_guidance"] = foundation_guidance
     if len(json.dumps(body, ensure_ascii=False).encode()) > LIMIT:
         raise GateError("context_size_limit")
     return {**body, "capsule_sha256": digest(body)}

@@ -28,6 +28,12 @@ authority, active task or checkpoint, startup commands, and the next safe step.
 Create a self-contained packet with a manifest and publication boundary; keep
 user data separate and exclude authentication material and secrets.
 
+For an unresolved malfunction, link the current experiment journal and preserve
+the continuation fields required by **Causal debugging** in
+`resources/docs/PROCESS.md`. The recipient reads that section from the current
+selected source or installed resources before the next diagnostic step; do not
+copy an independent version of the method into the handoff.
+
 The recipient begins a new project entry, reads current docs, verifies hashes,
 and does not treat the previous report as independent production proof. Expose
 missing capabilities and concurrent work. Output a packet with an acceptance

@@ -35,7 +35,7 @@ def route(kind: str, effects: list[str] | None = None) -> dict:
         "TARGET_AUTHORITY_REQUIRED" if target
         else "DOCUMENTATION_FIRST" if project_change else "FAST_PATH"
     )
-    return {
+    result = {
         "schema": "agentos.workflow-route/v1",
         "status": "BLOCKED" if target else "PASS",
         "mode": mode,
@@ -51,13 +51,26 @@ def route(kind: str, effects: list[str] | None = None) -> dict:
         "writes": [],
         "note": "Routing only. Existing read access is still required; target effects need separate scoped authority.",
     }
+    if project_change:
+        from .engineering_guidance import load
+
+        result["foundation_guidance"] = load()
+    return result
 
 
 def command(argv: list[str]) -> tuple[dict, int]:
     p = argparse.ArgumentParser(prog="agentos workflow")
-    p.add_argument("action", choices=["route"])
-    p.add_argument("--kind", choices=KINDS, required=True)
+    p.add_argument("action", choices=["route", "guidance"])
+    p.add_argument("--kind", choices=KINDS)
     p.add_argument("--effect", choices=EFFECTS, action="append", default=[])
     a = p.parse_args(argv)
+    if a.action == "guidance":
+        if a.kind is not None or a.effect:
+            raise GateError("engineering_guidance_does_not_accept_route_arguments")
+        from .engineering_guidance import load
+
+        return load(), 0
+    if a.kind is None:
+        p.error("route requires --kind")
     result = route(a.kind, a.effect)
     return result, 2 if result["status"] == "BLOCKED" else 0

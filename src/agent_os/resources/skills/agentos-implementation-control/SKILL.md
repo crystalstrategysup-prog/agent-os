@@ -1,16 +1,22 @@
 ---
 name: agentos-implementation-control
-description: "Implement a documented stage without silently expanding its scope."
+description: "Diagnose malfunctions through controlled experiments and implement a documented stage without silently expanding its scope."
 ---
 
 # agentos-implementation-control
 
+For malfunction diagnosis and correction, read and apply **Causal debugging**
+returned by `agentos workflow guidance`. Reuse its current body from entry, or
+read the exact section in `resources/docs/PROCESS.md` if the CLI is unavailable
+(locate installed resources with `agentos resources`). Continue the existing
+journal and evidence; use that method through implementation and verification.
+
 Check that the project gate passes for the exact task. Read the stage contract,
 write paths, authority, and approved checks. Implement a complete change within
 that contract with meaningful regression and negative tests where needed. Do not
-weaken a guard to make it pass. If scope expands, checkpoint the task, update the
-scope and documents, and enter again. Verify source rather than relying on an
-external report.
+weaken a required protection to make it pass. If scope expands, checkpoint the
+task, update the scope and documents, and enter again. Verify source rather than
+relying on an external report.
 
 Select bounded relevant sections before reading large files. Source reads can
 use `agent_os.source_sections` to refuse oversized rendered output

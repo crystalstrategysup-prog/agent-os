@@ -150,6 +150,7 @@ def install(
         "A read-only request does not authorize rewriting instructions; propose that as a separate project change.\n"
         "Read detailed knowledge on demand; verify dated status when the answer or action depends on it.\n"
         "Reuse verified existing answers; do not interrogate the owner again for known facts.\n"
+        "At engineering entry and continuation, consume the current actual text returned by `agentos workflow guidance` (or the same foundation_guidance body in the current workflow/context result). It is the canonical PROCESS.md causal-debugging method; a path, hash or acknowledgement is not its loaded text. Apply it to malfunctions before selecting experiments and preserve the existing experiment journal on resume. Ordinary feature work does not require an artificial failure.\n"
         "For handoff lookup read " + str(resources / "docs/HANDOFF_DISCOVERY.md") + ". Use the selected project/user index; verify before opening. Task results and archives are not current handoffs.\n"
         "For project changes read " + method + ". Use `agentos project questions`, then `enter`, "
         "register required documents, `ready`, approved checks and `close` or `checkpoint`.\n"

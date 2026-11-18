@@ -19,6 +19,7 @@ and speech features are not prerequisites for this route.
 | Component | Responsibility | Boundary |
 | --- | --- | --- |
 | `workflow` | Optional stateless route from declared kind and effects | Does not interpret natural language, execute work, or grant capability |
+| `engineering_guidance` | Bounded current PROCESS section, supplied by workflow/context entry and continuation | No second normative copy, user-home read, experiment execution, authority grant or behavior claim |
 | `project` / `doc_catalog` | Applicable docs, answer reuse, readiness, checks, current closeout | Does not intercept every tool or prove live deployment |
 | `turns` | Explicit project entry and terminal transitions | Does not receive native prompt events or reset a task for an ordinary question |
 | Observation store | Optional separate audit receipts | Is not a prerequisite for reading or project entry |

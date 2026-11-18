@@ -5,6 +5,12 @@ description: "Verify results and evidence, close documented work, or record an h
 
 # agentos-verification-closeout
 
+For a malfunction, evaluate the journal and claimed result against **Causal
+debugging** in `resources/docs/PROCESS.md`, located with `agentos resources`.
+Carry its separate preparation, local, installation and target-verification
+stages into the review. Instruction text or a successful isolated experiment
+alone does not satisfy the original user scenario's acceptance.
+
 Input: implemented stage and current READY. Update docs to match the result and
 register changed content hashes. Run the stage-approved `project check` for each
 check ID. Inspect actual return codes and logs, source/task/revision binding,

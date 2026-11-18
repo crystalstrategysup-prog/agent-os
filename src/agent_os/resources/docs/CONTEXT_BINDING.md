@@ -58,6 +58,18 @@ Ordinary reading with no requested profile dependency returns `FAST_PATH`
 without touching a user home and needs no capsule command at all. Real changes
 still follow PROCESS: documentation before product writes, target gates separate.
 
+For `project-change` and `continuation`, the capsule also materializes
+`foundation_guidance`: the actual bounded causal-debugging section of the
+installed `PROCESS.md`, its document/section hashes and package version. It has
+no user-home dependency. The section remains the single normative source; the
+capsule does not maintain another copy of the method. Consume that content before
+choosing experiments for a malfunction, and restore the existing experiment
+journal on continuation. Ordinary feature work does not require an artificial
+failure. Direct read-only fast paths remain independent of this resource.
+The complete capsule, including guidance, must fit the existing 64 KiB bound;
+oversize output is refused, never silently truncated. A guidance change invalidates
+an old capsule receipt. Delivery and byte binding still leave behavior unproven.
+
 ## Verification and continuation
 
 `context verify --request REQUEST.json --receipt RECEIPT.json` re-materializes

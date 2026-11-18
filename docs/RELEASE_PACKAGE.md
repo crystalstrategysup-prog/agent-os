@@ -23,11 +23,14 @@ The0.7.0rc2 coordination candidate is a separate version/content identity from f
 
 ## Hash-pinned canonical tag publication
 
-The canonical repository tag workflow runs only for that repository, with pinned
-checkout/setup-python commits and a release-job token limited to repository
-contents. It verifies the tag/version and public source, then builds using the
-versioned `.release/VERSION.json` tool versions and SOURCE_DATE_EPOCH. The wheel
-SHA must equal the reviewed pin before any Release is created.
+Run the canonical repository's validation and build locally, then deliver the
+reviewed commit and annotated tag through the existing authenticated Git route.
+Do not create or invoke GitHub Actions. Verify the tag/version and public source,
+then build using the versioned `.release/VERSION.json` tool versions and
+SOURCE_DATE_EPOCH. The wheel SHA must equal the reviewed pin before any Release
+is created. Use version-specific release notes and retain independent asset
+readback; the release publisher's historical default notes do not describe a
+new version.
 
 `tools/release_package.py --output NEW_DIRECTORY` produces the exact wheel,
 commit-bound source ZIP, public MANIFEST.json and SHA256SUMS. The publisher
