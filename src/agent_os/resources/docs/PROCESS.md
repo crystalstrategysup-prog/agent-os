@@ -181,6 +181,12 @@ observation or safe reproduction that distinguishes the remaining explanations.
 Do not invent a failure, infer recovery from a healthy process, or claim causality
 from timing, a matching error label or one successful run.
 
+The same HTTP 503 can originate at different boundaries. An `EXPORT_DEADLINE`
+records the export's observed time boundary; it does not establish a database
+`statement_timeout`. Retain the actual safe error, SQLSTATE if observed, and
+diagnostic classification. A missing SQLSTATE or unobserved database boundary
+remains unknown; never fill it with a guessed cause.
+
 ### Establish a working baseline
 
 Obtain a configuration in which the same scenario meets its success criterion.
@@ -189,6 +195,22 @@ environment and sufficient **finite** values to establish that baseline. Record
 which limits changed and their effective values; an explicit request is not
 proof that a setting took effect. Keep data, scenario and required semantics
 equivalent. Reuse a qualified baseline only while its relevant inputs match.
+
+Before launch, check compatible finite limits along the whole relevant chain:
+**producer/exporter → writer → reader → restore**. Compare effective units and
+semantics, including output, chunk/page, stored, expanded and restore-input sizes;
+raising the producer's ceiling does not establish downstream capacity. Account
+for the files that can coexist on each filesystem: primary data/output, staging
+and temporary copies, rollback/WAL and other journals, indexes and service data,
+retained partials and required recovery copies. Compare their combined requirement
+and justified headroom with available space. Preserve the previous configuration
+and an applicable rollback route; do not discard a partial to make the budget fit.
+
+Keep **configured ceilings**, **estimated requirements**, **observed usage** and
+**measured peaks** separate. A configured stage budget, end-of-run file size or
+arithmetic sum is not a measured disk peak or process RSS. Record the measurement
+method and scope, or leave the peak/RSS unknown. Missing sizing facts call for a
+bounded measurement or explicit estimate, not an invented capacity guarantee.
 
 Preserve authentication, authorization/access boundaries, isolation, data
 integrity and every mandatory protection. An operational experiment must not
@@ -205,6 +227,17 @@ back over a broken baseline and interpret the resulting failures as their effect
 For a necessary limit adjustment on an actual target, retain its existing explicit
 setter, ownership, authority, readback and rollback requirements.
 
+Retain failed-baseline evidence and partial outputs. Use observed elapsed time,
+completed/remaining work, bytes, phases and the first boundary to select the next
+distinguishing experiment and justify its finite resource profile. State the
+remaining uncertainty, expected new information, maximum duration/resources and
+stop conditions before launch. Do not cycle through known-insufficient profiles
+or repeat identical checks that add no knowledge. There is no automatic limit
+escalation or permission to exceed an approved ceiling; a further profile needs
+its existing scoped authority. A grouped profile change may establish a working
+baseline, but does not identify one factor's cause. Restore restrictions one at a
+time only after that baseline succeeds.
+
 ### Isolate the factor and demonstrate reversal
 
 Choose each experiment to discriminate between named hypotheses or to verify a
@@ -216,6 +249,12 @@ a bounded binary search may locate a group; then isolate the individual factor.
 If an effect requires a combination, test the combinations explicitly and name
 the interaction. Group removal or changing several settings at once is not proof
 of a single cause.
+
+For two binary factors, observe all four states: neither enabled, each enabled
+separately, and both enabled, with other factors and initial conditions fixed.
+Do not infer an unmeasured reference state from assumed monotonicity or knowledge
+of the implementation. If a state cannot be tested safely, identify the observed
+states and keep the broader interaction claim partial.
 
 Demonstrate a reversible sequence: **working configuration → failure → restoration
 → repeated failure**, with primary evidence for all four steps. For example,
@@ -232,16 +271,21 @@ identity through the existing route first. When reversal cannot safely be tested
 retain partial observations, explain the limitation and keep the causal claim
 unconfirmed. A synthetic reversal establishes only that experiment's scope;
 claiming the historical or target incident's cause requires matching evidence.
+An interrupted or stopped chat does not prove that an external process stopped.
+Restore the original operation ID, inspect its durable result and actual effects,
+and preserve UNKNOWN when evidence is insufficient. A new session, operation ID
+or transport is not permission to repeat that effect.
 
 ### Keep a compact experiment journal
 
 Keep the journal with the existing work/bug/incident record, linked by the current
 writer. Do not create a competing status ledger or copy private payloads into
-public reports. Record every discriminating run, including failed baselines:
+public reports. Retain the experiment ID, named hypotheses and differing forecasts
+before launch. Record every discriminating run, including failed baselines:
 
-| Step | Factor and actual value | Fixed conditions | Expected result | Actual result | Error and first failing location | Evidence reference | Conclusion and next step |
+| Step | Factor and actual value | Fixed conditions | Hypothesis and forecast | Actual result | Error and first failing location | Evidence reference | Conclusion and next step |
 |---|---|---|---|---|---|---|---|
-| Experiment/run ID | Effective setting or controlled input | Exact relevant pins, fixture, initial state and load | Prediction before the run | Observed criterion and response/exit | Safe code and boundary, or none | Primary retained receipt/artifact | What changed in knowledge; next discriminating action |
+| Experiment/run ID | Effective setting or controlled input | Exact relevant pins, fixture, initial state and load | Named alternatives and their predictions, retained before the run | Observed criterion and response/exit | Safe code and boundary, or none | Primary retained receipt/artifact | What changed in knowledge; next discriminating action |
 
 Label **hypothesis**, **observation**, **confirmed conclusion** and **unknown**
 separately. A receipt proves only its actual scope. Retain failed observations
@@ -252,6 +296,15 @@ unprepared data, redundant checks and unnecessary sequential execution. Prepare
 stable inputs once and parallelize independent observations without changing a
 controlled experiment or creating competing writers.
 
+At existing checkpoints, assess the investigation's own bottleneck: elapsed work
+and waits, slow remote access, unprepared local Linux environment/data, missing
+declared dependencies, repeated checks or needless serialization. Remedy a
+material bottleneck within current authority and verify the effect; otherwise
+state the exact boundary and next owner/action. Do not leave a solvable setup
+problem as a permanent blocker. Use subagents for useful independent work and
+review, with one owner for each changed file and environment. This adds no fixed
+checkpoint timer or authority to alter a protected environment.
+
 ### Correct, verify and continue
 
 After establishing the cause, make the smallest correction that satisfies the
@@ -259,6 +312,9 @@ contract. Re-run the original user scenario, relevant boundaries and regressions
 and exercise rollback where applicable. A mitigation may be useful before proof;
 identify it as a mitigation and keep the cause unresolved. Do not present an
 isolated or synthetic success as a working-product fix.
+For resource/admission changes, exercise the relevant capacity boundary, actual
+resource release and the contracted refusal or queue behavior; a successful
+request below the limit alone does not establish those properties.
 
 Report these stages separately, with the exact source, artifact and evidence:
 
@@ -269,14 +325,33 @@ Report these stages separately, with the exact source, artifact and evidence:
 | INSTALLED | The authorized target installation and readback are confirmed. |
 | TARGET_VERIFIED | The original scenario actually passed in the target environment. |
 
+Artifact status is a separate dimension. A checksum, retained partial or
+`SEALED` label establishes only its verified artifact contract; it does not prove
+source completeness, representativeness, successful restore or product acceptance.
+An actual restore also establishes only the verified restored scope. Keep missing
+required/optional work and the original user criterion visible.
+
+For result handoff, follow the existing [coordination](WORK_COORDINATION.md),
+[completion](COMPLETION.md) and [durable handoff](INDEXED_HANDOFF.md) contracts as
+applicable. Keep prepared, send-uncertain, recipient-received and semantically
+accepted results separate; use their existing states rather than a second ledger.
+A visible sent message or sender enqueue is not durable preservation or confirmed
+recipient receipt. Verify retained bytes/readback and the actual receiving-side
+evidence before declaring delivery complete. A receiver ACK is not semantic
+acceptance; a reviewed result may still be held or partial. Reconcile an uncertain
+send by its original identity before another attempt.
+
 These are reporting stages, not replacements for existing task/Atlas statuses.
 On continuation, restore the user criterion, reproduction/baseline pins, journal,
 current effective configuration, confirmed/unknown findings and next experiment.
 Recheck changed dependencies; reuse unchanged applicable evidence. Installation,
 document pickup and agent behavior remain distinct. Qualify changes to this method
 with fresh-session behavior on one restriction, a failing baseline, interacting
-factors, non-reproduction and a protected data/access boundary. Evaluate the
-experiment chosen and conclusions drawn, not just the presence of this text.
+factors, non-reproduction, a protected data/access boundary and continuation with
+an existing journal and uncertain operation. Evaluate the experiments actually
+chosen, preserved history, reconciliation and conclusions, not just the presence
+of this text. A fresh planning exercise can test interpretation of partial
+evidence; it does not execute or establish the source incident's next result.
 
 <!-- agentos:causal-debugging:end -->
 

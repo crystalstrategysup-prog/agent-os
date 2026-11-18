@@ -1,0 +1,10 @@
+{
+  "build_versions": {
+    "build": "1.6.1",
+    "setuptools": "84.2.1",
+    "wheel": "0.48.0"
+  },
+  "source_date_epoch": 1794974400,
+  "version": "0.8.0rc2056",
+  "wheel_sha256": "2f7e87964567fc988d9a5fbf39817b435f6a5fb6179dc79d23d24fdcae759303"
+}

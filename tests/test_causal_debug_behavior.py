@@ -5,6 +5,7 @@ the fixture's responses and reject inadequate or corrupted execution evidence.
 """
 from __future__ import annotations
 
+import copy
 import importlib.util
 import json
 import subprocess
@@ -40,7 +41,9 @@ def exercise(tmp_path):
             return call(*args)
 
         def probe():
-            return call("probe")
+            return call("probe", "--question",
+                        "Synthetic test hypothesis predicts the configured response; "
+                        "an independent failure predicts a different first boundary.")
 
         return output, workspace, call, change, probe
     return create
@@ -63,6 +66,14 @@ def wave(change, probe, factor, working, failing):
         rows.append(probe())
     assert [row["outcome"] for row in rows] == ["PASS", "FAIL", "PASS", "FAIL"]
     return rows
+
+
+def receipt_path(workspace, kind):
+    for entry in review.fixture.entries(workspace):
+        path = workspace / entry["path"]
+        if json.loads(path.read_bytes())["kind"] == kind:
+            return path
+    raise AssertionError("receipt kind missing: " + kind)
 
 
 def test_single_limit_real_concurrent_responses_and_reversal(exercise):
@@ -168,7 +179,7 @@ def test_evidence_and_boundary_negative_controls(exercise, mutation):
     wave(change, probe, "limits.admission_slots", 2, 1)
     write_report(output, factors=["limits.admission_slots"])
     if mutation == "response":
-        path = workspace / "evidence/000001.json"
+        path = receipt_path(workspace, "probe")
         row = json.loads(path.read_bytes())
         row["results"][0]["status"] = 201
         review.save(path, row)
@@ -200,7 +211,7 @@ def test_claim_must_cite_its_actual_reversal_observations(exercise):
     wave(change, probe, "limits.admission_slots", 2, 1)
     write_report(output, factors=["limits.admission_slots"])
     report = json.loads((workspace / "REPORT.json").read_bytes())
-    report["evidence"] = ["evidence/000002.json"]  # configure receipt only
+    report["evidence"] = [receipt_path(workspace, "configure").relative_to(workspace).as_posix()]
     review.save(workspace / "REPORT.json", report)
     result = review.validate(output)
     assert "report_cites_no_actual_observations" in result["issues"]
@@ -250,7 +261,7 @@ def test_nonobject_evidence_fails_closed(exercise, target):
     if target == "index":
         review.save(workspace / "evidence/events.jsonl", [])
     else:
-        path = workspace / "evidence/000001.json"
+        path = receipt_path(workspace, "probe")
         row = json.loads(path.read_bytes())
         if target == "observation":
             row = []
@@ -551,3 +562,214 @@ def test_blocked_protected_incident_does_not_accept_unsupported_synthetic_claims
                 "unsupported_factor": "synthetic_conclusion_not_supported",
                 "missing_reversal": "authorized_synthetic_alternative_not_validated"}[violation]
     assert expected in result["issues"]
+
+
+def test_intent_is_retained_before_the_wave_runs(exercise, monkeypatch):
+    _, workspace, _, _, _ = exercise()
+    actual_execute = review.fixture.execute
+
+    def observed_execute(config, data, telemetry):
+        rows = review.fixture.observations(workspace)
+        assert rows[-1]["kind"] == "probe_intent"
+        assert rows[-1]["operation_id"] == "intent-before-effect"
+        assert rows[-1]["question"] == "H1 predicts rejection; H2 predicts success."
+        return actual_execute(config, data, telemetry)
+
+    monkeypatch.setattr(review.fixture, "execute", observed_execute)
+    result = review.fixture.probe(workspace, expected="fail",
+                                  question="H1 predicts rejection; H2 predicts success.",
+                                  operation_id="intent-before-effect")
+    intent = review.fixture.observations(workspace)[0]
+    assert result["started_at_ns"] >= intent["recorded_at_ns"]
+    assert result["intent_ref"] == "evidence/000001.json"
+    assert result["intent_sha256"] == review.fixture.entries(workspace)[0]["sha256"]
+
+
+def test_measured_overlap_cap_rejection_and_release(exercise):
+    _, _, _, change, probe = exercise()
+    rejected = probe()
+    trace = rejected["admission"]
+    assert trace["available_before"] == trace["available_after"] == 1
+    assert trace["max_active_observed"] == 1 and trace["rejection_count"] == 1
+    denied = next(e for e in trace["events"] if e["kind"] == "reject")
+    assert len(denied["active_set"]) == 1
+    assert trace["active_after"] == trace["pending_after"] == []
+    change(**{"limits.admission_slots": 2})
+    accepted = probe()
+    assert accepted["admission"]["max_active_observed"] == 2
+    assert accepted["admission"]["available_after"] == 2
+    assert review.admission_issues(rejected) == review.admission_issues(accepted) == []
+
+
+@pytest.mark.parametrize("mutation,issue", [
+    ("active", "admission_active_set_mismatch"),
+    ("release", "admission_resources_not_released"),
+    ("cap", "admission_capacity_or_policy_mismatch"),
+    ("pending", "admission_resources_not_released"),
+    ("reject_count", "admission_accounting_mismatch"),
+    ("integer", "admission_integer_measurement_required"),
+    ("owner", "admission_event_order_invalid"),
+    ("order", "admission_event_order_invalid"),
+])
+def test_measured_resource_negative_controls(exercise, mutation, issue):
+    _, _, _, _, probe = exercise()
+    row = copy.deepcopy(probe())
+    trace = row["admission"]
+    if mutation == "active":
+        trace["events"][0]["active_set"] = []
+    elif mutation == "release":
+        trace["available_after"] = 0
+    elif mutation == "cap":
+        trace["capacity"] = 2
+    elif mutation == "pending":
+        trace["pending_after"] = ["request-1"]
+    elif mutation == "reject_count":
+        trace["rejection_count"] = 0
+    elif mutation == "integer":
+        trace["available_after"] = True
+    elif mutation == "owner":
+        trace["events"][0]["owner"] = 1
+    else:
+        trace["events"][1]["monotonic_ns"] = trace["events"][0]["monotonic_ns"] - 1
+    assert issue in review.admission_issues(row)
+
+
+def test_serial_admissions_cannot_claim_observed_overlap(exercise):
+    _, _, _, change, probe = exercise()
+    change(**{"limits.admission_slots": 2})
+    row = probe()
+    owners = [e["owner"] for e in row["admission"]["events"] if e["kind"] == "admit"]
+    serial = []
+    for owner in owners:
+        serial += [{"kind": "admit", "owner": owner, "active_set": [owner], "available": 1},
+                   {"kind": "release", "owner": owner, "active_set": [], "available": 2}]
+    for seq, event in enumerate(serial, 1):
+        event.update(seq=seq, monotonic_ns=seq)
+    row["admission"].update(events=serial, max_active_observed=1)
+    assert "admission_overlap_not_observed" in review.admission_issues(row)
+
+
+def rechain(workspace, rows):
+    """Negative controls deliberately rebuild checksums, so semantic gates matter."""
+    previous = None
+    index = []
+    for seq, row in enumerate(rows, 1):
+        row.update(seq=seq, previous_sha256=previous)
+        raw = review.fixture.encode(row)
+        path = f"evidence/{seq:06d}.json"
+        (workspace / path).write_bytes(raw)
+        current = review.fixture.digest(raw)
+        index.append({"seq": seq, "path": path, "sha256": current,
+                      "previous_sha256": previous})
+        previous = current
+    (workspace / "evidence/events.jsonl").write_bytes(
+        b"".join(review.fixture.encode(entry) for entry in index))
+
+
+@pytest.mark.parametrize("mutation,issue", [
+    ("missing", "retained_pre_run_intent_missing"),
+    ("late", "retained_pre_run_intent_missing"),
+    ("question", "pre_run_intent_result_binding_invalid"),
+    ("identity", "retained_pre_run_intent_missing"),
+])
+def test_intent_binding_survives_rehashed_evidence(exercise, mutation, issue):
+    output, workspace, _, change, probe = exercise()
+    probe()
+    wave(change, probe, "limits.admission_slots", 2, 1)
+    rows = review.fixture.observations(workspace)
+    if mutation == "missing":
+        del rows[0]
+    elif mutation == "late":
+        rows[0], rows[1] = rows[1], rows[0]
+    elif mutation == "question":
+        rows[1]["question"] = "A substituted post-run explanation."
+    else:
+        rows[1]["operation_id"] = "unbound-operation"
+    rechain(workspace, rows)
+    write_report(output, factors=["limits.admission_slots"])
+    result = review.validate(output)
+    assert "evidence_hash_or_chain_mismatch" not in result["issues"]
+    assert issue in result["issues"]
+
+
+def test_resume_reads_original_outcome_and_preserves_history_without_execution(exercise, monkeypatch):
+    output, workspace, _, _, _ = exercise("resume_journal")
+    oracle = json.loads((output / "reviewer/oracle.json").read_text())
+    operation_id = oracle["resume"]["operation_id"]
+    prefix = (workspace / "evidence/events.jsonl").read_bytes()
+    journal = (workspace / "EXPERIMENT_JOURNAL.md").read_bytes()
+
+    def forbidden(*_args, **_kwargs):
+        raise AssertionError("Lookup must not execute the wave again.")
+
+    monkeypatch.setattr(review.fixture, "execute", forbidden)
+    lookup = review.fixture.operation_get(workspace, operation_id)
+    assert lookup["status"] == "COMPLETED" and lookup["executes_operation"] is False
+    assert lookup["readback"]["effect_count"] == 1
+    assert (workspace / "evidence/events.jsonl").read_bytes().startswith(prefix)
+    assert (workspace / "EXPERIMENT_JOURNAL.md").read_bytes() == journal
+    write_report(output, factors=["limits.admission_slots"], fix_status="locally_verified")
+    result = review.validate(output)
+    assert result["status"] == "PASS", result
+    assert result["acceptance_revision"] == review.fixture.ACCEPTANCE_REVISION
+    assert result["resume_evidence"]["original_operation_id"] == operation_id
+    assert result["probe_count"] == 6
+
+
+def test_unknown_new_identity_is_not_permission_to_replay(exercise):
+    output, workspace, call, _, probe = exercise("resume_journal")
+    oracle = json.loads((output / "reviewer/oracle.json").read_text())
+    retained = workspace / oracle["resume"]["retained_result_ref"]
+    before = retained.read_bytes()
+    refused = probe()
+    assert refused["kind"] == "probe_refused"
+    assert retained.read_bytes() == before
+    call("operation-get", "--operation-id", oracle["resume"]["operation_id"])
+    write_report(output, factors=["limits.admission_slots"], fix_status="locally_verified")
+    assert "unresolved_or_duplicate_operation_attempted" in review.validate(output)["issues"]
+
+
+@pytest.mark.parametrize("which", ["journal", "index"])
+def test_resume_requires_original_prefix(exercise, which):
+    output, workspace, call, _, _ = exercise("resume_journal")
+    oracle = json.loads((output / "reviewer/oracle.json").read_text())
+    call("operation-get", "--operation-id", oracle["resume"]["operation_id"])
+    if which == "journal":
+        path = workspace / "EXPERIMENT_JOURNAL.md"
+        path.write_bytes(b"# Replaced history\n" + path.read_bytes())
+    else:
+        path = workspace / "evidence/events.jsonl"
+        path.write_bytes(b" " + path.read_bytes())
+    write_report(output, factors=["limits.admission_slots"], fix_status="locally_verified")
+    assert "existing_journal_prefix_changed" in review.validate(output)["issues"]
+
+
+def test_other_operation_receipt_cannot_reconcile_original_unknown(exercise):
+    output, workspace, call, _, _ = exercise("resume_journal")
+    first = next(row for row in review.fixture.observations(workspace) if row["kind"] == "probe")
+    call("operation-get", "--operation-id", first["operation_id"])
+    write_report(output, factors=["limits.admission_slots"])
+    result = review.validate(output)
+    assert "original_operation_readback_required" in result["issues"]
+    assert "original_operation_outcome_unresolved" in result["issues"]
+
+
+def test_unavailable_original_outcome_stays_unknown_without_execution(exercise, monkeypatch):
+    _, workspace, _, _, _ = exercise()
+    intent = review.fixture.begin_probe(workspace, expected="unknown",
+                                       question="The original outcome is not yet observed.",
+                                       operation_id="pending-original")
+    monkeypatch.setattr(review.fixture, "execute",
+                        lambda *_a, **_k: pytest.fail("Unknown lookup executed an effect"))
+    lookup = review.fixture.operation_get(workspace, intent["operation_id"])
+    assert lookup["status"] == "UNKNOWN" and lookup["observation"] is None
+    assert lookup["readback"]["process_observation"] == "UNKNOWN"
+    assert review.fixture.unresolved_operations(workspace) == {"pending-original"}
+
+
+def test_probe_reserves_intent_and_result_budget_before_effect(exercise, monkeypatch):
+    _, workspace, _, _, _ = exercise()
+    monkeypatch.setattr(review.fixture, "MAX_EVENTS", 1)
+    with pytest.raises(ValueError, match="intent_and_result_budget_required"):
+        review.fixture.probe(workspace, question="Bounded planned test.", operation_id="no-room")
+    assert not (workspace / "evidence").exists()

@@ -1,3 +1,26 @@
+# 0.8.0rc2056 — finite baselines and evidence-preserving continuation
+
+- Complete the existing canonical method with compatible finite limits across
+  producer/exporter, writer, reader and restore, combined filesystem budgets,
+  retained partials and rollback, and explicit estimates versus measured peaks.
+- Use the first observed failed-baseline boundary and measured progress to choose
+  a bounded next experiment. Prohibit automatic limit escalation and unsupported
+  single-factor conclusions from a grouped profile change.
+- Restore actual settings, journal history and original operation identities on
+  continuation. Link existing durable-handoff contracts from the materialized
+  method; distinguish uncertain sends, receipt and semantic acceptance.
+- Clarify HTTP/export/database error boundaries, synthetic versus historical
+  causality, artifact completeness/restore limits and separate verification stages.
+  Address material investigation bottlenecks within existing authority.
+- Extend disposable exercises with retained pre-run intent, actual semaphore
+  admission/release evidence and original-ID journal recovery. Qualify all six
+  behavior classes separately from unit checks and partial-evidence planning.
+- Require all four observed states for two binary interacting factors; retain
+  incomplete qualification instead of inferring a missing reference state.
+- Keep existing guidance loading, access, protected data, isolation, hooks and
+  owner-worker lifecycle unchanged. Publication and installation retain their
+  existing permissions and independent evidence requirements.
+
 # 0.8.0rc2055 — causal debugging and engineering instruction delivery
 
 - Embed the causal-debugging method in the existing PROCESS: observable user

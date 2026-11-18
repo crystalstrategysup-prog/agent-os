@@ -1096,5 +1096,17 @@
     "scope": "Route engineering start and continuation to the actual canonical PROCESS causal-debugging body; restore experiment state without replaying unchanged accepted work.",
     "historical_source_pins": "PRESERVED",
     "runtime_behavior": "REQUIRES_SEPARATE_OBSERVATION"
+  },
+  "causal_followup_increment": {
+    "version": "0.8.0rc2056",
+    "base_commit": "d7fca96e3bc5b40fe7f758b0a471aa7f2452bf70",
+    "selected_tree_sha256": "e1887b6bd01c54c50c98dd9adf1735f0dbbb7adc8db8faef13dc0580d6753eff",
+    "atlas_members_changed": false,
+    "process_document_sha256": "b1c0ec1fe79813d981115f14e80bc98856e03bf0581ce292cd03f308ef830d30",
+    "guidance_sha256": "0deed1df1feb474ca91208d5162c008029e8ca76ed21bbc74647e68b6e165fa6",
+    "guidance_bytes": 13400,
+    "scope": "Clarify the existing canonical causal method and qualify journal continuation; unchanged Atlas entry/continuation routes materialize the updated method.",
+    "historical_source_pins": "PRESERVED",
+    "runtime_behavior": "REQUIRES_SEPARATE_OBSERVATION"
   }
 }

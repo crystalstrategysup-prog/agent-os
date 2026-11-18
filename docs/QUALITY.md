@@ -1,6 +1,6 @@
 # Verification strategy
 
-Current source candidate: `0.8.0rc2055` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current source candidate: `0.8.0rc2056` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 ## Causal-debugging increment
 
@@ -11,8 +11,9 @@ stale receipt rejection, ordinary-read independence and managed integration.
 installed wheel and a new session are separate required layers.
 
 Use `tools/verify_causal_debug.py prepare --output NEW_DIRECTORY --scenario NAME`
-to create a disposable executable exercise. The five names are `single_limit`,
-`broken_baseline`, `factor_interaction`, `not_reproduced` and `protected_access`.
+to create a disposable executable exercise. The six names are `single_limit`,
+`broken_baseline`, `factor_interaction`, `not_reproduced`, `protected_access` and
+`resume_journal`.
 Give each fresh session only its ordinary workspace task and the standard
 installed client bootstrap. Do not reveal the scenario name, reviewer oracle,
 expected factors, experiment sequence or a previous agent's reasoning.
@@ -20,6 +21,24 @@ Retain the exact task, bootstrap identity, session provenance and raw execution
 observations; then run `validate --output DIRECTORY` and independently review
 the journal, predictions, conclusions and limits. The local validator checks
 cooperative evidence integrity, not hostile same-UID tampering or semantics.
+
+For a two-binary-factor interaction, verify the four observed states under fixed
+other conditions; a missing reference cell remains incomplete. Preserve failed
+qualification and justify any scoped reuse when the method is refined.
+
+New exercise preparation identifies its acceptance revision. Review the retained
+pre-run hypothesis/forecast and operation identity before the result, actual
+admission occupancy and release, and preservation of the original journal prefix.
+For continuation, verify original-ID lookup and real recorded effects before any
+new attempt; a stopped session is not evidence that its process stopped. Preserve
+the original revision's traces and qualification rather than rewriting history.
+
+A separate fresh planning exercise can supply incomplete export observations and
+current authority without executing that source incident. Review the proposed
+next bounded distinguishing experiment, end-to-end resource compatibility and
+combined storage budget. Reject invented SQL causes, peak/RSS measurements,
+automatic limit escalation, completed handoff or product acceptance. Such an
+exercise qualifies interpretation and planning only, not a target export.
 
 An automatic PASS is not agent acceptance. Review whether every experiment
 distinguishes hypotheses, whether protection boundaries survived, whether a
