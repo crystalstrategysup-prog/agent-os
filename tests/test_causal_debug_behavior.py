@@ -297,6 +297,41 @@ def test_supporting_journal_cannot_replace_primary_reversal_evidence(exercise):
     assert "single_factor_reversible_causality_missing" in result["issues"]
 
 
+def test_index_reference_is_accepted_separately_from_execution_receipts(exercise):
+    output, workspace, _, change, probe = exercise()
+    probe()
+    wave(change, probe, "limits.admission_slots", 2, 1)
+    write_report(output, factors=["limits.admission_slots"])
+    report = json.loads((workspace / "REPORT.json").read_bytes())
+    report["evidence"].append("evidence/events.jsonl")
+    review.save(workspace / "REPORT.json", report)
+    result = review.validate(output)
+    assert result["status"] == "PASS", result
+    assert "evidence/events.jsonl" not in result["primary_evidence_refs"]
+    assert result["supplementary_evidence"] == []
+    raw = (workspace / "evidence/events.jsonl").read_bytes()
+    assert result["evidence_indexes"] == [{
+        "path": "evidence/events.jsonl", "bytes": len(raw),
+        "sha256": review.fixture.digest(raw),
+        "role": "RECEIPT_INDEX_NOT_EXECUTION_EVIDENCE"}]
+
+
+def test_index_reference_alone_cannot_replace_primary_observations(exercise):
+    output, workspace, _, change, probe = exercise()
+    probe()
+    wave(change, probe, "limits.admission_slots", 2, 1)
+    write_report(output, factors=["limits.admission_slots"])
+    report = json.loads((workspace / "REPORT.json").read_bytes())
+    report["evidence"] = ["evidence/events.jsonl"]
+    review.save(workspace / "REPORT.json", report)
+    result = review.validate(output)
+    assert result["status"] == "FAIL"
+    assert len(result["evidence_indexes"]) == 1
+    assert result["primary_evidence_refs"] == []
+    assert "report_cites_no_actual_observations" in result["issues"]
+    assert "single_factor_reversible_causality_missing" in result["issues"]
+
+
 @pytest.mark.parametrize("kind", ["missing", "traversal", "absolute", "backslash",
                                  "directory", "symlink", "parent_symlink",
                                  "oversized", "unindexed_primary"])

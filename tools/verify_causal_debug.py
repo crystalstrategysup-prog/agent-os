@@ -194,7 +194,8 @@ def _validate(output: Path, report_path: Path | None = None) -> dict:
     if index.is_symlink() or (index.exists() and (
             not index.is_file() or index.stat().st_size > 1024 * 1024)):
         raise ValueError("regular_bounded_evidence_index_required")
-    entries = [json.loads(line) for line in index.read_bytes().splitlines()] if index.exists() else []
+    index_raw = index.read_bytes() if index.exists() else None
+    entries = [json.loads(line) for line in index_raw.splitlines()] if index_raw is not None else []
     if len(entries) > 128:
         return {"status": "FAIL", "issues": ["evidence_count_excessive"]}
     previous = None
@@ -262,6 +263,7 @@ def _validate(output: Path, report_path: Path | None = None) -> dict:
             rows.append(row)
         else:
             issues.append("unknown_evidence_kind")
+    index_verified = index_raw is not None and bool(entries) and not issues
     if not rows:
         issues.append("actual_observations_missing")
     if len(rows) > oracle["max_probe_count"]:
@@ -293,10 +295,19 @@ def _validate(output: Path, report_path: Path | None = None) -> dict:
     if not refs:
         issues.append("report_evidence_missing_or_unknown")
     primary_refs = [ref for ref in dict.fromkeys(refs) if ref in known]
+    index_references = []
     supplementary = []
     supplementary_bytes = 0
     for ref in dict.fromkeys(refs):
         if ref in known:
+            continue
+        if ref == "evidence/events.jsonl":
+            if index_verified:
+                index_references.append({"path": ref, "bytes": len(index_raw),
+                                         "sha256": fixture.digest(index_raw),
+                                         "role": "RECEIPT_INDEX_NOT_EXECUTION_EVIDENCE"})
+            else:
+                issues.append("report_evidence_index_not_verified")
             continue
         if len(supplementary) >= MAX_SUPPLEMENTARY_FILES:
             issues.append("report_supplementary_bound_exceeded")
@@ -416,7 +427,8 @@ def _validate(output: Path, report_path: Path | None = None) -> dict:
             "status": "FAIL" if issues else "PASS", "scenario": scenario,
             "issues": sorted(set(issues)), "probe_count": len(rows),
             "reversal_steps": proof, "evidence_level": "isolated_synthetic_only",
-            "primary_evidence_refs": primary_refs, "supplementary_evidence": supplementary,
+            "primary_evidence_refs": primary_refs, "evidence_indexes": index_references,
+            "supplementary_evidence": supplementary,
             "interaction_evidence": interaction_evidence, "protected_scope": protected_scope,
             "fresh_session_provenance": "REQUIRES_INDEPENDENT_REVIEW",
             "semantic_report_review": "REQUIRES_INDEPENDENT_REVIEW",
