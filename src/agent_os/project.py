@@ -414,9 +414,15 @@ def reuse_answers(root: Path, task_id: str, supplied: dict) -> dict:
     if not isinstance(supplied, dict):
         raise GateError("answers_must_be_object")
     previous = task["answers"]
-    if any(k != "authority" and previous.get(k) != v for k, v in supplied.items()):
+    if any(k not in {"authority", "development"} and previous.get(k) != v
+           for k, v in supplied.items()):
         raise GateError("scope_changed_supply_full_answers")
-    return {**{k: v for k, v in previous.items() if k != "authority"}, **supplied}
+    result = {**{k: v for k, v in previous.items() if k != "authority"}, **supplied}
+    if "development" in result:
+        from .development_level import normalize
+
+        result["development"] = normalize(result["development"])
+    return result
 
 
 def questionnaire(
@@ -431,11 +437,13 @@ def questionnaire(
     if resume_task:
         answers = reuse_answers(root, resume_task, answers)
     from .profile_adapter import context as profile_context
+    from .development_level import effective
 
     return {
         "schema": "agentos.questionnaire/v1",
         "existing_project": bool(project),
         "suggested_answers": answers,
+        "development": effective(answers),
         "reused_from_task": resume_task,
         "reuse_scope": "same_scope_only_current_authority_not_inherited",
         "known_context": project["context"] if project else {},
@@ -519,6 +527,10 @@ def _answers(raw: dict) -> dict:
         raise GateError("duplicate_acceptance_id")
     if raw["change_kind"] == "observe" and raw["write_paths"]:
         raise GateError("observe_cannot_authorize_product_writes")
+    if "development" in raw:
+        from .development_level import normalize
+
+        return {**raw, "development": normalize(raw["development"])}
     return raw
 
 
@@ -572,6 +584,10 @@ def enter(
             task = load_task(root, resume_task)
             if task["status"] == "CLOSED":
                 raise GateError("closed_task_is_immutable_start_new_task")
+            if "development" not in answers and "development" in task["answers"]:
+                from .development_level import effective
+
+                answers = {**answers, "development": effective(answers, task["answers"])}
             if task["status"] == "RECOVERY_REQUIRED":
                 # Keep the existing project -> user-turn lock order through the
                 # entire metadata entry transaction, before any answers/docs write.
@@ -697,6 +713,9 @@ def enter(
                 "required_documents": selection, "created_drafts": created,
                 "missing_documents": document_check(root, task)["errors"],
             }
+            from .development_level import effective
+
+            result["development"] = effective(answers)
         except BaseException:
             _recover_entry(root, user_home)
             raise

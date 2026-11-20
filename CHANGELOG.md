@@ -1,3 +1,19 @@
+# Unreleased — retain scoped development choices and level-1 cadence
+
+- Type the existing task/context development selection, normalize `1D` to level
+  1, retain an omitted choice on same-task resume, and permit an explicit choice
+  change with reused answers while requiring fresh authority.
+- Materialize the selected level/scope with the canonical method through
+  workflow and context. Keep legacy stored objects compatible; no hidden history
+  lookup, settings register, readiness grant or target-authority change.
+- Clarify level-1 connected increments, sufficient changed-link/risk checks,
+  internal progress versus terminal handoff, available base plus delta, optional
+  notification failures and measured delegation costs. Preserve existing whole
+  stand, modularity, stubs, recursive refinement and protected-effect rules.
+- Correct the context guide's stale causal-default description. Source changes
+  and context binding remain distinct from observed active-worker application;
+  this candidate makes no publication, installation or acceleration claim.
+
 # 0.8.0rc2058 — explicit recovery of a missing-project chat binding
 
 - Add `project recover-binding` for an exact ENTERED receipt whose former root

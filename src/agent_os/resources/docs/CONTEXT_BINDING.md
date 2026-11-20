@@ -38,7 +38,8 @@ Request schema `agentos.context-request/v1`:
     "acceptance": ["Verify the requested result against evidence"],
     "known_answers": {"comparison_unit": "the already agreed unit"},
     "authority_ref": "current owner instruction reference, not a new grant",
-    "source_ref": "current task answers or accepted handoff reference"
+    "source_ref": "current task answers or accepted handoff reference",
+    "development": {"level": 1, "scope": "project"}
   }
 }
 ```
@@ -58,14 +59,22 @@ Ordinary reading with no requested profile dependency returns `FAST_PATH`
 without touching a user home and needs no capsule command at all. Real changes
 still follow PROCESS: documentation before product writes, target gates separate.
 
+The optional `goal.development` has exactly `level` and `scope`: integer 1–5
+(input alias `1D` normalizes to 1) and a nonempty scope string up to 200 characters.
+Carry it with the current goal across sessions. The stateless builder does not
+recover a choice omitted by its caller or infer a hierarchy from scope names.
+Legacy goals remain unchanged; absent a carried choice, the materialized default
+is level 3 with scope `task`. Invalid explicit choices are refused, not defaulted.
+
 For `project-change` and `continuation`, the capsule also materializes
-`foundation_guidance`: the actual bounded causal-debugging section of the
-installed `PROCESS.md`, its document/section hashes and package version. It has
-no user-home dependency. The section remains the single normative source; the
-capsule does not maintain another copy of the method. Consume that content before
-choosing experiments for a malfunction, and restore the existing experiment
-journal on continuation. Ordinary feature work does not require an artificial
-failure. Direct read-only fast paths remain independent of this resource.
+`foundation_guidance`: the actual bounded **Project development** section of the
+selected `PROCESS.md`, its document/section hashes, package version and effective
+`development` selection. The capsule repeats that selection beside the goal;
+its hash binds both selection and method content. This has no user-home dependency.
+The section remains the single normative source, not a second method copy.
+For a concrete malfunction, explicitly load `workflow guidance --method
+causal-debugging` and restore its existing experiment journal. Ordinary feature
+work requires no artificial failure. Direct read-only fast paths remain independent.
 The complete capsule, including guidance, must fit the existing 64 KiB bound;
 oversize output is refused, never silently truncated. A guidance change invalidates
 an old capsule receipt. Delivery and byte binding still leave behavior unproven.
@@ -82,8 +91,8 @@ authenticity of that event or whether the agent applied the rules. Collect the
 actual provider event independently for live acceptance. A matching receipt has
 `behavior_compliance: "NOT_PROVEN"` and grants no authority.
 
-At a handoff, retain the original goal, scope, semantic criteria, known answers
-and source references. Revalidate the current authority at the target; copying
+At a handoff, retain the original goal, scope, semantic criteria, known answers,
+development choice and source references. Revalidate the current authority at the target; copying
 `authority_ref` does not renew or widen it. Reconcile an old writer and enforce
 the target lease under SESSION_LAUNCH before any target write. If an answer is
 already known for unchanged scope, reuse it; ask only a material unresolved

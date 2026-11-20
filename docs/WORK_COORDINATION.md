@@ -90,6 +90,30 @@ against a former writer. The display name does not authenticate an actor.
    do not infer failure from silence or resend an unknown operation blindly.
    Keep history and retry the same stable operation only after proven non-delivery.
 
+### Match coordination to the development level
+
+Use [Project development](PROCESS.md#project-development) for the scoped level,
+internal-step record and transfer boundary. Carry the selected `development`
+object in the existing task/goal when continuing or assigning work; a different
+session does not change it. Review the declared connected increment at level 1,
+not every helper as a separately delivered task. Existing required result
+acceptance and protected effects retain their checks.
+
+An optional owner-facing notice is not the required result-return channel.
+Once the result is preserved, record an optional delivery failure/UNKNOWN under
+its original identity and continue already authorized independent work. The
+coordinator can review an accessible result and choose its next assignment
+without waiting for that optional notice. Required acceptance still needs its
+evidence; silence never authorizes a duplicate request to a busy or unknown
+worker. Do not create a new polling service or replacement sender for this rule.
+
+Reuse the accepted available base for small deltas; use a complete transfer
+package when the recipient or recovery path requires one. Attribute elapsed
+time only to observed events: implementation, checks, packaging/reporting,
+coordination wait and access loss remain separate, with unknown portions explicit.
+For delegation, retain the useful returned contribution and any measured wait
+and integration cost. Do not equate a subagent count with effective parallelism.
+
 ## Architecture qualifications
 
 | Risk | Required qualification before adoption |

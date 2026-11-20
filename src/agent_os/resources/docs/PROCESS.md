@@ -194,6 +194,19 @@ narrower choice exists; otherwise use **3**. Briefly state it at start/change an
 record its scope in the current plan. Changes govern subsequent work; do not
 rebuild completed work merely for a level change.
 
+Carry the choice across sessions and handoffs. The existing task answers and
+context goal can contain `development: {"level": 1, "scope": "project"}`;
+`1D` is an input alias of level 1, not another level. Same-task resume retains
+an omitted saved choice. A stateless context caller must carry the current goal
+and its choice; a missing field cannot reconstruct discarded history. Scope
+names identify the existing plan's project/stage/module, not an authority grant
+or an automatically inferred scope tree. Use the enclosing plan to resolve it.
+When loading guidance, pass that same choice with `--development-level` and
+`--development-scope`, including an explicit causal-debugging lookup. Omitted
+arguments expose the stateless default; they do not replace a choice already
+known from the plan. Without the CLI, retain the choice beside the actual method
+text in that plan; no installation is required merely to read the method.
+
 Only for a new project whose development has not begun, offer a native
 single-choice control with the five options below, in the user's language;
 if unavailable, present one compact five-option choice. Apply an explicit level
@@ -203,7 +216,7 @@ standalone storage or imitation buttons.
 
 | Level / short button label | Description |
 |---|---|
-| **1 — Fast assembly** | Connect and run the whole fastest, with minimal detail/checks before assembly, extensive useful debug and an accessible error journal. |
+| **1 — Fast assembly** | Connect the whole with simple implementations or explicit stubs; check the new connection and material risk sufficiently, retain useful debug and an accessible error journal, then continue assembly. |
 | **2 — Main connections** | Assemble quickly with debug; check main module boundaries and connections, then deepen details. |
 | **3 — Working stage** | Run a coherent stage with related functions/exports connected and exercised; use a light synthetic end-to-end scenario, then proceed. |
 | **4 — Integration detail** | Detail selected module contracts and check main failure scenarios during integration. |
@@ -219,6 +232,15 @@ that part suffices without whole-project proof.
 Every level preserves modularity, common working stand before recursive detail,
 explicit stub status, access rights and essential checks for secrets, irreversible
 effects and other protected operations.
+
+At level 1, choose a connected increment as the unit of progress. A helper,
+file edit or internal microstep need not become a separate acceptance cycle.
+Keep module inputs/outputs and the short complete structure plan visible; defer
+nonblocking internal detail to its named recursive stage. One relevant existing
+check or a small scenario may suffice for the changed connection. Check affected
+Auth/ACL and data/effect protections when needed at every level. Investigate a
+concrete malfunction causally, then return to assembly once its scoped blocking
+condition is resolved. No level imposes a fixed number of minutes or tests.
 
 ### Working cycle
 
@@ -286,6 +308,47 @@ effects and other protected operations.
    decisions within the assignment without repeatedly returning them to the
    owner. This method uses existing authority and does not change external
    permissions, protections or UNKNOWN reconciliation.
+
+### Internal progress, handoff and coordination
+
+For an internal step in the same retained working stand, keep a compact record:
+changed connection, sufficient check/result, remaining stub or error, and next
+authorized action. Continue within the current assignment. This is not a call
+to `project close` or `project checkpoint`; those terminal operations retain
+their existing accepted-handoff requirements. A long report and a rebuilt full
+archive are not prerequisites for every internal step.
+
+Reuse an accepted available base and retain changed/added/deleted files and
+relevant new evidence as a delta. Pin the base and delta identities and their
+relationship; preserve the dependencies required to reconstruct the result.
+A delta without its accessible verified base is partial, not a self-contained
+handoff. Produce a complete package when requested, when transfer/recovery needs
+it, or when the destination cannot obtain the pinned base. Existing capture,
+integrity, required result-delivery and restore checks still apply.
+
+Preserve the result before a notification attempt. A failed optional owner
+notification does not hold the saved result or an already authorized independent
+next step; retain its exact delivery state for reconciliation. Required result
+receipt/review and optional notification are separate. The coordinator still
+reviews the declared result and owns the next assignment; do not infer permission
+for an unassigned step or send a duplicate to a busy/unknown executor.
+
+Delegate bounded independent parts when they can help. Record each returned
+contribution and observed execution, dependent wait and integration time where
+available; reuse existing timestamps at meaningful boundaries. Distinguish
+implementation, checks, packaging/reporting, coordinator wait and lost access.
+Unknown intervals stay UNKNOWN, overlaps are not summed twice, and gaps between
+messages do not establish their cause. A launch count or an unmatched before/after
+observation does not establish acceleration. This is lightweight task accounting,
+not per-command instrumentation or another mandatory report.
+
+A new method file, capsule hash or ACK proves neither active-session pickup nor
+application. Deliver the exact current instruction through the authorized route
+at a safe boundary, then inspect the next permitted action: retained level/scope,
+connected increment, proportionate check, useful journal, compact progress and
+continued ownership. Mark each observed behavior separately from unexercised or
+unknown behavior. Do not restart work or replay a finished scenario to manufacture
+adoption evidence.
 
 <!-- agentos:project-development:end -->
 

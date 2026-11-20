@@ -23,7 +23,31 @@
   ],
   "properties": {
     "answers": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "development": {
+          "description": "Selected planning/check depth in the existing scoped task context; no authority or readiness grant. Input 1D is normalized to integer 1 before storage.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "level",
+            "scope"
+          ],
+          "properties": {
+            "level": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            },
+            "scope": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "\\S"
+            }
+          }
+        }
+      }
     },
     "created_at": {
       "format": "date-time",

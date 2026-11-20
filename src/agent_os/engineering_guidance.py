@@ -9,6 +9,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from . import __version__
+from .development_level import default, normalize
 from .safeio import GateError, sha
 
 PROCESS_PATH = Path(__file__).parent / "resources" / "docs" / "PROCESS.md"
@@ -20,10 +21,11 @@ MAX_DOCUMENT_BYTES = 128 * 1024
 MAX_SECTION_BYTES = 16 * 1024
 
 
-def load(method: str = DEFAULT_METHOD) -> dict:
+def load(method: str = DEFAULT_METHOD, *, development: dict | None = None) -> dict:
     """Read one bounded packaged section; no overlay, network or execution."""
     if method not in METHODS:
         raise GateError("engineering_guidance_unknown_method")
+    selected = default() if development is None else normalize(development)
     start = f"<!-- agentos:{method}:start -->"
     end = f"<!-- agentos:{method}:end -->"
     try:
@@ -48,6 +50,7 @@ def load(method: str = DEFAULT_METHOD) -> dict:
         "status": "MATERIALIZED",
         "version": __version__,
         "source": f"docs/PROCESS.md#{method}",
+        "development": selected,
         "document_sha256": sha(raw),
         "content_sha256": sha(encoded),
         "content_bytes": len(encoded),

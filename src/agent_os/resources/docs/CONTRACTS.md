@@ -52,6 +52,19 @@ to bypass recovery. Older community commands may have different error shapes;
 do not infer a new contract from them. Put global `--home`/`--user-home` before
 the command group.
 
+`answers.development` and `goal.development` optionally carry exactly
+`{"level": 1, "scope": "project"}`. Level is integer 1–5; input alias `1D`
+normalizes to 1. Scope is a nonempty string up to 200 characters. Same-task
+resume preserves an omitted saved choice. `--reuse-answers` permits an explicit
+selection change while still requiring fresh authority and unchanged business
+scope. A new context/session carries the current goal explicitly; there is no
+hidden history lookup. Legacy objects are retained, with effective default 3/task.
+
+`workflow guidance` and `workflow route --kind project-change` accept the paired
+`--development-level` and `--development-scope` options and materialize the
+effective choice beside the canonical method. Selection changes planning/check
+depth only; readiness, effect gates and behavior-proof limits remain unchanged.
+
 | Group | Operations | Boundary |
 | --- | --- | --- |
 | `project` | init, questions, enter, next-turn, document, ready, check, assess, verify-closeout, status, close, checkpoint, gate, snapshot | Explicit actions in the named project; questions and reads need no product write |

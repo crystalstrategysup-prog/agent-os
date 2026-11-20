@@ -41,7 +41,8 @@ def _goal(value, required):
     if value is None and not required:
         return None
     fields = {"original", "scope", "acceptance", "known_answers", "authority_ref", "source_ref"}
-    if not isinstance(value, dict) or set(value) != fields:
+    if (not isinstance(value, dict) or fields - set(value)
+            or set(value) - fields - {"development"}):
         raise GateError("context_goal_contract_required")
     for key in ["original", "scope", "authority_ref", "source_ref"]:
         _text(value[key], key)
@@ -56,6 +57,12 @@ def _goal(value, required):
     for key, answer in answers.items():
         _text(key, "answer_key", 200)
         _text(answer, "answer")
+    if "development" in value:
+        from .development_level import normalize
+
+        choice = normalize(value["development"])
+        _text(choice["scope"], "development_scope", 200)
+        return {**value, "development": choice}
     return value
 
 
@@ -98,7 +105,11 @@ def build(home: Path, request: dict) -> dict:
     if purpose in {"project-change", "continuation"}:
         from .engineering_guidance import load
 
-        foundation_guidance = load()
+        def current_guidance():
+            return (load(development=goal["development"])
+                    if "development" in goal else load())
+
+        foundation_guidance = current_guidance()
 
     depends_on_profiles = bool(keys or index_keys)
     selected = (profile_adapter.context(home) if depends_on_profiles
@@ -162,7 +173,7 @@ def build(home: Path, request: dict) -> dict:
         raise GateError("context_selection_changed_during_read")
     if any(sha(_bytes(home, path)) != expected for path, expected in sources.items()):
         raise GateError("context_dependency_changed_during_read")
-    if foundation_guidance is not None and load() != foundation_guidance:
+    if foundation_guidance is not None and current_guidance() != foundation_guidance:
         raise GateError("context_foundation_guidance_changed_during_read")
     body = {
         "schema": "agentos.context-capsule/v1", "status": "MATERIALIZED",
@@ -179,6 +190,7 @@ def build(home: Path, request: dict) -> dict:
     }
     if foundation_guidance is not None:
         body["foundation_guidance"] = foundation_guidance
+        body["development"] = foundation_guidance["development"]
     if len(json.dumps(body, ensure_ascii=False).encode()) > LIMIT:
         raise GateError("context_size_limit")
     return {**body, "capsule_sha256": digest(body)}

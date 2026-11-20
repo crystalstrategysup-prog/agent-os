@@ -362,7 +362,12 @@
         "MATERIALIZED",
         "BLOCKED"
       ],
-      "write_surfaces": []
+      "write_surfaces": [],
+      "development_options": [
+        "--development-level",
+        "--development-scope"
+      ],
+      "development_contract": "Paired explicit selection; level 1-5 or 1D alias of 1, scope at most 200 characters; missing selection defaults to 3/task. On route, valid only for a project change. No settings store or authority grant."
     },
     {
       "effect": "read_only",
@@ -371,7 +376,12 @@
         "PASS",
         "BLOCKED"
       ],
-      "write_surfaces": []
+      "write_surfaces": [],
+      "development_options": [
+        "--development-level",
+        "--development-scope"
+      ],
+      "development_contract": "Paired explicit selection; level 1-5 or 1D alias of 1, scope at most 200 characters; missing selection defaults to 3/task. On route, valid only for a project change. No settings store or authority grant."
     },
     {
       "effect": "read_only",
