@@ -4,6 +4,20 @@ This policy retains the complete, unchanged pre-migration project instructions.
 The Atlas route MUST load the relevant sections before mutating this repository.
 The move gives no new authority and never bypasses protected effects.
 
+## Current development method
+
+Apply [Project development](PROCESS.md#project-development) to ordinary changes:
+plan the complete current level, assemble the connected modular working stand,
+then refine selected parts recursively. Relevant documentation and readiness
+describe the declared stage; they do not require every lower-level contract or
+whole-product release check before an early scaffold can be implemented.
+Preserve the owner's development level (1–5, balanced default 3) in the existing
+plan. Offer the five-level choice once for new development that has not begun,
+unless already chosen. Patches, fixes, enhancements and continuation reuse the
+current level without a new chooser.
+Select causal debugging separately for a concrete malfunction when needed.
+The original controls below retain their scope and authority requirements.
+
 ## Original policy, verbatim
 
 # Project contract

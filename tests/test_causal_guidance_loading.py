@@ -33,12 +33,15 @@ def request(purpose="project-change"):
                 "source_ref": "synthetic-test-input"}}
 
 
-def body(raw):
-    return raw.decode().split(guidance.START, 1)[1].split(guidance.END, 1)[0].strip()
+def body(raw, method="project-development"):
+    start = f"<!-- agentos:{method}:start -->"
+    end = f"<!-- agentos:{method}:end -->"
+    return raw.decode().split(start, 1)[1].split(end, 1)[0].strip()
 
 
-def assert_actual(result, raw):
-    expected = body(raw)
+def assert_actual(result, raw, method="project-development"):
+    expected = body(raw, method)
+    assert result["source"] == f"docs/PROCESS.md#{method}"
     assert result["content"] == expected
     assert result["content_sha256"] == sha(expected.encode())
     assert result["document_sha256"] == sha(raw)
@@ -70,6 +73,11 @@ def test_guidance_cli_returns_canonical_bytes_without_home_or_network(monkeypatc
     raw = (ROOT / "docs/PROCESS.md").read_bytes()
     assert raw == guidance.PROCESS_PATH.read_bytes()
     assert_actual(observed, raw)
+
+
+def test_explicit_causal_guidance_cli_returns_selected_canonical_bytes(tmp_path):
+    observed = run_cli("workflow", "guidance", "--method", "causal-debugging", cwd=tmp_path)
+    assert_actual(observed, guidance.PROCESS_PATH.read_bytes(), "causal-debugging")
 
 
 def test_real_subprocess_route_loads_same_installed_resource(tmp_path):
@@ -206,3 +214,10 @@ def test_installed_managed_entry_routes_to_actual_materialized_body(tmp_path):
 def test_guidance_does_not_accept_effect_arguments():
     with pytest.raises(GateError, match="does_not_accept_route_arguments"):
         workflow.command(["guidance", "--effect", "deploy"])
+
+
+def test_route_does_not_accept_guidance_method(capsys):
+    with pytest.raises(SystemExit) as exc:
+        workflow.command(["route", "--kind", "project-change", "--method", "causal-debugging"])
+    assert exc.value.code == 2
+    assert "--method is only valid for guidance" in capsys.readouterr().err

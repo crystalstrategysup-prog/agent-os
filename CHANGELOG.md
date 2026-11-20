@@ -1,3 +1,19 @@
+# 0.8.0rc2057 — modular working stand and adjustable development depth
+
+- Make project development the default engineering guidance: plan the complete
+  current level, assemble a connected modular working stand, then recursively
+  refine the selected module or microprocess and reintegrate it.
+- Permit simple implementations and explicit stubs as declared stage results;
+  stop checks when the stage criteria and relevant risks are covered.
+- Default to development level 3, adjustable by the owner from 1 to 5 at any
+  point. Level 1 emphasizes fast assembly with debug context and an error journal;
+  level 3 uses light synthetic integration checks; level 5 checks detailed steps
+  immediately. Offer five described choices at genuinely new development entry;
+  patches, fixes, enhancements and continuation retain the current scoped choice.
+- Keep causal debugging available through explicit method selection for concrete
+  malfunctions. Align Atlas, project entry and managed client instructions with
+  the development method without changing access or external-effect controls.
+
 # 0.8.0rc2056 — finite baselines and evidence-preserving continuation
 
 - Complete the existing canonical method with compatible finite limits across

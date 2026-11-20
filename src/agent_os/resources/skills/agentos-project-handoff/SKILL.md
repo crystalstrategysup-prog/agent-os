@@ -25,6 +25,10 @@ backups/history. Lookup needs no project entry.
 For an authorized handoff change, update the dossier, roadmap, architecture, contracts, current stage, and known
 issues. Record exact source and runtime separately, verified checks and limits,
 authority, active task or checkpoint, startup commands, and the next safe step.
+Preserve the current development level and its scope (default 3 only when no
+choice exists), current-level plan, connected stand status, remaining stubs and
+the selected next module or microprocess. Reuse existing context; do not restart
+completed work or create a separate level register.
 Create a self-contained packet with a manifest and publication boundary; keep
 user data separate and exclude authentication material and secrets.
 

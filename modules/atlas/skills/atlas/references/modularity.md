@@ -21,7 +21,20 @@ a state owner, and declared dependencies. Allow a modular monolith, packages
 within one repository, and separately deployable services. Extract a module into
 a separate service when actually needed, not merely because Atlas is present.
 
-Fix a substantive required contract for each module:
+Modularity is mandatory from the first working stand. Following **Project
+development** in AgentOS `docs/PROCESS.md`, plan the whole current level and
+connect its parts into a runnable main scenario before deepening their internals.
+Simple implementations and explicit stubs may provide unfinished parts behind
+clear interfaces. Then select a module or microprocess, repeat the method at that
+level and return its result to the common stand. Do not demand all lower-level
+contracts or separate service/deployment machinery before this first composition.
+
+Fix the contract needed for each module's current stage. Expand the fields below
+as their work is selected; retain later work in the same plan without claiming it
+complete. Detail and verification follow the separate development level in
+`operating-modes.md`. Recursive module work inherits the applicable level and
+does not reopen the initial five-button choice; the owner may change its scope
+and level at any time.
 
 | Field | What to establish |
 |---|---|
@@ -42,8 +55,9 @@ internal package when the actual deployment is one application.
 
 Cover HTTP, event/RPC, in-process interfaces, and system methods when they form
 module boundaries or are used by composite scenarios. Account for all such
-methods in the declared inventory; a list of user-facing buttons is not a
-complete API inventory.
+methods in the declared current-level inventory; expand internal methods when
+deepening the selected module. Preserve existing declared methods. A list of
+user-facing buttons is not a complete API inventory.
 
 Record the following for each method:
 
@@ -95,11 +109,12 @@ toolchain, lock/config, generated inputs, and required contracts. Do not include
 secret values in the manifest; use authorized selectors/references and a qualified
 environment. Fix the command, parameters, and outputs in the method registry.
 
-For a package/module, establish that it can be built and meaningfully checked
-separately, without manually copying a neighboring project or relying on
+When an independent build is required by the stage, establish that the package/module
+can be built and meaningfully checked separately, without manually copying a neighboring project or relying on
 undeclared hidden dependencies. With a shared monolith build, state truthfully
 which units are independent and which require the shared artifact. Record missing
-independent-build support as a bounded task; do not claim it by declaration alone.
+required independent-build support as a bounded task; do not claim it by
+declaration alone.
 
 Link every produced artifact to exact source/input identities, version, digest,
 build receipt, and check scope. Reuse cache only when relevant inputs/conditions
@@ -159,10 +174,12 @@ against a comparable scenario and environment, preserving prior receipts.
 
 ## Acceptance and gaps
 
-For each module, show its boundary/state owner; all declared API methods/callers;
-build unit and actual evidence; deployment contract/compatibility/rollback;
-measured cold/warm timings or an explicitly open work item. Link everything to
-a criterion and exact basis.
+Accept each module against its declared stage and development level. Its boundary,
+state owner and current interfaces must support the common working stand. Require
+independent builds, deployment contracts, compatibility/rollback or measured
+cold/warm timings when the selected stage or effect needs them. Keep remaining
+work in the existing plan; do not make every module pass a full delivery audit
+before the first stand. Link required results to a criterion and exact basis.
 
 Accept a local tool, modular source candidate, or contract within its declared
 local scope. Runtime rollout and measurements may remain separate open work.

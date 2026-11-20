@@ -7,13 +7,27 @@ continuing development. Missing tools or an unreadable binding are a gap, not pr
 of absent Atlas. Do not search unrelated roots.
 
 On start and resume, run the effect-free `agentos workflow guidance` and read its
-body, or reuse that same current body already materialized by entry. If the CLI
-is unavailable, read **Causal debugging** in AgentOS `docs/PROCESS.md` (installed
-`resources/docs/PROCESS.md`, located with `agentos resources`). Apply it when
-working on a malfunction. Restore the existing journal, fixed conditions,
-current configuration and next experiment; keep its evidence linked to the
-assigned work. A hash or ACK is not the method's content. Ordinary feature work
-requires no artificial failure or reversal cycle.
+default **Project development** body, or reuse that same current body already
+materialized by entry. If the CLI is unavailable, read that section of AgentOS
+`docs/PROCESS.md` (installed `resources/docs/PROCESS.md`, located with
+`agentos resources`). Plan the whole current level, then build or reuse the
+common runnable stand with module boundaries, connected parts and its main
+scenario. Simple implementations and explicit stubs are allowed. Deepen the
+selected module or microprocess by the same method and reconnect its result;
+do not detail every leaf first. Retain the applicable development level and
+scope in the current plan/context; see `operating-modes.md`.
+
+For genuinely new development from scratch that has not begun, offer the five
+level buttons with concise differences unless the owner already specified a
+level. For patches, fixes, enhancements or continuation, inherit the applicable
+level or use 3 without showing the chooser. Accept a scoped level change at any time.
+
+For a specific malfunction needing investigation, use
+`agentos workflow guidance --method causal-debugging` or the **Causal debugging**
+section of the same PROCESS document. Restore the existing journal, fixed
+conditions, current configuration and next experiment, then return to the plan
+when the scoped correction or mitigation criterion is met. A hash or ACK is not
+the method's content. Ordinary development needs no artificial failure or reversal cycle.
 
 **Atlas exists:** read its writer and assigned work, then use the configured
 start route. For a registered WM-UI project:
@@ -42,21 +56,21 @@ with the configured `.atlas/WRITER.json`:
 
 ```bash
 atlasctl work PROJECT --operation OP_ID --work WORK_ID --phase start \
-  --executor ACTOR --note "Investigating the assigned issue and its evidence" \
-  --next-action "Record the cause or the exact remaining uncertainty"
+  --executor ACTOR --note "Implementing the selected stage from the current plan" \
+  --next-action "Run the main scenario and record the stage result"
 ```
 
 If work is already underway, record its current progress without backdating:
 
 ```bash
 atlasctl work PROJECT --operation PROGRESS_OP_ID --work WORK_ID --phase progress \
-  --status doing --executor ACTOR --note "Checking the specific cause found" \
-  --next-action "Save the check result and its effect on the next step"
+  --status doing --executor ACTOR --note "Connecting the selected module to the working stand" \
+  --next-action "Confirm the stage result and continue the plan"
 ```
 
 Replace the notes with actual facts. If no leaf covers the assigned task, the
-current writer registers a bounded research/check item through its established
-source method; do not reopen an unrelated accepted item. A standalone question
+current writer registers a bounded implementation, research or check item through
+its established source method; do not reopen an unrelated accepted item. A standalone question
 or context lookup still needs no task intake or Atlas bootstrap.
 
 `work` pins inputs and publishes once. Use `dispatch` for real delegation;

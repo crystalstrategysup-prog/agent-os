@@ -5,7 +5,15 @@ description: "Verify results and evidence, close documented work, or record an h
 
 # agentos-verification-closeout
 
-For a malfunction, evaluate the journal and claimed result against **Causal
+Use **Project development** in `resources/docs/PROCESS.md` for the declared
+current-level stage and the owner's development level (default 3). A connected
+running scaffold with explicit stubs may complete its own stage. Select checks
+proportionate to that stage, level and remaining risks; stop when its criteria
+and required checks are satisfied. Do not impose whole-product release criteria
+on each intermediate step or widen checks without a concrete reason.
+
+For a malfunction investigated with the causal method, evaluate its journal and
+claimed result against **Causal
 debugging** in `resources/docs/PROCESS.md`, located with `agentos resources`.
 Carry its separate preparation, local, installation and target-verification
 stages into the review. Instruction text or a successful isolated experiment

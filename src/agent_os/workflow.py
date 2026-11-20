@@ -59,17 +59,20 @@ def route(kind: str, effects: list[str] | None = None) -> dict:
 
 
 def command(argv: list[str]) -> tuple[dict, int]:
+    from .engineering_guidance import DEFAULT_METHOD, METHODS, load
+
     p = argparse.ArgumentParser(prog="agentos workflow")
     p.add_argument("action", choices=["route", "guidance"])
     p.add_argument("--kind", choices=KINDS)
     p.add_argument("--effect", choices=EFFECTS, action="append", default=[])
+    p.add_argument("--method", choices=METHODS)
     a = p.parse_args(argv)
     if a.action == "guidance":
         if a.kind is not None or a.effect:
             raise GateError("engineering_guidance_does_not_accept_route_arguments")
-        from .engineering_guidance import load
-
-        return load(), 0
+        return load(a.method or DEFAULT_METHOD), 0
+    if a.method is not None:
+        p.error("--method is only valid for guidance")
     if a.kind is None:
         p.error("route requires --kind")
     result = route(a.kind, a.effect)

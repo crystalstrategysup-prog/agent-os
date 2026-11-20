@@ -25,9 +25,18 @@ Use the owner's instruction within its scope. In an existing project, use the
 active specification/contract and stable IDs without seeking renewed agreement
 on unchanged conditions. Identify unknown conditions that affect the decision explicitly.
 
-Plan a hierarchy to a useful depth: objective → independent outcomes → executable
-steps. Bind dependencies to the required result or artifact version. A change to
-one dependency does not halt all independent work.
+Plan the whole current level from objective to result: stages, their order,
+dependencies, executable steps and completion criteria. Keep module boundaries
+mandatory and establish the common runnable stand with connected parts and its
+main scenario before deepening internals. Simple implementations and explicit
+stubs may satisfy their declared stage. Select a module or microprocess, repeat
+the same method at that level and reconnect its result; do not require every
+lowest-level detail upfront. Follow **Project development** in AgentOS
+`docs/PROCESS.md`, carrying the applicable development level in the existing
+plan/packet as described in `operating-modes.md`. Patches, fixes, enhancements and
+continuation inherit that level or default 3; do not reopen the new-development
+choice for a session or recursive step. Bind dependencies to the required
+result or artifact version. A change to one dependency does not halt independent work.
 
 ## Responsibilities
 
@@ -153,11 +162,19 @@ criteria, and owner.
 
 At start/resume, read the actual body from `agentos workflow guidance`, reusing
 the same current body if already returned by entry. If the CLI is unavailable,
-read **Causal debugging** in AgentOS `docs/PROCESS.md`, also shipped as
-`resources/docs/PROCESS.md`. Apply this single method to malfunction work and
-link the experiment journal in the work packet. Carry its scoped findings, fixed
+read **Project development** in AgentOS `docs/PROCESS.md`, also shipped as
+`resources/docs/PROCESS.md`. This is the default method. Match checks to the
+declared stage, applicable development level and concrete risk. Stop after its
+criteria and required checks pass, then continue the plan; routine development
+does not require an experiment journal or exhaustive audit of each function.
+
+For a specific malfunction needing causal investigation, select
+`agentos workflow guidance --method causal-debugging` or read **Causal debugging**
+in the same PROCESS document. Link the existing experiment journal in the work
+packet. Carry its scoped findings, fixed
 conditions, current configuration and next experiment into the existing
-checkpoint; do not create a separate diagnostic workflow or acceptance.
+checkpoint; do not create a separate diagnostic workflow or acceptance. Return
+to the development plan when the scoped correction or mitigation criterion is met.
 
 Link evidence to the claim, exact relevant inputs, scope/environment, time,
 actor, and primary receipt. Distinguish documentary description, source review,
@@ -186,9 +203,11 @@ condition; do not pass the same action to another agent or route to bypass a res
 
 Perform bootstrap against an exact project inventory once, or reuse an already
 verified applicable inventory. Cover documents, goals, modules, contracts, work
-surfaces, all substantive work, and every existing authoritative matrix.
+surfaces, all substantive work at the declared current level, and every existing
+authoritative matrix. Do not require the complete future leaf hierarchy before
+the common working stand; expand it when selecting a deeper module or microprocess.
 Establish completeness through exact bindings and the absence of unexplained
-unmapped/UNKNOWN gaps.
+unmapped/UNKNOWN gaps within the declared scope.
 
 Thereafter update changed paths and affected links. Repeat a full audit when
 scope/inventory changes or a specific gap cannot be closed through a scoped delta.

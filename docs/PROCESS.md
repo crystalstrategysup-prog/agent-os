@@ -47,6 +47,13 @@ when their verified owner or host context matters. A missing or stale selection
 does not block unrelated reading, and dated host claims must not be used as live
 facts without revalidation.
 
+Prepare the complete plan for the current level and the declared next stage.
+The project-level plan covers the route to the final result; module and
+microprocess details are expanded when that level is selected. Start with a
+connected working stand, then deepen its parts under **Project development**
+below. Documentation and readiness describe the current level and stage; an
+early stage may deliberately deliver a scaffold with explicit stubs.
+
 When project metadata is absent, `project init --root P --name N --type TYPE
 --context context.json` creates `.agentos/project.json` and draft docs. The
 context supplies `purpose`, `current_state`, `boundaries`, and `constraints`.
@@ -114,9 +121,14 @@ and re-establish the task binding.
 
 Select only applicable layers from the catalog: dossier, roadmap, and stage are
 basic; API work needs a contract, personal data needs access and data rules,
-and operations need runbook and rollback. A draft never passes READY. The
-reviewer fills in facts, sources, unknowns, write paths, architecture decision,
-measurable acceptance, and rollback. Register each required document:
+and operations need runbook and rollback. Keep the overall objective and plan
+visible, while detailing the selected project, module or microprocess level.
+Define readiness and acceptance for the declared stage: a reviewed scaffold
+stage can be ready without completing every module or release requirement.
+A draft document never passes READY. The reviewer fills in facts, sources,
+unknowns, write paths, architecture decision, stage acceptance, and rollback.
+Reuse the existing documents instead of adding parallel plans. Register each
+required document:
 
 ```sh
 agentos project document --root P --id dossier --path docs/agentos/DOSSIER.md \
@@ -148,20 +160,141 @@ authority does not authorize a send. Local READY does not authorize production.
 If a target capability is absent, stop only that action and continue other
 authorized preparation. There is no universal `--authorized` override.
 
+<!-- agentos:project-development:start -->
+
+## Project development
+
+Use this method to advance the whole project to the user's result through
+understandable plans and working increments. It applies to ordinary development,
+features and policy work. The canonical text is this marked section of
+`docs/PROCESS.md`; read its current body through `agentos workflow guidance`,
+or directly from the selected source or installed resource when the CLI is
+unavailable. Continue the existing project and writer, using the current plan.
+
+### Development level: 1–5, default 3
+
+The level sets a development mode, not completion percentage. The user may change
+it anytime for a project, stage or module. Inherit the enclosing level unless a
+narrower choice exists; otherwise use **3**. Briefly state it at start/change and
+record its scope in the current plan. Changes govern subsequent work; do not
+rebuild completed work merely for a level change.
+
+Only for a new project whose development has not begun, offer a native
+single-choice control with the five options below, in the user's language;
+if unavailable, present one compact five-option choice. Apply an explicit level
+without repeating the choice. Patches, fixes, small changes and continuation
+inherit the level, defaulting to **3**; show no selector. Create no forms,
+standalone storage or imitation buttons.
+
+| Level / short button label | Description |
+|---|---|
+| **1 — Fast assembly** | Connect and run the whole fastest, with minimal detail/checks before assembly, extensive useful debug and an accessible error journal. |
+| **2 — Main connections** | Assemble quickly with debug; check main module boundaries and connections, then deepen details. |
+| **3 — Working stage** | Run a coherent stage with related functions/exports connected and exercised; use a light synthetic end-to-end scenario, then proceed. |
+| **4 — Integration detail** | Detail selected module contracts and check main failure scenarios during integration. |
+| **5 — Deep steps** | Detail and verify each step immediately within the overall plan. |
+
+Instrument key paths and module boundaries. Use existing logging or a simple
+accessible shared error journal: time, module/operation, error, known
+cause/stack when available, and request/run identity linking the scenario.
+Keep context bounded and free of secrets. Once a specific part works, remove or
+disable temporary noisy debug and retain normal error logging; confirmation of
+that part suffices without whole-project proof.
+
+Every level preserves modularity, common working stand before recursive detail,
+explicit stub status, access rights and essential checks for secrets, irreversible
+effects and other protected operations.
+
+### Working cycle
+
+1. **Define the result.** State the intended product, its main user scenarios,
+   scope and constraints. Identify what completion means at the current level.
+   Keep this outcome visible when choosing work, so implementation choices serve
+   the project instead of accumulating unrelated features or process tasks.
+
+2. **Plan the whole current level.** Before its main implementation, describe
+   the path from beginning to result: necessary stages, their order,
+   dependencies and concrete next steps. At project level, cover architecture,
+   code structure, data, interfaces, integrations, infrastructure, launch and
+   completion. Name unknowns and the stage that will resolve them. A complete
+   project plan does not require every lowest-level detail upfront; expand a
+   module or microprocess when choosing to work at that depth.
+
+3. **Keep modularity mandatory.** Give each part a clear responsibility, inputs,
+   outputs and interface to the rest of the project. Preserve these boundaries
+   as work becomes more detailed. Prefer existing components and straightforward
+   interfaces. A module boundary should make a part understandable and replaceable;
+   it need not create a separate service or extra deployment machinery.
+
+4. **Build the common working stand first.** Establish a runnable project with
+   connected parts and one main end-to-end scenario before deeply polishing an
+   individual component. This stand can use simple implementations and explicit
+   stubs for unfinished parts. Its purpose is to make the overall structure work
+   and expose the next useful increment. In an existing project, reuse the
+   working stand and preserve its useful behavior instead of starting another.
+
+5. **Use interim solutions deliberately.** Choose the simplest implementation
+   sufficient for the declared stage. For a stub, say what it substitutes for,
+   what behavior it currently provides, and which planned stage will replace it.
+   Keep its boundary clear to callers and users who depend on that behavior.
+   A scaffold, prototype or contract can be a completed stage result. Schedule
+   robustness, optimization and broader coverage where the product needs them.
+
+6. **Deepen recursively.** After the common stand works, select a module,
+   function or detail and repeat the same cycle: complete plan for that level,
+   understandable steps, working result, then further depth when useful.
+   Apply it again to a selected microprocess if necessary. Reconnect each result
+   to the common stand. Keep unresolved internals behind their declared interface
+   or stub so one detail does not block independent platform work.
+
+7. **Finish the declared stage.** Give each step a purpose, actions, expected
+   output and a simple completion criterion. Judge that output against its own
+   scope. Place whole-product integration and release acceptance in their planned
+   stages. Record nonblocking improvements at an explicit later point in the
+   same plan. Resolve a blocking dependency sufficiently to resume progress;
+   parallelize independent work with clear ownership.
+
+8. **Check enough, then stop.** Match verification to the selected development
+   level, changed behavior and risk: inspection, a build, a relevant existing
+   check or a focused user scenario may suffice. Sensitive data, access and
+   critical operations require their applicable checks and recovery provisions. Once the stage criterion
+   and required checks pass, with no concrete obstacle to continuation, stop
+   checking and proceed. Extend verification for an observed defect, changed
+   conditions, unresolved material risk or a planned acceptance gate. Reuse
+   applicable results; do not repeat unchanged checks or add speculative test
+   programs to a finished step.
+
+9. **Record and continue.** Update the existing plan briefly with the result,
+   remaining stubs or limits, and the next step. Save changes through the
+   project's normal route, then perform that step. Adjust affected plans when
+   new information changes dependencies or scope. Make routine technical
+   decisions within the assignment without repeatedly returning them to the
+   owner. This method uses existing authority and does not change external
+   permissions, protections or UNKNOWN reconciliation.
+
+<!-- agentos:project-development:end -->
+
 <!-- agentos:causal-debugging:start -->
 
 ## Causal debugging
 
-Use this method within the existing diagnosis, implementation and acceptance
-cycle for a malfunction in UI, API, services, data, performance or operational
-constraints. It does not create a second workflow, new task gate or permission.
-Read this section when starting or continuing such work; restore the experiment
-and its evidence from the existing work packet rather than restarting diagnosis.
+Select this method separately with
+`agentos workflow guidance --method causal-debugging` for a specific malfunction
+in UI, API, services, data, performance or operational constraints when causal
+investigation is needed. Ordinary development follows **Project development**;
+causal diagnosis is not a universal prerequisite. Define a sufficient correction
+or mitigation criterion for the current problem, then return to the project plan
+when it is met. Keep any unresolved cause explicit rather than extending the
+investigation solely for completeness. This method uses the existing diagnosis,
+implementation and acceptance cycle, without a second workflow, new task gate or
+permission. On continuation restore the experiment and its evidence from the
+existing work packet rather than restarting diagnosis.
 The canonical text is this section of `docs/PROCESS.md`, mirrored byte-for-byte
 in installed `resources/docs/PROCESS.md` (located with `agentos resources`).
 Read the actual bounded section returned by the effect-free
-`agentos workflow guidance`; if the CLI is unavailable, read this exact section
-from the selected source or installed resource. Entry/context output that already
+`agentos workflow guidance --method causal-debugging`; if the CLI is unavailable,
+read this exact section from the selected source or installed resource.
+Entry/context output that already
 materializes the same current body may be reused. A link, hash or receipt for
 instruction delivery alone does not prove agent behavior. Ordinary feature work
 without a malfunction does not require an invented failure or reversal cycle.
@@ -345,11 +478,15 @@ These are reporting stages, not replacements for existing task/Atlas statuses.
 On continuation, restore the user criterion, reproduction/baseline pins, journal,
 current effective configuration, confirmed/unknown findings and next experiment.
 Recheck changed dependencies; reuse unchanged applicable evidence. Installation,
-document pickup and agent behavior remain distinct. Qualify changes to this method
-with fresh-session behavior on one restriction, a failing baseline, interacting
-factors, non-reproduction, a protected data/access boundary and continuation with
-an existing journal and uncertain operation. Evaluate the experiments actually
-chosen, preserved history, reconciliation and conclusions, not just the presence
+document pickup and agent behavior remain distinct. For substantial changes to
+diagnostic behavior, qualify the affected scenarios in proportion to risk, using
+fresh-session behavior where needed. Select relevant cases such as one restriction,
+a failing baseline, interacting factors, non-reproduction, a protected data/access
+boundary or continuation with an existing journal and uncertain operation.
+A default-method or routing change alone does not require the full fresh-session
+diagnostic set. Requirements for claims of causality remain unchanged.
+Evaluate the experiments actually chosen, preserved history, reconciliation
+and conclusions, not just the presence
 of this text. A fresh planning exercise can test interpretation of partial
 evidence; it does not execute or establish the source incident's next result.
 

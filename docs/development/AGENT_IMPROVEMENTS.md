@@ -6,6 +6,7 @@ Agents using AgentOS may propose verified improvements to AgentOS and its depend
 
 | Category | Evidence appropriate to the change |
 | --- | --- |
+| Feature or policy | State the baseline or intended stage result and check the declared criteria in proportion to risk. |
 | Bug fix | Reproduce incorrect behavior and demonstrate the corrected scenario with relevant regressions. |
 | Performance | Compare equivalent workloads for latency, throughput or resources while retaining required behavior. |
 | Quality | Demonstrate improved correctness, completeness, reliability, diagnostics or usability. |
@@ -16,8 +17,8 @@ If an AgentOS limitation prevents the authorized task, diagnose and patch the ow
 
 ## Required delivery
 
-1. Preserve the original goal and a minimal reproduction or baseline.
-2. Follow prototype -> acceptance -> integration -> regression in proportion to risk. Integrated checks call the canonical module, not a prototype copy.
+1. Preserve the original goal and a baseline or declared stage criteria. Ordinary feature or policy work needs no invented failure or minimal reproduction; use the [project development method](../PROCESS.md#project-development). For a malfunction, retain its relevant reproduction when available and select causal debugging when needed.
+2. Use prototype -> acceptance -> integration -> regression as applicable and in proportion to risk. A scaffold or explicit stub can satisfy its declared stage. Integrated checks call the canonical module, not a prototype copy. Stop when the stage criteria and required checks are satisfied; broaden verification for a concrete remaining risk or the planned acceptance stage.
 3. Pin dependency changes and document compatibility and rollback.
 4. Review the actual diff and public-data boundary. Never include credentials, private overlays, transcripts or operational host data.
 5. Commit and push the verified change to an authorized branch of the canonical repository, then create or update its pull request. Do not leave accepted improvements only in a local installation or archive.

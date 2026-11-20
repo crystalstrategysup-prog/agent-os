@@ -1,19 +1,28 @@
 ---
 name: agentos-implementation-control
-description: "Diagnose malfunctions through controlled experiments and implement a documented stage without silently expanding its scope."
+description: "Build a connected modular stage at the selected development level, refining details or diagnosing malfunctions as needed."
 ---
 
 # agentos-implementation-control
 
-For malfunction diagnosis and correction, read and apply **Causal debugging**
-returned by `agentos workflow guidance`. Reuse its current body from entry, or
+Use **Project development** from `agentos workflow guidance`, reusing the current
+body from entry. Build the connected result of the current level before recursively
+refining a selected part. Preserve the owner's scoped development level (default
+3 of 5), explicit stubs, module boundaries and diagnostic/error-log requirements.
+The canonical PROCESS defines the level scale and sufficient stage checks.
+
+For a concrete malfunction needing causal investigation, read **Causal debugging**
+from `agentos workflow guidance --method causal-debugging`, or
 read the exact section in `resources/docs/PROCESS.md` if the CLI is unavailable
 (locate installed resources with `agentos resources`). Continue the existing
-journal and evidence; use that method through implementation and verification.
+journal and evidence; return to the development plan after sufficient repair or
+an explicitly scoped mitigation. Ordinary features need no artificial failure.
 
 Check that the project gate passes for the exact task. Read the stage contract,
 write paths, authority, and approved checks. Implement a complete change within
-that contract with meaningful regression and negative tests where needed. Do not
+that contract with checks appropriate to the selected level and concrete risks.
+Stop when its criteria and required checks are satisfied; a declared early stage
+may finish with a working scaffold or explicit stub. Do not
 weaken a required protection to make it pass. If scope expands, checkpoint the
 task, update the scope and documents, and enter again. Verify source rather than
 relying on an external report.

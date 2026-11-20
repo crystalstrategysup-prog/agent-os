@@ -1,4 +1,4 @@
-# Atlas — two depths, one workflow
+# Atlas — two scopes, one development method
 
 This is a procedural reference, not permission for mutation. `AGENTS.md`
 is only a router. A simple read-only question needs no Atlas intake.
@@ -10,12 +10,36 @@ is only a router. A simple read-only question needs no Atlas intake.
   Do not create a full dossier, agent room, duplicate matrix or report suite.
 - FULL: new project, architecture/data/contract changes, several dependent
   modules or actors, high-impact effects or an explicit owner request.
-  Maintain the relevant objective/dossier, architecture and boundaries,
-  roadmap, module/API/data contracts, work ownership/matrix/history, build,
-  verification, rollout and rollback evidence. Existing authoritative docs
-  are reused; FULL never means loading the whole repository in every turn.
+  Maintain the complete plan of the current level, relevant objective/dossier,
+  architecture and boundaries, roadmap, module/API/data contracts, work ownership/matrix/history, build,
+  verification, rollout and rollback evidence as their stages require. Build the
+  common modular working stand first, then deepen selected parts and integrate
+  them back. FULL does not require every leaf contract, detailed implementation
+  or production mechanism before the first stand. Reuse existing authoritative
+  docs; do not load the whole repository in every turn.
 - Escalate MINIMAL only for an observed dependency/risk/unknown. Mode changes
-  documentation depth only; current scope and authorization remain unchanged.
+  the breadth of applicable context and coordination; current authority remains
+  unchanged.
+
+## Development level
+
+Keep the development level **1–5, default 3 (medium)** separate from MINIMAL/FULL scope.
+Use the canonical **Project development** section of AgentOS `docs/PROCESS.md`,
+returned by `agentos workflow guidance`, for the level's detail, debug/error
+logging and verification requirements.
+
+Only for genuinely new development from scratch that has not previously begun,
+offer five buttons at the start, one per level with concise differences from the
+canonical scale. Skip this choice if the owner has already specified a level.
+Patches, fixes, enhancements and continuation do not show the chooser: inherit
+the applicable scoped level, or use 3 if none is set. A new session, recursive
+module step or FULL profile does not reopen the initial choice.
+
+Accept a natural-language level change at any time for the project, stage or
+module. Record the value and scope in the existing plan/context; inherit the
+enclosing choice where no narrower choice applies. Use 3 if no level is selected.
+Do not add a registry or repeated questionnaire. A level change never changes
+authority, mandatory protections or UNKNOWN reconciliation.
 
 ## Shared lifecycle, not per-command micromanagement
 1. Identify effect, exact root/binding, current task/writer, source revisions
@@ -24,8 +48,11 @@ is only a router. A simple read-only question needs no Atlas intake.
    first: source/hash, contract, dependencies, version, proof and unknowns.
    Fetch only affected authoritative fragments; expand when completeness needs.
 3. Work within existing writer and approvals. On actual start/dispatch record
-   status once; maintain affected docs/contracts from real source changes.
-4. Verify preconditions, tests and effects. Distinguish source, installed,
+   status once; follow Project development at the current level and maintain
+   affected docs/contracts from real source changes.
+4. Verify preconditions and the declared stage result at the applicable development
+   level, retaining required protection checks. Stop when its criteria are met
+   and continue the plan. Distinguish source, installed,
    runtime and owner acceptance; an answer or checksum is not runtime proof.
 5. Publish one factual checkpoint, exact evidence and next owner/action.
    No false DOING, duplicate writes, extra finish after successful work,

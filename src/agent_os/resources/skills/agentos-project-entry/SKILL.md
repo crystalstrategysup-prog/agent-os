@@ -20,12 +20,33 @@ init, intake, observation, an answers file, a profile interview, or closeout.
 
 On new entry and same-scope resume, read the actual body from the effect-free
 `agentos workflow guidance`, or reuse that same current body materialized by
-entry/context. If the CLI is unavailable, read **Causal debugging** in the
+entry/context. If the CLI is unavailable, read **Project development** in the
 normative `resources/docs/PROCESS.md`, located with `agentos resources`, or the
-selected source `docs/PROCESS.md`. For malfunction work, restore the existing
-journal, conditions, current configuration and next experiment. A path/digest/ACK
-without its body does not load the method. This adds no intake requirement to
-ordinary reading or reversal experiment to a feature task without a malfunction.
+selected source `docs/PROCESS.md`. Plan the whole current level, preserve mandatory
+modularity, and assemble connected running parts before deepening the selected
+module or microprocess with the same method. Simple implementations and explicit
+stubs can complete a declared stage; no advance decomposition of every leaf is
+required. A path/digest/ACK without its body does not load the method.
+
+The development level defaults to **3** on a **1–5** scale. The owner may set or
+change it at any time for a project, stage or module; retain the latest scoped
+choice in the existing plan/context without a new register. At the start of
+genuinely new development that has not begun, offer the five briefly described
+levels from the canonical method as one native single-choice control, unless
+the owner already selected a level. For patches, fixes, enhancements and
+continuation, inherit the existing level or use 3 without asking again.
+Level 1 means fast assembly with useful debug context and an error journal;
+level 3 means a connected stage result, launch and a light synthetic check;
+level 5 means detailed design and immediate checking at each step. Use the
+canonical method for all five descriptions and diagnostic cleanup. This level is
+independent of Atlas MINIMAL/FULL scope and grants no additional authority.
+
+For a concrete malfunction needing causal investigation, explicitly load
+`agentos workflow guidance --method causal-debugging`, or read **Causal debugging**
+in the same PROCESS. Restore the existing journal, conditions, configuration and
+next experiment. Return to the development plan after sufficient repair or an
+explicitly scoped mitigation. Ordinary reading needs no intake, and ordinary
+feature work needs no invented failure or reversal experiment.
 
 For a change, inspect the README, dossier, roadmap, stage, architecture, and
 contracts. Reuse verified facts; create only missing applicable docs before

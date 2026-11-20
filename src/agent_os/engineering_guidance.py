@@ -12,14 +12,20 @@ from . import __version__
 from .safeio import GateError, sha
 
 PROCESS_PATH = Path(__file__).parent / "resources" / "docs" / "PROCESS.md"
-START = "<!-- agentos:causal-debugging:start -->"
-END = "<!-- agentos:causal-debugging:end -->"
+DEFAULT_METHOD = "project-development"
+METHODS = (DEFAULT_METHOD, "causal-debugging")
+START = "<!-- agentos:project-development:start -->"
+END = "<!-- agentos:project-development:end -->"
 MAX_DOCUMENT_BYTES = 128 * 1024
 MAX_SECTION_BYTES = 16 * 1024
 
 
-def load() -> dict:
+def load(method: str = DEFAULT_METHOD) -> dict:
     """Read one bounded packaged section; no overlay, network or execution."""
+    if method not in METHODS:
+        raise GateError("engineering_guidance_unknown_method")
+    start = f"<!-- agentos:{method}:start -->"
+    end = f"<!-- agentos:{method}:end -->"
     try:
         if PROCESS_PATH.is_symlink() or not PROCESS_PATH.is_file():
             raise GateError("engineering_guidance_document_required")
@@ -30,10 +36,10 @@ def load() -> dict:
         text = raw.decode("utf-8")
     except (OSError, UnicodeError) as exc:
         raise GateError("engineering_guidance_document_unavailable") from exc
-    if (text.count(START) != 1 or text.count(END) != 1
-            or text.index(END) <= text.index(START)):
+    if (text.count(start) != 1 or text.count(end) != 1
+            or text.index(end) <= text.index(start)):
         raise GateError("engineering_guidance_section_invalid")
-    content = text.split(START, 1)[1].split(END, 1)[0].strip()
+    content = text.split(start, 1)[1].split(end, 1)[0].strip()
     encoded = content.encode("utf-8")
     if not encoded or len(encoded) > MAX_SECTION_BYTES:
         raise GateError("engineering_guidance_section_bound")
@@ -41,7 +47,7 @@ def load() -> dict:
         "schema": "agentos.engineering-guidance/v1",
         "status": "MATERIALIZED",
         "version": __version__,
-        "source": "docs/PROCESS.md#causal-debugging",
+        "source": f"docs/PROCESS.md#{method}",
         "document_sha256": sha(raw),
         "content_sha256": sha(encoded),
         "content_bytes": len(encoded),

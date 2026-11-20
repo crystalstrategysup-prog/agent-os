@@ -5,8 +5,9 @@ description: "Manage controlled development through parameterized standard proce
 
 # Atlas
 
-**Execution depth:** load [operating-modes.md](references/operating-modes.md)
-to select MINIMAL or FULL project work; AGENTS only routes to Atlas.
+**Project scope:** load [operating-modes.md](references/operating-modes.md)
+to select MINIMAL or FULL work and the separate development level; AGENTS only
+routes to Atlas.
 Before any mutation, resolve and READ the owning project policy, writer and affected
 source/contract context. For AgentOS public source read `docs/ATLAS_SOURCE_POLICY.md`
 in the selected source root, or its exact installed resource; do not infer policy
@@ -22,13 +23,29 @@ Read [quickstart.md](references/quickstart.md) for daily work,
 [modularity.md](references/modularity.md) for module/API/build/deployment boundaries,
 and [operations.md](references/operations.md) for exact methods and parameters.
 At start and continuation, read the body returned by the effect-free
-`agentos workflow guidance`. If unavailable, read the exact **Causal debugging**
+`agentos workflow guidance`: **Project development** is the default. If unavailable,
+read that exact section of AgentOS `docs/PROCESS.md`, or installed
+`resources/docs/PROCESS.md` located with `agentos resources`. Reuse the same
+current body if entry already materialized it. Plan the whole current level,
+build the common runnable stand with mandatory module boundaries and a main
+end-to-end scenario, then deepen a selected module or microprocess recursively
+and reconnect its result. Simple implementations and explicit stubs are valid
+stage results; do not require every lower-level detail before the first stand.
+Keep the applicable development level in the existing plan/context, as described
+in `operating-modes.md`. Offer the initial five-button choice only for genuinely
+new development from scratch that has not begun, unless the owner already chose
+a level. Patches, fixes, enhancements and continuation inherit the applicable
+level or default 3 without a chooser. The level does not change MINIMAL/FULL
+scope or authority.
+
+For a specific malfunction needing causal investigation, select
+`agentos workflow guidance --method causal-debugging`, or read the **Causal debugging**
 section of AgentOS `docs/PROCESS.md`, or installed `resources/docs/PROCESS.md`
-located with `agentos resources`. Reuse that same current body if the entry
-already materialized it. Apply it to malfunction work, restoring the journal,
-fixed conditions, current configuration and next experiment from the assigned
-packet. Ordinary feature work needs no invented failure or reversal cycle.
-This is the single diagnostic method, not another Atlas workflow. Missing or
+located with `agentos resources`. Restore the existing journal, fixed conditions,
+current configuration and next experiment from the assigned packet. Return to
+the development plan after the scoped correction or mitigation criterion is met.
+Ordinary feature work needs no invented failure, reversal cycle or experiment
+journal. These are the canonical methods, not another Atlas workflow. Missing or
 unreadable content is a context gap; a path/hash/ACK alone is not pickup.
 An existing WM-UI matrix uses [upstream-adapter.md](references/upstream-adapter.md):
 one explicit binding and `refresh`, then a packet; the source keeps its writer.
@@ -121,6 +138,8 @@ existing projection before its packet. Reuse given authorization and keep its sc
    projection, proposals, immutable snapshots, and primary evidence.
 3. Check coverage: documents, objectives, modules, contracts, work areas, all work,
    and the history of all authoritative matrices must have exact inventory bindings.
+   Cover the current level; expand future lower-level work when selected rather
+   than requiring every leaf before the common working stand.
 4. Preserve truthful coverage for partial/unmapped/UNKNOWN information. Do not
    claim the whole project is documented from a few documents or a subset of steps.
 5. Select a substantive step that advances the result or closes a specific gap.
@@ -131,12 +150,12 @@ existing projection before its packet. Reuse given authorization and keep its sc
 - Record the outcome, criteria, dependencies, and a bounded set of changes.
 - Record an assigned work item's actual beginning or delegation immediately,
   including research, diagnosis, document analysis and checks. Use the existing
-  leaf work ID and responsible actor; state what is being investigated and the
+  leaf work ID and responsible actor; state the current step and the
   next observable result. `start` alone writes no source work event. For work
   already underway, record present `progress --status doing`, without backdating.
 - If no existing leaf covers the actual task, the current writer registers a
-  bounded research/check item through its established source method. Do not use
-  an unrelated accepted item to make the matrix look active. Ordinary questions
+  bounded implementation, research or check item through its established source
+  method. Do not use an unrelated accepted item to make the matrix look active. Ordinary questions
   and standalone context lookups retain the read-only path without onboarding.
 - Before waiting after new start/dispatch/progress/result/blocker facts, the main
   writer calls `work` with an operation ID, work, phase, executor, note, next action
