@@ -1,3 +1,21 @@
+# 0.8.0rc2058 — explicit recovery of a missing-project chat binding
+
+- Add `project recover-binding` for an exact ENTERED receipt whose former root
+  is absent, with explicit permission to detach an unverifiable old task.
+- Require exact session, old turn/task/root, new turn and original receipt SHA;
+  refuse existing roots, symlinks, malformed receipts and conflicting registered
+  bindings. Keep ordinary `validate_entry` and `next-turn` checks unchanged.
+- Preserve the original bytes, request, planned replacement and recovery journal
+  under the shared turn lock; use compare-and-swap and durable archive publication.
+- Resume only the matching prepared transition or its exact committed postimage;
+  never clear a later entry or overwrite a changed archive.
+- Return only INTAKE_REQUIRED with no task, READY, native-hook evidence or target
+  authority. Preserve old task state, documents and history; allow normal entry
+  into the intended project after recovery.
+- Cover missing/moved roots, permission and identity failures, executor conflicts,
+  symlinks, concurrent writes, interrupted flushes, safe retries and new entry
+  with isolated synthetic fixtures.
+
 # 0.8.0rc2057 — modular working stand and adjustable development depth
 
 - Make project development the default engineering guidance: plan the complete

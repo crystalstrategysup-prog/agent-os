@@ -1452,6 +1452,20 @@ def make_parser() -> argparse.ArgumentParser:
     nxt.add_argument("--turn", required=True)
     nxt.add_argument("--recovery-request", type=Path)
     nxt.add_argument("--recovery-permit", type=Path)
+    stale = sub.add_parser(
+        "recover-binding",
+        help="Recover one chat binding whose exact former project root is missing",
+        allow_abbrev=False,
+    )
+    stale.add_argument("--session", required=True)
+    stale.add_argument("--from-turn", required=True)
+    stale.add_argument("--turn", required=True)
+    stale.add_argument("--expected-receipt-sha256", required=True)
+    stale.add_argument(
+        "--allow-unverifiable-detach",
+        action="store_true",
+        help="Attest explicit owner permission to detach while old task state is unverifiable",
+    )
     for action in ("refusal-acknowledge", "refusal-reconcile"):
         recovery = sub.add_parser(action)
         recovery.add_argument("--task", required=True)
@@ -1497,10 +1511,17 @@ def make_parser() -> argparse.ArgumentParser:
     task_budget.add_argument("--expected-project-sha256")
     task_budget.add_argument("--expected-budget-revision", type=int)
     for name, child in sub.choices.items():
-        child.add_argument("--root", type=Path, default=Path.cwd())
+        if name == "recover-binding":
+            child.add_argument(
+                "--root", required=True,
+                help="Exact absolute former root from the receipt; preserved without path resolution",
+            )
+        else:
+            child.add_argument("--root", type=Path, default=Path.cwd())
         if name in {
             "ready",
             "next-turn",
+            "recover-binding",
             "check",
             "assess",
             "verify-closeout",
@@ -1581,6 +1602,18 @@ def command(argv: list[str], user_home: Path) -> tuple[dict, int]:
             task_id=args.task,
             recovery_request=(recovery_document(args.recovery_request) if args.recovery_request else None),
             recovery_permit=(recovery_document(args.recovery_permit) if args.recovery_permit else None),
+        )
+    elif args.action == "recover-binding":
+        from .binding_recovery import recover_binding
+        result = recover_binding(
+            root,
+            user_home,
+            session_id=args.session,
+            previous_turn=args.from_turn,
+            turn_id=args.turn,
+            task_id=args.task,
+            expected_receipt_sha256=args.expected_receipt_sha256,
+            allow_unverifiable_detach=args.allow_unverifiable_detach,
         )
     elif args.action == "document":
         result = register_document(

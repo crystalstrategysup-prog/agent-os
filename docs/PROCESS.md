@@ -105,10 +105,25 @@ locks still apply. Only the old workflow receipt advances to INTAKE_REQUIRED;
 both tasks, project active pointer/revision, READY and check evidence are left
 unchanged. Then enter the intended isolated project explicitly. This does not
 resume/accept the old task, enter the other active task, transfer its authority
-or establish business completion. Missing/stale/replayed bindings, nonterminal
-old tasks and pending recovery remain refusals. Do not clear receipts manually
+or establish business completion. For this ordinary transition, missing, stale
+or replayed bindings, nonterminal old tasks and pending recovery remain refusals.
+Do not clear receipts manually
 or invoke a lower-level helper as a consumer workaround; reconcile an unknown
 atomic outcome before another transition.
+
+If the exact former root is missing or has been moved, use the separate
+`project recover-binding` procedure in [Binding recovery](BINDING_RECOVERY.md).
+It requires the exact session, old turn/task/root, new turn and SHA-256 of the
+current receipt, plus explicit owner permission to detach while the old task
+state is unverifiable. It refuses existing roots, unsafe paths, mismatches and
+conflicting registered executors. Under the user-turn lock, it archives the
+original receipt and journals a compare-and-swap transition of this chat alone
+to INTAKE_REQUIRED without a task binding. The old project, task and history
+remain unchanged; no READY or authority is created. Then use ordinary `project
+enter` at the intended project with the selected new turn and current authority.
+An exact retry can finish a PREPARED transition from its unchanged original
+receipt after repeating the preconditions, or confirm its exact replacement
+receipt. A later entry cannot be cleared by replaying recovery.
 
 Native provenance alone is neither authority nor evidence of native enforcement.
 

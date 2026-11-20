@@ -55,6 +55,7 @@ the command group.
 | Group | Operations | Boundary |
 | --- | --- | --- |
 | `project` | init, questions, enter, next-turn, document, ready, check, assess, verify-closeout, status, close, checkpoint, gate, snapshot | Explicit actions in the named project; questions and reads need no product write |
+| `project recover-binding` | exact old root, session, old/new turn, task, receipt SHA-256, explicit detach permission | One stale user-home chat receipt and its recovery archive; old project and task unchanged |
 | `project observe` | root, answers, session, turn | Optional user-home receipt; does not create a project task |
 | `overlay` | status, index, import, migrate-config | Import and migration plan by default; apply explicitly |
 | `profiles` | inventory, select, context, interview | Exact profiles and selection in the named user home |
@@ -76,6 +77,17 @@ are explicitly chosen; that does not prove a native hook event. After close or
 checkpoint, `project next-turn` records an exact transition. Legacy dispatch
 requires matching task objective and destination session; its one-time receipt
 is consumed even when downstream launch fails.
+
+For a missing former project root, `project recover-binding` is the explicit
+receipt-only transition described in [Binding recovery](BINDING_RECOVERY.md).
+Its required `--root` is the exact raw absolute value from the old receipt;
+there is no current-directory default or implicit path resolution. Exact
+identities and receipt-byte SHA-256 are checked under the existing user-turn
+lock. Explicit permission covers only detaching this chat while the old task
+state cannot be verified. Success is INTAKE_REQUIRED with `task_id: null` and
+false authority/production/native-hook claims. The archived original receipt
+and recovery journal remain local to the selected user home. Ordinary entry
+and its validation continue unchanged.
 
 ## MCP stdio
 

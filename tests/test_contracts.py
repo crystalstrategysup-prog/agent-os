@@ -144,6 +144,7 @@ def test_cli_contract_is_packaged_and_release_tree_refuses_runtime_receipts(tmp_
     assert {
         "project enter",
         "project next-turn",
+        "project recover-binding",
         "project close",
         "overlay import",
         "install.py rollback",

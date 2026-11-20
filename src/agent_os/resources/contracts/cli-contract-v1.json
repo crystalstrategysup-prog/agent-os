@@ -258,6 +258,41 @@
       ]
     },
     {
+      "effect": "explicit_user_binding_recovery",
+      "name": "project recover-binding",
+      "status_values": [
+        "INTAKE_REQUIRED"
+      ],
+      "write_surfaces": [
+        "exact existing standalone turn receipt",
+        "state/binding-recoveries/<recovery_id>/"
+      ],
+      "contract": "docs/BINDING_RECOVERY.md",
+      "required_options": [
+        "--root",
+        "--session",
+        "--from-turn",
+        "--task",
+        "--turn",
+        "--expected-receipt-sha256"
+      ],
+      "permission_option": "--allow-unverifiable-detach",
+      "root_input": "Exact raw absolute former root from the receipt; no default or implicit resolution",
+      "preconditions": [
+        "Exact ENTERED receipt identity and original byte SHA-256",
+        "Former root absent, safe path and no conflicting registered ENTERED receipt",
+        "Explicit permission to detach while old task state is unverifiable"
+      ],
+      "transaction": "Existing user-turn lock, compare-and-swap, immutable original receipt archive and PREPARED/COMMITTED journal",
+      "retry": "Exact request: resume PREPARED only from unchanged original after rechecking preconditions/CAS, or confirm exact postimage; refuse after later enter or other receipt change",
+      "task_id_after": null,
+      "old_task_changed": false,
+      "task_state_verified": false,
+      "native_hook_proven": false,
+      "authority_granted": false,
+      "production_authorized": false
+    },
+    {
       "effect": "user_receipt_only",
       "name": "project observe",
       "status_values": [
@@ -819,12 +854,12 @@
       "contract": "atlas.source-relocation/v1"
     }
   ],
-  "distribution_version": "0.8.0rc2057",
+  "distribution_version": "0.8.0rc2058",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.8.0rc2057",
+  "release": "0.8.0rc2058",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",
