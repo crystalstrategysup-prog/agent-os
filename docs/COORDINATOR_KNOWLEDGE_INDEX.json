@@ -6,13 +6,13 @@
     {
       "id": "work_coordination",
       "path": "WORK_COORDINATION.md",
-      "sha256": "afbc66f533dbd3faee53a2a7fa81ba81096119766c3ddcc1c3d52b1ae5a3a86b",
+      "sha256": "fffe49c64dee7ecf1fd7475e9669f69a73b2b6a1204ce8228db3df2746e39d5f",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "process",
       "path": "PROCESS.md",
-      "sha256": "b1c0ec1fe79813d981115f14e80bc98856e03bf0581ce292cd03f308ef830d30",
+      "sha256": "7accc4b2218d3bfaa89f88411c0df8ede6a1198594463f10b368cc142d336e04",
       "status": "SOURCE_CONTRACT"
     },
     {
@@ -66,7 +66,7 @@
     {
       "id": "context_binding",
       "path": "CONTEXT_BINDING.md",
-      "sha256": "c2f99bc61742d0a9a986ec4e2061f98c9cdb0bc49d2e286ad6fa7df8e3d6dcbc",
+      "sha256": "32268cb4b52b17fb8e90894b6e819a8693f3346b522da33121ac53d9f80cb83c",
       "status": "SOURCE_CONTRACT"
     },
     {

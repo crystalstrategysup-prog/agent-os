@@ -13,6 +13,10 @@
 - Correct the context guide's stale causal-default description. Source changes
   and context binding remain distinct from observed active-worker application;
   this candidate makes no publication, installation or acceleration claim.
+- Clarify native `report-review` as a compact review record and continuation of
+  authorized work; a child result does not require a full owner report or the
+  delegator's terminal final. Preserve existing return, review and acceptance gates.
+  Refresh the coordinator index's stale candidate method/context document pins.
 
 # 0.8.0rc2058 — explicit recovery of a missing-project chat binding
 

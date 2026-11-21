@@ -169,7 +169,12 @@ def native_session_next_action(
         if o.result_stage == "received":
             return decision("review-result", "coordinator", "Receipt permits evidence review, not business acceptance.")
         if o.result_stage == "reviewed":
-            return decision("report-review", "coordinator", "Preserve review, remaining goal and next owner in the delegator's own report.")
+            return decision(
+                "report-review", "coordinator",
+                "Preserve a compact review, remaining goal and next owned action; "
+                "continue already authorized work. A full owner report follows "
+                "its declared reporting boundary.",
+            )
         if o.result_stage == "prepared":
             if o.final_ref is None:
                 return decision("save-final", "worker", "Preserve the producer's compact final before returning the result.")

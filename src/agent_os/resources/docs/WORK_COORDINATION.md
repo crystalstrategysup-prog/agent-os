@@ -318,7 +318,7 @@ author contract semantics, create a keeper or schedule another session.
 | Result prepared and final saved | Worker may return it only through the currently authorized route; preserve a stable operation identity. |
 | Send attempted, recipient outcome unknown | Read/reconcile that exact operation. Do not send again because of silence or timeout. |
 | Recipient receipt captured | Coordinator reads the result and evidence and reviews the original criteria. Receipt alone is not review. |
-| Child semantic review recorded | Coordinator records accepted/partial/held, remaining original goal and next owned action, then prepares its own return report/final. This does not accept the original business goal. |
+| Child semantic review recorded | Coordinator records accepted/partial/held, remaining original goal and next owned action, preserves a compact review record and continues the next authorized action. Its own final is prepared at the actual return/handoff boundary. This does not accept the original business goal. |
 | Worker active/busy | Use a bounded supported wait and continue independent authorized work. Do not send redundant continuation. |
 | Exact worker idle/completed, result absent | After supported readback and no uncertain input, one authorized request may ask for its existing result. A completed turn does not prove completed work. |
 | Child blocked | Obtain its evidence and owned checkpoint; continue independent work and escalate only the material unresolved decision/effect. |
@@ -372,7 +372,13 @@ at most two wait/read attempts and one result/checkpoint request before an owned
 checkpoint. Record an attempted input as UNKNOWN before I/O; never reset the
 counters merely on a new turn or final. Only actual new progress/assignment with
 reconciled prior operations can establish a new bounded observation cycle.
-`report-review` prepares the delegator's report; it is not permission to send it.
+`report-review` preserves the compact semantic review, remaining goal and next
+owned action in the existing record. It does not require an owner-facing full
+report or terminal final after every child result. Continue already authorized
+work; prepare the final at the actual return/handoff boundary. A selected owner
+presentation contract governs the corresponding report format without replacing
+required result-return, review or acceptance records. This recommendation is not
+permission to send a message.
 Unknown worker inputs/effects block worker-directed requests, but do not prohibit
 a distinct currently authorized report that accurately discloses that unknown.
 
