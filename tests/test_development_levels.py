@@ -17,7 +17,7 @@ from test_foundation import documents
 from test_foundation import setup as foundation_setup
 
 from agent_os import context_gate, engineering_guidance, project, workflow
-from agent_os.safeio import GateError, filemap
+from agent_os.safeio import GateError, atomic_json, filemap
 
 setup = foundation_setup
 ROOT = Path(__file__).resolve().parents[1]
@@ -241,3 +241,144 @@ def test_new_scope_field_keeps_existing_context_secret_filter(tmp_path, level):
 def test_cli_requires_both_level_and_its_scope(arguments):
     with pytest.raises((SystemExit, GateError)):
         workflow.command(["guidance", *arguments])
+
+
+def bound_request(setup, selected=None):
+    """Use a real entered task; the producer need not copy its choice by hand."""
+    root, _, _ = setup
+    task_id = enter(setup, selected)["task_id"]
+    task = project.load_task(root, task_id)
+    raw = request(purpose="continuation")
+    raw["development_source"] = {
+        "root": str(root.resolve()), "task_id": task_id, "revision": task["revision"],
+    }
+    return raw, task
+
+
+@pytest.mark.parametrize("level,scope", [
+    (1, "project"), (3, "stage:synthetic-connection"),
+    (5, "module:synthetic-platform/topics"),
+])
+def test_saved_task_supplies_omitted_choice_to_real_continuation_cli(setup, tmp_path, level, scope):
+    root, home, _ = setup
+    selected = choice(level, scope)
+    raw, task = bound_request(setup, selected)
+    # Reproduce the observed producer: its text answers know a level, but the
+    # goal omits the typed choice. The explicit task binding resolves it.
+    raw["goal"]["known_answers"]["level"] = str(level)
+    raw["session_id"], raw["turn_id"] = "resumed-session", "resumed-turn"
+    before = filemap(root), filemap(home)
+    path = tmp_path / "continuation.json"
+    atomic_json(path, raw)
+    process = subprocess.run(
+        [sys.executable, "-m", "agent_os", "context", "build", "--request", str(path)],
+        cwd=tmp_path, env=dict(os.environ, PYTHONPATH=str(ROOT / "src")),
+        capture_output=True, text=True, timeout=15,
+    )
+    assert process.returncode == 0, process.stdout + process.stderr
+    capsule = json.loads(process.stdout)
+    assert capsule["goal"]["development"] == capsule["development"] == selected
+    assert capsule["foundation_guidance"]["development"] == selected
+    assert capsule["development_source"]["task_id"] == task["id"]
+    assert capsule["development_source"]["revision"] == task["revision"]
+    assert capsule["development_source"]["development"] == selected
+    assert capsule["authority_granted"] is False and capsule["native_hooks"] == "DISABLED"
+    assert capsule["behavior_compliance"] == "NOT_PROVEN"
+    assert project.load_task(root, task["id"])["status"] == "INTAKE"
+    assert (filemap(root), filemap(home)) == before
+
+
+@pytest.mark.parametrize("key", ["level", "development_level"])
+def test_text_only_mode_is_diagnosed_instead_of_silently_defaulted(tmp_path, key):
+    for purpose in ("project-change", "continuation"):
+        raw = request(purpose=purpose)
+        raw["goal"]["known_answers"][key] = "1"
+        with pytest.raises(GateError, match="context_development_source_or_selection_required"):
+            context_gate.build(tmp_path / "unused", raw)
+        raw["goal"]["development"] = choice(1, "project")
+        assert context_gate.build(tmp_path / "unused", raw)["development"] == choice(1, "project")
+
+
+def test_bound_choice_conflict_is_rejected_without_modifying_task(setup):
+    root, home, _ = setup
+    raw, _ = bound_request(setup, choice(1, "project"))
+    before = filemap(root), filemap(home)
+    raw["goal"]["development"] = choice(5, "project")
+    with pytest.raises(GateError, match="context_development_selection_mismatch"):
+        context_gate.build(home, raw)
+    raw["goal"]["development"] = choice(1, "module:synthetic-platform/topics")
+    with pytest.raises(GateError, match="context_development_selection_mismatch"):
+        context_gate.build(home, raw)
+    assert (filemap(root), filemap(home)) == before
+
+
+def test_changed_task_choice_invalidates_previous_context_receipt(setup):
+    root, home, answers = setup
+    raw, task = bound_request(setup, choice(1, "project"))
+    capsule = context_gate.build(home, raw)
+    receipt = {key: capsule[key] for key in ("session_id", "turn_id", "capsule_sha256")}
+    receipt.update(event_kind="tool_result", event_ref="synthetic-context-observation")
+    narrower = choice(5, "module:synthetic-platform/auth")
+    project.enter(root, {**answers, "development": narrower},
+                  session_id="synthetic-session", turn_id="synthetic-turn",
+                  user_home=home, resume_task=task["id"])
+    with pytest.raises(GateError, match="context_development_revision_mismatch"):
+        context_gate.verify(home, raw, receipt)
+    raw["development_source"]["revision"] = project.load_task(root, task["id"])["revision"]
+    resumed = context_gate.build(home, raw)
+    assert resumed["development"] == narrower
+    with pytest.raises(GateError, match="context_receipt_binding_mismatch"):
+        context_gate.verify(home, raw, receipt)
+
+
+def test_source_without_saved_choice_is_not_invented(setup):
+    raw, _ = bound_request(setup)
+    with pytest.raises(GateError, match="development"):
+        context_gate.build(setup[1], raw)
+
+
+def test_foreign_project_task_is_not_an_accepted_development_source(setup):
+    root, home, _ = setup
+    raw, task = bound_request(setup, choice(1))
+    task["project_id"] = "synthetic-other-project"
+    atomic_json(project.task_path(root, task["id"]), task)
+    before = filemap(root)
+    with pytest.raises(GateError, match="context_development_task_mismatch"):
+        context_gate.build(home, raw)
+    assert filemap(root) == before
+
+
+def test_missing_or_symlinked_task_source_is_refused(setup, tmp_path):
+    root, home, _ = setup
+    raw, task = bound_request(setup, choice(1))
+    path = project.task_path(root, task["id"])
+    retained = tmp_path / "retained-synthetic-task.json"
+    retained.write_bytes(path.read_bytes())
+    path.unlink()
+    with pytest.raises(GateError):
+        context_gate.build(home, raw)
+    path.symlink_to(retained)
+    with pytest.raises(GateError, match="symlink"):
+        context_gate.build(home, raw)
+
+
+def test_concurrent_task_choice_change_cannot_produce_mixed_capsule(setup, monkeypatch):
+    root, home, _ = setup
+    raw, task = bound_request(setup, choice(1))
+    original_load = engineering_guidance.load
+    changed = False
+
+    def change_task_during_materialization(*args, **kwargs):
+        nonlocal changed
+        result = original_load(*args, **kwargs)
+        if not changed:
+            changed = True
+            current = project.load_task(root, task["id"])
+            current["answers"]["development"] = choice(5)
+            # Even without a revision bump, the pinned source bytes changed.
+            atomic_json(project.task_path(root, task["id"]), current)
+        return result
+
+    monkeypatch.setattr(engineering_guidance, "load", change_task_during_materialization)
+    with pytest.raises(GateError, match="context_development_source_changed_during_read"):
+        context_gate.build(home, raw)

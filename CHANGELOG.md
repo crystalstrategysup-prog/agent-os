@@ -1,3 +1,14 @@
+# 0.8.0rc2060 — preserve the saved development choice in continuation context
+
+- Bind engineering context to an explicit current project task and revision;
+  carry its saved development level/scope into the goal and canonical guidance.
+- Refuse stale, changed or contradictory source metadata. Diagnose an omitted
+  typed choice when an old caller supplied the level only in known answers,
+  instead of silently materializing the balanced default.
+- Update the actual managed-client and project-entry instructions to use the
+  bound route. Source-free unspecified requests retain the legacy default;
+  ordinary reads, task state, authority and disabled native hooks are unchanged.
+
 # 0.8.0rc2059 — scoped development choices and proportional reporting
 
 - Type the existing task/context development selection, normalize `1D` to level

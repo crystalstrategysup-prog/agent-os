@@ -197,8 +197,10 @@ rebuild completed work merely for a level change.
 Carry the choice across sessions and handoffs. The existing task answers and
 context goal can contain `development: {"level": 1, "scope": "project"}`;
 `1D` is an input alias of level 1, not another level. Same-task resume retains
-an omitted saved choice. A stateless context caller must carry the current goal
-and its choice; a missing field cannot reconstruct discarded history. Scope
+an omitted saved choice. For registered tasks, context callers bind the exact
+current task and revision through `development_source` in [CONTEXT_BINDING](CONTEXT_BINDING.md);
+the builder carries and checks its saved choice. Unregistered/portable callers
+carry typed `goal.development`; a choice recorded only in prose is insufficient. Scope
 names identify the existing plan's project/stage/module, not an authority grant
 or an automatically inferred scope tree. Use the enclosing plan to resolve it.
 When loading guidance, pass that same choice with `--development-level` and

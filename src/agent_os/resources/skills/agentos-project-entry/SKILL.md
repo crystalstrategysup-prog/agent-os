@@ -41,6 +41,13 @@ level 5 means detailed design and immediate checking at each step. Use the
 canonical method for all five descriptions and diagnostic cleanup. This level is
 independent of Atlas MINIMAL/FULL scope and grants no additional authority.
 
+For a registered task's engineering context, supply `development_source` with
+its exact root, task ID and current revision as defined in
+`resources/docs/CONTEXT_BINDING.md`. Consume the returned saved level/scope;
+do not leave a known choice only in `known_answers`. Without a registered task,
+carry typed `goal.development`. Persist a scoped change in task answers before
+binding its new revision. A new session does not reset the selected level.
+
 For a concrete malfunction needing causal investigation, explicitly load
 `agentos workflow guidance --method causal-debugging`, or read **Causal debugging**
 in the same PROCESS. Restore the existing journal, conditions, configuration and

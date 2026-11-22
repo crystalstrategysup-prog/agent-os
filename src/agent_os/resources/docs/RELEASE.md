@@ -1,6 +1,6 @@
 # Release policy
 
-Current publication candidate: `0.8.0rc2059`, retaining scoped development choices across continuation and clarifying proportional level-1 coordination on the `0.8.0rc2058` baseline. The existing actual-body loader, result-return and acceptance contracts remain in use. Package, CLI, MCP and release metadata must agree. This is a prerelease; source publication, asset availability, target installation and observed agent behavior are separate.
+Current publication candidate: `0.8.0rc2060`, retaining scoped development choices across continuation and clarifying proportional level-1 coordination on the `0.8.0rc2058` baseline. The existing actual-body loader, result-return and acceptance contracts remain in use. Package, CLI, MCP and release metadata must agree. This is a prerelease; source publication, asset availability, target installation and observed agent behavior are separate.
 
 Recovery v3 preserves workflow/native-turn identity and existing CAS/journal and finite supported-observer limits. It does not provide missing provider exact-origin capabilities. Old v1/v2-only readers are not safe rollback targets after real v3 metadata activation. No host activation, scheduler or native hook is implied. Earlier tags and published assets remain immutable.
 

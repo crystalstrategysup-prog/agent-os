@@ -80,9 +80,43 @@ def _bytes(home, relative):
     return data
 
 
+def _task_development(source: dict) -> dict:
+    """Read one explicitly selected task; never discover a task or grant entry."""
+    from . import project
+    from .development_level import normalize
+
+    if (not isinstance(source, dict) or set(source) != {"root", "task_id", "revision"}
+            or type(source.get("revision")) is not int
+            or not 1 <= source["revision"] <= 2147483647):
+        raise GateError("context_development_source_invalid")
+    root_value = _text(source.get("root"), "development_root")
+    if not Path(root_value).is_absolute():
+        raise GateError("context_development_source_absolute_root_required")
+    task_id = identifier(source.get("task_id"))
+    root = project.root_path(Path(root_value))
+    current_project = project.load_project(root)
+    task = project.load_task(root, task_id)
+    project_id = identifier(current_project.get("id"))
+    if task.get("project_id") != project_id:
+        raise GateError("context_development_task_mismatch")
+    if type(task.get("revision")) is not int or task["revision"] != source["revision"]:
+        raise GateError("context_development_revision_mismatch")
+    answers = task.get("answers")
+    if not isinstance(answers, dict) or "development" not in answers:
+        raise GateError("context_development_task_choice_missing")
+    selected = normalize(answers["development"])
+    _text(selected["scope"], "development_scope", 200)
+    return {
+        "root": str(root), "task_id": task_id, "revision": task["revision"],
+        "project_id": project_id, "task_digest": digest(task),
+        "project_digest": digest(current_project), "development": selected,
+    }
+
+
 def build(home: Path, request: dict) -> dict:
     """Return actual relevant text and its source binding, without writing files."""
-    fields = {"schema", "session_id", "turn_id", "purpose", "profile_keys", "index_keys", "goal"}
+    fields = {"schema", "session_id", "turn_id", "purpose", "profile_keys", "index_keys", "goal",
+              "development_source"}
     if (not isinstance(request, dict) or set(request) - fields
             or request.get("schema") != "agentos.context-request/v1"):
         raise GateError("context_invalid_request")
@@ -96,6 +130,20 @@ def build(home: Path, request: dict) -> dict:
     if len(index_keys) > 8:
         raise GateError("context_index_limit")
     goal = _goal(request.get("goal"), purpose in {"project-change", "continuation"})
+    task_source = None
+    if "development_source" in request:
+        if purpose in READS or goal is None:
+            raise GateError("context_development_source_requires_project_goal")
+        task_source = _task_development(request["development_source"])
+        selected = task_source["development"]
+        if "development" in goal and goal["development"] != selected:
+            raise GateError("context_development_selection_mismatch")
+        goal = {**goal, "development": selected}
+    if (purpose in {"project-change", "continuation"} and "development" not in goal
+            and {"level", "development_level"} & goal["known_answers"].keys()):
+        # These legacy answer fields are hints, not a typed scoped choice.
+        # Refuse the observed silent reset without guessing level or scope.
+        raise GateError("context_development_source_or_selection_required")
     if purpose in READS and not keys and not index_keys:
         return {"schema": "agentos.context-capsule/v1", "status": "FAST_PATH",
                 "purpose": purpose, "home_read": False, "intake_required": False,
@@ -175,6 +223,13 @@ def build(home: Path, request: dict) -> dict:
         raise GateError("context_dependency_changed_during_read")
     if foundation_guidance is not None and current_guidance() != foundation_guidance:
         raise GateError("context_foundation_guidance_changed_during_read")
+    if task_source is not None:
+        try:
+            current_source = _task_development(request["development_source"])
+        except (GateError, OSError, ValueError, KeyError) as exc:
+            raise GateError("context_development_source_changed_during_read") from exc
+        if current_source != task_source:
+            raise GateError("context_development_source_changed_during_read")
     body = {
         "schema": "agentos.context-capsule/v1", "status": "MATERIALIZED",
         "session_id": session, "turn_id": turn, "purpose": purpose,
@@ -191,6 +246,9 @@ def build(home: Path, request: dict) -> dict:
     if foundation_guidance is not None:
         body["foundation_guidance"] = foundation_guidance
         body["development"] = foundation_guidance["development"]
+    if task_source is not None:
+        body["development_source"] = task_source
+        body["development"] = task_source["development"]
     if len(json.dumps(body, ensure_ascii=False).encode()) > LIMIT:
         raise GateError("context_size_limit")
     return {**body, "capsule_sha256": digest(body)}

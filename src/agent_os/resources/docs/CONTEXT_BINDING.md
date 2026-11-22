@@ -61,10 +61,32 @@ still follow PROCESS: documentation before product writes, target gates separate
 
 The optional `goal.development` has exactly `level` and `scope`: integer 1–5
 (input alias `1D` normalizes to 1) and a nonempty scope string up to 200 characters.
-Carry it with the current goal across sessions. The stateless builder does not
-recover a choice omitted by its caller or infer a hierarchy from scope names.
-Legacy goals remain unchanged; absent a carried choice, the materialized default
-is level 3 with scope `task`. Invalid explicit choices are refused, not defaulted.
+Carry it with the current goal across sessions. For a registered task, bind its
+saved choice instead of copying it from prose. Add this top-level request field:
+
+```json
+"development_source": {
+  "root": "/absolute/current/project",
+  "task_id": "current-task-id",
+  "revision": 7
+}
+```
+
+Use the exact current task ID and revision. For `project-change` or `continuation`,
+the builder reads only that project's metadata and task, carries its saved
+`answers.development` into the goal and guidance, pins the source, and rechecks it
+before returning. An explicit `goal.development` must agree with the saved choice.
+Persist an owner's changed project/stage/module choice through the existing task
+answer mechanism first, then use the new revision. A stale revision, missing
+saved choice, mismatched identity or concurrent source change is refused; no task
+or chat binding is modified and no authority is granted.
+
+For an unregistered or portable handoff, carry the current typed `goal.development`
+directly. Scope names do not imply an automatically inferred hierarchy. A known
+choice stored only in `known_answers.level` or `known_answers.development_level`
+is not a typed selection: supply the saved-task source or the typed choice before
+materializing engineering context. Legacy source-free goals with no such choice
+retain default level 3 with scope `task`. Invalid choices are never defaulted.
 
 For `project-change` and `continuation`, the capsule also materializes
 `foundation_guidance`: the actual bounded **Project development** section of the
