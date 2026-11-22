@@ -1,3 +1,19 @@
+# 0.8.0rc2062 — protect the actual action and affected state
+
+- Distinguish live operational state, unique non-production material and isolated
+  reproducible development stands in the canonical method returned by workflow
+  guidance. Classify actual targets and effects; the development level and a
+  server/database label do not determine the need for a full backup.
+- Preserve code through Git and retain rebuild inputs for reproducible stands.
+  New backups need a concrete recovery reason; choose the smallest sufficient
+  protection and reuse applicable recovery points. Do not routinely copy entire
+  runtimes, synthetic databases, caches, dependencies or earlier backups.
+- Connect target rollback and causal capacity planning to this same rule.
+  Keep decisions in existing work records without new forms or approval gates.
+- Preserve target authority, confidentiality, unique evidence, narrow
+  transactional journals, retained backups and UNKNOWN reconciliation. No
+  runtime guard, stored-state schema or automatic cleanup behavior changes.
+
 # 0.8.0rc2061 — keep current plans distinct from historical guidance
 
 - Clarify the existing plan-maintenance step: label superseded mutable sections

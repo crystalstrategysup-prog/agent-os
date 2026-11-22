@@ -178,6 +178,9 @@ validity period or lease, allowed effects, and rollback at the target. Read
 authority does not authorize a send. Local READY does not authorize production.
 If a target capability is absent, stop only that action and continue other
 authorized preparation. There is no universal `--authorized` override.
+Choose protection by the actual effect and affected state under
+[Proportionate protection](#proportionate-protection-of-data-and-runtime).
+Rollback means a sufficient recovery route, not an automatic full copy.
 
 <!-- agentos:project-development:start -->
 
@@ -247,6 +250,52 @@ check or a small scenario may suffice for the changed connection. Check affected
 Auth/ACL and data/effect protections when needed at every level. Investigate a
 concrete malfunction causally, then return to assembly once its scoped blocking
 condition is resolved. No level imposes a fixed number of minutes or tests.
+
+### Proportionate protection of data and runtime
+
+Assess the actual action and affected state before choosing protection.
+Distinguish a live service or operational database, unique non-production data,
+and an isolated reproducible development stand. A new runtime is not production
+merely because it runs a server or database. Names such as `lab` or `test` do not
+establish isolation either; use the known target, connections, storage and
+dependencies. Reuse unchanged facts instead of repeating discovery for every edit.
+
+- For versioned source and reproducible development state, preserve changes
+  through Git and retain the available inputs needed to rebuild or reseed the
+  affected stand. Preserve relevant uncommitted or untracked work before an
+  operation that could remove it. Do not routinely copy the whole runtime,
+  dependencies, caches, synthetic database or earlier backups. A release package
+  captures its declared source/artifacts; it does not require a running database
+  copy. A full stand capture is warranted for a concrete transfer or recovery
+  rehearsal that needs those bytes, not for ordinary development increments.
+- Unique data, configuration or evidence can exist outside production. Preserve
+  only the affected material that cannot be safely or acceptably recreated.
+  Retain an expensive experiment's necessary result without copying unrelated
+  runtime state. An isolated copy of real data remains confidential; keep private
+  data and secrets out of public Git even when that copy can be recreated.
+- For live services and operational data, assess concrete loss or corruption,
+  interruption, disclosure and external effects. Choose the smallest sufficient
+  protection: an existing applicable recovery point, transaction, targeted
+  preimage/export, configuration rollback or retained release. A code-only change
+  does not automatically require a database copy; code can still cause destructive
+  writes without a schema migration. Read-only inspection requires no new backup.
+
+A new backup needs a concrete reason: what state could be lost, by which action,
+why it cannot be safely or acceptably recreated, and why an available recovery
+route or a smaller copy is insufficient. A full backup is appropriate only when
+the affected scope and recovery need justify it, or it is the requested
+deliverable. Reuse an available, sufficiently current recovery point when it
+covers the operation. Account for the copy's disk, time and service impact;
+repeated copies are not evidence of safety.
+
+Record material decisions briefly in the existing plan or operation record,
+without a separate risk register, per-command form or repeated owner approval.
+If the target or effect is uncertain, make the smallest relevant read-only check
+and continue independent authorized work. Development level changes verification
+depth, not the value of data or a default backup requirement. Existing target
+authority, ownership, mandatory narrow transactional journals and UNKNOWN
+reconciliation remain in force. This rule does not authorize deleting retained
+backups, evidence or history.
 
 ### Working cycle
 
@@ -426,6 +475,10 @@ and temporary copies, rollback/WAL and other journals, indexes and service data,
 retained partials and required recovery copies. Compare their combined requirement
 and justified headroom with available space. Preserve the previous configuration
 and an applicable rollback route; do not discard a partial to make the budget fit.
+Select recovery copies under [Proportionate protection](#proportionate-protection-of-data-and-runtime):
+the action's actual risk determines their scope. A reproducible stand normally
+uses retained source and rebuild inputs; this capacity check does not require a
+full runtime or database backup. Reuse an applicable existing recovery point.
 
 Keep **configured ceilings**, **estimated requirements**, **observed usage** and
 **measured peaks** separate. A configured stage budget, end-of-run file size or
