@@ -1,4 +1,4 @@
-# Unreleased — retain scoped development choices and level-1 cadence
+# 0.8.0rc2059 — scoped development choices and proportional reporting
 
 - Type the existing task/context development selection, normalize `1D` to level
   1, retain an omitted choice on same-task resume, and permit an explicit choice

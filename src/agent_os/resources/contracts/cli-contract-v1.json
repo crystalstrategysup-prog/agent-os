@@ -864,12 +864,12 @@
       "contract": "atlas.source-relocation/v1"
     }
   ],
-  "distribution_version": "0.8.0rc2058",
+  "distribution_version": "0.8.0rc2059",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.8.0rc2058",
+  "release": "0.8.0rc2059",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",
