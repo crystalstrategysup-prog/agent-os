@@ -1,6 +1,10 @@
 # Process: direct reading, documented changes
 
-Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Read the selected source's `pyproject.toml` or installed package metadata for the
+package version, and the selected release manifest for release identity. Version
+metadata does not establish publication or host adoption. RC-labelled sections
+below are retained historical records, not current installation or publication
+claims.
 
 
 ## Historical indexed handoff successor0.7.0rc1
@@ -306,10 +310,14 @@ condition is resolved. No level imposes a fixed number of minutes or tests.
 9. **Record and continue.** Update the existing plan briefly with the result,
    remaining stubs or limits, and the next step. Save changes through the
    project's normal route, then perform that step. Adjust affected plans when
-   new information changes dependencies or scope. Make routine technical
-   decisions within the assignment without repeatedly returning them to the
-   owner. This method uses existing authority and does not change external
-   permissions, protections or UNKNOWN reconciliation.
+   new information changes dependencies or scope. When newer scoped guidance
+   supersedes part of a mutable plan, mark the replaced section as historical
+   and link to the current plan and its scope. Preserve accepted results and
+   dated evidence. For immutable snapshots, update the existing current index
+   instead. Repair affected links and conflicts without a separate documentation
+   sweep. Make routine technical decisions within the assignment without
+   repeatedly returning them to the owner. This method uses existing authority
+   and does not change external permissions, protections or UNKNOWN reconciliation.
 
 ### Internal progress, handoff and coordination
 

@@ -1,3 +1,13 @@
+# 0.8.0rc2061 — keep current plans distinct from historical guidance
+
+- Clarify the existing plan-maintenance step: label superseded mutable sections
+  as historical and link to the current scoped plan; preserve accepted results,
+  dated evidence and immutable snapshots without a separate documentation sweep.
+- Replace PROCESS's stale current-candidate label with source/package version
+  and release-identity pointers. Publication and host adoption remain separate.
+- Scoped development choices, finite stage criteria, proportionate checks and
+  target protections already exist and are unchanged.
+
 # 0.8.0rc2060 — preserve the saved development choice in continuation context
 
 - Bind engineering context to an explicit current project task and revision;
