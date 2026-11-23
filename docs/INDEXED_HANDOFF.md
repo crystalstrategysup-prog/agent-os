@@ -123,6 +123,44 @@ the current format. Rebuilding explicitly to v1 reverses the active format;
 historical v2 snapshots still require a reader that supports v2. The format
 transition leaves existing objects in place.
 
+### Compact index archives
+
+The local POSIX backend supports one opt-in immutable archive of index pages.
+Root, route, history, manifest and evidence references keep their existing
+format. The authorized writer can create a pack on a physically verified
+destination outside the library:
+
+```text
+agentos library --root OWNER_LIBRARY pack-build --selection SHA256_LIST \
+  --directory ARCHIVE --max-bytes SIZE_BUDGET --reserve-bytes FREE_SPACE_FLOOR
+agentos library --root OWNER_LIBRARY pack-attach --directory ARCHIVE \
+  --manifest-sha256 VERIFIED_SHA256
+```
+
+Supply an exact owner-reviewed selection as strictly ascending lowercase digest
+lines, one 64-character SHA-256 per line and a final newline. The builder
+accepts only stored index pages, verifies their original digest and commits an
+immutable manifest after durable pack and index writes. Choose a byte budget
+with headroom for the block layout and other writers. The operating system
+must provide sufficient blocks during each write. Attachment verifies sorted
+index coverage, the two full file hashes and each decoded record before
+publishing the library pointer. Both attachment and rollback hold the existing
+publisher lock and should be scheduled accordingly.
+
+Normal reads prefer loose files. If the loose file is absent, the same scoped
+reference can read the exact bytes by SHA-256 from the archive. A corrupt loose
+file remains an integrity error. Readers bound offsets and decompression and
+verify the requested size and digest. Keep the attached archive immutable and
+mounted. Old executables require all loose files to remain available.
+
+Pack commands leave all originals in place. A separate retirement operation
+requires a verified preserve set, compatible installed readers and writers,
+an independent recovery copy, and coordination with current operations. Use
+`agentos library --root OWNER_LIBRARY pack-restore --reserve-bytes FREE_SPACE_FLOOR`
+to rehydrate exact loose files and detach the pointer only after success. If
+rehydration fails partway, restored files remain valid and the pointer remains
+attached so the operation can resume. The pack is retained for recovery.
+
 Retraction is supported logical retirement: a new immutable snapshot removes
 current visibility and retains historical accepted bytes/reasons. Retirement
 report returns reclaimed_bytes=0. Physical session cleanup/GC is NOT IMPLEMENTED;

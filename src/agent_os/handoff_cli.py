@@ -87,6 +87,16 @@ def command(argv):
     )
     task.add_argument("--expected-revision", type=int, required=True)
     s.add_parser("retirement")
+    pack = s.add_parser("pack-build")
+    pack.add_argument("--selection", type=Path, required=True)
+    pack.add_argument("--directory", type=Path, required=True)
+    pack.add_argument("--max-bytes", type=int, required=True)
+    pack.add_argument("--reserve-bytes", type=int, required=True)
+    attach = s.add_parser("pack-attach")
+    attach.add_argument("--directory", type=Path, required=True)
+    attach.add_argument("--manifest-sha256", required=True)
+    unpack = s.add_parser("pack-restore")
+    unpack.add_argument("--reserve-bytes", type=int, required=True)
     args = p.parse_args(argv)
     principal = local_principal()
 
@@ -105,6 +115,20 @@ def command(argv):
             "library_id": library._authorize(principal)["library_id"],
         }
     library = Library(args.root)
+    if args.action.startswith("pack-"):
+        try:
+            if args.action == "pack-build":
+                return library.pack_index_pages(
+                    principal, selection=args.selection, directory=args.directory,
+                    budget=args.max_bytes, reserve=args.reserve_bytes,
+                )
+            if args.action == "pack-attach":
+                return library.attach_index_pack(
+                    principal, directory=args.directory, manifest_sha256=args.manifest_sha256,
+                )
+            return library.restore_index_pack(principal, reserve=args.reserve_bytes)
+        except OSError as exc:
+            raise HandoffError("PACK_UNAVAILABLE") from exc
     if args.action == "build":
         assets = {key: bounded(Path(path)) for key, path in data(args.assets).items()}
         return {

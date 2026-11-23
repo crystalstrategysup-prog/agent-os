@@ -1248,6 +1248,31 @@ class Library:
             ],
         }
 
+    @api
+    def pack_index_pages(self, principal, *, selection, directory, budget, reserve):
+        from .handoff_pack import build_pack
+
+        self._authorize(principal, write=True)
+        return build_pack(self.store, selection, directory, budget, reserve)
+
+    @api
+    def attach_index_pack(self, principal, *, directory, manifest_sha256):
+        from .handoff_pack import attach_pack
+
+        self._authorize(principal, write=True)
+        with lock(self.store.path("publisher.lock")):
+            self._authorize(principal, write=True)
+            return attach_pack(self.store, directory, manifest_sha256)
+
+    @api
+    def restore_index_pack(self, principal, *, reserve):
+        from .handoff_pack import restore_pack
+
+        self._authorize(principal, write=True)
+        with lock(self.store.path("publisher.lock")):
+            self._authorize(principal, write=True)
+            return restore_pack(self.store, reserve)
+
     def resolve(self, logical_id, principal, revision="current", *, snapshot=None):
         _, root, routes, tree = self._view(principal, snapshot=snapshot)
         row = (
