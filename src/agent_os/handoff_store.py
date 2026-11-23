@@ -616,8 +616,20 @@ class Store:
         require(type(ref["size_bytes"]) is int and 0 <= ref["size_bytes"] <= limit)
         try:
             path = self.path(f"objects/sha256/{digest[:2]}/{digest}")
-            require(path.exists() or path.is_symlink(), "SOURCE_UNAVAILABLE")
-            data = bounded(path, limit)
+            try:
+                path.lstat()
+            except FileNotFoundError:
+                from .handoff_pack import read_packed
+
+                try:
+                    data = read_packed(self, digest, ref["size_bytes"])
+                except HandoffError as exc:
+                    # Rollback restores the loose object before removing the pointer.
+                    if exc.code not in {"SOURCE_UNAVAILABLE", "PACK_UNAVAILABLE"} or not path.exists():
+                        raise
+                    data = bounded(path, limit)
+            else:
+                data = bounded(path, limit)
         except OSError as exc:
             raise HandoffError("SOURCE_UNAVAILABLE") from exc
         require(len(data) == ref["size_bytes"] and sha(data) == digest)

@@ -13,7 +13,8 @@ from pathlib import Path
 import pytest
 
 from agent_os.handoff import Library, checked, local_principal
-from agent_os.handoff_index import verify_indexes
+from agent_os.handoff_cli import command
+from agent_os.handoff_index import CONTENT_PAGE_SCHEMA, GENERATION_PAGE_SCHEMA, Tree, verify_indexes
 from agent_os.handoff_lifecycle import TOPICS, draft
 from agent_os.handoff_store import HandoffError
 
@@ -503,6 +504,92 @@ def test_index_corruption_refused_rebuild_only_accepted_not_staging(lib):
     )
     with pytest.raises(HandoffError, match="INDEX_STALE"):
         tree.find(old, "anything")
+
+
+def test_content_pages_reuse_refs_and_preserve_legacy_history(lib, tmp_path):
+    first, receipt = accept(lib, 1)
+    accept(lib, 2)
+    _, legacy, legacy_routes, legacy_tree = lib._view(P)
+    old_snapshot = lib.store.put_json(legacy)
+    cursor = lib.search({"limit": 1}, P)["next_cursor"]
+    assert legacy_tree.page_schema == GENERATION_PAGE_SCHEMA
+
+    registry = tmp_path / "registry.json"
+    registry.write_text(json.dumps(legacy["registry_ref"]))
+    draft = command(["--root", str(lib.path), "rebuild", "--registry-ref", str(registry), "--page-format", "v2"])
+    assert lib._view(P)[1]["generation"] == legacy["generation"]
+    lib.publish_rebuild(draft["root_ref"], legacy["generation"], P)
+    _, current, routes, tree = lib._view(P)
+    assert tree.page_schema == CONTENT_PAGE_SCHEMA
+    assert routes["schema"] != legacy_routes["schema"]
+
+    repeated = lib.rebuild_indexes(current["registry_ref"], P)
+    lib.publish_rebuild(repeated, current["generation"], P)
+    _, newer, newer_routes, new_tree = lib._view(P)
+    assert newer["registry_ref"] == current["registry_ref"]
+    assert newer_routes["current"] == routes["current"]
+    assert newer_routes["history"] == routes["history"]
+    assert newer["routes_ref"] != current["routes_ref"]
+    with pytest.raises(HandoffError, match="UNSUPPORTED_SCHEMA"):
+        new_tree.read(legacy_routes["current"]["handoff_id"])
+
+    assert lib.resolve("handoff:1", P, snapshot=old_snapshot)["row"]["manifest_ref"] == first
+    assert lib.search({"limit": 1}, P, cursor=cursor)["generation"] == legacy["generation"]
+    assert lib.reconcile(receipt["idempotency_key"], P)["accepted"] == receipt["accepted"]
+    assert lib.restore("handoff:1", tmp_path / "restore-v2", P)["status"] == "complete"
+    accept(lib, 3)
+    lib.retract("handoff:2", "Synthetic retired result", P)
+    _, active, active_routes, active_tree = lib._view(P)
+    assert active_tree.page_schema == CONTENT_PAGE_SCHEMA
+    assert active_routes["current"]["entity_id"] != routes["current"]["entity_id"]
+    v2_snapshot = lib.store.put_json(active)
+
+    rollback = lib.rebuild_indexes(active["registry_ref"], P, page_schema=GENERATION_PAGE_SCHEMA)
+    lib.publish_rebuild(rollback, active["generation"], P)
+    _, _, _, default_tree = lib._view(P)
+    assert default_tree.page_schema == GENERATION_PAGE_SCHEMA
+    assert lib.resolve("handoff:3", P, snapshot=v2_snapshot)["row"]["handoff_id"] == "handoff:3"
+    assert lib.retirement_report(P)["states"] == {
+        "accepted": 2, "retracted": 1, "superseded": 0,
+    }
+
+
+def test_content_rebuild_rejects_stale_candidate_and_revoked_historical_acl(lib):
+    accept(lib, 1)
+    accept(lib, 2)
+    lib.grant_access("reader:other", P)
+    before = lib._view(P)[1]
+    cursor = lib.search({"limit": 1}, "reader:other")["next_cursor"]
+    draft = lib.rebuild_indexes(before["registry_ref"], P, page_schema=CONTENT_PAGE_SCHEMA)
+    lib.revoke_access("reader:other", P)
+    with pytest.raises(HandoffError, match="GENERATION_CONFLICT"):
+        lib.publish_rebuild(draft, before["generation"], P)
+    head = lib._view(P)[1]
+    current = lib.rebuild_indexes(head["registry_ref"], P, page_schema=CONTENT_PAGE_SCHEMA)
+    altered = lib.store.json(current)
+    altered["validation"]["generation"] -= 1
+    altered["validation_ref"] = lib.store.put_json(altered["validation"])
+    with pytest.raises(HandoffError, match="INDEX_STALE"):
+        lib.publish_rebuild(lib.store.put_json(altered), head["generation"], P)
+    assert lib._view(P)[1] == head
+
+    lib.publish_rebuild(current, head["generation"], P)
+    with pytest.raises(HandoffError, match="NOT_AUTHORIZED_OR_NOT_FOUND"):
+        lib.search({"limit": 1}, "reader:other", cursor=cursor)
+
+
+def test_content_branches_reuse_and_keep_unchanged_old_snapshot_pages(lib):
+    rows = [(f"key:{i:04}", "synthetic" * 24) for i in range(640)]
+    earlier = Tree(lib.store, 1, 1, page_schema=CONTENT_PAGE_SCHEMA)
+    first = earlier.build(rows)
+    assert earlier.read(first)["kind"] == "branch"
+
+    latest = Tree(lib.store, 2, 2, page_schema=CONTENT_PAGE_SCHEMA)
+    assert latest.build(rows) == first
+    modified = latest.build([*rows, ("key:9999", "new")])
+    assert modified != first
+    assert list(latest.rows(modified)) == [*rows, ("key:9999", "new")]
+    assert list(earlier.rows(first)) == rows
 
 
 def test_parent_completion_and_task_register_bindings(lib):
