@@ -17,7 +17,9 @@ from functools import wraps
 from pathlib import Path
 
 from .handoff_index import (
+    CONTENT_PAGE_SCHEMA,
     DIMENSIONS,
+    GENERATION_PAGE_SCHEMA,
     Tree,
     build_indexes,
     facets,
@@ -45,6 +47,11 @@ from .handoff_store import publisher_lock as lock
 
 SCHEMA = "agentos.indexed-handoff/v1"
 ROOT_SCHEMA = "agentos.results-root/v1"
+ROUTE_SCHEMAS = {
+    "agentos.results-routes/v1": GENERATION_PAGE_SCHEMA,
+    "agentos.results-routes/v2": CONTENT_PAGE_SCHEMA,
+}
+PAGE_ROUTE_SCHEMAS = {page: route for route, page in ROUTE_SCHEMAS.items()}
 VALIDATOR = "agentos.indexed-handoff-validator/v1"
 STATES = {"active", "blocked", "verifying", "completed", "cancelled"}
 CHECKS = (
@@ -205,14 +212,16 @@ class Library:
             "UNSUPPORTED_SCHEMA",
         )
         require(root["generation"] <= current["generation"], "INDEX_STALE")
+        routes, tree = self._snapshot_index(root)
+        return current, root, routes, tree
+
+    def _snapshot_index(self, root):
         require(root["index_state"] == "complete", "INDEX_STALE")
         require(sha(bounded(self.store.path("START.md"), 4096)) == root["start_sha256"])
         self.store.metrics["entry_files"] += 1
         routes = self.store.json(root["routes_ref"], limit=128 * 1024)
         self.store.metrics["entry_files"] += 1
-        require(
-            routes.get("schema") == "agentos.results-routes/v1", "UNSUPPORTED_SCHEMA"
-        )
+        tree = self._index_tree(root, routes)
         require(
             routes["normalizer"] == NORMALIZER
             and routes["generation"] == root["generation"]
@@ -222,6 +231,8 @@ class Library:
         report = root["validation"]
         require(
             report["status"] == "pass"
+            and report["generation"] == root["generation"]
+            and report["committed_seq"] == root["committed_seq"]
             and report["routes_ref"] == root["routes_ref"]
             and report["registry_ref"] == root["registry_ref"],
             "INDEX_STALE",
@@ -231,11 +242,14 @@ class Library:
             and set(routes["history"]) == set(DIMENSIONS),
             "INDEX_STALE",
         )
-        return (
-            current,
-            root,
-            routes,
-            Tree(self.store, root["generation"], root["committed_seq"]),
+        return routes, tree
+
+    def _index_tree(self, root, routes):
+        page_schema = ROUTE_SCHEMAS.get(routes.get("schema"))
+        require(page_schema is not None, "UNSUPPORTED_SCHEMA")
+        return Tree(
+            self.store, root["generation"], root["committed_seq"],
+            page_schema=page_schema,
         )
 
     def _state(self, root, routes, tree):
@@ -247,8 +261,10 @@ class Library:
             },
         }
 
-    def _snapshot(self, state, generation, seq, access, previous):
-        tree = Tree(self.store, generation, seq)
+    def _snapshot(
+        self, state, generation, seq, access, previous, *, page_schema=GENERATION_PAGE_SCHEMA,
+    ):
+        tree = Tree(self.store, generation, seq, page_schema=page_schema)
         rows = state["rows"]
         current = {
             row["handoff_id"]: row
@@ -261,7 +277,7 @@ class Library:
         verify_indexes(tree, history_roots, rows)
         registry = tree.build(sorted(rows.items()))
         routes = {
-            "schema": "agentos.results-routes/v1",
+            "schema": PAGE_ROUTE_SCHEMAS[page_schema],
             "generation": generation,
             "normalizer": NORMALIZER,
             "indexed_through_seq": seq,
@@ -1068,6 +1084,7 @@ class Library:
                 root["committed_seq"] + 1,
                 root["access"],
                 previous,
+                page_schema=tree.page_schema,
             )
             self._fault("before_commit")
             self.store.commit(expected_generation, next_root)
@@ -1125,6 +1142,7 @@ class Library:
                 op["committed_seq"],
                 access,
                 self.store.put_json(root),
+                page_schema=tree.page_schema,
             )
             self.store.commit(root["generation"], candidate)
             return self._receipt(op, candidate)
@@ -1609,10 +1627,10 @@ class Library:
         durable(Path(destination) / "restoration-report.json", encoded(report))
         return report
 
-    def rebuild_indexes(self, registry_snapshot, principal):
+    def rebuild_indexes(self, registry_snapshot, principal, *, page_schema=None):
         root = self._authorize(principal, write=True)
         routes = self.store.json(root["routes_ref"], limit=128 * 1024)
-        tree = Tree(self.store, root["generation"], root["committed_seq"])
+        tree = self._index_tree(root, routes)
         # Explicit repair may walk the accepted registry. Object-store/staging
         # discovery is never an acceptance source and no session is searched.
         require(registry_snapshot == root["registry_ref"], "UNACCEPTED_REGISTRY")
@@ -1634,6 +1652,7 @@ class Library:
             root["committed_seq"] + 1,
             root["access"],
             self.store.put_json(root),
+            page_schema=tree.page_schema if page_schema is None else page_schema,
         )
         return self.store.put_json(candidate)
 
@@ -1648,21 +1667,18 @@ class Library:
                 "GENERATION_CONFLICT",
             )
             require(
-                candidate["library_id"] == current["library_id"]
+                candidate["schema"] == ROOT_SCHEMA
+                and candidate["schema_version"] == current["schema_version"]
+                and candidate["library_id"] == current["library_id"]
                 and candidate["access"] == current["access"]
                 and candidate["committed_seq"] == current["committed_seq"] + 1,
                 "UNACCEPTED_REGISTRY",
             )
-            old_routes = self.store.json(current["routes_ref"])
+            old_routes = self.store.json(current["routes_ref"], limit=128 * 1024)
             old_state = self._state(
-                current,
-                old_routes,
-                Tree(self.store, current["generation"], current["committed_seq"]),
+                current, old_routes, self._index_tree(current, old_routes),
             )
-            new_routes = self.store.json(candidate["routes_ref"])
-            new_tree = Tree(
-                self.store, candidate["generation"], candidate["committed_seq"]
-            )
+            new_routes, new_tree = self._snapshot_index(candidate)
             new_state = self._state(candidate, new_routes, new_tree)
             require(new_state == old_state, "UNACCEPTED_REGISTRY")
             verify_indexes(

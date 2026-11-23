@@ -101,6 +101,28 @@ or sessions. Mandatory facet loss/sequence/generation/normalizer mismatch refuse
 ordinary reads; repair rebuilds from pinned accepted data and validates membership.
 Unsupported normalizer migrations require an explicit successor adapter.
 
+### Reusing index pages
+
+New libraries start with generation-bound v1 pages. The v2 route format
+references immutable index pages by content. An unchanged page can be used by
+multiple snapshots. The root, route table and validation still carry the
+snapshot generation and sequence. The route schema selects exactly one page
+format for the entire index, including posting trees. The store verifies each
+object's digest, size and library locator, and publication checks membership
+against the accepted rows. Historical snapshots continue to use their original
+format. Operation receipt pages retain their original generation binding.
+
+Update all readers and writers before a format transition. With the approved
+library root and the actual committed registry reference, prepare a candidate
+using `library rebuild --page-format v2 --registry-ref REGISTRY_REF.json`.
+Publish it with `library publish-rebuild --ref CANDIDATE_REF.json
+--expected-generation GENERATION` under the ordinary writer authorization.
+The rebuild preserves the accepted state and the current ACL. Subsequent
+publications retain the selected format. Omitting `--page-format` preserves
+the current format. Rebuilding explicitly to v1 reverses the active format;
+historical v2 snapshots still require a reader that supports v2. The format
+transition leaves existing objects in place.
+
 Retraction is supported logical retirement: a new immutable snapshot removes
 current visibility and retains historical accepted bytes/reasons. Retirement
 report returns reclaimed_bytes=0. Physical session cleanup/GC is NOT IMPLEMENTED;

@@ -7,6 +7,7 @@ import base64
 from pathlib import Path
 
 from .handoff import Library, local_principal
+from .handoff_index import CONTENT_PAGE_SCHEMA, GENERATION_PAGE_SCHEMA
 from .handoff_store import HandoffError, bounded
 from .safeio import GateError, read_json_input
 
@@ -61,6 +62,10 @@ def command(argv):
     rebuild = s.add_parser("rebuild")
     rebuild.add_argument(
         "--registry-ref", required=True, help="JSON document file, or - for stdin"
+    )
+    rebuild.add_argument(
+        "--page-format", choices=("v1", "v2"),
+        help="Prepare an explicit format transition. By default retain the current format.",
     )
     repair = s.add_parser("publish-rebuild")
     repair.add_argument(
@@ -137,9 +142,13 @@ def command(argv):
         result["bytes_base64"] = base64.b64encode(result.pop("bytes")).decode()
         return result
     if args.action == "rebuild":
+        formats = {"v1": GENERATION_PAGE_SCHEMA, "v2": CONTENT_PAGE_SCHEMA}
         return {
             "status": "draft",
-            "root_ref": library.rebuild_indexes(data(args.registry_ref), principal),
+            "root_ref": library.rebuild_indexes(
+                data(args.registry_ref), principal,
+                page_schema=formats.get(args.page_format),
+            ),
         }
     if args.action == "publish-rebuild":
         return library.publish_rebuild(

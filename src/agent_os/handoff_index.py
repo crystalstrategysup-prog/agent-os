@@ -7,6 +7,9 @@ import unicodedata
 
 from .handoff_store import NORMALIZER, PAGE_BYTES, Store, encoded, require
 
+GENERATION_PAGE_SCHEMA = "aos.index-page/v1"
+CONTENT_PAGE_SCHEMA = "aos.index-page/v2"
+
 DIMENSIONS = (
     "handoff_id",
     "entity_id",
@@ -33,19 +36,25 @@ def words(value: str):
 
 
 class Tree:
-    def __init__(self, store: Store, generation: int, seq: int):
+    def __init__(self, store: Store, generation: int, seq: int, *, page_schema=GENERATION_PAGE_SCHEMA):
+        require(
+            page_schema in (GENERATION_PAGE_SCHEMA, CONTENT_PAGE_SCHEMA),
+            "UNSUPPORTED_SCHEMA",
+        )
         self.store, self.generation, self.seq = store, generation, seq
+        self.page_schema = page_schema
         self.cache = {}
 
     def _page(self, kind, entries):
-        return {
-            "schema": "aos.index-page/v1",
-            "generation": self.generation,
-            "indexed_through_seq": self.seq,
+        page = {
+            "schema": self.page_schema,
             "normalizer": NORMALIZER,
             "kind": kind,
             "entries": entries,
         }
+        if self.page_schema == GENERATION_PAGE_SCHEMA:
+            page.update(generation=self.generation, indexed_through_seq=self.seq)
+        return page
 
     def build(self, items):
         """Items must be unique and sorted; split by encoded size, not counts."""
@@ -84,13 +93,19 @@ class Tree:
         oid = ref["object_id"]
         if oid not in self.cache:
             page = self.store.json(ref, limit=PAGE_BYTES)
-            require(page.get("schema") == "aos.index-page/v1", "UNSUPPORTED_SCHEMA")
-            require(
-                page.get("generation") == self.generation
-                and page.get("indexed_through_seq") == self.seq
-                and page.get("normalizer") == NORMALIZER,
-                "INDEX_STALE",
-            )
+            require(page.get("schema") == self.page_schema, "UNSUPPORTED_SCHEMA")
+            require(page.get("normalizer") == NORMALIZER, "INDEX_STALE")
+            if self.page_schema == GENERATION_PAGE_SCHEMA:
+                require(
+                    page.get("generation") == self.generation
+                    and page.get("indexed_through_seq") == self.seq,
+                    "INDEX_STALE",
+                )
+            else:
+                require(
+                    set(page) == {"schema", "normalizer", "kind", "entries"},
+                    "INDEX_STALE",
+                )
             require(
                 page.get("kind") in {"leaf", "branch"}
                 and isinstance(page.get("entries"), list),
