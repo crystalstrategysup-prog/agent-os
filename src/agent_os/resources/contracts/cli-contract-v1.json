@@ -864,12 +864,12 @@
       "contract": "atlas.source-relocation/v1"
     }
   ],
-  "distribution_version": "0.8.0rc2062",
+  "distribution_version": "0.8.0rc2063",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.8.0rc2062",
+  "release": "0.8.0rc2063",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",
@@ -888,9 +888,24 @@
     "legacy": "Existing normal gates, predicates, acceptance, source/scan/capacity unchanged outside pending/newstatus branch",
     "pending_signal": "Atomic reserved directory + identity before preparation; complete journal afterward; either signal blocks all ordinary require_clear callsites. IncompleteUNKNOWN is never auto-cleared.",
     "task_metadata_entry_max": 256,
-    "journal_admission": "Bounded one exact task metadata directory names, producer handoff-{profile}-{fingerprint}.json and any uncertain handoff-shaped entry refuse before recovery writes; no source/library discovery",
+    "journal_admission": "Default: bounded exact task metadata directory names; any handoff-shaped record refuses before recovery writes. Modern requests may explicitly qualify accepted checkpoint history as documented below; v1 remains metadata-only.",
     "schemas": "Bundled task/event enums and typed recovery contract now include actual A/C outputs; old enum values/bounds preserved",
     "typed_revision": "Strict int permit and receipt revision, bool/float do not equal int1",
-    "staged_semantics": "Canonical typed parsed JSON equality, not Python dict equality, for ALL task/turn/ack/advance postimages before first targetwrite. Invalid aliases preserve targets/reservation/journal; keyorder/whitespace allowed."
+    "staged_semantics": "Canonical typed parsed JSON equality, not Python dict equality, for ALL task/turn/ack/advance postimages before first targetwrite. Invalid aliases preserve targets/reservation/journal; keyorder/whitespace allowed.",
+    "accepted_checkpoint_history": {
+      "request_versions": [
+        "agentos.refusal-recovery-request/v2",
+        "agentos.refusal-recovery-request/v3"
+      ],
+      "optional_digest_field": "accepted_checkpoint_history_sha256",
+      "qualification": "Exact accepted historical journals, immutable objects, current ACL, event sequence and latest library head under the existing publisher lock; fail closed on changed or unknown state",
+      "witness_scope": "SAVED checkpoint diagnostic at embedded_asset with no candidate_ref or capture_manifest",
+      "max_journals": 32,
+      "max_reference_visits": 32768,
+      "max_required_object_reads": 1024,
+      "max_required_object_bytes": 67108864,
+      "reuse": "Identical complete typed non-review references within one check; each review body and recovery phase remain verified",
+      "effects": "Existing metadata disposition only; no publication retry, history rewrite, READY or external authority"
+    }
   }
 }

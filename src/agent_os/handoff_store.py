@@ -225,8 +225,118 @@ def _dynamic_credential_expression(
     return False
 
 
+def _json_stdin_calls(tree):
+    """Recognize only canonical stdlib JSON stdin reads with readonly roots.
+
+    This is source provenance, not validation of the runtime value. All original
+    bytes still pass the unconditional key and literal-secret checks.
+    """
+    nodes = list(ast.walk(tree))
+    parents = {child: node for node in nodes for child in ast.iter_child_nodes(node)}
+    imports = []
+    for top in tree.body:
+        if isinstance(top, (ast.Import, ast.ImportFrom)):
+            imports.append(top)
+        elif not (isinstance(top, ast.Expr) and isinstance(top.value, ast.Constant)
+                  and isinstance(top.value.value, str)):
+            break
+    modules = {alias.name for node in imports if isinstance(node, ast.Import)
+               for alias in node.names if alias.asname is None}
+    if not {'json', 'sys'} <= modules:
+        return set()
+    def root_name(node):
+        while isinstance(node, (ast.Attribute, ast.Subscript)):
+            node = node.value
+        return node.id if isinstance(node, ast.Name) else None
+    for node in nodes:
+        # The proof owns only direct module access. Escaping a module, its
+        # namespace or a callable would allow alias mutation to replace the
+        # loader/stream without assigning to the canonical name.
+        if (isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load)
+                and node.id in {'json', 'sys'}):
+            member = parents.get(node)
+            if not (isinstance(member, ast.Attribute) and member.value is node):
+                return set()
+            if member.attr.startswith('_'):
+                return set()
+            use = parents.get(member)
+            if node.id == 'json' and not (isinstance(use, ast.Call) and use.func is member):
+                return set()
+            if node.id == 'sys' and member.attr == 'stdin' and not (
+                    isinstance(use, ast.Call) and isinstance(use.func, ast.Attribute)
+                    and isinstance(use.func.value, ast.Name) and use.func.value.id == 'json'
+                    and use.func.attr == 'load' and use.args == [member] and not use.keywords):
+                return set()
+            if node.id == 'sys' and member.attr == 'modules':
+                # A registry alias can reach the same imported module object.
+                if not (isinstance(use, ast.Subscript) and isinstance(use.ctx, ast.Store)):
+                    return set()
+        if isinstance(node, ast.ImportFrom) and node.module in {'json', 'sys'}:
+            return set()
+        if isinstance(node, ast.Name) and isinstance(node.ctx, (ast.Store, ast.Del)) and node.id in {'json', 'sys'}:
+            return set()
+        if isinstance(node, ast.arg) and node.arg in {'json', 'sys'}:
+            return set()
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and node.name in {'json', 'sys'}:
+            return set()
+        if isinstance(node, (ast.Attribute, ast.Subscript)) and isinstance(node.ctx, (ast.Store, ast.Del)) and root_name(node) in {'json', 'sys'}:
+            base = node
+            while isinstance(base, ast.Subscript):
+                base = base.value
+            # Changing search paths or registry entries after the initial imports does not
+            # rebind json.load or the stdin stream.
+            if not (isinstance(base, ast.Attribute)
+                    and base.attr in {'path', 'modules'}
+                    and isinstance(base.value, ast.Name) and base.value.id == 'sys'):
+                return set()
+        if isinstance(node, (ast.Import, ast.ImportFrom)):
+            for alias in node.names:
+                bound = alias.asname or alias.name.split('.')[0]
+                if isinstance(node, ast.Import) and alias.name in {'json', 'sys'} and alias.asname:
+                    return set()
+                if bound in {'json', 'sys'} and not (node in imports and isinstance(node, ast.Import) and alias.name == bound and alias.asname is None):
+                    return set()
+    calls = set()
+    for node in nodes:
+        if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                and isinstance(node.func.value, ast.Name) and node.func.value.id == 'json'
+                and node.func.attr == 'load' and len(node.args) == 1 and not node.keywords
+                and isinstance(node.args[0], ast.Attribute) and node.args[0].attr == 'stdin'
+                and isinstance(node.args[0].value, ast.Name) and node.args[0].value.id == 'sys'):
+            continue
+        assignment = parents.get(node)
+        if not (isinstance(assignment, ast.Assign) and len(assignment.targets) == 1
+                and isinstance(assignment.targets[0], ast.Name)):
+            continue
+        name = assignment.targets[0].id
+        readonly = True
+        for use in nodes:
+            if isinstance(use, ast.arg) and use.arg == name:
+                readonly = False
+            if not isinstance(use, ast.Name) or use.id != name or not isinstance(use.ctx, ast.Load):
+                continue
+            parent = parents.get(use)
+            if not (isinstance(parent, ast.Subscript) and parent.value is use
+                    and isinstance(parent.slice, ast.Constant) and isinstance(parent.slice.value, (str, int))):
+                readonly = False
+                break
+            path = parent
+            while isinstance(parents.get(path), (ast.Subscript, ast.Attribute)) and parents[path].value is path:
+                if not isinstance(path.ctx, ast.Load):
+                    readonly = False
+                path = parents[path]
+            if not isinstance(path.ctx, ast.Load):
+                readonly = False
+            outer = parents.get(path)
+            if isinstance(path, ast.Attribute) and isinstance(outer, ast.Call) and path.attr not in {'encode'}:
+                readonly = False
+        if readonly:
+            calls.add(node)
+    return calls
+
+
 def _source_literal_spans(data: bytes) -> set[tuple[int, int]]:
-    """Prove two non-credential source forms, never exempt a file or field."""
+    """Prove narrow non-credential source forms, never exempt a file or field."""
     spans = set()
     # A type ternary contains the words password/text as input-type enums.
     # Require the complete same-identifier conditional; mask only its operands.
@@ -274,6 +384,13 @@ def _source_literal_spans(data: bytes) -> set[tuple[int, int]]:
             scopes.append(scope)
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 functions.setdefault(node.name, []).append((node, scope))
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)):
+            arguments = [*node.args.posonlyargs, *node.args.args]
+            for argument, default in zip(arguments[-len(node.args.defaults):] if node.args.defaults else [], node.args.defaults):
+                scope["bindings"].setdefault(argument.arg, []).append(default)
+            for argument, default in zip(node.args.kwonlyargs, node.args.kw_defaults):
+                if default is not None:
+                    scope["bindings"].setdefault(argument.arg, []).append(default)
         nodes.append((node, scope))
         stack.extend((child, scope) for child in ast.iter_child_nodes(node))
         if isinstance(node, (ast.Assign, ast.AnnAssign, ast.NamedExpr, ast.AugAssign)):
@@ -413,7 +530,7 @@ def _source_literal_spans(data: bytes) -> set[tuple[int, int]]:
             else:
                 scope["bindings"].setdefault(name, []).append(ast.Constant(value=None))
         scope["runtime_unpack"] = runtime_unpack
-    runtime_calls = set()
+    runtime_calls = _json_stdin_calls(tree)
     if jwt_source is not None:
         call_scopes = {node: scope for node, scope in nodes if isinstance(node, ast.Call)}
         for call in jwt_source.candidates():
@@ -441,11 +558,13 @@ def _source_literal_spans(data: bytes) -> set[tuple[int, int]]:
             if not (
                 isinstance(key, ast.Constant)
                 and isinstance(key.value, str)
-                and key.value.casefold() == "authorization"
+                and key.value.casefold() in {"authorization", "cookie"}
                 and isinstance(value, ast.BinOp)
                 and isinstance(value.op, ast.Add)
                 and isinstance(value.left, ast.Constant)
-                and value.left.value == "Bearer "
+                and isinstance(value.left.value, str)
+                and ((key.value.casefold() == "authorization" and value.left.value == "Bearer ")
+                     or (key.value.casefold() == "cookie" and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_.-]*=", value.left.value)))
                 and _dynamic_credential_expression(
                     value.right, bindings, assigned_paths, runtime_unpack,
                     runtime_calls=runtime_calls
@@ -461,8 +580,18 @@ def _source_literal_spans(data: bytes) -> set[tuple[int, int]]:
                 original = ast.literal_eval(data[span[0]:span[1]].decode("utf-8"))
             except (SyntaxError, ValueError, UnicodeError, RecursionError):
                 continue
-            if original == "Bearer ":
+            if original == value.left.value:
                 spans.add(span)
+    from .source_runtime_http import runtime_prefix_nodes
+    for left in runtime_prefix_nodes(tree):
+        span = (offsets[left.lineno - 1] + left.col_offset,
+                offsets[left.end_lineno - 1] + left.end_col_offset)
+        try:
+            original = ast.literal_eval(data[span[0]:span[1]].decode("utf-8"))
+        except (SyntaxError, ValueError, UnicodeError, RecursionError):
+            continue
+        if original == left.value:
+            spans.add(span)
     return spans
 
 

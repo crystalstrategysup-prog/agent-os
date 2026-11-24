@@ -16,15 +16,23 @@ package inputs. No hooks, credentials or policy changes are required.
 ## Source literals and CLI input documents
 
 The secret scanner always rejects recognizable key/private-key patterns in the
-original bytes. It exempts only a proven empty Python Bearer prefix inside a
-parsed dynamic dict expression, and the complete JavaScript input-type ternary
-whose branches are the password/text enums. Static payloads and ambiguous syntax
-remain refused within the bounded lookup grammar. Direct calls, conflicting local
-assignments and unknown local expressions fail closed. Opaque runtime tuple
-method-call outputs are supported; their arbitrary execution/data flow is not
-interpreted or certified. This heuristic is defense in depth, not a semantic
-security audit.
-No filename, vendor hash or whole-file exemption grants trust.
+original bytes. Within a parsed Python header dictionary, it can recognize an
+empty `Bearer ` prefix or cookie-name prefix only when the appended expression
+has an admitted runtime origin. It also recognizes the complete JavaScript
+input-type ternary whose branches are the password/text enums. Only the exact
+proven prefix or enum operands are masked; static payloads remain scanned.
+
+The bounded Python grammar covers existing runtime tuple outputs, readonly
+stdlib `json.load(sys.stdin)` input, and values derived from standard HTTP
+response reads. The HTTP path follows supported JSON decoding, cookie parsing,
+local helper arguments/returns, tuple unpacking and bounded tuple slices. It
+does not execute source, contact an endpoint or certify runtime credential
+contents. Conflicting definitions, shadowed or rebound imports, unsupported
+mutations and unknown expressions fail closed within the admitted grammar.
+The HTTP proof is limited to 100,000 AST nodes and 4,096 visits per expression,
+with depth/cycle guards. An exhausted proof budget supplies no exemption.
+No filename, vendor hash or whole-file exemption grants trust. This heuristic
+is defense in depth, not a semantic security audit.
 
 Library CLI input options such as `search --query` take a regular JSON document
 file or `-` for stdin. They do not accept an inline JSON string. The existing

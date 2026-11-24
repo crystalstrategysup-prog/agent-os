@@ -1,3 +1,22 @@
+# 0.8.0rc2063 — preserve runtime header provenance and accepted recovery history
+
+- Recognize bounded runtime Bearer/cookie prefix construction from readonly JSON
+  stdin and standard HTTP response paths, including supported helper returns,
+  tuple unpacking and slices. Keep literal-secret checks and fail-closed handling
+  of conflicting, mutated or unknown source expressions; no source execution,
+  endpoint access or whole-file exemption is introduced.
+- Reject escaped JSON/stdin module, namespace and loader aliases that could
+  invalidate the runtime-origin proof; retain ordinary canonical stdin reads.
+- Allow explicit modern SAVED refusal recovery with a pinned, live-qualified
+  accepted checkpoint history. Preserve original journals, objects and receipts;
+  verify the event sequence and current library head under existing locks/CAS.
+- Reuse identical typed non-review objects within each bounded history check.
+  Every review body and each recovery phase remain verified. Default recovery
+  behavior, ordinary entry gates, task scope and authority remain unchanged.
+- Integrate existing local corrections into the public source. Development
+  levels, reporting rules, managed integration and disabled native hooks are
+  unchanged; publication, installation and active-worker adoption remain separate.
+
 # 0.8.0rc2062 — protect the actual action and affected state
 
 - Distinguish live operational state, unique non-production material and isolated

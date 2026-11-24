@@ -79,12 +79,12 @@ def library_read_lock(home):
         os.close(fd)
 
 
-def qualify(root, home, *, task_id, project_id, revision):
+def qualify(root, home, *, task_id, project_id, revision, reuse_verified_objects=False):
     with library_read_lock(home):
-        return _qualify(root, home, task_id=task_id, project_id=project_id, revision=revision)
+        return _qualify(root, home, task_id=task_id, project_id=project_id, revision=revision, reuse_verified_objects=reuse_verified_objects)
 
 
-def _qualify(root, home, *, task_id, project_id, revision):
+def _qualify(root, home, *, task_id, project_id, revision, reuse_verified_objects=False):
     """Bounded detached metadata only; does not write journals or publish anything.
 
     The continuation transaction validates actual project/task identity separately.
@@ -106,6 +106,8 @@ def _qualify(root, home, *, task_id, project_id, revision):
         current = library._authorize(principal)
         acl_hash = sha(encoded(current["access"]))
         rows, ref_count, ref_bytes = [], 0, 0
+        verified = set()
+        scanned = 0
         for name, (journal_sha, fingerprint, raw) in journals.items():
             journal = rr.parse(raw)
             rr.keys(journal, "payload_sha256 candidate_ref idempotency_key library_root")
@@ -152,11 +154,19 @@ def _qualify(root, home, *, task_id, project_id, revision):
                 size = asset_ref["size_bytes"]
                 if type(size) is not int or size < 0:
                     fail("ref_size")
+                scanned += 1
+                if scanned > MAX_JOURNALS * MAX_REQUIRED_REFS:
+                    fail("required_object_limit")
+                typed_ref = encoded(asset_ref)
+                if reuse_verified_objects and typed_ref in verified and asset["asset_id"] != "evidence:review":
+                    continue
                 ref_count += 1
                 ref_bytes += size
                 if ref_count > MAX_REQUIRED_REFS or ref_bytes > MAX_REQUIRED_BYTES:
                     fail("required_object_limit")
                 data = library.store.get(asset_ref)
+                if reuse_verified_objects:
+                    verified.add(typed_ref)
                 if asset["asset_id"] == "evidence:review":
                     payload = rr.parse(data)
             if not isinstance(payload, dict) or payload.get("task_id") != task_id or payload.get("revision") != old_revision:
@@ -187,10 +197,11 @@ def main():
     for key in ("root", "home", "task-id", "project-id"):
         parser.add_argument("--" + key, required=True)
     parser.add_argument("--revision", type=int, required=True)
+    parser.add_argument("--reuse-verified-objects", action="store_true")
     args = parser.parse_args()
     try:
         result = qualify(args.root, args.home, task_id=args.task_id,
-                         project_id=args.project_id, revision=args.revision)
+                         project_id=args.project_id, revision=args.revision, reuse_verified_objects=args.reuse_verified_objects)
     except GateError as exc:
         print(json.dumps({"status": "HOLD", "error": str(exc)}))
         return 2

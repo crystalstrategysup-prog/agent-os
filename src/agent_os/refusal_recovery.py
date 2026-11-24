@@ -6,6 +6,7 @@ cooperative filesystem trust applies; no source/library/scanner dependency.
 """
 from __future__ import annotations
 
+from contextlib import nullcontext
 import json
 import os
 import re
@@ -197,6 +198,23 @@ def require_clear(root):
         fail('refusal_recovery_transaction_pending')
 
 
+def _history_lock(home, request):
+    if 'accepted_checkpoint_history_sha256' in request:
+        from .accepted_checkpoint_history import library_read_lock
+        return library_read_lock(home)
+    return nullcontext()
+
+
+def _check_history(root, home, request, task):
+    if 'accepted_checkpoint_history_sha256' in request:
+        from .refusal_history import verify
+        verify(root, home, request, task)
+    else:
+        if task.get('checkpoint') or task.get('closeout'):
+            fail('recovery_publication_unreconciled')
+        _reject_handoff_journals(root, request['task_id'])
+
+
 def _reject_handoff_journals(root, task_id):
     # Real deliver writes direct task metadata handoff-{profile}-{fingerprint}.json.
     # Names only, bounded one directory; no journal body, source or library reads.
@@ -272,7 +290,12 @@ def _release_committed_reservation(root, request, journal):
 
 def validate_request(root, home, task_id, request):
     workflow = isinstance(request, dict) and request.get('schema') == WORKFLOW_REQUEST
-    keys(request, 'schema root user_home operation_id actor_id session_id project_id task_id revision expected witness goal next_owner next_scope' + (' native_origin' if workflow else ''))
+    history = isinstance(request, dict) and 'accepted_checkpoint_history_sha256' in request
+    if history:
+        if not _modern(request):
+            fail('recovery_state_invalid')
+        digest(request['accepted_checkpoint_history_sha256'])
+    keys(request, 'schema root user_home operation_id actor_id session_id project_id task_id revision expected witness goal next_owner next_scope' + (' native_origin' if workflow else '') + (' accepted_checkpoint_history_sha256' if history else ''))
     if request['schema'] not in (REQUEST, MODERN_REQUEST, WORKFLOW_REQUEST) or canonical(request['root']) != root or canonical(request['user_home']) != home or request['task_id'] != task_id:
         fail('recovery_identity_mismatch')
     op(request['operation_id']); short(request['actor_id']); nonempty(request['session_id'], 'session_id', 200)
@@ -382,6 +405,10 @@ def _validate_witness(root, request):
         metadata = validate_receipt(parse(raw))
     except (ValueError, TypeError, RecursionError, OverflowError):
         fail('recovery_diagnostic_invalid')
+    if 'accepted_checkpoint_history_sha256' in request and (
+            metadata['stage'] != 'embedded_asset' or metadata['profile'] != 'checkpoint'
+            or metadata['candidate_ref'] is not None or metadata['capture_manifest'] is not None):
+        fail('recovery_publication_unreconciled')
     if (metadata['task_id'] != request['task_id']
             or metadata['revision'] != request['revision']
             or metadata['attempt_id'] != w['attempt_id']
@@ -673,7 +700,7 @@ def _protected_call(call):
 def acknowledge(root, home, task_id, request, permit, *, observer=None):
     def run():
         validate_request(root,home,task_id,request);validate_permit(request,permit,'ack')
-        with lock(_path(root,'.agentos/write.lock')), lock(_path(home,'state/turns.lock')):
+        with lock(_path(root,'.agentos/write.lock')), lock(_path(home,'state/turns.lock')), _history_lock(home, request):
             _entry_clear(root);require_clear(root)
             directory=area(root,task_id,request['operation_id'])
             if (directory/'ack.json').exists():
@@ -682,8 +709,7 @@ def acknowledge(root, home, task_id, request, permit, *, observer=None):
             _,raws,values=_metadata(root,home,request);project,task,binding=values;e=request['expected']
             if [sha(x) for x in raws]!=[e['project_sha256'],e['task_sha256'],e['turn_sha256']]:fail('recovery_cas_mismatch')
             if task.get('status')!='VERIFYING' or binding.get('status')!='ENTERED' or binding.get('task_id')!=task_id or binding.get('turn_id')!=e['bound_turn_id']:fail('recovery_state_invalid')
-            if task.get('checkpoint') or task.get('closeout'):fail('recovery_publication_unreconciled')
-            _reject_handoff_journals(root, task_id)
+            _check_history(root, home, request, task)
             w=request['witness'];_validate_witness(root,request)
             _observe_unchanged(root,home,request,permit,observer,raws)
             if request['schema'] == WORKFLOW_REQUEST:
@@ -702,7 +728,7 @@ def acknowledge(root, home, task_id, request, permit, *, observer=None):
 def advance(root, home, task_id, request, permit, *, observer=None):
     def run():
         validate_request(root,home,task_id,request)
-        with lock(_path(root,'.agentos/write.lock')),lock(_path(home,'state/turns.lock')):
+        with lock(_path(root,'.agentos/write.lock')),lock(_path(home,'state/turns.lock')), _history_lock(home, request):
             _entry_clear(root);require_clear(root);ack,ackraw=_ack(root,request)
             validate_permit(request,permit,'advance',sha(ackraw))
             old,oldraw=_advance_receipt(root,request)
@@ -713,6 +739,8 @@ def advance(root, home, task_id, request, permit, *, observer=None):
             _,raws,values=_metadata(root,home,request);project,task,binding=values
             if (sha(raws[0])!=ack['project_sha256'] or sha(raws[1])!=ack['task_after_sha256'] or sha(raws[2])!=ack['turn_before_sha256']):fail('recovery_cas_mismatch')
             if task.get('status')!='RECOVERY_REQUIRED' or binding.get('status')!='ENTERED' or binding.get('task_id')!=task_id:fail('recovery_state_invalid')
+            if 'accepted_checkpoint_history_sha256' in request:
+                _check_history(root, home, request, task)
             _observe_unchanged(root,home,request,permit,observer,raws,advancing=True)
             if request['schema'] == WORKFLOW_REQUEST:
                 validate_permit(request,permit,'advance',sha(ackraw))
@@ -758,7 +786,7 @@ def status(root, home, task_id, operation):
 def reconcile(root, home, task_id, request, permit, *, observer=None):
     def run():
         validate_request(root,home,task_id,request)
-        with lock(_path(root,'.agentos/write.lock')),lock(_path(home,'state/turns.lock')):
+        with lock(_path(root,'.agentos/write.lock')),lock(_path(home,'state/turns.lock')), _history_lock(home, request):
             _entry_clear(root);j,jraw=_journal(root,request)
             validate_permit(request,permit,'reconcile',journal_sha=sha(jraw))
             # No original operation is re-executed; exact existing metadata postimages only.
@@ -781,6 +809,9 @@ def reconcile(root, home, task_id, request, permit, *, observer=None):
                 _, native_before, _ = _metadata(root,home,request)
                 _observe_unchanged(root,home,request,permit,observer,native_before,advancing=j['phase']=='advance')
                 validate_permit(request,permit,'reconcile',journal_sha=sha(jraw))
+            if 'accepted_checkpoint_history_sha256' in request:
+                task = parse(_read(_path(root,f'.agentos/tasks/{task_id}/task.json'), task_metadata_limit(root)))
+                _check_history(root, home, request, task)
             audit=directory/('reconcile-permit-'+sha(enc(permit))+'.json')
             prior=_read(audit,missing=True)
             if prior is None:write(audit,enc(permit),root,only=True)
@@ -796,6 +827,9 @@ def validate_resume(root, home, task, session_id, turn_id, answers):
     if not isinstance(recovery,dict) or recovery.get('schema') not in (RECEIPT,MODERN_RECEIPT,WORKFLOW_RECEIPT):fail('recovery_resume_required')
     directory=area(root,task['id'],recovery.get('operation_id'))
     request=validate_request(root,home,task['id'],parse(_read(directory/'request.json')))
+    if 'accepted_checkpoint_history_sha256' in request:
+        with _history_lock(home, request):
+            _check_history(root, home, request, task)
     if enc(recovery) != enc(_task_recovery(request)):fail('recovery_resume_cas_mismatch')
     if sorted(answers.get('write_paths',[]))!=sorted(request['next_scope']['write_paths']):
         fail('recovery_resume_scope_mismatch')

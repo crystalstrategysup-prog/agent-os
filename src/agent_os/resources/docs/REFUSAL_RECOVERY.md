@@ -1,7 +1,10 @@
 # Explicit refusal recovery: metadata disposition, not result acceptance
 
-Version rc2009. Local same-owner, cooperative filesystem contract. No automatic
-retry, background worker, source capture, scan, library operation or cleanup.
+Historical rc2009 baseline, with explicitly scoped extensions below. Local
+same-owner, cooperative filesystem contract. The default metadata-only route
+performs no source capture, scan or library operation. The opt-in accepted-history
+extension reads only qualified existing history; it does not publish anything.
+Neither route performs automatic retry, background work or cleanup.
 Original refusal and pre-journal partial objects remain UNKNOWN where unknown.
 A generic SECRET_DETECTED is not evidence that a real credential was present.
 
@@ -218,6 +221,50 @@ readback. Retain compatible readers after v2 metadata activation; the generic
 installer cannot certify rollback of this additional workflow schema. All
 operator-turn rules, original refusals and UNKNOWN partial-object boundaries
 above remain in force.
+
+
+## SAVED refusal after accepted checkpoints
+
+Modern v2/v3 requests may explicitly include
+`accepted_checkpoint_history_sha256`. V1 and requests without this field retain
+the default refusal of existing checkpoint or handoff records. The extension
+qualifies already accepted history before a nonaccepting recovery disposition;
+it never declares the failed checkpoint accepted or retries its publication.
+
+Obtain the digest through the bounded existing-history reader:
+
+```text
+python -m agent_os.accepted_checkpoint_history \
+  --root ROOT --home HOME --project-id PROJECT --task-id TASK \
+  --revision BLOCKED_REVISION --reuse-verified-objects
+```
+
+Use the exact existing root, owner home, project, task and blocked revision.
+This read-only result grants neither READY nor historical effect authority.
+It includes the current library ACL and exact accepted checkpoint journals,
+manifests and receipts. Every recovery phase rechecks those live references
+under the existing publisher lock in addition to project/turn locks and CAS.
+
+The reader admits at most 32 historical checkpoint journals. Identical complete
+typed non-review object references may reuse verification within that one check;
+every review body is read and validated. Reference visits are bounded by
+32 × 1,024; required object reads remain bounded by 1,024 and 64 MiB. This is
+not a persistent cache or permission to skip a later phase's verification.
+
+The original SAVED diagnostic must identify a checkpoint failure at
+`embedded_asset`, before a candidate reference or capture manifest existed.
+Unknown partial objects remain UNKNOWN. The complete ENTER/CHECKPOINT event
+sequence, accepted library receipts, latest task checkpoint and current library
+head must agree. A closeout, missing history, changed ACL/object/head, conflicting
+identity or mismatched pinned digest refuses recovery without rewriting history.
+
+Acknowledgement and advance retain the original revision and accepted evidence.
+Ordinary entry consumes the disposition and starts the next revision of the
+same task, with current checks and readiness required again. Existing permit,
+native-observer, exact-scope and UNKNOWN rules remain in force. No source file,
+historical object or receipt is edited by this qualification, and no new external
+authority is granted. Retain a reader supporting this opt-in field while such a
+recovery is pending; generic installer success is not task-state rollback proof.
 
 
 ## Standalone session-label compatibility
