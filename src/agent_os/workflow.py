@@ -68,7 +68,7 @@ def command(argv: list[str]) -> tuple[dict, int]:
     p.add_argument("--kind", choices=KINDS)
     p.add_argument("--effect", choices=EFFECTS, action="append", default=[])
     p.add_argument("--method", choices=METHODS)
-    p.add_argument("--development-level", help="Planning/check depth 1–5; 1D is an alias of 1")
+    p.add_argument("--development-level", help="Saved planning/check depth 1–5; 1D aliases 1. For temporary level 0 select --method project-diagnostics.")
     p.add_argument("--development-scope", help="Existing project, stage, module or task scope")
     a = p.parse_args(argv)
     development = None
@@ -78,6 +78,8 @@ def command(argv: list[str]) -> tuple[dict, int]:
         from .development_level import normalize
 
         value = a.development_level
+        if value == "0":
+            raise GateError("diagnostic_zero_use_project_diagnostics_with_saved_development_level")
         development = normalize({
             "level": int(value) if value in {"1", "2", "3", "4", "5"} else value,
             "scope": a.development_scope,

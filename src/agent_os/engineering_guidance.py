@@ -15,7 +15,8 @@ from .safeio import GateError, sha
 PROCESS_PATH = Path(__file__).parent / "resources" / "docs" / "PROCESS.md"
 DEFAULT_METHOD = "project-development"
 COMMON_METHOD = "solution-integrity"
-METHODS = (DEFAULT_METHOD, "causal-debugging", COMMON_METHOD)
+DIAGNOSTIC_METHOD = "project-diagnostics"
+METHODS = (DEFAULT_METHOD, "causal-debugging", COMMON_METHOD, DIAGNOSTIC_METHOD)
 START = "<!-- agentos:project-development:start -->"
 END = "<!-- agentos:project-development:end -->"
 MAX_DOCUMENT_BYTES = 128 * 1024
@@ -70,7 +71,7 @@ def load(method: str = DEFAULT_METHOD, *, development: dict | None = None) -> di
     encoded = content.encode("utf-8")
     if len(encoded) > MAX_CONTENT_BYTES:
         raise GateError("engineering_guidance_section_bound")
-    return {
+    result = {
         "schema": "agentos.engineering-guidance/v1",
         "status": "MATERIALIZED",
         "version": __version__,
@@ -86,3 +87,11 @@ def load(method: str = DEFAULT_METHOD, *, development: dict | None = None) -> di
         "behavior_compliance": "NOT_PROVEN",
         "writes": [],
     }
+    if method == DIAGNOSTIC_METHOD:
+        # A method lookup supplies instructions; only an explicit diagnostic run
+        # changes the task's temporary mode. The saved 1–5 choice stays intact.
+        result["execution"] = {
+            "level": 0, "mode": "diagnostic", "temporary": True,
+            "return_development": selected, "lifecycle": "GUIDANCE_ONLY",
+        }
+    return result

@@ -1,3 +1,31 @@
+# 0.8.0rc2065 — diagnose the project temporarily, then resume its development mode
+
+- Add one-shot diagnostic level 0 above the unchanged saved levels 1–5. The
+  canonical project-diagnostics method reconciles the objective, current project
+  inventory, modular boundaries, applicable contracts, documents and evidence,
+  then leaves a justified next action. Existing dossier, modularity and causal
+  integrity requirements are reused, not introduced again as new requirements.
+- Add explicit start/status/finish/cancel on the existing task, with current
+  writer/turn checks, task-byte and revision CAS, and atomic retained run history.
+  Preserve task answers, accepted checks, ordinary revision and readiness records.
+  An active pass survives same-task continuation; finish/cancel restores the
+  current saved choice, preserving a newer explicit owner selection.
+- Materialize the common laws plus project diagnostics for active bound or
+  explicitly portable context. Keep unregistered read-only work free of invented
+  intake. Diagnostic state/result records are not audit PASS, readiness grants or
+  production authority. Ordinary task gates still govern subsequent work.
+- Route substantial uncertain work and meaningful milestone changes through a
+  proportionate diagnostic pass; reuse current evidence and inspect deltas.
+  Completion needs a clear current picture, consequential gaps and owned next
+  work, not repair of every finding. No per-patch full audit, report or archive.
+- Correct architecture guidance to allow read-only diagnostics before entry.
+  Check actual contracts appropriate to the interfaces: absent HTTP OpenAPI is
+  not a defect where there is no HTTP API. Retain UNKNOWN and evidence boundaries.
+- Cover native lifecycle and portable/native context, return at levels 1/3/5,
+  resume/owner changes, repeated calls, races, malformed state and unchanged
+  authority. Guidance delivery and synthetic exercises do not prove adoption by
+  every existing client or production correctness.
+
 # 0.8.0rc2064 — share solution integrity across development and research
 
 - Add one canonical shared standard for task fidelity, justified expectations,

@@ -1,6 +1,6 @@
 # Public release packaging
 
-Current source candidate: `0.8.0rc2064` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Current source candidate: `0.8.0rc2065` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
 
 ## Retained 0.7.1 baseline
 

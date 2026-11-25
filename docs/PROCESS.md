@@ -191,7 +191,7 @@ discrepancy, preserves the meaning of the original task, and withstands a releva
 check. A desired output alone proves none of these.**
 
 Apply this standard to development, research, calculations and diagnosis at every
-development level **1–5**. A level changes implementation detail and verification
+development level **1–5**, including temporary **diagnostic level 0**. A level changes implementation detail and verification
 breadth, never the integrity of the task, evidence or conclusion. For new work
 without an observed malfunction, justify the intended result and the meaningful
 input-to-output chain; do not invent a failure or a cause to satisfy this rule.
@@ -296,6 +296,137 @@ Reading these laws grants no authority and does not prove their application.
 
 <!-- agentos:solution-integrity:end -->
 
+<!-- agentos:project-diagnostics:start -->
+
+## Project diagnostics
+
+**Diagnostic level 0** is a temporary, one-pass mode for understanding and
+correcting the direction of an existing project. Its result is a current dossier,
+an explicit inventory and gap assessment, and a justified next step. Ask: what
+result are we pursuing, what actually exists, do the parts fit, does the work
+serve that result, and what should happen next? Apply **Solution integrity**;
+guidance prepends that same canonical body to this method.
+
+### Enter, preserve and return
+
+Keep the selected development level **1–5** and its scope; 0 does not replace it
+or add a sixth persistent choice. Enter on the owner's request, or before
+substantial work when material uncertainty about the current state, objective,
+architecture or dependencies could lead to the wrong implementation. At a
+significant architecture, integration, migration or delivery milestone, review
+whether changed evidence warrants another diagnostic pass. This is an event-based
+decision, not a calendar schedule or an audit after every patch.
+
+Record the reason, scope, current basis and captured previous level in the
+existing task/context. An active pass survives interruption and a new session:
+resume its findings and next investigation instead of starting again. Native
+registered tasks use `project diagnose start|status|finish|cancel`; take exact
+arguments from the current CLI/contract. Standalone read-only work needs no
+intake, project initialization or fabricated task. Retain equivalent state in its
+existing plan/context and journal; do not create a parallel settings register.
+
+On finish, retain the current dossier reference, findings, unresolved work and
+next action, then return to the saved development mode. An explicit newer owner
+choice of level/scope takes precedence over the captured previous choice; retain
+both as history rather than restoring an obsolete setting. Cancellation records
+the partial result and remainder and also returns the mode; it does not pretend
+the audit completed. Neither transition closes the product task, accepts its
+findings as repaired, grants READY/authority, nor clears a concrete blocker.
+
+### Establish the current project, then its gaps
+
+1. **Restore the intended outcome.** Read the original objective, current scope,
+   main user scenarios, constraints and acceptance conditions. Separate the
+   desired state from observations. Identify where current work no longer serves
+   the goal; a convenient implementation is not a substitute for the requested
+   result. Preserve the current writer, accepted results and their dated basis.
+2. **Build the current inventory.** Cover the whole project at the selected
+   architectural level: authoritative source/revisions, documents, components,
+   services, dependencies, state owners, environments, interfaces and existing
+   work. Name the inventory's boundary, exclusions and uninspected areas. Expand
+   selected modules recursively when a dependency or discrepancy requires it;
+   a top-level audit need not enumerate every internal helper. Stay within the
+   known project roots and authorized sources, not unrelated accounts or hosts.
+3. **Trace the useful chains.** Connect goal → user scenario → modules →
+   interfaces/data → implementation → evidence → delivery/recovery. Establish
+   responsibility, inputs/outputs, actual consumers, state/effect ownership and
+   dependencies at each material boundary. A directory or service name alone
+   does not establish modularity, independent builds or independent updates.
+4. **Compare documents with actual state.** Check applicable contracts,
+   architecture, dossier, roadmap and stage records against the relevant source
+   and permitted runtime observations. Identify missing, stale, conflicting or
+   incomplete content, including a documented interface with undocumented
+   consumers or incompatible errors. A heading, file, hash or generated schema
+   alone does not prove semantic correctness or complete coverage.
+5. **Classify consequential gaps.** For each material finding keep its source,
+   observation, effect on the goal, remaining uncertainty and next owner/action.
+   Distinguish a demonstrated inconsistency from a hypothesis or missing evidence.
+   Identify which gap blocks a particular next step and which belongs to a later
+   stage. Do not stop independent authorized work for unrelated findings.
+6. **Update the path forward.** Correct the affected authoritative documents
+   through their existing writer and permitted change route; retain AS_IS and
+   proposals separately. Reuse the current dossier, architecture, work matrix,
+   roadmap and journal rather than creating another report suite. If a required
+   source cannot be changed in this scope, return an exact proposed delta to its
+   owner. Preserve history and prior partial acceptance. Leave an ordered plan
+   with dependencies, a bounded next result and its meaningful check.
+
+### Select applicable contracts and evidence
+
+Use [the documentation catalog](DOCUMENTATION_CATALOG.md) and the existing module
+contracts to select the required content and suitable formats. Inspect:
+
+- **Interfaces:** provided and consumed HTTP, event, RPC and in-process methods;
+  input/output/error semantics, versions, compatibility, Auth/ACL/tenant context,
+  effects, idempotency and unknown-outcome reconciliation. Use OpenAPI for an
+  applicable HTTP surface, or the project's appropriate schema/IDL/typed contract.
+  No HTTP API means OpenAPI may be N/A with a reason, not a missing deliverable.
+- **State and data:** actual owner, lifecycle, schema and migrations, lineage,
+  privacy/access, transaction boundaries and partial/repeated operations. Do not
+  manufacture an ERD when there is no database or omit real file-backed state.
+- **Build and operations:** declared build/dependency inputs, artifacts,
+  deployment units, versions/configuration, useful logs and error journal,
+  readiness, continuity, recovery and rollback where the stage/effect needs them.
+  Do not infer independent deployment from logical module boundaries.
+- **Quality and progress:** what is accepted, partially accepted, running,
+  blocked or not begun; exact proof scope and the concrete remainder. Separate
+  source review, synthetic stand, candidate, installed state and observed
+  production behavior. Preserve untested conditions and stale evidence.
+
+Mark UNKNOWN when evidence cannot establish a fact, and N/A only with an
+applicability reason. Missing required content is a named gap, not a placeholder
+filled to pass a gate. Reuse current evidence with its original scope/date;
+repeat only for changed inputs, a material discrepancy, applicable freshness or
+a required gate. Existing Atlas `project-audit`/coverage is useful evidence about
+its declared inventory; it does not automatically inspect the whole source or
+execute the product. Read-only diagnosis grants no runtime mutation or access.
+
+For migration from an existing production system to independent service modules,
+map the current user journeys, identities/sessions, state and in-flight work to
+the proposed owners and contracts. Identify compatibility during mixed versions,
+migration ownership/order, observable continuity, cutover conditions, reconciliation
+and recovery. Confirm which units can actually be built and updated separately.
+A diagram, successful build or synthetic scenario does not establish a seamless
+user transition; place the remaining real acceptance in the migration plan.
+
+### Finish when the direction is sufficiently clear
+
+The pass is sufficient when the inspected scope and sources are explicit, the
+current/desired states and their material gaps are understandable, applicable
+documentation and contracts are accounted for, and the next justified action,
+owner, dependencies and check are clear. State remaining UNKNOWN and their impact.
+Completing diagnosis does not require repairing every finding, proving every
+internal detail or eliminating every unknown. Block only the next action whose
+material precondition remains unestablished; give other gaps owned roadmap work.
+
+Save one concise result in the existing records and return to the development
+level. After a later significant change, inspect the affected delta against this
+basis. Repeat the full inventory only when its scope or reliability materially
+changed. Loading this method, ending the mode or receiving an ACK proves neither
+that the audit was performed nor that the project works.
+
+<!-- agentos:project-diagnostics:end -->
+
 <!-- agentos:project-development:start -->
 
 ## Project development
@@ -309,6 +440,17 @@ unavailable. Apply the shared [Solution integrity](#solution-integrity) laws at
 every level; guidance includes their current body before this method. When
 reading the document directly, read both sections. Continue the existing project
 and writer, using the current plan.
+
+Before substantial work with material uncertainty about the project's state,
+direction or dependencies, use **Project diagnostics** through
+`agentos workflow guidance --method project-diagnostics`: temporary level 0
+preserves the selected 1–5 level and returns to it after a current dossier,
+findings and next action are recorded. Resume an active pass across sessions.
+At significant milestones review changed evidence and diagnose the affected
+scope when needed; do not launch a full audit after every increment or repeat
+unchanged inventory. Explicit newer owner level choices prevail on return.
+Diagnostics clarifies the next step; it does not require fixing every finding
+before continuing, replace product acceptance or grant authority.
 
 ### Development level: 1–5, default 3
 

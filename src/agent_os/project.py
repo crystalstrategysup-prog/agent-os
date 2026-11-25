@@ -224,6 +224,10 @@ def load_task(root: Path, task_id: str) -> dict:
     task = tm.read_task(root, task_id)
     if task.get("schema") != "agentos.project-task/v1" or task.get("id") != task_id:
         raise GateError("unsupported_or_mismatched_task")
+    if "diagnostics" in task:
+        from .project_diagnostics import normalize_state
+
+        normalize_state(task["diagnostics"])
     return task
 
 
@@ -716,6 +720,10 @@ def enter(
             from .development_level import effective
 
             result["development"] = effective(answers)
+            if "diagnostics" in task:
+                from .project_diagnostics import view
+
+                result["diagnostic"] = view(task)
         except BaseException:
             _recover_entry(root, user_home)
             raise
@@ -1340,6 +1348,11 @@ def close(root: Path, task_id: str, review: dict, *, user_home: Path | None = No
     with lock(within(root, ".agentos/write.lock")):
         _require_entry_recovered(root)
         task = load_task(root, task_id)
+        from .project_diagnostics import active
+
+        if active(task) is not None:
+            return {"status": "BLOCKED", "task_id": task_id,
+                    "errors": ["diagnostic_finish_or_cancel_before_close"]}
         if task["answers"].get("continuation_required") or "continuation" in review:
             from .continuation import validate
 
@@ -1504,6 +1517,7 @@ def make_parser() -> argparse.ArgumentParser:
     sub.add_parser("assess")
     sub.add_parser("verify-closeout")
     sub.add_parser("status")
+    sub.add_parser("diagnose", help="One-shot diagnostic level 0: start, status, finish or cancel")
     fin = sub.add_parser("close")
     fin.add_argument("--review", type=Path, required=True)
     diagnostic = sub.add_parser("handoff-diagnostic")
@@ -1555,6 +1569,10 @@ def make_parser() -> argparse.ArgumentParser:
 
 
 def command(argv: list[str], user_home: Path) -> tuple[dict, int]:
+    if argv and argv[0] == "diagnose":
+        from .project_diagnostics import command as diagnostic_command
+
+        return diagnostic_command(argv[1:], user_home)
     if argv and argv[0] == "local":
         from .project_lite import command as local_command
         return local_command(argv[1:], user_home)

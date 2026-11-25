@@ -65,9 +65,70 @@ hidden history lookup. Legacy objects are retained, with effective default 3/tas
 effective choice beside the canonical method. Selection changes planning/check
 depth only; readiness, effect gates and behavior-proof limits remain unchanged.
 
+### Temporary diagnostic level 0
+
+Level 0 is a one-shot diagnostic overlay, not a value of `answers.development`.
+The saved 1–5 choice, scope and balanced default 3 remain unchanged. The normative
+audit method is [Project diagnostics](PROCESS.md#project-diagnostics).
+
+`project diagnose status --root P --task T [--run R]` reads the existing task
+and returns `task_sha256`, `task_revision`, the diagnostic generation, active
+descriptor, selected run and effective level. It does not create a task or home.
+`start`, `finish` and `cancel` additionally require `--run`, exact `--session` and
+`--turn`, `--expected-task-sha256` and `--expected-revision`. `start` takes
+`--scope` and `--reason`. These are explicit local metadata operations on the
+current task and its existing owner binding; they do not discover another task,
+modify a turn receipt or authorize product work.
+
+`finish` and `cancel` take `--result PATH|-`, a bounded object in this shape:
+
+```json
+{
+  "summary": "Current project picture and consequential gaps established.",
+  "remaining": ["The next migration step still requires runtime evidence."],
+  "next_action": "The current writer resolves that prerequisite in the existing plan.",
+  "references": ["Existing dossier or journal reference with its observed basis"]
+}
+```
+
+These fields record the caller's result and evidence references; they do not
+certify that an audit happened. A completed result needs at least one reference;
+cancellation can retain an unfinished result without one. Keep actual dossiers
+and findings in their owning existing records, not duplicated inside each run.
+
+The `diagnostics` field in the existing task JSON uses schema
+`agentos.project-diagnostics/v1`: its generation and compact retained runs are
+saved in one atomic write under the project and turn locks, after exact task
+byte/revision CAS and current writer checks. Only this field changes. The task's
+main revision, answers, status, READY data and check receipts are retained. A
+second distinct active run is refused. Matching repeats under current CAS return
+the recorded run without another write; a changed completed result is refused.
+Use status and reconcile uncertain outcomes before any new operation.
+
+The diagnostic mode does not replace ordinary readiness and check contracts:
+already authorized checks remain available during the audit, while an unready
+task still needs its normal gates. Finish or cancel an active run before the
+task's final close; checkpoint may preserve a suspended pass for later resume.
+Finishing/cancelling removes the temporary mode and returns the current saved
+1–5 choice. The captured previous
+choice remains history; an explicit newer owner choice takes precedence. No
+transition invokes `ready`, clears a blocker, closes a product task or grants
+authority. Any previously established readiness still has its ordinary validity
+conditions. History is never truncated to fit: existing task metadata bounds apply.
+Same-task resume retains the diagnostic state. Its exact task digest changes
+context binding even though the main task revision need not change.
+A separately entered task has its own scope and does not inherit the old task's
+diagnostic run; resume the original task through its existing owner route to
+continue that saved pass.
+
+For unregistered/read-only work, load guidance and keep the active descriptor
+and result in the existing context or journal; no fabricated intake is required.
+The portable descriptor and its limits are in [Context binding](CONTEXT_BINDING.md).
+
 | Group | Operations | Boundary |
 | --- | --- | --- |
 | `project` | init, questions, enter, next-turn, document, ready, check, assess, verify-closeout, status, close, checkpoint, gate, snapshot | Explicit actions in the named project; questions and reads need no product write |
+| `project diagnose` | start, status, finish, cancel | Temporary diagnostic state in the existing exact task; no saved-level replacement or new readiness/authority |
 | `project recover-binding` | exact old root, session, old/new turn, task, receipt SHA-256, explicit detach permission | One stale user-home chat receipt and its recovery archive; old project and task unchanged |
 | `project observe` | root, answers, session, turn | Optional user-home receipt; does not create a project task |
 | `overlay` | status, index, import, migrate-config | Import and migration plan by default; apply explicitly |
@@ -136,8 +197,9 @@ shape and version are in the schemas and packaged copies.
 
 `workflow guidance` is a read-only materialization of the canonical PROCESS text.
 Its default method is `project-development`; `--method causal-debugging` selects
-the diagnostic method, and `--method solution-integrity` returns only the shared
-laws for development, research and calculations. Both full methods prepend those
+causal malfunction investigation, `--method project-diagnostics` selects temporary
+level-0 project understanding, and `--method solution-integrity` returns only the
+shared laws for development, research and calculations. All full methods prepend those
 laws to their selected body. Its `agentos.engineering-guidance/v1` response
 contains actual `content`, `content_bytes`, `content_sha256`, `document_sha256`,
 `version`, and the selected method's `source`. Additive `sections` lists each
@@ -153,9 +215,16 @@ the two-byte separator. The context capsule keeps its existing 64 KiB ceiling.
 `--kind` and `--effect`
 belong to `workflow route` and are rejected by `guidance`.
 
+For `project-diagnostics`, `development` still carries the saved return choice.
+Additive `execution` reports level 0, temporary diagnostic mode and
+`lifecycle: GUIDANCE_ONLY`: this read-only lookup does not start or finish a run.
+Passing 0 as the permanent `--development-level` is refused with the method route
+hint; pass the saved 1–5 choice with the diagnostic method instead.
+
 Engineering `workflow route` responses and `context build` for `project-change`
 or `continuation` carry the same object as additive `foundation_guidance`.
-Ordinary read routes retain their previous result and require no guidance read.
+An active bound or explicitly portable diagnostic context selects the diagnostic
+method; an ordinary read route retains its previous result and needs no guidance.
 These are instruction-delivery surfaces, not a native interception mechanism.
 
 ## Optional extensions

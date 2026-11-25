@@ -371,9 +371,10 @@
       "methods": [
         "project-development",
         "causal-debugging",
-        "solution-integrity"
+        "solution-integrity",
+        "project-diagnostics"
       ],
-      "guidance_contract": "Read-only common Solution integrity followed by the selected method; standalone solution-integrity needs no intake. Ordered sections identify exact UTF-8 content, and the aggregate content hash covers every returned section. Development selection, authority and behavior-compliance limits are unchanged."
+      "guidance_contract": "Read-only common Solution integrity followed by the selected method; standalone solution-integrity needs no intake. Ordered sections identify exact UTF-8 content, and the aggregate content hash covers every returned section. Development selection, authority and behavior-compliance limits are unchanged. Project diagnostics is temporary level 0; development retains the saved 1–5 return choice. execution.lifecycle=GUIDANCE_ONLY does not start a diagnostic run."
     },
     {
       "effect": "read_only",
@@ -868,14 +869,103 @@
         "native-output-CAS"
       ],
       "contract": "atlas.source-relocation/v1"
+    },
+    {
+      "effect": "local_task_metadata_cas",
+      "name": "project diagnose start",
+      "status_values": [
+        "NOT_STARTED",
+        "ACTIVE",
+        "COMPLETED",
+        "CANCELLED"
+      ],
+      "write_surfaces": [
+        ".agentos/tasks/<task>/task.json"
+      ],
+      "contract": "Temporary level 0 in existing task state; no saved-level replacement, new READY, authority, product effects or hooks.",
+      "required_options": [
+        "--root",
+        "--task",
+        "--run",
+        "--session",
+        "--turn",
+        "--expected-task-sha256",
+        "--expected-revision",
+        "--scope",
+        "--reason"
+      ]
+    },
+    {
+      "effect": "read_only",
+      "name": "project diagnose status",
+      "status_values": [
+        "NOT_STARTED",
+        "ACTIVE",
+        "COMPLETED",
+        "CANCELLED"
+      ],
+      "write_surfaces": [],
+      "contract": "Temporary level 0 in existing task state; no saved-level replacement, new READY, authority, product effects or hooks.",
+      "required_options": [
+        "--root",
+        "--task"
+      ]
+    },
+    {
+      "effect": "local_task_metadata_cas",
+      "name": "project diagnose finish",
+      "status_values": [
+        "NOT_STARTED",
+        "ACTIVE",
+        "COMPLETED",
+        "CANCELLED"
+      ],
+      "write_surfaces": [
+        ".agentos/tasks/<task>/task.json"
+      ],
+      "contract": "Temporary level 0 in existing task state; no saved-level replacement, new READY, authority, product effects or hooks.",
+      "required_options": [
+        "--root",
+        "--task",
+        "--run",
+        "--session",
+        "--turn",
+        "--expected-task-sha256",
+        "--expected-revision",
+        "--result"
+      ]
+    },
+    {
+      "effect": "local_task_metadata_cas",
+      "name": "project diagnose cancel",
+      "status_values": [
+        "NOT_STARTED",
+        "ACTIVE",
+        "COMPLETED",
+        "CANCELLED"
+      ],
+      "write_surfaces": [
+        ".agentos/tasks/<task>/task.json"
+      ],
+      "contract": "Temporary level 0 in existing task state; no saved-level replacement, new READY, authority, product effects or hooks.",
+      "required_options": [
+        "--root",
+        "--task",
+        "--run",
+        "--session",
+        "--turn",
+        "--expected-task-sha256",
+        "--expected-revision",
+        "--result"
+      ]
     }
   ],
-  "distribution_version": "0.8.0rc2064",
+  "distribution_version": "0.8.0rc2065",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.8.0rc2064",
+  "release": "0.8.0rc2065",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",
@@ -890,7 +980,7 @@
     "existing_metadata_max_bytes": 4194304,
     "observation_max_age_seconds": 900,
     "authority_truth": "Owner-attested local evidence; not cryptographically authenticated by core",
-    "resume": "RECOVERY_REQUIRED-specific enter guard checks committed B and exact project/task/revision/op/newbinding under project\u2192turn locks BEFORE all answers/docs/status writes",
+    "resume": "RECOVERY_REQUIRED-specific enter guard checks committed B and exact project/task/revision/op/newbinding under project→turn locks BEFORE all answers/docs/status writes",
     "legacy": "Existing normal gates, predicates, acceptance, source/scan/capacity unchanged outside pending/newstatus branch",
     "pending_signal": "Atomic reserved directory + identity before preparation; complete journal afterward; either signal blocks all ordinary require_clear callsites. IncompleteUNKNOWN is never auto-cleared.",
     "task_metadata_entry_max": 256,

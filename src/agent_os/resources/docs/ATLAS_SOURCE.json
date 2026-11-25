@@ -369,8 +369,8 @@
     },
     {
       "path": "skills/atlas/SKILL.md",
-      "bytes": 19584,
-      "sha256": "8ca83018550fabab11f12ce2291a08edb00c3ed2b2e37bedf01f9fbcf6db3173",
+      "bytes": 20372,
+      "sha256": "62119fa3fe8ed37f0741e74de3c86a2ddd644f284879838093ca1a3a3cf0507e",
       "source_bytes": 14379,
       "source_sha256": "c5c841e5cdfbd55edad3835840e9c5ce4e36f0cf733855896813040983ca18cf"
     },
@@ -460,8 +460,8 @@
     },
     {
       "path": "skills/atlas/references/operating-modes.md",
-      "bytes": 7332,
-      "sha256": "b63ca6fe7bb86956447668b091f9e0130d5cb4b6c5ec4ea17899e07974a795d6",
+      "bytes": 8223,
+      "sha256": "6639b4146d615a98871621f5cc578fd576f912a471a778f0048ecc295874c44e",
       "source_bytes": 5700,
       "source_sha256": "6417cdb6e9f4b2372bb86029dfa86b0557a3079aa918039e7ad5422c99b70ba5"
     },
@@ -481,8 +481,8 @@
     },
     {
       "path": "skills/atlas/references/quickstart.md",
-      "bytes": 8650,
-      "sha256": "9cb1b9fead8575ce7928983ad574209aff6aaa0d93b2ce46b048d8451ba552e2",
+      "bytes": 9356,
+      "sha256": "0ec075f75f96dfd4ffbb898ceab6c764cec4be99b78017925862cd6bcea6681f",
       "source_bytes": 4664,
       "source_sha256": "af49ed8d6557354be39aecfdeec4f65fcec67061eb273e667d5e7d4514a158ad"
     },
@@ -509,8 +509,8 @@
     },
     {
       "path": "skills/atlas/references/workflow.md",
-      "bytes": 13646,
-      "sha256": "fad46a2920b264fe0893d96ef3bc0977cfdae901546830e0039d972419dab069",
+      "bytes": 14373,
+      "sha256": "cacb858244eab21dd538daabaa4f67071092bd962c8ca137010fd2721aa83aac",
       "source_bytes": 15495,
       "source_sha256": "302b4d770a8ea305b62cafbf39a2254a8452e1a7bfb78a93e2d253ee05b4902a"
     },
@@ -979,7 +979,7 @@
   },
   "schema": "agent-os.atlas-source/v1",
   "selected_file_count": 74,
-  "selected_tree_sha256": "db6a7ee72299f7953437fe685b93afa93804d5cbdadb06f0eddfda205c0c0775",
+  "selected_tree_sha256": "c58a3402c2420126dded7fecfc4e86b16a4ac35f00f12682291ab9ffa758fefc",
   "source_commit_reported": "1b7cd88",
   "source_file_count": 64,
   "source_tree_sha256": "15b36a79f1133be8cb790d61f0dff6562262196b0eb8c3ea15c41a9700dd6bab",

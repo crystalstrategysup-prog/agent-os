@@ -23,6 +23,16 @@ level buttons with concise differences unless the owner already specified a
 level. For patches, fixes, enhancements or continuation, inherit the applicable
 level or use 3 without showing the chooser. Accept a scoped level change at any time.
 
+If temporary diagnostic level 0 is active, continue that pass. On an audit
+request, or before substantial work with material unknowns, load
+`agentos workflow guidance --method project-diagnostics` (or **Solution integrity**
+and **Project diagnostics** in PROCESS). Keep the previous 1–5 selection; inspect
+current state, applicable contracts/documents and goal alignment, then record the
+dossier/findings/next action and return to the saved mode. A newer explicit owner
+choice prevails. Review changed evidence at major milestones instead of auditing
+every small step. `atlasctl audit PROJECT` supplies inventory-bound coverage;
+its result alone does not establish the strategic or runtime conclusions.
+
 For a specific malfunction needing investigation, use
 `agentos workflow guidance --method causal-debugging` or the **Causal debugging**
 section of the same PROCESS document. Restore the existing journal, fixed

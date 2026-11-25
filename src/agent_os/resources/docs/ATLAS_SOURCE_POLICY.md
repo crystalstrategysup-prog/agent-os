@@ -20,6 +20,14 @@ plan. Offer the five-level choice once for new development that has not begun,
 unless already chosen. Patches, fixes, enhancements and continuation reuse the
 current level without a new chooser.
 Select causal debugging separately for a concrete malfunction when needed.
+Use [Project diagnostics](PROCESS.md#project-diagnostics), temporary level 0, for
+an explicit project audit or before substantial work whose material unknowns
+obscure the right direction. Review its need at significant milestones against
+changed evidence. Preserve the current 1–5 choice and return after the scoped
+current-state, findings and next action are recorded; a newer explicit owner
+choice prevails. Read-only diagnosis needs no project intake. Update existing
+owning documents within the authorized scope, preserving gaps and prior results;
+diagnosis completion is neither product acceptance nor authority.
 The original controls below retain their scope and authority requirements.
 
 ## Original policy, verbatim

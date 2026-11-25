@@ -1,6 +1,6 @@
 # Release policy
 
-Current publication candidate: `0.8.0rc2064`, supplying shared solution-integrity laws with development and causal guidance at every level. Standalone research and calculations can load the same common source without task intake. Context hashes cover both common laws and the selected method; existing development choices, proportionate checks/reporting, protected effects and disabled native hooks are preserved. Package, CLI, MCP and release metadata must agree. This is a prerelease; source publication, asset availability, target installation and observed agent behavior are separate.
+Current publication candidate: `0.8.0rc2065`, adding temporary diagnostic level 0 for project inventory, goal alignment, applicable contracts and a justified next step. The existing saved level 1–5 remains intact, with explicit start/status/finish/cancel, continued context and return to the current owner-selected mode. Existing dossier/modularity/causal standards are reused. Package, CLI, MCP and release metadata must agree. This is a prerelease; source publication, installation and observed agent behavior remain separate.
 
 Recovery v3 preserves workflow/native-turn identity and existing CAS/journal and finite supported-observer limits. It does not provide missing provider exact-origin capabilities. Old v1/v2-only readers are not safe rollback targets after real v3 metadata activation. No host activation, scheduler or native hook is implied. Earlier tags and published assets remain immutable.
 

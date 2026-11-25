@@ -33,6 +33,17 @@ The shared Solution integrity laws apply at every level. Standalone research or
 calculations may load `agentos workflow guidance --method solution-integrity`
 without task intake; use the same canonical section if the CLI is unavailable.
 
+An explicit project audit or substantial work with material unknowns uses
+temporary **diagnostic level 0**. Load **Project diagnostics** with
+`agentos workflow guidance --method project-diagnostics`, or read it with
+**Solution integrity** in the same PROCESS. Resume an active pass across sessions,
+retaining the saved 1–5 level/scope. Review current state, contracts, documents and
+goal alignment; update the existing dossier/plan through its writer. Record
+findings, remaining gaps and next action, then return to the saved mode, honoring
+any explicit newer owner choice. At major milestones review changed evidence;
+do not repeat a full audit for every small step. Read-only diagnosis needs no
+intake; completion does not establish READY, repaired findings or authority.
+
 The development level defaults to **3** on a **1–5** scale. The owner may set or
 change it at any time for a project, stage or module; retain the latest scoped
 choice in the existing plan/context without a new register. At the start of

@@ -12,7 +12,7 @@
     {
       "id": "process",
       "path": "PROCESS.md",
-      "sha256": "e6961665e72cc45c484e597e48af1bc95d53e20466a002771633e1c09bd45326",
+      "sha256": "31a75ba6739025a95e2d66a7b900b08a077b22112ee3195d8e8e4c7e01e5db10",
       "status": "SOURCE_CONTRACT"
     },
     {
@@ -66,7 +66,7 @@
     {
       "id": "context_binding",
       "path": "CONTEXT_BINDING.md",
-      "sha256": "80c176bf20416df34ff2be362986e2ca624caad2327a2e0b2d23910483dad286",
+      "sha256": "c4e14cf869f86d21d3d3bcc29dc53deaae6a9f19132a2afbd079590fcf8acd3b",
       "status": "SOURCE_CONTRACT"
     },
     {
@@ -85,5 +85,6 @@
   "schema": "agentos.coordinator-knowledge-index/v1",
   "status": "PUBLIC_RELEASE_CANDIDATE_NOT_ADOPTED",
   "causal_followup_increment": "0.8.0rc2056: current PROCESS and QUALITY pins for finite resource-chain and journal-continuation qualification; historical core/version pins and separate behavior evidence are preserved.",
-  "solution_integrity_increment": "0.8.0rc2064: shared laws for development, diagnosis and standalone research; current affected document pins only, with historical provenance and separate behavior evidence preserved."
+  "solution_integrity_increment": "0.8.0rc2064: shared laws for development, diagnosis and standalone research; current affected document pins only, with historical provenance and separate behavior evidence preserved.",
+  "diagnostic_zero_increment": "0.8.0rc2065: temporary project diagnostics over unchanged saved levels 1–5; affected current pins only; historical provenance and separate behavior evidence retained."
 }

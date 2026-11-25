@@ -38,6 +38,17 @@ a level. Patches, fixes, enhancements and continuation inherit the applicable
 level or default 3 without a chooser. The level does not change MINIMAL/FULL
 scope or authority.
 
+Use temporary **diagnostic level 0** on an explicit audit request or before
+substantial work with material uncertainty about the project's state or direction.
+Read **Solution integrity** and **Project diagnostics** through
+`agentos workflow guidance --method project-diagnostics`, or their marked PROCESS
+sections. Retain the 1–5 choice, resume an active pass across sessions, update the
+existing dossier/inventory/plan through their writer, then return to the saved
+mode; a newer explicit owner choice prevails. Review the need after significant
+milestones using changed evidence, without repeating unchanged full audits.
+`project-audit` supports this review against its declared inventory; it is not
+whole-project behavioral acceptance. Read-only diagnosis needs no Atlas bootstrap.
+
 For a specific malfunction needing causal investigation, select
 `agentos workflow guidance --method causal-debugging`, or read the **Causal debugging**
 section of AgentOS `docs/PROCESS.md`, or installed `resources/docs/PROCESS.md`
