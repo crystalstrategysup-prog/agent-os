@@ -134,13 +134,23 @@ The MCP entry plan states that entry is required for project changes and that
 read-only intake is unnecessary; native hooks are disabled. The exact JSON
 shape and version are in the schemas and packaged copies.
 
-`workflow guidance` is a read-only, argument-free materialization of the canonical
-`PROCESS.md#causal-debugging` section. Its `agentos.engineering-guidance/v1` response
+`workflow guidance` is a read-only materialization of the canonical PROCESS text.
+Its default method is `project-development`; `--method causal-debugging` selects
+the diagnostic method, and `--method solution-integrity` returns only the shared
+laws for development, research and calculations. Both full methods prepend those
+laws to their selected body. Its `agentos.engineering-guidance/v1` response
 contains actual `content`, `content_bytes`, `content_sha256`, `document_sha256`,
-`version`, and `source`. It reads no user overlay, creates no task, executes no
+`version`, and the selected method's `source`. Additive `sections` lists each
+included section's `source`, `content_bytes` and `content_sha256` in content order.
+`content` joins the stripped section bodies with exactly two newlines; its digest
+covers that whole text. It reads no user overlay, creates no task, executes no
 experiment and grants no authority. `behavior_compliance` remains `NOT_PROVEN`.
-Missing, duplicate, reversed, empty or oversized section markers are refusals;
-the document and section bounds are 128 KiB and 16 KiB. `--kind` and `--effect`
+Missing, duplicate, reversed, empty, overlapping or oversized required sections
+are refusals. Shared laws must precede the selected method; an unselected method
+is not a standalone lookup dependency. The document and per-section bounds
+remain 128 KiB and 16 KiB; combined content is bounded by two section limits plus
+the two-byte separator. The context capsule keeps its existing 64 KiB ceiling.
+`--kind` and `--effect`
 belong to `workflow route` and are rejected by `guidance`.
 
 Engineering `workflow route` responses and `context build` for `project-change`

@@ -20,13 +20,18 @@ init, intake, observation, an answers file, a profile interview, or closeout.
 
 On new entry and same-scope resume, read the actual body from the effect-free
 `agentos workflow guidance`, or reuse that same current body materialized by
-entry/context. If the CLI is unavailable, read **Project development** in the
+entry/context. If the CLI is unavailable, read **Solution integrity** and
+**Project development** in the
 normative `resources/docs/PROCESS.md`, located with `agentos resources`, or the
 selected source `docs/PROCESS.md`. Plan the whole current level, preserve mandatory
 modularity, and assemble connected running parts before deepening the selected
 module or microprocess with the same method. Simple implementations and explicit
 stubs can complete a declared stage; no advance decomposition of every leaf is
 required. A path/digest/ACK without its body does not load the method.
+
+The shared Solution integrity laws apply at every level. Standalone research or
+calculations may load `agentos workflow guidance --method solution-integrity`
+without task intake; use the same canonical section if the CLI is unavailable.
 
 The development level defaults to **3** on a **1–5** scale. The owner may set or
 change it at any time for a project, stage or module; retain the latest scoped
@@ -49,7 +54,7 @@ carry typed `goal.development`. Persist a scoped change in task answers before
 binding its new revision. A new session does not reset the selected level.
 
 For a concrete malfunction needing causal investigation, explicitly load
-`agentos workflow guidance --method causal-debugging`, or read **Causal debugging**
+`agentos workflow guidance --method causal-debugging`, or read **Solution integrity** and **Causal debugging**
 in the same PROCESS. Restore the existing journal, conditions, configuration and
 next experiment. Return to the development plan after sufficient repair or an
 explicitly scoped mitigation. Ordinary reading needs no intake, and ordinary

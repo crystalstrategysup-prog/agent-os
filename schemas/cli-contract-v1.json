@@ -367,7 +367,13 @@
         "--development-level",
         "--development-scope"
       ],
-      "development_contract": "Paired explicit selection; level 1-5 or 1D alias of 1, scope at most 200 characters; missing selection defaults to 3/task. On route, valid only for a project change. No settings store or authority grant."
+      "development_contract": "Paired explicit selection; level 1-5 or 1D alias of 1, scope at most 200 characters; missing selection defaults to 3/task. On route, valid only for a project change. No settings store or authority grant.",
+      "methods": [
+        "project-development",
+        "causal-debugging",
+        "solution-integrity"
+      ],
+      "guidance_contract": "Read-only common Solution integrity followed by the selected method; standalone solution-integrity needs no intake. Ordered sections identify exact UTF-8 content, and the aggregate content hash covers every returned section. Development selection, authority and behavior-compliance limits are unchanged."
     },
     {
       "effect": "read_only",
@@ -864,12 +870,12 @@
       "contract": "atlas.source-relocation/v1"
     }
   ],
-  "distribution_version": "0.8.0rc2063",
+  "distribution_version": "0.8.0rc2064",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.8.0rc2063",
+  "release": "0.8.0rc2064",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",
@@ -884,7 +890,7 @@
     "existing_metadata_max_bytes": 4194304,
     "observation_max_age_seconds": 900,
     "authority_truth": "Owner-attested local evidence; not cryptographically authenticated by core",
-    "resume": "RECOVERY_REQUIRED-specific enter guard checks committed B and exact project/task/revision/op/newbinding under project→turn locks BEFORE all answers/docs/status writes",
+    "resume": "RECOVERY_REQUIRED-specific enter guard checks committed B and exact project/task/revision/op/newbinding under project\u2192turn locks BEFORE all answers/docs/status writes",
     "legacy": "Existing normal gates, predicates, acceptance, source/scan/capacity unchanged outside pending/newstatus branch",
     "pending_signal": "Atomic reserved directory + identity before preparation; complete journal afterward; either signal blocks all ordinary require_clear callsites. IncompleteUNKNOWN is never auto-cleared.",
     "task_metadata_entry_max": 256,

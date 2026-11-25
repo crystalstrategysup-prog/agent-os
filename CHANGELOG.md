@@ -1,3 +1,24 @@
+# 0.8.0rc2064 — share solution integrity across development and research
+
+- Add one canonical shared standard for task fidelity, justified expectations,
+  traceable transformations, testable mechanisms, independent references,
+  distinguishable experiments, information timing, state continuity, refuting
+  checks and proportionate claims. Existing causal-debugging rules remain in
+  place; this change extends their common basis to ordinary development and
+  makes the previously implicit expectation, reference and timing rules explicit.
+- Return the shared laws before the selected development or diagnostic method.
+  Bind exact combined content and ordered section hashes; refuse malformed,
+  overlapping or oversized source sections. Preserve the selected level/scope.
+- Provide read-only `workflow guidance --method solution-integrity` for research,
+  calculations and result validation without invented task intake or authority.
+  Align installed fallback instructions and current document/contract pins.
+- Keep level 1's connected modular stand, explicit stubs, debug/error journal,
+  smallest sufficient checks and continued authorized work. No extra per-step
+  report, backup, experiment form or full acceptance requirement is introduced.
+- Cover all methods at levels 1–5, continuation choices, common-law drift,
+  malformed sections and UTF-8 bounds. Method delivery and synthetic exercises
+  do not establish adoption by every existing worker or production correctness.
+
 # 0.8.0rc2063 — preserve runtime header provenance and accepted recovery history
 
 - Recognize bounded runtime Bearer/cookie prefix construction from readonly JSON

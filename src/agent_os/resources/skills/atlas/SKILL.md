@@ -24,7 +24,7 @@ Read [quickstart.md](references/quickstart.md) for daily work,
 and [operations.md](references/operations.md) for exact methods and parameters.
 At start and continuation, read the body returned by the effect-free
 `agentos workflow guidance`: **Project development** is the default. If unavailable,
-read that exact section of AgentOS `docs/PROCESS.md`, or installed
+read **Solution integrity** and that method section of AgentOS `docs/PROCESS.md`, or installed
 `resources/docs/PROCESS.md` located with `agentos resources`. Reuse the same
 current body if entry already materialized it. Plan the whole current level,
 build the common runnable stand with mandatory module boundaries and a main
@@ -44,7 +44,9 @@ section of AgentOS `docs/PROCESS.md`, or installed `resources/docs/PROCESS.md`
 located with `agentos resources`. Restore the existing journal, fixed conditions,
 current configuration and next experiment from the assigned packet. Return to
 the development plan after the scoped correction or mitigation criterion is met.
-Ordinary feature work needs no invented failure, reversal cycle or experiment
+Apply the shared laws at every development level; standalone substantive research
+or calculation can load `agentos workflow guidance --method solution-integrity`
+without project registration. Ordinary feature work needs no invented failure, reversal cycle or experiment
 journal. These are the canonical methods, not another Atlas workflow. Missing or
 unreadable content is a context gap; a path/hash/ACK alone is not pickup.
 An existing WM-UI matrix uses [upstream-adapter.md](references/upstream-adapter.md):

@@ -5,15 +5,15 @@ description: "Build a connected modular stage at the selected development level,
 
 # agentos-implementation-control
 
-Use **Project development** from `agentos workflow guidance`, reusing the current
-body from entry. Build the connected result of the current level before recursively
+Use **Solution integrity** and **Project development** from `agentos workflow
+guidance`, reusing the current body from entry. Build the connected result of the current level before recursively
 refining a selected part. Preserve the owner's scoped development level (default
 3 of 5), explicit stubs, module boundaries and diagnostic/error-log requirements.
 The canonical PROCESS defines the level scale and sufficient stage checks.
 
 For a concrete malfunction needing causal investigation, read **Causal debugging**
 from `agentos workflow guidance --method causal-debugging`, or
-read the exact section in `resources/docs/PROCESS.md` if the CLI is unavailable
+read **Solution integrity** and the selected method in `resources/docs/PROCESS.md` if the CLI is unavailable
 (locate installed resources with `agentos resources`). Continue the existing
 journal and evidence; return to the development plan after sufficient repair or
 an explicitly scoped mitigation. Ordinary features need no artificial failure.

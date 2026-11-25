@@ -8,7 +8,8 @@ of absent Atlas. Do not search unrelated roots.
 
 On start and resume, run the effect-free `agentos workflow guidance` and read its
 default **Project development** body, or reuse that same current body already
-materialized by entry. If the CLI is unavailable, read that section of AgentOS
+materialized by entry. If the CLI is unavailable, read **Solution integrity**
+and that method section of AgentOS
 `docs/PROCESS.md` (installed `resources/docs/PROCESS.md`, located with
 `agentos resources`). Plan the whole current level, then build or reuse the
 common runnable stand with module boundaries, connected parts and its main

@@ -31,8 +31,8 @@
     "base_wheel_sha256": "36a6e53906f8de057b1c8f0014b555257857455d45158d85d87a1883a75ed0e8",
     "current_selected_packaged_files": {
       "agent_os/resources/skills/atlas/SKILL.md": {
-        "bytes": 16357,
-        "sha256": "43eda62933c49bbda359f3dd8c1221f173f9d30cc5d2d0e4aa3d1acb905664df"
+        "bytes": 19584,
+        "sha256": "8ca83018550fabab11f12ce2291a08edb00c3ed2b2e37bedf01f9fbcf6db3173"
       },
       "agent_os/resources/skills/atlas/agents/openai.yaml": {
         "bytes": 232,
@@ -79,8 +79,8 @@
         "sha256": "aa83df72b3a5f86a3a537d0f9b038a0ff1520851f6fef02c2fc9aedafbbe535b"
       },
       "agent_os/resources/skills/atlas/references/modularity.md": {
-        "bytes": 9613,
-        "sha256": "de79c3c7c54c8b180bd8b380de5e480f113c2ac30a171eee4570c541f0620b7d"
+        "bytes": 10910,
+        "sha256": "3e6a8e9bf06d87c323381f95727f57840bb5e7f4c465e87a6f8846f65ea9f6d3"
       },
       "agent_os/resources/skills/atlas/references/operations.md": {
         "bytes": 10590,
@@ -91,16 +91,16 @@
         "sha256": "b2549510f35da38caface852cdc46947e5d32dfe6a10c9074b4f280b77e21bed"
       },
       "agent_os/resources/skills/atlas/references/quickstart.md": {
-        "bytes": 7051,
-        "sha256": "78d4598f685fdf4326f3420456a9ac539496b16b89c4832cc4030094d3643122"
+        "bytes": 8650,
+        "sha256": "9cb1b9fead8575ce7928983ad574209aff6aaa0d93b2ce46b048d8451ba552e2"
       },
       "agent_os/resources/skills/atlas/references/upstream-adapter.md": {
         "bytes": 19230,
         "sha256": "2404380cb733e3a76d983a8447955c48012b2acd09b1e6231019dd3368ee5018"
       },
       "agent_os/resources/skills/atlas/references/workflow.md": {
-        "bytes": 11623,
-        "sha256": "2c5da714fe41e4e05ea0244e99b72a1425c4822d483b15e0b1f2e4a813e8bca5"
+        "bytes": 13646,
+        "sha256": "fad46a2920b264fe0893d96ef3bc0977cfdae901546830e0039d972419dab069"
       },
       "agent_os/resources/skills/atlas/references/workspace.md": {
         "bytes": 16610,
@@ -369,8 +369,8 @@
     },
     {
       "path": "skills/atlas/SKILL.md",
-      "bytes": 18065,
-      "sha256": "7e1a63fdd5b7fdb6ab7ae0bc2bf2ccba0928a20d08ff67aff9dbdb2e94f2dcff",
+      "bytes": 19584,
+      "sha256": "8ca83018550fabab11f12ce2291a08edb00c3ed2b2e37bedf01f9fbcf6db3173",
       "source_bytes": 14379,
       "source_sha256": "c5c841e5cdfbd55edad3835840e9c5ce4e36f0cf733855896813040983ca18cf"
     },
@@ -453,15 +453,15 @@
     },
     {
       "path": "skills/atlas/references/modularity.md",
-      "bytes": 9613,
-      "sha256": "de79c3c7c54c8b180bd8b380de5e480f113c2ac30a171eee4570c541f0620b7d",
+      "bytes": 10910,
+      "sha256": "3e6a8e9bf06d87c323381f95727f57840bb5e7f4c465e87a6f8846f65ea9f6d3",
       "source_bytes": 14720,
       "source_sha256": "182fe4c346afd45230e87bd40da616564a1afe90f9f16b097a64f0b8a843c465"
     },
     {
       "path": "skills/atlas/references/operating-modes.md",
-      "bytes": 5700,
-      "sha256": "6417cdb6e9f4b2372bb86029dfa86b0557a3079aa918039e7ad5422c99b70ba5",
+      "bytes": 7332,
+      "sha256": "b63ca6fe7bb86956447668b091f9e0130d5cb4b6c5ec4ea17899e07974a795d6",
       "source_bytes": 5700,
       "source_sha256": "6417cdb6e9f4b2372bb86029dfa86b0557a3079aa918039e7ad5422c99b70ba5"
     },
@@ -481,8 +481,8 @@
     },
     {
       "path": "skills/atlas/references/quickstart.md",
-      "bytes": 7653,
-      "sha256": "9cebbca45ef7b4e7a8ca5156eb14b63d630a6556e3b938c0737b67911da8ca30",
+      "bytes": 8650,
+      "sha256": "9cb1b9fead8575ce7928983ad574209aff6aaa0d93b2ce46b048d8451ba552e2",
       "source_bytes": 4664,
       "source_sha256": "af49ed8d6557354be39aecfdeec4f65fcec67061eb273e667d5e7d4514a158ad"
     },
@@ -509,8 +509,8 @@
     },
     {
       "path": "skills/atlas/references/workflow.md",
-      "bytes": 12158,
-      "sha256": "86efd4d1ae885182eb60b46786b32c88a4e49720cde774134a88974e86c57dca",
+      "bytes": 13646,
+      "sha256": "fad46a2920b264fe0893d96ef3bc0977cfdae901546830e0039d972419dab069",
       "source_bytes": 15495,
       "source_sha256": "302b4d770a8ea305b62cafbf39a2254a8452e1a7bfb78a93e2d253ee05b4902a"
     },
@@ -979,7 +979,7 @@
   },
   "schema": "agent-os.atlas-source/v1",
   "selected_file_count": 74,
-  "selected_tree_sha256": "e1887b6bd01c54c50c98dd9adf1735f0dbbb7adc8db8faef13dc0580d6753eff",
+  "selected_tree_sha256": "db6a7ee72299f7953437fe685b93afa93804d5cbdadb06f0eddfda205c0c0775",
   "source_commit_reported": "1b7cd88",
   "source_file_count": 64,
   "source_tree_sha256": "15b36a79f1133be8cb790d61f0dff6562262196b0eb8c3ea15c41a9700dd6bab",
@@ -1108,5 +1108,17 @@
     "scope": "Clarify the existing canonical causal method and qualify journal continuation; unchanged Atlas entry/continuation routes materialize the updated method.",
     "historical_source_pins": "PRESERVED",
     "runtime_behavior": "REQUIRES_SEPARATE_OBSERVATION"
+  },
+  "solution_integrity_increment": {
+    "version": "0.8.0rc2064",
+    "previous_selected_tree_sha256": "e1887b6bd01c54c50c98dd9adf1735f0dbbb7adc8db8faef13dc0580d6753eff",
+    "scope": "Load the shared Solution integrity section with development/diagnostic guidance and standalone research. Reconcile current selected pins, including prior unchanged modularity and operating-mode sources; historical source provenance is retained. Live adoption needs separate evidence.",
+    "updated_selected_pins": [
+      "skills/atlas/SKILL.md",
+      "skills/atlas/references/modularity.md",
+      "skills/atlas/references/operating-modes.md",
+      "skills/atlas/references/quickstart.md",
+      "skills/atlas/references/workflow.md"
+    ]
   }
 }

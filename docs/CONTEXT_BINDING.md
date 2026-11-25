@@ -89,14 +89,17 @@ materializing engineering context. Legacy source-free goals with no such choice
 retain default level 3 with scope `task`. Invalid choices are never defaulted.
 
 For `project-change` and `continuation`, the capsule also materializes
-`foundation_guidance`: the actual bounded **Project development** section of the
-selected `PROCESS.md`, its document/section hashes, package version and effective
+`foundation_guidance`: the actual bounded **Solution integrity** laws followed by
+**Project development** from the selected `PROCESS.md`, their ordered section
+identities and hashes, combined content hash, package version and effective
 `development` selection. The capsule repeats that selection beside the goal;
 its hash binds both selection and method content. This has no user-home dependency.
-The section remains the single normative source, not a second method copy.
+The sections remain the single normative source, not another method copy.
 For a concrete malfunction, explicitly load `workflow guidance --method
 causal-debugging` and restore its existing experiment journal. Ordinary feature
-work requires no artificial failure. Direct read-only fast paths remain independent.
+work requires no artificial failure. Standalone research/calculations may read
+`workflow guidance --method solution-integrity` without creating a task or
+requiring a project context. Direct read-only fast paths remain independent.
 The complete capsule, including guidance, must fit the existing 64 KiB bound;
 oversize output is refused, never silently truncated. A guidance change invalidates
 an old capsule receipt. Delivery and byte binding still leave behavior unproven.

@@ -4,6 +4,16 @@ Current source candidate: `0.8.0rc2056` (not publication or host adoption). RC-l
 
 ## Causal-debugging increment
 
+For the shared Solution integrity laws, check actual common-plus-method delivery
+and standalone lookup, all selected levels, continuation binding, malformed or
+overlapping section refusal, unchanged direct reads and installed resource parity.
+Use a few relevant fresh task exercises to review the reasoning actually produced,
+such as a wrong expectation, a transformed value, an explicitly unfinished stage
+or information unavailable at decision time. Do not reveal reviewer conclusions
+in the task. Scope findings to those exercises; text delivery does not prove
+adoption by existing workers or correctness in every future task. This common
+increment does not require every diagnostic exercise below for every change.
+
 The normative method lives only in PROCESS.md. Check actual source and installed
 `workflow guidance`, engineering route/context delivery, content/digest binding,
 stale receipt rejection, ordinary-read independence and managed integration.

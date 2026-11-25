@@ -182,6 +182,120 @@ Choose protection by the actual effect and affected state under
 [Proportionate protection](#proportionate-protection-of-data-and-runtime).
 Rollback means a sufficient recovery route, not an automatic full copy.
 
+<!-- agentos:solution-integrity:start -->
+
+## Solution integrity
+
+**A solution is a justified change that removes the established cause of a
+discrepancy, preserves the meaning of the original task, and withstands a relevant
+check. A desired output alone proves none of these.**
+
+Apply this standard to development, research, calculations and diagnosis at every
+development level **1–5**. A level changes implementation detail and verification
+breadth, never the integrity of the task, evidence or conclusion. For new work
+without an observed malfunction, justify the intended result and the meaningful
+input-to-output chain; do not invent a failure or a cause to satisfy this rule.
+An explicit stub, scoped stage, hypothesis or mitigation can be useful progress
+without being a proven correction or a completed product.
+
+### Twelve working laws
+
+1. **Preserve the task.** Keep the agreed inputs, conditions, constraints and
+   success criterion. Do not silently remove difficult cases, costs or required
+   behavior to obtain a desired answer. A changed premise or criterion is an
+   explicitly identified separate experiment; it does not solve the original one.
+
+2. **Justify the expectation.** Establish why the expected result should hold:
+   units, semantics, order of operations, timing, rounding and relevant contract.
+   The expectation itself may be wrong. Explain a necessary correction to it
+   using evidence instead of silently changing either the task or the output.
+
+3. **Trace the result.** Retain the material chain **source → input →
+   transformation → output**, including relevant versions, imported functions,
+   effective configuration, timestamps and units. Inspect the actual values at
+   the suspect boundary; do not insert an output adjustment merely to hide an
+   unexplained discrepancy. A contractually justified conversion remains valid.
+
+4. **Find the first divergence.** Locate the last correct state and first
+   incorrect state, then investigate the boundary between them. Follow upstream
+   dependencies when evidence moves the divergence there. Observed divergence
+   determines useful depth; inspecting every lower layer by default does not.
+
+5. **Make causes testable.** State what a proposed cause predicts when present,
+   removed or changed, and what competing explanations predict. Revise a
+   hypothesis when observation contradicts it. A plausible story, temporal
+   association or one successful retry does not establish the mechanism.
+
+6. **Use an independent reference.** Check the critical result by a method that
+   does not reproduce the same suspected error: a small hand calculation, a
+   separately justified invariant, an independent implementation or a qualified
+   reference. Do not calculate the expected test answer with the function under
+   test. Synthetic input is useful when its expected behavior and basis are known.
+
+7. **Make experiments distinguishable.** Retain an adequate baseline and make
+   changes whose effects can be distinguished. Reuse versioned source, input
+   identities and necessary evidence; this does not require a full backup.
+   Isolate hypotheses when possible. Several interacting changes may be required;
+   explain and check their relationship rather than hiding a bundle of changes.
+
+8. **Correct the mechanism.** Change the mechanism that produced the discrepancy.
+   Name temporary symptom relief as mitigation and retain any unresolved cause.
+   The cause determines the needed scope: one line or several component contracts.
+   Restored availability alone does not prove that the original cause was fixed.
+
+9. **Respect information timing.** Justify a decision only with information
+   available at that decision time. Preserve data vintages and the time a value
+   or event became known/confirmed. Later outcomes may evaluate a decision; they
+   cannot retroactively justify it. Do not replace original inputs with corrected
+   later data without identifying the new experiment.
+
+10. **Preserve state and history.** Interpret an event in its actual state and
+    preceding transitions. A renamed object, new identifier, session or retry
+    does not erase earlier actions, partial effects or a failed premise. Reuse
+    the real continuation context and reconcile uncertain operations through
+    their existing identity; do not treat them as an untouched first attempt.
+
+11. **Try to disprove the result.** Choose a relevant case that could show the
+    proposed rule or correction to be wrong or harmful. Check meaningful
+    alternatives and tradeoffs, including a beneficial behavior it might remove.
+    A check capable only of confirming the preferred answer is insufficient.
+
+12. **Match the claim to the evidence.** Distinguish observation, hypothesis,
+    established mechanism, result on a checked sample, and untested generalization.
+    Related observations are not automatically independent confirmations. A
+    successful launch does not prove a calculation; one correct example does not
+    establish general reliability. Include material untested conditions.
+
+### Sufficient explanation and proportionate work
+
+Before claiming that a discrepancy is corrected, be able to explain where it
+first appears and the evidence, the mechanism, why the change affects it, which
+check could refute the explanation and what it showed, and which material
+conditions remain untested. Use the smallest discriminating check sufficient for
+the scoped claim. Mathematical or contract evidence can supply an independent
+reference; an operational reversal cycle is not required for every calculation,
+new feature or observation. A market price sequence can establish a checked
+predictive association without proving all causes of the price movement.
+
+At level 1, retain the complete short structure plan, connected modular stand,
+explicit stubs, useful boundary debug and accessible error journal. A small
+independent example and a relevant counterexample may suffice for a new
+connection. Keep unverified internals and conclusions explicit and continue
+independent authorized assembly; do not turn each helper edit into deep
+acceptance. Levels 2–5 increase the selected coverage and detail, not permission
+to substitute premises or overstate evidence. Preserve the selected level on
+continuation and deepen only the relevant module or microprocess.
+
+Keep material reasoning and evidence in the existing plan, code, check or journal;
+reuse unchanged evidence. These laws add no per-command form, status registry,
+fixed test/time quota, universal backup or full-report requirement. Use existing
+checkpoints for sufficient outcomes and residual work, then continue. Preserve
+Auth/ACL, data protection, external authority, UNKNOWN reconciliation and the
+distinctions between synthetic, candidate, installed and target-verified results.
+Reading these laws grants no authority and does not prove their application.
+
+<!-- agentos:solution-integrity:end -->
+
 <!-- agentos:project-development:start -->
 
 ## Project development
@@ -191,7 +305,10 @@ understandable plans and working increments. It applies to ordinary development,
 features and policy work. The canonical text is this marked section of
 `docs/PROCESS.md`; read its current body through `agentos workflow guidance`,
 or directly from the selected source or installed resource when the CLI is
-unavailable. Continue the existing project and writer, using the current plan.
+unavailable. Apply the shared [Solution integrity](#solution-integrity) laws at
+every level; guidance includes their current body before this method. When
+reading the document directly, read both sections. Continue the existing project
+and writer, using the current plan.
 
 ### Development level: 1–5, default 3
 
@@ -430,7 +547,9 @@ The canonical text is this section of `docs/PROCESS.md`, mirrored byte-for-byte
 in installed `resources/docs/PROCESS.md` (located with `agentos resources`).
 Read the actual bounded section returned by the effect-free
 `agentos workflow guidance --method causal-debugging`; if the CLI is unavailable,
-read this exact section from the selected source or installed resource.
+read this exact section and shared [Solution integrity](#solution-integrity) from
+the selected source or installed resource. Guidance includes the shared laws
+before this method; their integrity requirements apply at every development level.
 Entry/context output that already
 materializes the same current body may be reused. A link, hash or receipt for
 instruction delivery alone does not prove agent behavior. Ordinary feature work

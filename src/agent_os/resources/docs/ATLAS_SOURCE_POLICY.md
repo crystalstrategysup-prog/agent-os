@@ -6,6 +6,10 @@ The move gives no new authority and never bypasses protected effects.
 
 ## Current development method
 
+Apply the shared [Solution integrity](PROCESS.md#solution-integrity) laws to all
+development levels and substantive research/calculations. Method output includes
+that actual body; direct document readers consume it with the selected method.
+
 Apply [Project development](PROCESS.md#project-development) to ordinary changes:
 plan the complete current level, assemble the connected modular working stand,
 then refine selected parts recursively. Relevant documentation and readiness

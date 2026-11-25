@@ -162,14 +162,14 @@ criteria, and owner.
 
 At start/resume, read the actual body from `agentos workflow guidance`, reusing
 the same current body if already returned by entry. If the CLI is unavailable,
-read **Project development** in AgentOS `docs/PROCESS.md`, also shipped as
+read **Solution integrity** and **Project development** in AgentOS `docs/PROCESS.md`, also shipped as
 `resources/docs/PROCESS.md`. This is the default method. Match checks to the
 declared stage, applicable development level and concrete risk. Stop after its
 criteria and required checks pass, then continue the plan; routine development
 does not require an experiment journal or exhaustive audit of each function.
 
 For a specific malfunction needing causal investigation, select
-`agentos workflow guidance --method causal-debugging` or read **Causal debugging**
+`agentos workflow guidance --method causal-debugging` or read **Solution integrity** and **Causal debugging**
 in the same PROCESS document. Link the existing experiment journal in the work
 packet. Carry its scoped findings, fixed
 conditions, current configuration and next experiment into the existing

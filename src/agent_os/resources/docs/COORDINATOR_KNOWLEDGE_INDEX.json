@@ -12,7 +12,7 @@
     {
       "id": "process",
       "path": "PROCESS.md",
-      "sha256": "9608655960f028ecf09a8c3fafe3288d2644d501dcedbd17ebac12f06fe42f9d",
+      "sha256": "e6961665e72cc45c484e597e48af1bc95d53e20466a002771633e1c09bd45326",
       "status": "SOURCE_CONTRACT"
     },
     {
@@ -36,7 +36,7 @@
     {
       "id": "quality",
       "path": "QUALITY.md",
-      "sha256": "8ccbc5a108f1c9c8139c70645fa8cfe9489f0a974b2abfc907fd4de1d1ba3e85",
+      "sha256": "d71b5fcdac6f9cc303b3f90b4858a420859b439a7b291561fcf80127326eff78",
       "status": "SOURCE_CONTRACT"
     },
     {
@@ -66,7 +66,7 @@
     {
       "id": "context_binding",
       "path": "CONTEXT_BINDING.md",
-      "sha256": "cc4e029fbd8846ca3285fe74de99469f5b66f5fbbcf7c3437c88972264b24f42",
+      "sha256": "80c176bf20416df34ff2be362986e2ca624caad2327a2e0b2d23910483dad286",
       "status": "SOURCE_CONTRACT"
     },
     {
@@ -84,5 +84,6 @@
   "role_title": "Main coordinator",
   "schema": "agentos.coordinator-knowledge-index/v1",
   "status": "PUBLIC_RELEASE_CANDIDATE_NOT_ADOPTED",
-  "causal_followup_increment": "0.8.0rc2056: current PROCESS and QUALITY pins for finite resource-chain and journal-continuation qualification; historical core/version pins and separate behavior evidence are preserved."
+  "causal_followup_increment": "0.8.0rc2056: current PROCESS and QUALITY pins for finite resource-chain and journal-continuation qualification; historical core/version pins and separate behavior evidence are preserved.",
+  "solution_integrity_increment": "0.8.0rc2064: shared laws for development, diagnosis and standalone research; current affected document pins only, with historical provenance and separate behavior evidence preserved."
 }
