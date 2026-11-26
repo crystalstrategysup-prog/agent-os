@@ -1,0 +1,393 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/crystalstrategysup-prog/agent-os/schemas/project-resource-observation-request-v1.schema.json",
+  "title": "Private request for effect-free resource observation",
+  "description": "At most256 KiB UTF-8 JSON; duplicate keys and nonfinite values are refused. IDs must be unique in their respective lists, and all admitted_root_id references must name a selected root. Capacity has at most one row per root. Descriptor claims do not establish ownership, process termination, reservation or cleanup authority. Paths stay private; output carries IDs and safe metadata only. The implementation additionally checks UTF-8 byte and filesystem component constraints.",
+  "x-effects": "NONE",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "project_id",
+    "task_id",
+    "run_id",
+    "operation_id",
+    "roots",
+    "resources",
+    "capacity"
+  ],
+  "properties": {
+    "schema": {
+      "const": "agentos.resource-observation-request/v1"
+    },
+    "project_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "task_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "run_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "operation_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "roots": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "admitted_root_id",
+          "path"
+        ],
+        "properties": {
+          "admitted_root_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096,
+            "pattern": "^/",
+            "description": "Private absolute host path; at most4096 UTF-8 bytes. No backslash, NUL, empty/dot/traversal components. Only exact metadata is observed."
+          }
+        }
+      }
+    },
+    "resources": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resource_id",
+          "admitted_root_id",
+          "relative_name",
+          "class",
+          "owner_id",
+          "origin",
+          "reproducible",
+          "inputs_ref",
+          "process_state",
+          "dependencies",
+          "release_condition",
+          "retention"
+        ],
+        "properties": {
+          "resource_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "admitted_root_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "relative_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024,
+            "description": "Private relative name under the selected admitted root, at most1024 UTF-8 bytes; no absolute, empty/dot/traversal components, backslash or NUL."
+          },
+          "class": {
+            "enum": [
+              "reproducible-temporary",
+              "build-output",
+              "private-cache",
+              "shared-cache",
+              "test-database",
+              "temporary-backup",
+              "durable-backup",
+              "accepted-checkpoint",
+              "deliverable",
+              "journal",
+              "unknown"
+            ]
+          },
+          "owner_id": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "origin": {
+            "enum": [
+              "DECLARED_RUN",
+              "UNKNOWN"
+            ]
+          },
+          "reproducible": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "inputs_ref": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "process_state": {
+            "enum": [
+              "STOPPED",
+              "ACTIVE",
+              "UNKNOWN"
+            ]
+          },
+          "dependencies": {
+            "enum": [
+              "CLEAR",
+              "ACTIVE",
+              "UNKNOWN"
+            ]
+          },
+          "release_condition": {
+            "enum": [
+              "SATISFIED",
+              "OPEN",
+              "UNKNOWN"
+            ]
+          },
+          "retention": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "owner_id",
+                  "reason_code",
+                  "next_review"
+                ],
+                "properties": {
+                  "owner_id": {
+                    "$ref": "#/$defs/identifier"
+                  },
+                  "reason_code": {
+                    "$ref": "#/$defs/retentionReason"
+                  },
+                  "next_review": {
+                    "type": "string",
+                    "maxLength": 40,
+                    "description": "An ISO 8601 timestamp with a timezone; checked and canonicalized by the observer."
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "owner_id",
+                  "reason_code",
+                  "release_event_id"
+                ],
+                "properties": {
+                  "owner_id": {
+                    "$ref": "#/$defs/identifier"
+                  },
+                  "reason_code": {
+                    "$ref": "#/$defs/retentionReason"
+                  },
+                  "release_event_id": {
+                    "$ref": "#/$defs/identifier"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "capacity": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "admitted_root_id",
+          "remaining_peak",
+          "headroom",
+          "unconsumed_reservations",
+          "quota"
+        ],
+        "properties": {
+          "admitted_root_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "remaining_peak": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "bytes",
+              "inodes"
+            ],
+            "properties": {
+              "bytes": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 9223372036854775807
+              },
+              "inodes": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 9223372036854775807
+              }
+            }
+          },
+          "headroom": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "bytes",
+              "inodes"
+            ],
+            "properties": {
+              "bytes": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 9223372036854775807
+              },
+              "inodes": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 9223372036854775807
+              }
+            }
+          },
+          "unconsumed_reservations": {
+            "type": "array",
+            "maxItems": 128,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "reservation_id",
+                "bytes",
+                "inodes"
+              ],
+              "properties": {
+                "reservation_id": {
+                  "$ref": "#/$defs/identifier"
+                },
+                "bytes": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9223372036854775807
+                },
+                "inodes": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9223372036854775807
+                }
+              }
+            }
+          },
+          "quota": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "required",
+              "available_bytes",
+              "available_inodes"
+            ],
+            "properties": {
+              "status": {
+                "enum": [
+                  "UNKNOWN",
+                  "NOT_APPLICABLE",
+                  "DECLARED"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "available_bytes": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 9223372036854775807
+              },
+              "available_inodes": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 9223372036854775807
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "UNKNOWN",
+                        "NOT_APPLICABLE"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "available_bytes": {
+                      "type": "null"
+                    },
+                    "available_inodes": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$",
+      "maxLength": 80
+    },
+    "retentionReason": {
+      "enum": [
+        "ROLLBACK_WINDOW",
+        "ACCEPTED_HISTORY",
+        "UNIQUE_DATA",
+        "LIVE_CONSUMER",
+        "UNKNOWN_OPERATION",
+        "OTHER_DECLARED"
+      ]
+    }
+  }
+}

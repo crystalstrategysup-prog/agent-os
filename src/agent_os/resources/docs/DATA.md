@@ -63,6 +63,13 @@ transaction. Config migration backs up and reads back, preserving unknown keys.
 Unsupported future schemas block; implicit downgrade is not allowed. Never
 import secrets or live state from an archive.
 
+For workspace data, use the single [workspace hygiene contract](WORKSPACE_HYGIENE.md).
+Record the owner, class, capacity and final disposition of each owned run root
+in the existing work journal. Reproducible run data and required rollback or
+reconciliation evidence have different lifetimes. An old or apparently temporary
+name does not authorize deletion. Private path mappings stay on the host; portable
+plans carry opaque IDs and safe reason codes.
+
 There is no automatic deletion of evidence, backups, or history. Retention must
 follow the user's content and project requirements; this document invents no
 legal period. Deletion needs separate scope and authority, verified export

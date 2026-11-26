@@ -369,8 +369,8 @@
     },
     {
       "path": "skills/atlas/SKILL.md",
-      "bytes": 20372,
-      "sha256": "62119fa3fe8ed37f0741e74de3c86a2ddd644f284879838093ca1a3a3cf0507e",
+      "bytes": 20850,
+      "sha256": "6f44a445d8484aa12abfed9c99edcbcdce51931e5695b2830eaf51eb5dc6235a",
       "source_bytes": 14379,
       "source_sha256": "c5c841e5cdfbd55edad3835840e9c5ce4e36f0cf733855896813040983ca18cf"
     },
@@ -481,8 +481,8 @@
     },
     {
       "path": "skills/atlas/references/quickstart.md",
-      "bytes": 9356,
-      "sha256": "0ec075f75f96dfd4ffbb898ceab6c764cec4be99b78017925862cd6bcea6681f",
+      "bytes": 9915,
+      "sha256": "3a13d2343c5f576d12edc071a68303d9e587a4b56313ddb43c9a507db2495a3f",
       "source_bytes": 4664,
       "source_sha256": "af49ed8d6557354be39aecfdeec4f65fcec67061eb273e667d5e7d4514a158ad"
     },
@@ -979,7 +979,7 @@
   },
   "schema": "agent-os.atlas-source/v1",
   "selected_file_count": 74,
-  "selected_tree_sha256": "c58a3402c2420126dded7fecfc4e86b16a4ac35f00f12682291ab9ffa758fefc",
+  "selected_tree_sha256": "91b1dbd370815e803e917604996042e4e8273337bad676c00d2feaa9d1375b48",
   "source_commit_reported": "1b7cd88",
   "source_file_count": 64,
   "source_tree_sha256": "15b36a79f1133be8cb790d61f0dff6562262196b0eb8c3ea15c41a9700dd6bab",
@@ -1120,5 +1120,18 @@
       "skills/atlas/references/quickstart.md",
       "skills/atlas/references/workflow.md"
     ]
+  },
+  "workspace_hygiene_increment": {
+    "version": "0.8.0rc2066",
+    "base_commit": "f0e6612d7ef271435b28ba235b96d16d84dfc16e",
+    "previous_manifest_sha256": "3d1ae6216097c1f3e8d2476904b2c766414bc99cf79fb3839528f7f3ea931185",
+    "previous_selected_tree_sha256": "c58a3402c2420126dded7fecfc4e86b16a4ac35f00f12682291ab9ffa758fefc",
+    "changed_files": [
+      "skills/atlas/SKILL.md",
+      "skills/atlas/references/quickstart.md"
+    ],
+    "scope": "Route every development level to the canonical workspace hygiene method; record capacity and owned run-resource disposition in the existing work record. Observation grants no reservation or deletion.",
+    "historical_source_pins": "PRESERVED",
+    "runtime_behavior": "REQUIRES_SEPARATE_OBSERVATION"
   }
 }

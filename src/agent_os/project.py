@@ -1518,6 +1518,7 @@ def make_parser() -> argparse.ArgumentParser:
     sub.add_parser("verify-closeout")
     sub.add_parser("status")
     sub.add_parser("diagnose", help="One-shot diagnostic level 0: start, status, finish or cancel")
+    sub.add_parser("resource", help="Observe explicit run resources and plan their disposition; no deletion")
     fin = sub.add_parser("close")
     fin.add_argument("--review", type=Path, required=True)
     diagnostic = sub.add_parser("handoff-diagnostic")
@@ -1569,6 +1570,10 @@ def make_parser() -> argparse.ArgumentParser:
 
 
 def command(argv: list[str], user_home: Path) -> tuple[dict, int]:
+    if argv and argv[0] == "resource":
+        from .project_resource_cli import command as resource_command
+
+        return resource_command(argv[1:])
     if argv and argv[0] == "diagnose":
         from .project_diagnostics import command as diagnostic_command
 

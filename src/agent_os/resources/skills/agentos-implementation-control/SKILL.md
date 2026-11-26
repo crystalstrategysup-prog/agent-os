@@ -5,6 +5,14 @@ description: "Build a connected modular stage at the selected development level,
 
 # agentos-implementation-control
 
+Use **Workspace hygiene** from `agentos workflow guidance --method workspace-hygiene`
+before heavy writes and when disposing of run data; its detailed contract is
+`resources/docs/WORKSPACE_HYGIENE.md`. Keep one existing-journal record per owned
+run root, bounded volume capacity and cleanup in normal/exception paths. After
+ENOSPC/EDQUOT, stop new heavy writes on that volume, diagnose the real constraint
+and preserve prior accepted results. An alternate `/tmp` needs its own capacity,
+quota, lifetime and memory check. Observation is not a reservation or delete grant.
+
 Use **Solution integrity** and **Project development** from `agentos workflow
 guidance`, reusing the current body from entry. Build the connected result of the current level before recursively
 refining a selected part. Preserve the owner's scoped development level (default

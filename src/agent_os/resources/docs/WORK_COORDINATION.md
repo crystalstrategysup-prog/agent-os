@@ -114,6 +114,17 @@ coordination wait and access loss remain separate, with unknown portions explici
 For delegation, retain the useful returned contribution and any measured wait
 and integration cost. Do not equate a subagent count with effective parallelism.
 
+Shared workspace capacity also constrains delegation. Follow
+[workspace hygiene](WORKSPACE_HYGIENE.md): assign an owner and bounded run root,
+account for simultaneous peaks and outstanding reservations on the same volume,
+and return each run resource's disposition with the existing result record.
+Disjoint directories do not provide independent free space. The current resource
+plan observes metadata; it does not acquire a host-wide reservation or fence a
+writer. Without such coordination, reduce concurrent heavy writes or use an
+already qualified coordinator. Cleanup of owned run resources remains due after
+a failure or refusal; unknown ownership and unresolved effects stay on HOLD.
+Do not turn each file into another report or stop unrelated authorized work.
+
 ## Architecture qualifications
 
 | Risk | Required qualification before adoption |

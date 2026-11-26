@@ -5,6 +5,14 @@ description: "Verify results and evidence, close documented work, or record an h
 
 # agentos-verification-closeout
 
+Before closing, account for owned run resources under
+`resources/docs/WORKSPACE_HYGIENE.md`: qualified removal, accepted transfer with
+readback, or retention with a reason, owner and review event/date. Use the existing
+result journal, not another document bundle. Verify stopped writers and actual
+identity before qualified cleanup; unknown ownership, recovery dependencies or
+outcomes remain on HOLD. Do not block this task on unrelated old directories.
+Metadata observation and removed names alone do not prove reclaimed capacity.
+
 Use **Project development** in `resources/docs/PROCESS.md` for the declared
 current-level stage and the owner's development level (default 3). A connected
 running scaffold with explicit stubs may complete its own stage. Select checks

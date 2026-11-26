@@ -294,7 +294,140 @@ Auth/ACL, data protection, external authority, UNKNOWN reconciliation and the
 distinctions between synthetic, candidate, installed and target-verified results.
 Reading these laws grants no authority and does not prove their application.
 
+At every level, apply [Workspace hygiene](#workspace-hygiene) before material
+resource allocation or cleanup and at the next substantive completion boundary.
+Read its current body with `workflow guidance --method workspace-hygiene`.
+Retain enough capacity for the result, own the disposition of temporary roots,
+and reuse the existing run journal without per-file forms or repeated approvals.
+
 <!-- agentos:solution-integrity:end -->
+
+<!-- agentos:workspace-hygiene:start -->
+
+## Workspace hygiene
+
+Own the space used by the authorized work through its useful lifetime. Apply
+this method to development levels **1–5** and diagnostic **0** without changing
+the saved level or scope. Before a material build, test, restore, package,
+download or cleanup, establish the relevant resource and capacity facts. Reuse
+unchanged facts and record one compact result at a substantive checkpoint,
+close or handoff. The complete class, retention and qualification contract is
+[WORKSPACE_HYGIENE.md](WORKSPACE_HYGIENE.md).
+
+### What is implemented
+
+`agentos project resource plan --input PATH|-` observes an explicit bounded
+private descriptor and returns a metadata-only plan. It does not register a
+resource, reserve capacity, release a lease, delete files or accept a stage.
+Declared ownership, reproduction or closure is not independently proved by a
+plan. Native reservation and cleanup apply/reconcile are proposed successors,
+with separate destructive-profile qualification. Existing inventory and task
+metadata budgets do not allocate filesystem capacity. A handoff retirement
+retains history and does not reclaim space.
+
+The obligations below already govern the agent's authorized work. Use an
+existing qualified cleanup routine for its own private resources when disposal
+is within the task's authority; do not ask again for each ordinary derived file.
+A new observation plan grants no deletion or host authority and does not enable
+mass cleanup of old directories.
+
+### Before and during the run
+
+Keep the existing task/run record of the resource's opaque ID, project/run and
+creating operation, owner, private admitted root, class, reproduction/recovery
+reference, consumers and release condition. One build tree or private test
+database needs one root record: its known ordinary derivatives inherit the
+class. Separate a different owner, durable evidence or recovery copy inside it.
+Keep the path mapping private on the host; ordinary output uses opaque IDs and
+safe reasons. Age, a `tmp` prefix, filename or common UID do not establish
+provenance. An unclassified existing object stays HOLD.
+
+Choose the actual filesystem and estimate its remaining peak of simultaneously
+live new writes: archive/download, expansion, PGDATA/WAL, intermediates, package,
+final copy, retained partial and any retry overlap. Do not count an existing
+input read in place as a new copy. Use a comparable measured run or a justified
+bound; distinguish estimates, configured limits, usage and measured peaks.
+Bound unknown growth by chunks with fresh checks or a qualified exclusive window
+with an enforceable limit. Do not prescribe one universal multiplier or margin.
+
+Measure available bytes and inode capacity for the current identity, applicable
+quota when known, relevant filesystem identity and other participating runs'
+unconsumed reservations. Compare the remaining peak after subtracting those
+promises and justified service headroom. Reserve room in the decision for the
+final result and emergency journal. Physical allocation reduces an unconsumed
+promise; counting both in full would count the same use twice. For a known
+required quota without an observation, use a separately verified bounded area
+or pause the dependent write. UNKNOWN is not unlimited. The read-only command
+does not make a shared reservation or fence external writers.
+
+Keep live ownership and consumer facts current. On normal exit and exception,
+finish the owned routine in `finally`. After a crash or lost reply, reconcile
+the original operation before a new attempt. Verify the exact stopped process
+using the relevant host/boot/start identity, run, locks and data root. An absent
+PID file or expired lease requires reconciliation; neither proves termination.
+
+### Decide what can be released
+
+- Release scratch, staging, build output or a private cache only within its
+  proven ownership, after required output is retained/read back and reproduction
+  inputs remain available. Shared caches belong to their manager and consumers.
+- A disposable database additionally needs actual isolation, reproducible
+  seed/migrations, stopped owner and consumers, and retained diagnostic evidence.
+  Unique changes or uncertain process state stay HOLD.
+- A temporary recovery copy needs a closed rollback window, no active
+  backup/restore dependency and a verified usable replacement or exact recovery
+  route. Check from the restoration location, including dependencies and access;
+  replacing the only critical copy requires a restoration check.
+- Retain authoritative results, receipts, journals, accepted checkpoints,
+  durable backups and necessary PREPARED/UNKNOWN evidence under their own policy.
+  A separate packaging copy can be removed after destination content is verified.
+  No automatic age expiry or bulk historical cleanup follows from this method.
+
+### Complete or hand over cleanup
+
+Use the selected run's plan to see each resource ID, class/owner, estimate,
+release or HOLD reason, and next action. Resolve the listed dependency through
+its owner; close the owned consumer, preserve the useful result and record the
+release condition. Then use only a qualified already-authorized routine with
+durable intent/outcome outside the removable tree and fresh identity checks.
+Keep a single cleaner in an exclusively controlled private scope. Do not follow
+symlinks, cross unexpected mounts, infer mount identity from device number alone,
+or treat another object at the same name as the former resource. A hardlink,
+unexpected independent object, uncontrolled writer or unsupported adapter gives
+HOLD in the initial profile. Repeated `lstat` alone cannot exclude substitution.
+
+Read back the original object and any retained/transferred result. Lost output
+requires the same operation ID and actual-state reconciliation, not another
+delete against the current name. Record released, accepted transfer, or retention
+with reason, responsible actor and next review date/event in the existing run
+journal. A due date requests review rather than authorizing removal. A transfer
+of HOLD retains responsibility and does not free bytes. Unrelated historical
+material does not block the current stage. These are procedural obligations;
+this release adds no native close gate or per-file report requirement.
+
+Keep removed names, known allocated blocks and observed available-space delta
+separate. Competing writes can make the volume delta zero or negative; an open
+deleted file may keep its blocks. Retain timestamps and filesystem/quota scope.
+Report uncertain reclaimed bytes as UNKNOWN, even after name removal is verified.
+
+### Handle insufficient space without losing the result
+
+On negative admission, ENOSPC or EDQUOT, stop new heavy writes to that filesystem.
+Observe bytes, inode, quota and the selected owned temporary resources; check
+open-deleted files when observable. Keep an unmeasured accumulation cause unknown.
+Check a candidate alternate volume's capacity, quota, rights and lifetime, plus
+memory headroom for memory-backed storage. Recheck both staging and the final
+destination; their free space is separate.
+
+Preserve the previous accepted result. Write its replacement through an exclusive
+sibling partial, bounded writes, size/hash readback, file fsync, atomic replacement
+on that filesystem and directory fsync under the publisher's qualified semantics.
+Keep a failed write visibly partial and rebuild only reproducible outputs.
+If the required durable journal cannot be written, pause new deletion until its
+storage is reliable. Retain useful progress and an owned next action; do not
+create another full archive or repeat unchanged work to finish a cleanup note.
+
+<!-- agentos:workspace-hygiene:end -->
 
 <!-- agentos:project-diagnostics:start -->
 
@@ -306,6 +439,10 @@ an explicit inventory and gap assessment, and a justified next step. Ask: what
 result are we pursuing, what actually exists, do the parts fit, does the work
 serve that result, and what should happen next? Apply **Solution integrity**;
 guidance prepends that same canonical body to this method.
+
+Include resource ownership, capacity and retention gaps in the current dossier
+where relevant; use [Workspace hygiene](#workspace-hygiene) for material audit
+outputs and their disposition, without scanning unrelated historical roots.
 
 ### Enter, preserve and return
 
@@ -441,6 +578,8 @@ every level; guidance includes their current body before this method. When
 reading the document directly, read both sections. Continue the existing project
 and writer, using the current plan.
 
+For material allocations and completion, use [Workspace hygiene](#workspace-hygiene).
+
 Before substantial work with material uncertainty about the project's state,
 direction or dependencies, use **Project diagnostics** through
 `agentos workflow guidance --method project-diagnostics`: temporary level 0
@@ -555,6 +694,10 @@ depth, not the value of data or a default backup requirement. Existing target
 authority, ownership, mandatory narrow transactional journals and UNKNOWN
 reconciliation remain in force. This rule does not authorize deleting retained
 backups, evidence or history.
+
+For capacity, temporary-copy release conditions and owned cleanup, apply
+[Workspace hygiene](#workspace-hygiene) and its single
+[resource contract](WORKSPACE_HYGIENE.md); retain decisions in the existing run.
 
 ### Working cycle
 
@@ -696,6 +839,10 @@ Entry/context output that already
 materializes the same current body may be reused. A link, hash or receipt for
 instruction delivery alone does not prove agent behavior. Ordinary feature work
 without a malfunction does not require an invented failure or reversal cycle.
+
+Use [Workspace hygiene](#workspace-hygiene) for diagnostic fixtures, capacity
+observations and cleanup. A full filesystem can explain a write failure while
+the accumulation cause remains unmeasured; preserve that distinction.
 
 ### Define and reproduce the failure
 

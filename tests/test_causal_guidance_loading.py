@@ -95,7 +95,7 @@ def test_explicit_causal_guidance_cli_returns_selected_canonical_bytes(tmp_path)
     assert_actual(observed, guidance.PROCESS_PATH.read_bytes(), "causal-debugging")
 
 
-@pytest.mark.parametrize("method", ["project-development", "causal-debugging", "solution-integrity", "project-diagnostics"])
+@pytest.mark.parametrize("method", ["project-development", "causal-debugging", "solution-integrity", "project-diagnostics", "workspace-hygiene"])
 @pytest.mark.parametrize("level", [1, 2, 3, 4, 5])
 def test_every_level_receives_shared_laws_without_changing_selection_or_claims(method, level):
     selected = {"level": level, "scope": "module:synthetic-connection"}

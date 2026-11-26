@@ -16,7 +16,9 @@ PROCESS_PATH = Path(__file__).parent / "resources" / "docs" / "PROCESS.md"
 DEFAULT_METHOD = "project-development"
 COMMON_METHOD = "solution-integrity"
 DIAGNOSTIC_METHOD = "project-diagnostics"
-METHODS = (DEFAULT_METHOD, "causal-debugging", COMMON_METHOD, DIAGNOSTIC_METHOD)
+HYGIENE_METHOD = "workspace-hygiene"
+METHODS = (DEFAULT_METHOD, "causal-debugging", COMMON_METHOD, DIAGNOSTIC_METHOD,
+           HYGIENE_METHOD)
 START = "<!-- agentos:project-development:start -->"
 END = "<!-- agentos:project-development:end -->"
 MAX_DOCUMENT_BYTES = 128 * 1024

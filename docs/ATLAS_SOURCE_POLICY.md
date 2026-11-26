@@ -28,6 +28,11 @@ current-state, findings and next action are recorded; a newer explicit owner
 choice prevails. Read-only diagnosis needs no project intake. Update existing
 owning documents within the authorized scope, preserving gaps and prior results;
 diagnosis completion is neither product acceptance nor authority.
+Apply [Workspace hygiene](WORKSPACE_HYGIENE.md) at every level, including this
+repository's tests and release builds: budget and own run resources before heavy
+writes, then remove qualified reproducible data, transfer it with verified
+readback, or retain it with an owner and release condition in the existing log.
+The observation-only resource plan grants neither deletion nor reservation.
 The original controls below retain their scope and authority requirements.
 
 ## Original policy, verbatim

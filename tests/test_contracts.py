@@ -18,6 +18,28 @@ from agent_os.mcp_server import MCP_CONTRACT, response
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_resource_observation_contract_is_packaged_and_matches_a_real_request(tmp_path):
+    from agent_os.project_resources import observe_plan
+
+    name = "project-resource-observation-request-v1.schema.json"
+    raw = (ROOT / "schemas" / name).read_bytes()
+    assert raw == (ROOT / "src/agent_os/resources/contracts" / name).read_bytes()
+    schema = json.loads(raw)
+    Draft202012Validator.check_schema(schema)
+    payload = {"schema": "agentos.resource-observation-request/v1",
+               "project_id": "synthetic-project", "task_id": "synthetic-task",
+               "run_id": "synthetic-run", "operation_id": "synthetic-observation",
+               "roots": [{"admitted_root_id": "synthetic-root", "path": str(tmp_path)}],
+               "resources": [], "capacity": []}
+    Draft202012Validator(schema).validate(payload)
+    result = observe_plan(payload)
+    assert result["status"] == "OBSERVATION_ONLY"
+    assert result["effects"] == "NONE" and not result["admission_granted"]
+    assert not result["physical_cleanup_supported"]
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate({**payload, "delete": True})
+
+
 def test_release_and_mcp_versions_have_one_identity():
     package_version = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"][
         "version"

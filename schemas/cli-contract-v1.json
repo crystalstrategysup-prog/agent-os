@@ -372,9 +372,10 @@
         "project-development",
         "causal-debugging",
         "solution-integrity",
-        "project-diagnostics"
+        "project-diagnostics",
+        "workspace-hygiene"
       ],
-      "guidance_contract": "Read-only common Solution integrity followed by the selected method; standalone solution-integrity needs no intake. Ordered sections identify exact UTF-8 content, and the aggregate content hash covers every returned section. Development selection, authority and behavior-compliance limits are unchanged. Project diagnostics is temporary level 0; development retains the saved 1–5 return choice. execution.lifecycle=GUIDANCE_ONLY does not start a diagnostic run."
+      "guidance_contract": "Read-only common Solution integrity followed by the selected method; standalone solution-integrity needs no intake. Ordered sections identify exact UTF-8 content, and the aggregate content hash covers every returned section. Development selection, authority and behavior-compliance limits are unchanged. Project diagnostics is temporary level 0; development retains the saved 1–5 return choice. execution.lifecycle=GUIDANCE_ONLY does not start a diagnostic run. Workspace hygiene applies at every saved level and temporary diagnostic 0; it supplies no native reservation or deletion capability."
     },
     {
       "effect": "read_only",
@@ -958,14 +959,26 @@
         "--expected-revision",
         "--result"
       ]
+    },
+    {
+      "name": "project resource plan",
+      "effect": "read_only",
+      "status_values": [
+        "OBSERVATION_ONLY",
+        "BLOCKED"
+      ],
+      "write_surfaces": [],
+      "input": "--input PATH|-; bounded private agentos.resource-observation-request/v1 descriptor, schema schemas/project-resource-observation-request-v1.schema.json",
+      "output": "agentos.resource-observation-plan/v1; explicit metadata only, no private path mapping or resource contents",
+      "capability_contract": "No owner-home discovery, task mutation, registration, reservation, lease release, deletion, READY or authority. HOLD/RETAINED/CANDIDATE_FOR_QUALIFICATION are observational dispositions, not delete permission. Arithmetic FITS_REPORTED_VALUES is not admission. Native hooks stay disabled."
     }
   ],
-  "distribution_version": "0.8.0rc2065",
+  "distribution_version": "0.8.0rc2066",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.8.0rc2065",
+  "release": "0.8.0rc2066",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",

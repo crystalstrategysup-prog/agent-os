@@ -5,6 +5,14 @@ description: "Enter a new or existing project task before making product changes
 
 # agentos-project-entry
 
+Before creating substantial workspace data, load **Workspace hygiene** with
+`agentos workflow guidance --method workspace-hygiene`, or its marked section in
+current PROCESS. Use `resources/docs/WORKSPACE_HYGIENE.md` for the exact contract.
+Assign a private run root, owner, class, remaining peak and release condition in
+the existing work record. Observe the actual target volume, inode and known quota
+limits, including parallel writers; a read-only resource plan reserves nothing.
+This applies at every development level without adding a per-file intake.
+
 For an assigned native-session package, preserve its original goal and exact
 delegator. Read the native return contract in `resources/docs/WORK_COORDINATION.md`.
 Bind existing human authorization for return messages before promising delivery;

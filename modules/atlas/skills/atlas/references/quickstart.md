@@ -60,6 +60,14 @@ See `integration.md` for onboarding; ordinary read-only questions need none.
 
 ## Record the work, then continue
 
+Use AgentOS **Workspace hygiene** before substantial writes and at the end of a
+run. Record the owned run root/class, remaining peak on its real volume and
+release condition in the current work journal. At completion, retain one factual
+disposition: removed by a qualified route, accepted transfer/readback, or retained
+with reason, owner and date/event. Do not delete old unknown data or treat a
+metadata plan as a reservation. The owning contract is `docs/WORKSPACE_HYGIENE.md`;
+load its method with `agentos workflow guidance --method workspace-hygiene`.
+
 `start` loads context; it does not mark work as begun. When actual project work
 begins, including research, document analysis or checks, the main writer records
 it before the long operation or wait. Use the existing leaf work ID and actor,

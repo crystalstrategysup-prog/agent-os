@@ -19,6 +19,13 @@ Continue a project from its objective and actual state. Leave the next agent a
 short, verifiable path to the result: work → owner → change → acceptance.
 Perform repeatable actions through standard procedures with explicit parameters.
 
+Apply **Workspace hygiene** at every level and both Atlas scopes. Before heavy
+writes, load `agentos workflow guidance --method workspace-hygiene`, or the marked
+section in current PROCESS and `docs/WORKSPACE_HYGIENE.md`. Keep resource owner,
+capacity and final disposition in the existing work record. A read-only
+`agentos project resource plan` observes explicit run roots; it neither reserves
+space nor authorizes deletion. No duplicate matrix or per-file report is needed.
+
 Read [quickstart.md](references/quickstart.md) for daily work,
 [modularity.md](references/modularity.md) for module/API/build/deployment boundaries,
 and [operations.md](references/operations.md) for exact methods and parameters.

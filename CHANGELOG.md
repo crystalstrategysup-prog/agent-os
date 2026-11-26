@@ -1,3 +1,27 @@
+# 0.8.0rc2066 — own workspace resources before writing and through cleanup
+
+- Make workspace hygiene a common duty at every development level, including
+  temporary diagnostic 0. Route ordinary build, test and release work through
+  one canonical contract and a bounded materialized method. Preserve the saved
+  level, existing work journal and proportionate reporting.
+- Record each owned run root's class, owner, capacity, dependencies and final
+  disposition. Distinguish reproducible temporary data from recovery evidence;
+  unknown legacy resources stay on HOLD. Account for real volume, inode, quota,
+  simultaneous peak and unconsumed reservations before heavy writes. Existing
+  causal resource-chain diagnosis and evidence-retention rules remain in force.
+- Add effect-free `project resource plan --input PATH|-` and the same typed
+  observation API. Inspect only explicit bounded metadata; report opaque IDs,
+  conservative dispositions, capacity arithmetic and UNKNOWN without exporting
+  private paths or reading resource contents. Plans grant no reservation,
+  deletion, READY, task-state change or external authority.
+- Define the staged qualification of a future durable run-resource registry,
+  reservation service and fenced physical cleanup. This release implements the
+  observation stage only; it adds no automatic deletion, native hooks or daemon.
+- Exercise bounded input, privacy, capacity sharing, inode/space shortages,
+  symlink and identity uncertainty, unsupported effects and unchanged level/host
+  authority. Published instructions and observed metadata do not establish live
+  adoption by every existing chat or prove actual reclaimed volume bytes.
+
 # 0.8.0rc2065 — diagnose the project temporarily, then resume its development mode
 
 - Add one-shot diagnostic level 0 above the unchanged saved levels 1–5. The
