@@ -1,3 +1,14 @@
+# 0.8.0rc2067 — resolve release instructions from the selected manifest
+
+- Complete the workspace-hygiene delivery introduced in rc2066 with corrected
+  installation, release and packaging instructions. Remove stale declarations
+  of a moving current RC; read version and artifact identity from source metadata
+  and the selected manifest. Installation examples use explicit manifest values.
+- Keep the published rc2066 source/tag immutable. Resource observation behavior,
+  canonical hygiene method, level selection and authority boundaries are unchanged.
+  Reuse their verified checks by unchanged scope; refresh version, package,
+  document mirrors and installation readback for this successor.
+
 # 0.8.0rc2066 — own workspace resources before writing and through cleanup
 
 - Make workspace hygiene a common duty at every development level, including

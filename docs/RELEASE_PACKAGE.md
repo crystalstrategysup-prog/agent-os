@@ -1,6 +1,9 @@
 # Public release packaging
 
-Current source candidate: `0.8.0rc2065` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Resolve the current source/package version from `pyproject.toml` and
+`src/agent_os/__init__.py`, then select `.release/VERSION.json` and the matching
+manifest. RC-labelled sections below are historical records, not current
+installation or publication claims.
 
 ## Retained 0.7.1 baseline
 

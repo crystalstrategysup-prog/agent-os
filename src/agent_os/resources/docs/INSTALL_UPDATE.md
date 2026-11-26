@@ -1,6 +1,9 @@
 # Install, update, rollback, and recovery
 
-Current source candidate: `0.8.0rc2065` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Resolve the current source/package version from `pyproject.toml` and
+`src/agent_os/__init__.py`, and the selected delivery from its release manifest.
+RC-labelled sections below are historical records, not current installation or
+publication claims.
 
 
 ## Historical: Indexed handoff successor0.7.0rc1
@@ -9,8 +12,9 @@ Candidate0.7.0rc1 introduces mandatory accepted terminal handoff for new/resumed
 
 ## Version and proof
 
-The source declares candidate `0.8.0rc2065`. Verify the published tag or release asset
-separately; a version string does not prove publication. Review the exact
+Use the exact selected manifest's version, artifact name and SHA-256; this
+procedure does not pin a moving "current" release. Verify the published tag or
+release asset separately; a version string does not prove publication. Review the exact
 source, patch, and manifest, run local checks, and read back the target runtime.
 Python 3.11+ and disjoint core and user roots are required. The commands below
 describe the procedure; only a current pointer and live readback prove it ran.
@@ -24,8 +28,8 @@ existing AgentOS installation as the new core home.
 
 ```sh
 python3 tools/install.py install \
-  --wheel /absolute/crystal_agent_os-0.8.0rc2065-py3-none-any.whl \
-  --sha256 ACTUAL_WHEEL_SHA256 --version 0.8.0rc2065 \
+  --wheel /absolute/path/to/VERIFIED_RELEASE.whl \
+  --sha256 ACTUAL_WHEEL_SHA256 --version EXACT_VERSION_FROM_MANIFEST \
   --core-home "$HOME/.local/share/agentos-foundation" \
   --user-home "$HOME/.agentos-user"
 ```
