@@ -6,43 +6,43 @@
     {
       "id": "work_coordination",
       "path": "WORK_COORDINATION.md",
-      "sha256": "afbc66f533dbd3faee53a2a7fa81ba81096119766c3ddcc1c3d52b1ae5a3a86b",
+      "sha256": "08028c71139455e46a895dfee399fcb9c1c2dc65b3064ef3e5b0e77cb91a422b",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "process",
       "path": "PROCESS.md",
-      "sha256": "b1c0ec1fe79813d981115f14e80bc98856e03bf0581ce292cd03f308ef830d30",
+      "sha256": "13bc9dcfb8dda050c1d290e94979875e3a50889e90854fb2c59209439f9ba239",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "work_continuation",
       "path": "WORK_CONTINUATION.md",
-      "sha256": "c4e1d083f4e182f1a3e52d0485c060e3931aa982b7cca32d095b6dfcc5dea113",
+      "sha256": "cb82887dca05e6e305c296af91b2325c9bec27dc1c6262beed0d5685206f5955",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "indexed_handoff",
       "path": "INDEXED_HANDOFF.md",
-      "sha256": "de140809a7c1b342defc0ee8c5bc6d41d3ad29fe4d64ff138aefd86adb9683f9",
+      "sha256": "ea11a13a1bcdc21053966e6365db74cec244d16fafeedc571962650bb1fb24e6",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "foundation_overlay",
       "path": "FOUNDATION_OVERLAY.md",
-      "sha256": "39ce90646f2013d675d31891b16cc21f8357394f5d714e3e2b2937743fedc892",
+      "sha256": "0d729d986f8b35cb644b10ab27e93e3d7eeb58789532fd70df364c0d3e48a4f1",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "quality",
       "path": "QUALITY.md",
-      "sha256": "8ccbc5a108f1c9c8139c70645fa8cfe9489f0a974b2abfc907fd4de1d1ba3e85",
+      "sha256": "14fac7a950424b0cfbc9663db0a653addad2202e21fe505cfce32409297bd2c7",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "handoff_discovery",
       "path": "HANDOFF_DISCOVERY.md",
-      "sha256": "190b6862c3a1a77325099a4af4082b75d9753204dedbf9b49337ff30fb59bd8f",
+      "sha256": "69a10f5adcabdfd5b24a746921069d09f9d58829b2a2bf426d704fd5b859079f",
       "status": "SOURCE_CONTRACT"
     },
     {
@@ -66,13 +66,25 @@
     {
       "id": "context_binding",
       "path": "CONTEXT_BINDING.md",
-      "sha256": "c2f99bc61742d0a9a986ec4e2061f98c9cdb0bc49d2e286ad6fa7df8e3d6dcbc",
+      "sha256": "c4e14cf869f86d21d3d3bcc29dc53deaae6a9f19132a2afbd079590fcf8acd3b",
       "status": "SOURCE_CONTRACT"
     },
     {
       "id": "completion",
       "path": "COMPLETION.md",
       "sha256": "0d651d6a19b27fd8118a2c8816a90714a23f223f2951e00b52b4d00de3351110",
+      "status": "SOURCE_CONTRACT"
+    },
+    {
+      "id": "workspace_hygiene",
+      "path": "WORKSPACE_HYGIENE.md",
+      "sha256": "b175e97909dfe455c631ef36c9c5cedf879e7594db8a5dfb31621d9adb2dde5f",
+      "status": "SOURCE_CONTRACT"
+    },
+    {
+      "id": "work_environment",
+      "path": "WORK_ENVIRONMENT.md",
+      "sha256": "b5eb1c3bbb592ddae26007fa2ef11f59d1455840b1268f2cda7b5de384a2772b",
       "status": "SOURCE_CONTRACT"
     }
   ],
@@ -84,5 +96,9 @@
   "role_title": "Main coordinator",
   "schema": "agentos.coordinator-knowledge-index/v1",
   "status": "PUBLIC_RELEASE_CANDIDATE_NOT_ADOPTED",
-  "causal_followup_increment": "0.8.0rc2056: current PROCESS and QUALITY pins for finite resource-chain and journal-continuation qualification; historical core/version pins and separate behavior evidence are preserved."
+  "causal_followup_increment": "0.8.0rc2056: current PROCESS and QUALITY pins for finite resource-chain and journal-continuation qualification; historical core/version pins and separate behavior evidence are preserved.",
+  "solution_integrity_increment": "0.8.0rc2064: shared laws for development, diagnosis and standalone research; current affected document pins only, with historical provenance and separate behavior evidence preserved.",
+  "diagnostic_zero_increment": "0.8.0rc2065: temporary project diagnostics over unchanged saved levels 1–5; affected current pins only; historical provenance and separate behavior evidence retained.",
+  "workspace_hygiene_increment": "0.8.0rc2066: current canonical workspace resource ownership, capacity and cleanup-planning method; observation only, no native reservation or deletion; historical provenance and separate behavior evidence retained.",
+  "frozen_work_laws_increment": "0.8.0rc2068: owner-approved frozen laws and initial orientation; current document pins, separate installation and behavioral evidence."
 }

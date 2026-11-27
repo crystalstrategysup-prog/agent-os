@@ -2,8 +2,11 @@
 """Bounded public-tree validation; heuristic privacy check is not a security audit."""
 
 import ast
+import hashlib
 import json
+import os
 import re
+import stat
 import sys
 import tomllib
 from pathlib import Path
@@ -12,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from agent_os import __version__
 from agent_os.doc_catalog import DOCS
+from agent_os.engineering_guidance import MAX_DOCUMENT_BYTES, _section
 from agent_os.handoff_store import HandoffError, scan_secrets
 
 EXTENSION_SKILLS = {
@@ -19,6 +23,83 @@ EXTENSION_SKILLS = {
     "src/agent_os/resources/skills/function-extractor/SKILL.md": "function-extractor",
     "modules/atlas/skills/atlas/SKILL.md": "atlas",
 }
+FROZEN_WORK_MANIFEST = ".release/work-laws-v1.json"
+FROZEN_WORK_MANIFEST_SHA256 = "86b7d47d03520c659a3203b249694ac76069410d18df270f2b6db4cad2c67637"
+FROZEN_WORK_DOCUMENTS = (
+    ("laws", "docs/PROCESS.md", "src/agent_os/resources/docs/PROCESS.md", "solution-integrity"),
+    ("orientation", "docs/WORK_ENVIRONMENT.md", "src/agent_os/resources/docs/WORK_ENVIRONMENT.md", None),
+)
+
+
+def _frozen_read(root: Path, relative: str, limit: int) -> bytes:
+    """Read a fixed bounded regular file, refusing symlinks in its path."""
+    path = root
+    if path.is_symlink():
+        raise ValueError("frozen_root_symlink")
+    for part in Path(relative).parts:
+        path = path / part
+        if path.is_symlink():
+            raise ValueError("frozen_path_symlink")
+    if not path.is_file():
+        raise ValueError("frozen_regular_file_required")
+    flags = os.O_RDONLY | getattr(os, "O_BINARY", 0)
+    flags |= getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+    with os.fdopen(os.open(path, flags), "rb") as stream:
+        if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+            raise ValueError("frozen_regular_file_required")
+        raw = stream.read(limit + 1)
+    if len(raw) > limit:
+        raise ValueError("frozen_byte_bound")
+    return raw
+
+
+def frozen_work_laws_errors(root: Path) -> list[str]:
+    """Check reviewed bytes, not owner authorization, meaning or agent behavior.
+
+    The retained revision and this anchor change only by an explicit owner
+    decision about the laws/orientation. Never regenerate them to clear a check.
+    An editor able to replace the guard can replace its trust anchor as well.
+    """
+    try:
+        raw = _frozen_read(root, FROZEN_WORK_MANIFEST, 4096)
+        if hashlib.sha256(raw).hexdigest() != FROZEN_WORK_MANIFEST_SHA256:
+            return ["frozen_work_manifest_changed:" + FROZEN_WORK_MANIFEST]
+        manifest = json.loads(raw.decode("utf-8"))
+        if (not isinstance(manifest, dict)
+                or set(manifest) != {"schema", "revision", "change_policy", "historical_revisions",
+                                     "proof_limit", "laws", "orientation"}
+                or manifest["schema"] != "agentos.frozen-work-laws/v1"
+                or type(manifest["revision"]) is not int or manifest["revision"] != 1
+                or manifest["change_policy"] != "EXPLICIT_OWNER_DECISION_ABOUT_THIS_REVISION_REQUIRED"
+                or manifest["historical_revisions"] != "RETAIN_IMMUTABLE"
+                or not isinstance(manifest["proof_limit"], str) or not manifest["proof_limit"]):
+            raise ValueError("frozen_manifest_schema")
+        for name, source, resource, section in FROZEN_WORK_DOCUMENTS:
+            pin = manifest[name]
+            if (not isinstance(pin, dict)
+                    or set(pin) != ({"source", "resource", "sha256", "bytes"} | ({"section"} if section else set()))
+                    or pin["source"] != source or pin["resource"] != resource
+                    or (section is not None and pin["section"] != section)
+                    or type(pin["bytes"]) is not int or not 0 < pin["bytes"] <= MAX_DOCUMENT_BYTES
+                    or not isinstance(pin["sha256"], str) or not re.fullmatch(r"[0-9a-f]{64}", pin["sha256"])):
+                raise ValueError("frozen_manifest_pin")
+    except (OSError, ValueError, KeyError, TypeError):
+        return ["frozen_work_manifest_invalid:" + FROZEN_WORK_MANIFEST]
+    errors = []
+    for name, source, resource, section in FROZEN_WORK_DOCUMENTS:
+        for relative in (source, resource):
+            try:
+                raw = _frozen_read(root, relative, MAX_DOCUMENT_BYTES)
+                text = raw.decode("utf-8")
+                if section is not None:
+                    content, _ = _section(text, section)
+                    raw = content.encode("utf-8")
+                pin = manifest[name]
+                if len(raw) != pin["bytes"] or hashlib.sha256(raw).hexdigest() != pin["sha256"]:
+                    errors.append("frozen_work_content_changed:" + relative)
+            except (OSError, ValueError):
+                errors.append("frozen_work_content_invalid:" + relative)
+    return errors
 
 
 def version_matches(project_text: str, runtime_version: str) -> bool:
@@ -76,7 +157,10 @@ def runtime_receipts_present(root: Path) -> bool:
 
 
 def verify() -> dict:
-    errors = []
+    errors = frozen_work_laws_errors(ROOT)
+    frozen_rejected = ({FROZEN_WORK_MANIFEST} | {
+        path for _, source, resource, _ in FROZEN_WORK_DOCUMENTS for path in (source, resource)
+    }) if errors else set()
     counts = {"python": 0, "json": 0, "skills": 0, "markdown": 0}
     if runtime_receipts_present(ROOT):
         errors.append("runtime_receipts_in_public_tree")
@@ -124,6 +208,10 @@ def verify() -> dict:
             errors.append("symlink:" + str(rel))
             continue
         if not path.is_file():
+            continue
+        # A refused frozen revision must not be reopened by this unbounded scan.
+        # Preserve its controlled refusal and continue scanning all other files.
+        if rel.as_posix() in frozen_rejected:
             continue
         try:
             scan_secrets(path.read_bytes())

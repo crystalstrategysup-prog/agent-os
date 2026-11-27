@@ -41,6 +41,20 @@ enclosing choice where no narrower choice applies. Use 3 if no level is selected
 Do not add a registry or repeated questionnaire. A level change never changes
 authority, mandatory protections or UNKNOWN reconciliation.
 
+### Temporary diagnostic level 0
+
+Level 0 is a one-pass project diagnosis, separate from the persistent 1–5 scale
+and MINIMAL/FULL profile. Follow **Project diagnostics** in AgentOS
+`docs/PROCESS.md` or `agentos workflow guidance --method project-diagnostics`.
+Enter on the owner's request or before substantial work with material unknowns;
+review the need at significant milestones, based on changed evidence.
+Retain the selected level/scope and current pass across sessions. At finish or
+cancel, record the actual result, remaining gaps and next action and return to
+the saved mode, honoring an explicit newer owner choice. Cancellation preserves
+partial findings without claiming a completed audit. No transition grants READY,
+acceptance or authority. Reuse current dossier/inventory/history; repeating an
+unchanged audit or fixing all its findings is not a prerequisite for progress.
+
 ## Shared lifecycle, not per-command micromanagement
 1. Identify effect, exact root/binding, current task/writer, source revisions
    and applicable host/security policy. Existing explicit STOPs remain.

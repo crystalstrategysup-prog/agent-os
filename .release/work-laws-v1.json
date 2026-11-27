@@ -1,0 +1,20 @@
+{
+  "change_policy": "EXPLICIT_OWNER_DECISION_ABOUT_THIS_REVISION_REQUIRED",
+  "historical_revisions": "RETAIN_IMMUTABLE",
+  "laws": {
+    "bytes": 10606,
+    "resource": "src/agent_os/resources/docs/PROCESS.md",
+    "section": "solution-integrity",
+    "sha256": "04df533f643c23d15f3968fd410b7971879cb65639c9cea0d9bd21fbbedba6d8",
+    "source": "docs/PROCESS.md"
+  },
+  "orientation": {
+    "bytes": 61388,
+    "resource": "src/agent_os/resources/docs/WORK_ENVIRONMENT.md",
+    "sha256": "b5eb1c3bbb592ddae26007fa2ef11f59d1455840b1268f2cda7b5de384a2772b",
+    "source": "docs/WORK_ENVIRONMENT.md"
+  },
+  "proof_limit": "Byte integrity under a trusted guard; not authorization, semantic correctness, agent compliance or provider behavior.",
+  "revision": 1,
+  "schema": "agentos.frozen-work-laws/v1"
+}

@@ -38,6 +38,14 @@ continuation inherit that level or default 3; do not reopen the new-development
 choice for a session or recursive step. Bind dependencies to the required
 result or artifact version. A change to one dependency does not halt independent work.
 
+For an explicit audit or substantial work whose direction is obscured by material
+unknowns, use temporary diagnostic level 0 under **Project diagnostics** in AgentOS
+`docs/PROCESS.md`. Preserve the 1–5 choice and active pass across sessions; record
+the current inventory/dossier, gaps and justified next action, then return to
+development. A newer explicit owner choice prevails. Review the need after major
+milestones against changed evidence. Reuse existing work/documents and accepted
+results; do not require all audit findings to be fixed before independent work.
+
 ## Responsibilities
 
 | Role | Action |
@@ -95,6 +103,9 @@ call chain.
 | `integrate` | Inputs after the current writer incorporates deltas → the same cycle and a new snapshot only on change. |
 | `reconcile` | Selected local output → exact current immutable snapshot; remote operation readback is performed by a separate declared adapter. |
 | `project-audit` | Exact registered inventory → coverage, unmapped/UNKNOWN gaps, and bounded work to close them. |
+
+`project-audit` is evidence for diagnostic level 0 within that inventory; it
+neither supplies the full strategic review nor establishes product execution.
 
 Preserve the objective, typed parameters, preconditions, method order, outputs,
 effect scope, and reconciliation path for each procedure. Bind host steps through
@@ -162,14 +173,14 @@ criteria, and owner.
 
 At start/resume, read the actual body from `agentos workflow guidance`, reusing
 the same current body if already returned by entry. If the CLI is unavailable,
-read **Project development** in AgentOS `docs/PROCESS.md`, also shipped as
+read **Solution integrity** and **Project development** in AgentOS `docs/PROCESS.md`, also shipped as
 `resources/docs/PROCESS.md`. This is the default method. Match checks to the
 declared stage, applicable development level and concrete risk. Stop after its
 criteria and required checks pass, then continue the plan; routine development
 does not require an experiment journal or exhaustive audit of each function.
 
 For a specific malfunction needing causal investigation, select
-`agentos workflow guidance --method causal-debugging` or read **Causal debugging**
+`agentos workflow guidance --method causal-debugging` or read **Solution integrity** and **Causal debugging**
 in the same PROCESS document. Link the existing experiment journal in the work
 packet. Carry its scoped findings, fixed
 conditions, current configuration and next experiment into the existing

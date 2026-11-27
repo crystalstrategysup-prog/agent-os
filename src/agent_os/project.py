@@ -224,6 +224,10 @@ def load_task(root: Path, task_id: str) -> dict:
     task = tm.read_task(root, task_id)
     if task.get("schema") != "agentos.project-task/v1" or task.get("id") != task_id:
         raise GateError("unsupported_or_mismatched_task")
+    if "diagnostics" in task:
+        from .project_diagnostics import normalize_state
+
+        normalize_state(task["diagnostics"])
     return task
 
 
@@ -414,9 +418,15 @@ def reuse_answers(root: Path, task_id: str, supplied: dict) -> dict:
     if not isinstance(supplied, dict):
         raise GateError("answers_must_be_object")
     previous = task["answers"]
-    if any(k != "authority" and previous.get(k) != v for k, v in supplied.items()):
+    if any(k not in {"authority", "development"} and previous.get(k) != v
+           for k, v in supplied.items()):
         raise GateError("scope_changed_supply_full_answers")
-    return {**{k: v for k, v in previous.items() if k != "authority"}, **supplied}
+    result = {**{k: v for k, v in previous.items() if k != "authority"}, **supplied}
+    if "development" in result:
+        from .development_level import normalize
+
+        result["development"] = normalize(result["development"])
+    return result
 
 
 def questionnaire(
@@ -431,11 +441,13 @@ def questionnaire(
     if resume_task:
         answers = reuse_answers(root, resume_task, answers)
     from .profile_adapter import context as profile_context
+    from .development_level import effective
 
     return {
         "schema": "agentos.questionnaire/v1",
         "existing_project": bool(project),
         "suggested_answers": answers,
+        "development": effective(answers),
         "reused_from_task": resume_task,
         "reuse_scope": "same_scope_only_current_authority_not_inherited",
         "known_context": project["context"] if project else {},
@@ -519,6 +531,10 @@ def _answers(raw: dict) -> dict:
         raise GateError("duplicate_acceptance_id")
     if raw["change_kind"] == "observe" and raw["write_paths"]:
         raise GateError("observe_cannot_authorize_product_writes")
+    if "development" in raw:
+        from .development_level import normalize
+
+        return {**raw, "development": normalize(raw["development"])}
     return raw
 
 
@@ -572,6 +588,10 @@ def enter(
             task = load_task(root, resume_task)
             if task["status"] == "CLOSED":
                 raise GateError("closed_task_is_immutable_start_new_task")
+            if "development" not in answers and "development" in task["answers"]:
+                from .development_level import effective
+
+                answers = {**answers, "development": effective(answers, task["answers"])}
             if task["status"] == "RECOVERY_REQUIRED":
                 # Keep the existing project -> user-turn lock order through the
                 # entire metadata entry transaction, before any answers/docs write.
@@ -697,6 +717,13 @@ def enter(
                 "required_documents": selection, "created_drafts": created,
                 "missing_documents": document_check(root, task)["errors"],
             }
+            from .development_level import effective
+
+            result["development"] = effective(answers)
+            if "diagnostics" in task:
+                from .project_diagnostics import view
+
+                result["diagnostic"] = view(task)
         except BaseException:
             _recover_entry(root, user_home)
             raise
@@ -1321,6 +1348,11 @@ def close(root: Path, task_id: str, review: dict, *, user_home: Path | None = No
     with lock(within(root, ".agentos/write.lock")):
         _require_entry_recovered(root)
         task = load_task(root, task_id)
+        from .project_diagnostics import active
+
+        if active(task) is not None:
+            return {"status": "BLOCKED", "task_id": task_id,
+                    "errors": ["diagnostic_finish_or_cancel_before_close"]}
         if task["answers"].get("continuation_required") or "continuation" in review:
             from .continuation import validate
 
@@ -1485,6 +1517,8 @@ def make_parser() -> argparse.ArgumentParser:
     sub.add_parser("assess")
     sub.add_parser("verify-closeout")
     sub.add_parser("status")
+    sub.add_parser("diagnose", help="One-shot diagnostic level 0: start, status, finish or cancel")
+    sub.add_parser("resource", help="Observe explicit run resources and plan their disposition; no deletion")
     fin = sub.add_parser("close")
     fin.add_argument("--review", type=Path, required=True)
     diagnostic = sub.add_parser("handoff-diagnostic")
@@ -1536,6 +1570,14 @@ def make_parser() -> argparse.ArgumentParser:
 
 
 def command(argv: list[str], user_home: Path) -> tuple[dict, int]:
+    if argv and argv[0] == "resource":
+        from .project_resource_cli import command as resource_command
+
+        return resource_command(argv[1:])
+    if argv and argv[0] == "diagnose":
+        from .project_diagnostics import command as diagnostic_command
+
+        return diagnostic_command(argv[1:], user_home)
     if argv and argv[0] == "local":
         from .project_lite import command as local_command
         return local_command(argv[1:], user_home)

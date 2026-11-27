@@ -5,15 +5,32 @@ description: "Build a connected modular stage at the selected development level,
 
 # agentos-implementation-control
 
-Use **Project development** from `agentos workflow guidance`, reusing the current
-body from entry. Build the connected result of the current level before recursively
+Use **Workspace hygiene** from `agentos workflow guidance --method workspace-hygiene`
+before heavy writes and when disposing of run data; its detailed contract is
+`resources/docs/WORKSPACE_HYGIENE.md`. Keep one existing-journal record per owned
+run root, bounded volume capacity and cleanup in normal/exception paths. After
+ENOSPC/EDQUOT, stop new heavy writes on that volume, diagnose the real constraint
+and preserve prior accepted results. An alternate `/tmp` needs its own capacity,
+quota, lifetime and memory check. Observation is not a reservation or delete grant.
+
+Use **Solution integrity** and **Project development** from `agentos workflow
+guidance`, reusing the current body from entry. Build the connected result of the current level before recursively
 refining a selected part. Preserve the owner's scoped development level (default
 3 of 5), explicit stubs, module boundaries and diagnostic/error-log requirements.
 The canonical PROCESS defines the level scale and sufficient stage checks.
 
+When diagnostic level 0 is active, continue **Project diagnostics** from
+`agentos workflow guidance --method project-diagnostics` or the same PROCESS.
+Use it before substantial work with material unknowns, and review its need at
+major milestones against changed evidence. Preserve the selected 1–5 level;
+record the current dossier, consequential gaps and next action, then return to
+that mode, honoring a newer explicit owner choice. Do not turn every increment
+into a full audit or require all findings to be fixed before independent work.
+This diagnosis grants no readiness or additional effects.
+
 For a concrete malfunction needing causal investigation, read **Causal debugging**
 from `agentos workflow guidance --method causal-debugging`, or
-read the exact section in `resources/docs/PROCESS.md` if the CLI is unavailable
+read **Solution integrity** and the selected method in `resources/docs/PROCESS.md` if the CLI is unavailable
 (locate installed resources with `agentos resources`). Continue the existing
 journal and evidence; return to the development plan after sufficient repair or
 an explicitly scoped mitigation. Ordinary features need no artificial failure.

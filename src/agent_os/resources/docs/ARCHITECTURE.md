@@ -1,6 +1,7 @@
 # Foundation architecture
 
-Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Resolve the current source version from package metadata and the selected
+release manifest. Historical version records do not establish target adoption.
 
 
 ## Historical: Indexed handoff successor0.7.0rc1
@@ -20,6 +21,7 @@ and speech features are not prerequisites for this route.
 | --- | --- | --- |
 | `workflow` | Optional stateless route from declared kind and effects | Does not interpret natural language, execute work, or grant capability |
 | `engineering_guidance` | Bounded current PROCESS section, supplied by workflow/context entry and continuation | No second normative copy, user-home read, experiment execution, authority grant or behavior claim |
+| `development_level` | Normalize the scoped 1–5 choice carried by existing task answers and context goals | No settings registry, history lookup, inferred scope tree, readiness or authority grant |
 | `project` / `doc_catalog` | Applicable docs, answer reuse, readiness, checks, current closeout | Does not intercept every tool or prove live deployment |
 | `turns` | Explicit project entry and terminal transitions | Does not receive native prompt events or reset a task for an ordinary question |
 | Observation store | Optional separate audit receipts | Is not a prerequisite for reading or project entry |

@@ -6,6 +6,10 @@ The move gives no new authority and never bypasses protected effects.
 
 ## Current development method
 
+Apply the shared [Solution integrity](PROCESS.md#solution-integrity) laws to all
+development levels and substantive research/calculations. Method output includes
+that actual body; direct document readers consume it with the selected method.
+
 Apply [Project development](PROCESS.md#project-development) to ordinary changes:
 plan the complete current level, assemble the connected modular working stand,
 then refine selected parts recursively. Relevant documentation and readiness
@@ -16,7 +20,26 @@ plan. Offer the five-level choice once for new development that has not begun,
 unless already chosen. Patches, fixes, enhancements and continuation reuse the
 current level without a new chooser.
 Select causal debugging separately for a concrete malfunction when needed.
+Use [Project diagnostics](PROCESS.md#project-diagnostics), temporary level 0, for
+an explicit project audit or before substantial work whose material unknowns
+obscure the right direction. Review its need at significant milestones against
+changed evidence. Preserve the current 1–5 choice and return after the scoped
+current-state, findings and next action are recorded; a newer explicit owner
+choice prevails. Read-only diagnosis needs no project intake. Update existing
+owning documents within the authorized scope, preserving gaps and prior results;
+diagnosis completion is neither product acceptance nor authority.
+Apply [Workspace hygiene](WORKSPACE_HYGIENE.md) at every level, including this
+repository's tests and release builds: budget and own run resources before heavy
+writes, then remove qualified reproducible data, transfer it with verified
+readback, or retain it with an owner and release condition in the existing log.
+The observation-only resource plan grants neither deletion nor reservation.
 The original controls below retain their scope and authority requirements.
+
+At first engagement read [WORK_ENVIRONMENT](WORK_ENVIRONMENT.md), then reuse the
+current introduction and relevant sections. The frozen Solution integrity laws
+and introduction may change only on an explicit owner decision about those
+texts; general improvement authority does not permit weakening their acceptance
+criteria or changing their retained pins. Keep factual project records current.
 
 ## Original policy, verbatim
 

@@ -9,23 +9,41 @@ from __future__ import annotations
 from pathlib import Path
 
 from . import __version__
+from .development_level import default, normalize
 from .safeio import GateError, sha
 
 PROCESS_PATH = Path(__file__).parent / "resources" / "docs" / "PROCESS.md"
 DEFAULT_METHOD = "project-development"
-METHODS = (DEFAULT_METHOD, "causal-debugging")
+COMMON_METHOD = "solution-integrity"
+DIAGNOSTIC_METHOD = "project-diagnostics"
+HYGIENE_METHOD = "workspace-hygiene"
+METHODS = (DEFAULT_METHOD, "causal-debugging", COMMON_METHOD, DIAGNOSTIC_METHOD,
+           HYGIENE_METHOD)
 START = "<!-- agentos:project-development:start -->"
 END = "<!-- agentos:project-development:end -->"
 MAX_DOCUMENT_BYTES = 128 * 1024
 MAX_SECTION_BYTES = 16 * 1024
+MAX_CONTENT_BYTES = 2 * MAX_SECTION_BYTES + 2
 
 
-def load(method: str = DEFAULT_METHOD) -> dict:
-    """Read one bounded packaged section; no overlay, network or execution."""
-    if method not in METHODS:
-        raise GateError("engineering_guidance_unknown_method")
+def _section(text: str, method: str) -> tuple[str, tuple[int, int]]:
     start = f"<!-- agentos:{method}:start -->"
     end = f"<!-- agentos:{method}:end -->"
+    if (text.count(start) != 1 or text.count(end) != 1
+            or text.index(end) <= text.index(start)):
+        raise GateError("engineering_guidance_section_invalid")
+    first, last = text.index(start), text.index(end)
+    content = text[first + len(start):last].strip()
+    if not content or len(content.encode("utf-8")) > MAX_SECTION_BYTES:
+        raise GateError("engineering_guidance_section_bound")
+    return content, (first, last + len(end))
+
+
+def load(method: str = DEFAULT_METHOD, *, development: dict | None = None) -> dict:
+    """Read shared laws and the selected bounded method without side effects."""
+    if method not in METHODS:
+        raise GateError("engineering_guidance_unknown_method")
+    selected = default() if development is None else normalize(development)
     try:
         if PROCESS_PATH.is_symlink() or not PROCESS_PATH.is_file():
             raise GateError("engineering_guidance_document_required")
@@ -36,24 +54,46 @@ def load(method: str = DEFAULT_METHOD) -> dict:
         text = raw.decode("utf-8")
     except (OSError, UnicodeError) as exc:
         raise GateError("engineering_guidance_document_unavailable") from exc
-    if (text.count(start) != 1 or text.count(end) != 1
-            or text.index(end) <= text.index(start)):
-        raise GateError("engineering_guidance_section_invalid")
-    content = text.split(start, 1)[1].split(end, 1)[0].strip()
+    methods = (COMMON_METHOD,) if method == COMMON_METHOD else (COMMON_METHOD, method)
+    fragments, sections = [], []
+    previous_end = -1
+    for selected_method in methods:
+        fragment, (first, last) = _section(text, selected_method)
+        if first < previous_end:
+            raise GateError("engineering_guidance_section_invalid")
+        previous_end = last
+        encoded_fragment = fragment.encode("utf-8")
+        fragments.append(fragment)
+        sections.append({
+            "source": f"docs/PROCESS.md#{selected_method}",
+            "content_sha256": sha(encoded_fragment),
+            "content_bytes": len(encoded_fragment),
+        })
+    content = "\n\n".join(fragments)
     encoded = content.encode("utf-8")
-    if not encoded or len(encoded) > MAX_SECTION_BYTES:
+    if len(encoded) > MAX_CONTENT_BYTES:
         raise GateError("engineering_guidance_section_bound")
-    return {
+    result = {
         "schema": "agentos.engineering-guidance/v1",
         "status": "MATERIALIZED",
         "version": __version__,
         "source": f"docs/PROCESS.md#{method}",
+        "development": selected,
         "document_sha256": sha(raw),
         "content_sha256": sha(encoded),
         "content_bytes": len(encoded),
         "content": content,
+        "sections": sections,
         "authority_granted": False,
         "native_hooks": "DISABLED",
         "behavior_compliance": "NOT_PROVEN",
         "writes": [],
     }
+    if method == DIAGNOSTIC_METHOD:
+        # A method lookup supplies instructions; only an explicit diagnostic run
+        # changes the task's temporary mode. The saved 1–5 choice stays intact.
+        result["execution"] = {
+            "level": 0, "mode": "diagnostic", "temporary": True,
+            "return_development": selected, "lifecycle": "GUIDANCE_ONLY",
+        }
+    return result

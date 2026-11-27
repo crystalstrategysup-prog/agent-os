@@ -5,6 +5,21 @@ description: "Enter a new or existing project task before making product changes
 
 # agentos-project-entry
 
+On first engagement, read the frozen Solution integrity laws in PROCESS and the
+full `resources/docs/WORK_ENVIRONMENT.md` introduction (or verified source).
+Then reuse the current introduction and restore relevant parts after context
+loss. Agents may not change or weaken these texts or their pinned checks without
+an explicit owner decision about the revision. Keep current project facts in
+their existing records. Read/ACK is separate from observed application.
+
+Before creating substantial workspace data, load **Workspace hygiene** with
+`agentos workflow guidance --method workspace-hygiene`, or its marked section in
+current PROCESS. Use `resources/docs/WORKSPACE_HYGIENE.md` for the exact contract.
+Assign a private run root, owner, class, remaining peak and release condition in
+the existing work record. Observe the actual target volume, inode and known quota
+limits, including parallel writers; a read-only resource plan reserves nothing.
+This applies at every development level without adding a per-file intake.
+
 For an assigned native-session package, preserve its original goal and exact
 delegator. Read the native return contract in `resources/docs/WORK_COORDINATION.md`.
 Bind existing human authorization for return messages before promising delivery;
@@ -20,13 +35,29 @@ init, intake, observation, an answers file, a profile interview, or closeout.
 
 On new entry and same-scope resume, read the actual body from the effect-free
 `agentos workflow guidance`, or reuse that same current body materialized by
-entry/context. If the CLI is unavailable, read **Project development** in the
+entry/context. If the CLI is unavailable, read **Solution integrity** and
+**Project development** in the
 normative `resources/docs/PROCESS.md`, located with `agentos resources`, or the
 selected source `docs/PROCESS.md`. Plan the whole current level, preserve mandatory
 modularity, and assemble connected running parts before deepening the selected
 module or microprocess with the same method. Simple implementations and explicit
 stubs can complete a declared stage; no advance decomposition of every leaf is
 required. A path/digest/ACK without its body does not load the method.
+
+The shared Solution integrity laws apply at every level. Standalone research or
+calculations may load `agentos workflow guidance --method solution-integrity`
+without task intake; use the same canonical section if the CLI is unavailable.
+
+An explicit project audit or substantial work with material unknowns uses
+temporary **diagnostic level 0**. Load **Project diagnostics** with
+`agentos workflow guidance --method project-diagnostics`, or read it with
+**Solution integrity** in the same PROCESS. Resume an active pass across sessions,
+retaining the saved 1–5 level/scope. Review current state, contracts, documents and
+goal alignment; update the existing dossier/plan through its writer. Record
+findings, remaining gaps and next action, then return to the saved mode, honoring
+any explicit newer owner choice. At major milestones review changed evidence;
+do not repeat a full audit for every small step. Read-only diagnosis needs no
+intake; completion does not establish READY, repaired findings or authority.
 
 The development level defaults to **3** on a **1–5** scale. The owner may set or
 change it at any time for a project, stage or module; retain the latest scoped
@@ -41,8 +72,15 @@ level 5 means detailed design and immediate checking at each step. Use the
 canonical method for all five descriptions and diagnostic cleanup. This level is
 independent of Atlas MINIMAL/FULL scope and grants no additional authority.
 
+For a registered task's engineering context, supply `development_source` with
+its exact root, task ID and current revision as defined in
+`resources/docs/CONTEXT_BINDING.md`. Consume the returned saved level/scope;
+do not leave a known choice only in `known_answers`. Without a registered task,
+carry typed `goal.development`. Persist a scoped change in task answers before
+binding its new revision. A new session does not reset the selected level.
+
 For a concrete malfunction needing causal investigation, explicitly load
-`agentos workflow guidance --method causal-debugging`, or read **Causal debugging**
+`agentos workflow guidance --method causal-debugging`, or read **Solution integrity** and **Causal debugging**
 in the same PROCESS. Restore the existing journal, conditions, configuration and
 next experiment. Return to the development plan after sufficient repair or an
 explicitly scoped mitigation. Ordinary reading needs no intake, and ordinary

@@ -5,6 +5,12 @@ description: "Handoff a project without forcing the next agent to reconstruct in
 
 # agentos-project-handoff
 
+Include the disposition of this task's owned run roots in its existing handoff:
+removed, accepted by the receiver with readback, or retained with owner and release
+condition. Keep path mappings private and link resource IDs, inputs, restore and
+UNKNOWN-operation dependencies under `resources/docs/WORKSPACE_HYGIENE.md`.
+An ACK or same pathname does not prove a safe replacement or authorize deletion.
+
 A native worker must return its result/evidence/remainder/next owner to the
 delegator through the currently authorized supported route and preserve its
 final. A prepared report is not a send; an uncertain send needs read-only

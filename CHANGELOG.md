@@ -1,3 +1,183 @@
+# 0.8.0rc2068 — freeze short work laws and explain their practical application
+
+- Express the existing twelve solution-integrity laws and established workflow
+  duties as twenty short numbered rules with correct/incorrect examples. Keep
+  the original task, independent evidence, saved levels, modular stand, scoped
+  acceptance, cumulative progress, workspace hygiene and authority boundaries.
+  These principles predate this release; the change makes their application
+  explicit and protects the owner-approved revision from routine rewriting.
+- Add one initial WORK_ENVIRONMENT introduction explaining work types, useful
+  steps, target preconditions, stateful user paths, comparisons and handoff.
+  Read it once, then restore relevant context. Default guidance still supplies
+  the actual common laws and selected method, without the whole introduction.
+- Require an explicit owner decision to revise these protected texts or their
+  retained checks. Validate their exact source and resource bytes in the existing
+  public release path. A pin detects drift; it does not prove authorization,
+  semantic correctness, provider intent or live adoption by existing agents.
+- Correct remaining stale current-version labels in active documentation while
+  preserving historical version records. No recipe CLI, background reviewer,
+  automatic cleanup, native hooks or changes to the reviewed user projects.
+
+# 0.8.0rc2067 — resolve release instructions from the selected manifest
+
+- Complete the workspace-hygiene delivery introduced in rc2066 with corrected
+  installation, release and packaging instructions. Remove stale declarations
+  of a moving current RC; read version and artifact identity from source metadata
+  and the selected manifest. Installation examples use explicit manifest values.
+- Keep the published rc2066 source/tag immutable. Resource observation behavior,
+  canonical hygiene method, level selection and authority boundaries are unchanged.
+  Reuse their verified checks by unchanged scope; refresh version, package,
+  document mirrors and installation readback for this successor.
+
+# 0.8.0rc2066 — own workspace resources before writing and through cleanup
+
+- Make workspace hygiene a common duty at every development level, including
+  temporary diagnostic 0. Route ordinary build, test and release work through
+  one canonical contract and a bounded materialized method. Preserve the saved
+  level, existing work journal and proportionate reporting.
+- Record each owned run root's class, owner, capacity, dependencies and final
+  disposition. Distinguish reproducible temporary data from recovery evidence;
+  unknown legacy resources stay on HOLD. Account for real volume, inode, quota,
+  simultaneous peak and unconsumed reservations before heavy writes. Existing
+  causal resource-chain diagnosis and evidence-retention rules remain in force.
+- Add effect-free `project resource plan --input PATH|-` and the same typed
+  observation API. Inspect only explicit bounded metadata; report opaque IDs,
+  conservative dispositions, capacity arithmetic and UNKNOWN without exporting
+  private paths or reading resource contents. Plans grant no reservation,
+  deletion, READY, task-state change or external authority.
+- Define the staged qualification of a future durable run-resource registry,
+  reservation service and fenced physical cleanup. This release implements the
+  observation stage only; it adds no automatic deletion, native hooks or daemon.
+- Exercise bounded input, privacy, capacity sharing, inode/space shortages,
+  symlink and identity uncertainty, unsupported effects and unchanged level/host
+  authority. Published instructions and observed metadata do not establish live
+  adoption by every existing chat or prove actual reclaimed volume bytes.
+
+# 0.8.0rc2065 — diagnose the project temporarily, then resume its development mode
+
+- Add one-shot diagnostic level 0 above the unchanged saved levels 1–5. The
+  canonical project-diagnostics method reconciles the objective, current project
+  inventory, modular boundaries, applicable contracts, documents and evidence,
+  then leaves a justified next action. Existing dossier, modularity and causal
+  integrity requirements are reused, not introduced again as new requirements.
+- Add explicit start/status/finish/cancel on the existing task, with current
+  writer/turn checks, task-byte and revision CAS, and atomic retained run history.
+  Preserve task answers, accepted checks, ordinary revision and readiness records.
+  An active pass survives same-task continuation; finish/cancel restores the
+  current saved choice, preserving a newer explicit owner selection.
+- Materialize the common laws plus project diagnostics for active bound or
+  explicitly portable context. Keep unregistered read-only work free of invented
+  intake. Diagnostic state/result records are not audit PASS, readiness grants or
+  production authority. Ordinary task gates still govern subsequent work.
+- Route substantial uncertain work and meaningful milestone changes through a
+  proportionate diagnostic pass; reuse current evidence and inspect deltas.
+  Completion needs a clear current picture, consequential gaps and owned next
+  work, not repair of every finding. No per-patch full audit, report or archive.
+- Correct architecture guidance to allow read-only diagnostics before entry.
+  Check actual contracts appropriate to the interfaces: absent HTTP OpenAPI is
+  not a defect where there is no HTTP API. Retain UNKNOWN and evidence boundaries.
+- Cover native lifecycle and portable/native context, return at levels 1/3/5,
+  resume/owner changes, repeated calls, races, malformed state and unchanged
+  authority. Guidance delivery and synthetic exercises do not prove adoption by
+  every existing client or production correctness.
+
+# 0.8.0rc2064 — share solution integrity across development and research
+
+- Add one canonical shared standard for task fidelity, justified expectations,
+  traceable transformations, testable mechanisms, independent references,
+  distinguishable experiments, information timing, state continuity, refuting
+  checks and proportionate claims. Existing causal-debugging rules remain in
+  place; this change extends their common basis to ordinary development and
+  makes the previously implicit expectation, reference and timing rules explicit.
+- Return the shared laws before the selected development or diagnostic method.
+  Bind exact combined content and ordered section hashes; refuse malformed,
+  overlapping or oversized source sections. Preserve the selected level/scope.
+- Provide read-only `workflow guidance --method solution-integrity` for research,
+  calculations and result validation without invented task intake or authority.
+  Align installed fallback instructions and current document/contract pins.
+- Keep level 1's connected modular stand, explicit stubs, debug/error journal,
+  smallest sufficient checks and continued authorized work. No extra per-step
+  report, backup, experiment form or full acceptance requirement is introduced.
+- Cover all methods at levels 1–5, continuation choices, common-law drift,
+  malformed sections and UTF-8 bounds. Method delivery and synthetic exercises
+  do not establish adoption by every existing worker or production correctness.
+
+# 0.8.0rc2063 — preserve runtime header provenance and accepted recovery history
+
+- Recognize bounded runtime Bearer/cookie prefix construction from readonly JSON
+  stdin and standard HTTP response paths, including supported helper returns,
+  tuple unpacking and slices. Keep literal-secret checks and fail-closed handling
+  of conflicting, mutated or unknown source expressions; no source execution,
+  endpoint access or whole-file exemption is introduced.
+- Reject escaped JSON/stdin module, namespace and loader aliases that could
+  invalidate the runtime-origin proof; retain ordinary canonical stdin reads.
+- Allow explicit modern SAVED refusal recovery with a pinned, live-qualified
+  accepted checkpoint history. Preserve original journals, objects and receipts;
+  verify the event sequence and current library head under existing locks/CAS.
+- Reuse identical typed non-review objects within each bounded history check.
+  Every review body and each recovery phase remain verified. Default recovery
+  behavior, ordinary entry gates, task scope and authority remain unchanged.
+- Integrate existing local corrections into the public source. Development
+  levels, reporting rules, managed integration and disabled native hooks are
+  unchanged; publication, installation and active-worker adoption remain separate.
+
+# 0.8.0rc2062 — protect the actual action and affected state
+
+- Distinguish live operational state, unique non-production material and isolated
+  reproducible development stands in the canonical method returned by workflow
+  guidance. Classify actual targets and effects; the development level and a
+  server/database label do not determine the need for a full backup.
+- Preserve code through Git and retain rebuild inputs for reproducible stands.
+  New backups need a concrete recovery reason; choose the smallest sufficient
+  protection and reuse applicable recovery points. Do not routinely copy entire
+  runtimes, synthetic databases, caches, dependencies or earlier backups.
+- Connect target rollback and causal capacity planning to this same rule.
+  Keep decisions in existing work records without new forms or approval gates.
+- Preserve target authority, confidentiality, unique evidence, narrow
+  transactional journals, retained backups and UNKNOWN reconciliation. No
+  runtime guard, stored-state schema or automatic cleanup behavior changes.
+
+# 0.8.0rc2061 — keep current plans distinct from historical guidance
+
+- Clarify the existing plan-maintenance step: label superseded mutable sections
+  as historical and link to the current scoped plan; preserve accepted results,
+  dated evidence and immutable snapshots without a separate documentation sweep.
+- Replace PROCESS's stale current-candidate label with source/package version
+  and release-identity pointers. Publication and host adoption remain separate.
+- Scoped development choices, finite stage criteria, proportionate checks and
+  target protections already exist and are unchanged.
+
+# 0.8.0rc2060 — preserve the saved development choice in continuation context
+
+- Bind engineering context to an explicit current project task and revision;
+  carry its saved development level/scope into the goal and canonical guidance.
+- Refuse stale, changed or contradictory source metadata. Diagnose an omitted
+  typed choice when an old caller supplied the level only in known answers,
+  instead of silently materializing the balanced default.
+- Update the actual managed-client and project-entry instructions to use the
+  bound route. Source-free unspecified requests retain the legacy default;
+  ordinary reads, task state, authority and disabled native hooks are unchanged.
+
+# 0.8.0rc2059 — scoped development choices and proportional reporting
+
+- Type the existing task/context development selection, normalize `1D` to level
+  1, retain an omitted choice on same-task resume, and permit an explicit choice
+  change with reused answers while requiring fresh authority.
+- Materialize the selected level/scope with the canonical method through
+  workflow and context. Keep legacy stored objects compatible; no hidden history
+  lookup, settings register, readiness grant or target-authority change.
+- Clarify level-1 connected increments, sufficient changed-link/risk checks,
+  internal progress versus terminal handoff, available base plus delta, optional
+  notification failures and measured delegation costs. Preserve existing whole
+  stand, modularity, stubs, recursive refinement and protected-effect rules.
+- Correct the context guide's stale causal-default description. Source changes
+  and context binding remain distinct from observed active-worker application;
+  this candidate makes no publication, installation or acceleration claim.
+- Clarify native `report-review` as a compact review record and continuation of
+  authorized work; a child result does not require a full owner report or the
+  delegator's terminal final. Preserve existing return, review and acceptance gates.
+  Refresh the coordinator index's stale candidate method/context document pins.
+
 # 0.8.0rc2058 — explicit recovery of a missing-project chat binding
 
 - Add `project recover-binding` for an exact ENTERED receipt whose former root

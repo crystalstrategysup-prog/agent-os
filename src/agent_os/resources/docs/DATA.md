@@ -1,6 +1,7 @@
 # Data and documentation
 
-Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Resolve the current source version from package metadata and the selected
+release manifest. Historical version records do not establish target adoption.
 
 
 ## Historical: Indexed handoff successor0.7.0rc1
@@ -62,6 +63,13 @@ so a rerun must classify them idempotently. It is not a whole-filesystem
 transaction. Config migration backs up and reads back, preserving unknown keys.
 Unsupported future schemas block; implicit downgrade is not allowed. Never
 import secrets or live state from an archive.
+
+For workspace data, use the single [workspace hygiene contract](WORKSPACE_HYGIENE.md).
+Record the owner, class, capacity and final disposition of each owned run root
+in the existing work journal. Reproducible run data and required rollback or
+reconciliation evidence have different lifetimes. An old or apparently temporary
+name does not authorize deletion. Private path mappings stay on the host; portable
+plans carry opaque IDs and safe reason codes.
 
 There is no automatic deletion of evidence, backups, or history. Retention must
 follow the user's content and project requirements; this document invents no

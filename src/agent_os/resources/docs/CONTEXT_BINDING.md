@@ -38,7 +38,8 @@ Request schema `agentos.context-request/v1`:
     "acceptance": ["Verify the requested result against evidence"],
     "known_answers": {"comparison_unit": "the already agreed unit"},
     "authority_ref": "current owner instruction reference, not a new grant",
-    "source_ref": "current task answers or accepted handoff reference"
+    "source_ref": "current task answers or accepted handoff reference",
+    "development": {"level": 1, "scope": "project"}
   }
 }
 ```
@@ -58,14 +59,81 @@ Ordinary reading with no requested profile dependency returns `FAST_PATH`
 without touching a user home and needs no capsule command at all. Real changes
 still follow PROCESS: documentation before product writes, target gates separate.
 
+The optional `goal.development` has exactly `level` and `scope`: integer 1–5
+(input alias `1D` normalizes to 1) and a nonempty scope string up to 200 characters.
+Carry it with the current goal across sessions. For a registered task, bind its
+saved choice instead of copying it from prose. Add this top-level request field:
+
+```json
+"development_source": {
+  "root": "/absolute/current/project",
+  "task_id": "current-task-id",
+  "revision": 7
+}
+```
+
+Use the exact current task ID and revision. For `project-change` or `continuation`,
+the builder reads only that project's metadata and task, carries its saved
+`answers.development` into the goal and guidance, pins the source, and rechecks it
+before returning. An explicit `goal.development` must agree with the saved choice.
+Persist an owner's changed project/stage/module choice through the existing task
+answer mechanism first, then use the new revision. A stale revision, missing
+saved choice, mismatched identity or concurrent source change is refused; no task
+or chat binding is modified and no authority is granted.
+
+A task's native `diagnostics` record also binds the current active run. The
+builder derives its descriptor without copying the retained history. An explicit
+`goal.diagnostic` must agree with that task or is refused; absence does not erase
+an active run. The full task digest is pinned and read again, so start/finish or a
+concurrent change invalidates an earlier capsule even when the main task revision
+is unchanged. A validated diagnostic record captures an implicit default where
+no earlier choice existed; legacy tasks without such a record still require a
+saved choice for `development_source`.
+
+For an unregistered or portable handoff, carry the current typed `goal.development`
+directly. Scope names do not imply an automatically inferred hierarchy. A known
+choice stored only in `known_answers.level` or `known_answers.development_level`
+is not a typed selection: supply the saved-task source or the typed choice before
+materializing engineering context. Legacy source-free goals with no such choice
+retain default level 3 with scope `task`. Invalid choices are never defaulted.
+
+For a portable diagnostic continuation, keep `goal.development` as the current
+saved 1–5 choice and carry this exact optional four-field descriptor:
+
+```json
+"diagnostic": {
+  "id": "diagnosis-before-migration",
+  "scope": "project interfaces and migration path",
+  "reason": "The existing and proposed service contracts are not reconciled.",
+  "captured_development": {"level": 1, "scope": "project"}
+}
+```
+
+The descriptor is accepted for `project-change`, `continuation`, or an explicit
+standalone `audit` goal. ID follows the existing identifier contract; scope is at
+most 200 characters and reason at most 2,000. `captured_development` preserves
+the previous selection; an owner's later explicit choice remains in
+`goal.development`. A diagnostic descriptor without the current saved choice is
+refused. The capsule reports `effective_level: 0`, includes this descriptor and
+materializes **Solution integrity** plus **Project diagnostics**. It does not
+write or activate anything; portable lifecycle/results remain with the existing
+writer and journal. On completion/cancellation, retain that result and remove the
+active descriptor from the next request while keeping the saved development.
+An ordinary audit without a descriptor still takes the existing read-only fast
+path. No project intake or user-home/profile dependency is added to either path.
+
 For `project-change` and `continuation`, the capsule also materializes
-`foundation_guidance`: the actual bounded causal-debugging section of the
-installed `PROCESS.md`, its document/section hashes and package version. It has
-no user-home dependency. The section remains the single normative source; the
-capsule does not maintain another copy of the method. Consume that content before
-choosing experiments for a malfunction, and restore the existing experiment
-journal on continuation. Ordinary feature work does not require an artificial
-failure. Direct read-only fast paths remain independent of this resource.
+`foundation_guidance`: the actual bounded **Solution integrity** laws followed by
+**Project development** from the selected `PROCESS.md`, their ordered section
+identities and hashes, combined content hash, package version and effective
+`development` selection. The capsule repeats that selection beside the goal;
+its hash binds both selection and method content. This has no user-home dependency.
+The sections remain the single normative source, not another method copy.
+For a concrete malfunction, explicitly load `workflow guidance --method
+causal-debugging` and restore its existing experiment journal. Ordinary feature
+work requires no artificial failure. Standalone research/calculations may read
+`workflow guidance --method solution-integrity` without creating a task or
+requiring a project context. Direct read-only fast paths remain independent.
 The complete capsule, including guidance, must fit the existing 64 KiB bound;
 oversize output is refused, never silently truncated. A guidance change invalidates
 an old capsule receipt. Delivery and byte binding still leave behavior unproven.
@@ -82,8 +150,9 @@ authenticity of that event or whether the agent applied the rules. Collect the
 actual provider event independently for live acceptance. A matching receipt has
 `behavior_compliance: "NOT_PROVEN"` and grants no authority.
 
-At a handoff, retain the original goal, scope, semantic criteria, known answers
-and source references. Revalidate the current authority at the target; copying
+At a handoff, retain the original goal, scope, semantic criteria, known answers,
+development choice, any active diagnostic descriptor, and source references.
+Revalidate the current authority at the target; copying
 `authority_ref` does not renew or widen it. Reconcile an old writer and enforce
 the target lease under SESSION_LAUNCH before any target write. If an answer is
 already known for unchanged scope, reuse it; ask only a material unresolved

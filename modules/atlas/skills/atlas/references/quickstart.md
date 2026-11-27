@@ -1,5 +1,10 @@
 # Atlas every day
 
+For first engagement, read AgentOS `docs/WORK_ENVIRONMENT.md` and its frozen work
+laws in PROCESS. Reuse that introduction; ordinary continuation restores the
+goal, current state and relevant details, not a repeated full handbook. Agents
+cannot revise the laws or their pins without an explicit owner decision.
+
 ## Start or continue a project
 
 Check the selected project's instructions, registry entry and Atlas binding before
@@ -8,7 +13,8 @@ of absent Atlas. Do not search unrelated roots.
 
 On start and resume, run the effect-free `agentos workflow guidance` and read its
 default **Project development** body, or reuse that same current body already
-materialized by entry. If the CLI is unavailable, read that section of AgentOS
+materialized by entry. If the CLI is unavailable, read **Solution integrity**
+and that method section of AgentOS
 `docs/PROCESS.md` (installed `resources/docs/PROCESS.md`, located with
 `agentos resources`). Plan the whole current level, then build or reuse the
 common runnable stand with module boundaries, connected parts and its main
@@ -21,6 +27,16 @@ For genuinely new development from scratch that has not begun, offer the five
 level buttons with concise differences unless the owner already specified a
 level. For patches, fixes, enhancements or continuation, inherit the applicable
 level or use 3 without showing the chooser. Accept a scoped level change at any time.
+
+If temporary diagnostic level 0 is active, continue that pass. On an audit
+request, or before substantial work with material unknowns, load
+`agentos workflow guidance --method project-diagnostics` (or **Solution integrity**
+and **Project diagnostics** in PROCESS). Keep the previous 1–5 selection; inspect
+current state, applicable contracts/documents and goal alignment, then record the
+dossier/findings/next action and return to the saved mode. A newer explicit owner
+choice prevails. Review changed evidence at major milestones instead of auditing
+every small step. `atlasctl audit PROJECT` supplies inventory-bound coverage;
+its result alone does not establish the strategic or runtime conclusions.
 
 For a specific malfunction needing investigation, use
 `agentos workflow guidance --method causal-debugging` or the **Causal debugging**
@@ -48,6 +64,14 @@ result, then close the temporary assignment. No permanent keeper is created.
 See `integration.md` for onboarding; ordinary read-only questions need none.
 
 ## Record the work, then continue
+
+Use AgentOS **Workspace hygiene** before substantial writes and at the end of a
+run. Record the owned run root/class, remaining peak on its real volume and
+release condition in the current work journal. At completion, retain one factual
+disposition: removed by a qualified route, accepted transfer/readback, or retained
+with reason, owner and date/event. Do not delete old unknown data or treat a
+metadata plan as a reservation. The owning contract is `docs/WORKSPACE_HYGIENE.md`;
+load its method with `agentos workflow guidance --method workspace-hygiene`.
 
 `start` loads context; it does not mark work as begun. When actual project work
 begins, including research, document analysis or checks, the main writer records

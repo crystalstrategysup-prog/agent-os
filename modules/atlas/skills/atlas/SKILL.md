@@ -5,6 +5,13 @@ description: "Manage controlled development through parameterized standard proce
 
 # Atlas
 
+At first engagement, read AgentOS `docs/WORK_ENVIRONMENT.md` (or the installed
+resource) and the frozen Solution integrity laws in PROCESS. Reuse the current
+introduction thereafter; restore the goal and relevant parts after context loss.
+Only an explicit owner decision about those texts permits a new revision;
+agents may not weaken them or their pinned checks for a task. Current project
+facts remain in ordinary records. Verify application through actual work.
+
 **Project scope:** load [operating-modes.md](references/operating-modes.md)
 to select MINIMAL or FULL work and the separate development level; AGENTS only
 routes to Atlas.
@@ -19,12 +26,19 @@ Continue a project from its objective and actual state. Leave the next agent a
 short, verifiable path to the result: work → owner → change → acceptance.
 Perform repeatable actions through standard procedures with explicit parameters.
 
+Apply **Workspace hygiene** at every level and both Atlas scopes. Before heavy
+writes, load `agentos workflow guidance --method workspace-hygiene`, or the marked
+section in current PROCESS and `docs/WORKSPACE_HYGIENE.md`. Keep resource owner,
+capacity and final disposition in the existing work record. A read-only
+`agentos project resource plan` observes explicit run roots; it neither reserves
+space nor authorizes deletion. No duplicate matrix or per-file report is needed.
+
 Read [quickstart.md](references/quickstart.md) for daily work,
 [modularity.md](references/modularity.md) for module/API/build/deployment boundaries,
 and [operations.md](references/operations.md) for exact methods and parameters.
 At start and continuation, read the body returned by the effect-free
 `agentos workflow guidance`: **Project development** is the default. If unavailable,
-read that exact section of AgentOS `docs/PROCESS.md`, or installed
+read **Solution integrity** and that method section of AgentOS `docs/PROCESS.md`, or installed
 `resources/docs/PROCESS.md` located with `agentos resources`. Reuse the same
 current body if entry already materialized it. Plan the whole current level,
 build the common runnable stand with mandatory module boundaries and a main
@@ -38,13 +52,26 @@ a level. Patches, fixes, enhancements and continuation inherit the applicable
 level or default 3 without a chooser. The level does not change MINIMAL/FULL
 scope or authority.
 
+Use temporary **diagnostic level 0** on an explicit audit request or before
+substantial work with material uncertainty about the project's state or direction.
+Read **Solution integrity** and **Project diagnostics** through
+`agentos workflow guidance --method project-diagnostics`, or their marked PROCESS
+sections. Retain the 1–5 choice, resume an active pass across sessions, update the
+existing dossier/inventory/plan through their writer, then return to the saved
+mode; a newer explicit owner choice prevails. Review the need after significant
+milestones using changed evidence, without repeating unchanged full audits.
+`project-audit` supports this review against its declared inventory; it is not
+whole-project behavioral acceptance. Read-only diagnosis needs no Atlas bootstrap.
+
 For a specific malfunction needing causal investigation, select
 `agentos workflow guidance --method causal-debugging`, or read the **Causal debugging**
 section of AgentOS `docs/PROCESS.md`, or installed `resources/docs/PROCESS.md`
 located with `agentos resources`. Restore the existing journal, fixed conditions,
 current configuration and next experiment from the assigned packet. Return to
 the development plan after the scoped correction or mitigation criterion is met.
-Ordinary feature work needs no invented failure, reversal cycle or experiment
+Apply the shared laws at every development level; standalone substantive research
+or calculation can load `agentos workflow guidance --method solution-integrity`
+without project registration. Ordinary feature work needs no invented failure, reversal cycle or experiment
 journal. These are the canonical methods, not another Atlas workflow. Missing or
 unreadable content is a context gap; a path/hash/ACK alone is not pickup.
 An existing WM-UI matrix uses [upstream-adapter.md](references/upstream-adapter.md):

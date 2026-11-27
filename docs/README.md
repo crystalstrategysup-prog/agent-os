@@ -1,9 +1,11 @@
 # AgentOS documentation
 
-Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Resolve the current source version from `pyproject.toml` and
+`src/agent_os/__init__.py`, and delivery from the selected release manifest.
+Historical version headings do not establish publication or host adoption.
 
 
-## 0.8.0rc2 public source candidate
+## Current entry and historical foundation
 
 Start with the [module map and project API workflow](MODULAR_PROJECT_API.md),
 [current interfaces](CONTRACTS.md) and the relevant module's contract. The current
@@ -13,18 +15,19 @@ work. The indexed results, coordinator and model-policy contracts introduced in
 stable 0.7.1 remain in [indexed handoff](INDEXED_HANDOFF.md),
 [coordination](WORK_COORDINATION.md) and [model selection](MODEL_SELECTION.md).
 
-The public source declares `0.8.0rc2`; publication, installation and target verification remain separate. Ordinary questions and read-only work need
+Publication, installation and target verification remain separate. Ordinary questions and read-only work need
 no project intake; real project changes follow a documentation-first stage.
 Native AgentOS hooks are excluded. Check publication and installation with
 separate readback.
 
-Start with [PROCESS](PROCESS.md), then read only the documents relevant to the
+Start with the frozen [work laws](PROCESS.md#solution-integrity) and, on first
+engagement, [WORK_ENVIRONMENT](WORK_ENVIRONMENT.md). Then read documents relevant to the
 work: [ARCHITECTURE](ARCHITECTURE.md), [CONTRACTS](CONTRACTS.md),
 [SECURITY_MODEL](SECURITY_MODEL.md), [INSTALL_UPDATE](INSTALL_UPDATE.md), or
 [QUALITY](QUALITY.md). [FOUNDATION_OVERLAY](FOUNDATION_OVERLAY.md) explains
 physical separation and [DOCUMENTATION_CATALOG](DOCUMENTATION_CATALOG.md)
 explains document selection. The current public workflow is
-[PROCESS](PROCESS.md); [the source release contract](agentos/RELEASE.md)
+[PROCESS](PROCESS.md); [the release contract](RELEASE.md)
 records candidate boundaries. Local task and stage records are excluded from
 public exports and runtime resources; the installed process contract is the
 packaged `resources/docs/PROCESS.md`. See [COMPATIBILITY](COMPATIBILITY.md) for

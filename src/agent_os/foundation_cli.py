@@ -30,6 +30,14 @@ def dispatch(argv: list[str]) -> int | None:
     }:
         return None
     try:
+        if rest[:2] == ["project", "resource"]:
+            # Observation consumes only explicitly supplied roots. Do not
+            # initialize or discover an owner home for a read-only plan.
+            from .project_resource_cli import command
+
+            result, code = command(rest[2:])
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return code
         if rest[0] == "library":
             from .handoff_cli import command
 

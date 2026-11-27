@@ -41,7 +41,8 @@ def _goal(value, required):
     if value is None and not required:
         return None
     fields = {"original", "scope", "acceptance", "known_answers", "authority_ref", "source_ref"}
-    if not isinstance(value, dict) or set(value) != fields:
+    if (not isinstance(value, dict) or fields - set(value)
+            or set(value) - fields - {"development", "diagnostic"}):
         raise GateError("context_goal_contract_required")
     for key in ["original", "scope", "authority_ref", "source_ref"]:
         _text(value[key], key)
@@ -56,6 +57,20 @@ def _goal(value, required):
     for key, answer in answers.items():
         _text(key, "answer_key", 200)
         _text(answer, "answer")
+    if "diagnostic" in value:
+        from .project_diagnostics import normalize_selection
+
+        diagnostic = normalize_selection(value["diagnostic"])
+        for key in ("id", "scope", "reason"):
+            _text(diagnostic[key], "diagnostic_" + key)
+        _text(diagnostic["captured_development"]["scope"], "diagnostic_captured_scope", 200)
+        value = {**value, "diagnostic": diagnostic}
+    if "development" in value:
+        from .development_level import normalize
+
+        choice = normalize(value["development"])
+        _text(choice["scope"], "development_scope", 200)
+        return {**value, "development": choice}
     return value
 
 
@@ -73,9 +88,54 @@ def _bytes(home, relative):
     return data
 
 
+def _task_development(source: dict) -> dict:
+    """Read one explicitly selected task; never discover a task or grant entry."""
+    from . import project
+    from .development_level import effective
+    from .project_diagnostics import context_selection
+
+    if (not isinstance(source, dict) or set(source) != {"root", "task_id", "revision"}
+            or type(source.get("revision")) is not int
+            or not 1 <= source["revision"] <= 2147483647):
+        raise GateError("context_development_source_invalid")
+    root_value = _text(source.get("root"), "development_root")
+    if not Path(root_value).is_absolute():
+        raise GateError("context_development_source_absolute_root_required")
+    task_id = identifier(source.get("task_id"))
+    root = project.root_path(Path(root_value))
+    current_project = project.load_project(root)
+    task = project.load_task(root, task_id)
+    project_id = identifier(current_project.get("id"))
+    if task.get("project_id") != project_id:
+        raise GateError("context_development_task_mismatch")
+    if type(task.get("revision")) is not int or task["revision"] != source["revision"]:
+        raise GateError("context_development_revision_mismatch")
+    answers = task.get("answers")
+    if not isinstance(answers, dict) or ("development" not in answers and "diagnostics" not in task):
+        raise GateError("context_development_task_choice_missing")
+    # A native diagnostic explicitly captures even the previously implicit
+    # default. Other legacy tasks retain the existing choice-required contract.
+    diagnostic = context_selection(task)
+    if diagnostic is not None:
+        for key in ("id", "scope", "reason"):
+            _text(diagnostic[key], "diagnostic_" + key)
+        _text(diagnostic["captured_development"]["scope"], "diagnostic_captured_scope", 200)
+    selected = effective(answers)
+    _text(selected["scope"], "development_scope", 200)
+    result = {
+        "root": str(root), "task_id": task_id, "revision": task["revision"],
+        "project_id": project_id, "task_digest": digest(task),
+        "project_digest": digest(current_project), "development": selected,
+    }
+    if diagnostic is not None:
+        result["diagnostic"] = diagnostic
+    return result
+
+
 def build(home: Path, request: dict) -> dict:
     """Return actual relevant text and its source binding, without writing files."""
-    fields = {"schema", "session_id", "turn_id", "purpose", "profile_keys", "index_keys", "goal"}
+    fields = {"schema", "session_id", "turn_id", "purpose", "profile_keys", "index_keys", "goal",
+              "development_source"}
     if (not isinstance(request, dict) or set(request) - fields
             or request.get("schema") != "agentos.context-request/v1"):
         raise GateError("context_invalid_request")
@@ -89,16 +149,47 @@ def build(home: Path, request: dict) -> dict:
     if len(index_keys) > 8:
         raise GateError("context_index_limit")
     goal = _goal(request.get("goal"), purpose in {"project-change", "continuation"})
-    if purpose in READS and not keys and not index_keys:
+    task_source = None
+    if "development_source" in request:
+        if purpose in READS or goal is None:
+            raise GateError("context_development_source_requires_project_goal")
+        task_source = _task_development(request["development_source"])
+        selected = task_source["development"]
+        if "development" in goal and goal["development"] != selected:
+            raise GateError("context_development_selection_mismatch")
+        goal = {**goal, "development": selected}
+        diagnostic = task_source.get("diagnostic")
+        if "diagnostic" in goal and goal["diagnostic"] != diagnostic:
+            raise GateError("context_diagnostic_selection_mismatch")
+        if diagnostic is not None:
+            goal = {**goal, "diagnostic": diagnostic}
+    diagnostic = goal.get("diagnostic") if goal else None
+    if diagnostic is not None:
+        if purpose not in {"audit", "project-change", "continuation"}:
+            raise GateError("context_diagnostic_requires_audit_or_project_goal")
+        if "development" not in goal:
+            raise GateError("context_diagnostic_saved_development_required")
+    if (purpose in {"project-change", "continuation"} and "development" not in goal
+            and {"level", "development_level"} & goal["known_answers"].keys()):
+        # These legacy answer fields are hints, not a typed scoped choice.
+        # Refuse the observed silent reset without guessing level or scope.
+        raise GateError("context_development_source_or_selection_required")
+    if purpose in READS and not keys and not index_keys and diagnostic is None:
         return {"schema": "agentos.context-capsule/v1", "status": "FAST_PATH",
                 "purpose": purpose, "home_read": False, "intake_required": False,
                 "authority_granted": False, "behavior_compliance": "NOT_PROVEN"}
 
     foundation_guidance = None
-    if purpose in {"project-change", "continuation"}:
-        from .engineering_guidance import load
+    if purpose in {"project-change", "continuation"} or diagnostic is not None:
+        from .engineering_guidance import DIAGNOSTIC_METHOD, load
 
-        foundation_guidance = load()
+        def current_guidance():
+            if diagnostic is not None:
+                return load(DIAGNOSTIC_METHOD, development=goal["development"])
+            return (load(development=goal["development"])
+                    if "development" in goal else load())
+
+        foundation_guidance = current_guidance()
 
     depends_on_profiles = bool(keys or index_keys)
     selected = (profile_adapter.context(home) if depends_on_profiles
@@ -162,8 +253,15 @@ def build(home: Path, request: dict) -> dict:
         raise GateError("context_selection_changed_during_read")
     if any(sha(_bytes(home, path)) != expected for path, expected in sources.items()):
         raise GateError("context_dependency_changed_during_read")
-    if foundation_guidance is not None and load() != foundation_guidance:
+    if foundation_guidance is not None and current_guidance() != foundation_guidance:
         raise GateError("context_foundation_guidance_changed_during_read")
+    if task_source is not None:
+        try:
+            current_source = _task_development(request["development_source"])
+        except (GateError, OSError, ValueError, KeyError) as exc:
+            raise GateError("context_development_source_changed_during_read") from exc
+        if current_source != task_source:
+            raise GateError("context_development_source_changed_during_read")
     body = {
         "schema": "agentos.context-capsule/v1", "status": "MATERIALIZED",
         "session_id": session, "turn_id": turn, "purpose": purpose,
@@ -179,6 +277,13 @@ def build(home: Path, request: dict) -> dict:
     }
     if foundation_guidance is not None:
         body["foundation_guidance"] = foundation_guidance
+        body["development"] = foundation_guidance["development"]
+    if task_source is not None:
+        body["development_source"] = task_source
+        body["development"] = task_source["development"]
+    if diagnostic is not None:
+        body["diagnostic"] = diagnostic
+        body["effective_level"] = 0
     if len(json.dumps(body, ensure_ascii=False).encode()) > LIMIT:
         raise GateError("context_size_limit")
     return {**body, "capsule_sha256": digest(body)}

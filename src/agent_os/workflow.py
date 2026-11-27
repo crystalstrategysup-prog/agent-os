@@ -19,7 +19,7 @@ TARGET_EFFECTS = (
 EFFECTS = ("local-project-write", *TARGET_EFFECTS)
 
 
-def route(kind: str, effects: list[str] | None = None) -> dict:
+def route(kind: str, effects: list[str] | None = None, *, development: dict | None = None) -> dict:
     if kind not in KINDS:
         raise GateError("unknown_request_kind")
     effects = [] if effects is None else effects
@@ -30,6 +30,8 @@ def route(kind: str, effects: list[str] | None = None) -> dict:
         raise GateError("unknown_request_effect")
     selected = sorted(set(effects))
     project_change = kind == "project-change" or "local-project-write" in selected
+    if development is not None and not project_change:
+        raise GateError("development_selection_requires_project_change")
     target = sorted(set(selected) & set(TARGET_EFFECTS))
     mode = (
         "TARGET_AUTHORITY_REQUIRED" if target
@@ -54,7 +56,7 @@ def route(kind: str, effects: list[str] | None = None) -> dict:
     if project_change:
         from .engineering_guidance import load
 
-        result["foundation_guidance"] = load()
+        result["foundation_guidance"] = load(development=development)
     return result
 
 
@@ -66,14 +68,29 @@ def command(argv: list[str]) -> tuple[dict, int]:
     p.add_argument("--kind", choices=KINDS)
     p.add_argument("--effect", choices=EFFECTS, action="append", default=[])
     p.add_argument("--method", choices=METHODS)
+    p.add_argument("--development-level", help="Saved planning/check depth 1–5; 1D aliases 1. For temporary level 0 select --method project-diagnostics.")
+    p.add_argument("--development-scope", help="Existing project, stage, module or task scope")
     a = p.parse_args(argv)
+    development = None
+    if (a.development_level is None) != (a.development_scope is None):
+        raise GateError("development_level_and_scope_required_together")
+    if a.development_level is not None:
+        from .development_level import normalize
+
+        value = a.development_level
+        if value == "0":
+            raise GateError("diagnostic_zero_use_project_diagnostics_with_saved_development_level")
+        development = normalize({
+            "level": int(value) if value in {"1", "2", "3", "4", "5"} else value,
+            "scope": a.development_scope,
+        })
     if a.action == "guidance":
         if a.kind is not None or a.effect:
             raise GateError("engineering_guidance_does_not_accept_route_arguments")
-        return load(a.method or DEFAULT_METHOD), 0
+        return load(a.method or DEFAULT_METHOD, development=development), 0
     if a.method is not None:
         p.error("--method is only valid for guidance")
     if a.kind is None:
         p.error("route requires --kind")
-    result = route(a.kind, a.effect)
+    result = route(a.kind, a.effect, development=development)
     return result, 2 if result["status"] == "BLOCKED" else 0

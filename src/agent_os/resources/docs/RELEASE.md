@@ -1,6 +1,12 @@
 # Release policy
 
-Current publication candidate: `0.8.0rc2056`, completing finite resource-chain planning, failed-baseline continuation and journal-recovery qualification on the `0.8.0rc2055` causal-debugging baseline. The existing actual-body loader and handoff contracts remain in use. Package, CLI, MCP and release metadata must agree. This is a prerelease; source publication, asset availability, target installation and observed agent behavior are separate.
+Resolve the selected source/package version from `pyproject.toml` and
+`src/agent_os/__init__.py`; use the matching `CHANGELOG.md` entry for its changes
+and `.release/VERSION.json` for its build pin. Package, CLI, MCP and selected
+release metadata must agree. This policy does not duplicate a moving "current"
+RC number or treat a historical feature summary as the newest release.
+Source publication, installed runtime and observed agent behavior require
+separate evidence.
 
 Recovery v3 preserves workflow/native-turn identity and existing CAS/journal and finite supported-observer limits. It does not provide missing provider exact-origin capabilities. Old v1/v2-only readers are not safe rollback targets after real v3 metadata activation. No host activation, scheduler or native hook is implied. Earlier tags and published assets remain immutable.
 

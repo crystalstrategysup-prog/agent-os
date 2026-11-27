@@ -5,7 +5,15 @@ description: "Select and maintain project documentation according to project typ
 
 # agentos-documentation-planning
 
-Input: dossier, verified project types and features, and the selection from entry.
+Input: the current dossier/inventory, verified project types and features, and
+the applicable selection from entry or read-only diagnosis. For temporary
+diagnostic level 0, follow **Project diagnostics** in `resources/docs/PROCESS.md`
+or `agentos workflow guidance --method project-diagnostics`. Compare actual
+sources with the owning documents; expose missing, stale or conflicting content
+and update it through its writer within the authorized scope. Retain UNKNOWN
+and reasoned N/A, the saved 1–5 mode and a clear next action. A completed audit
+does not certify that every document or product behavior is correct.
+
 Use the document catalog to select meaningful IDs and suitable formats. Do not
 create OpenAPI, ERD, or policies that the change does not need. A small document
 may satisfy several IDs; a complex project may separate product, architecture,

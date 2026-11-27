@@ -1,6 +1,10 @@
 # Process: direct reading, documented changes
 
-Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Read the selected source's `pyproject.toml` or installed package metadata for the
+package version, and the selected release manifest for release identity. Version
+metadata does not establish publication or host adoption. RC-labelled sections
+below are retained historical records, not current installation or publication
+claims.
 
 
 ## Historical indexed handoff successor0.7.0rc1
@@ -174,6 +178,314 @@ validity period or lease, allowed effects, and rollback at the target. Read
 authority does not authorize a send. Local READY does not authorize production.
 If a target capability is absent, stop only that action and continue other
 authorized preparation. There is no universal `--authorized` override.
+Choose protection by the actual effect and affected state under
+[Proportionate protection](#proportionate-protection-of-data-and-runtime).
+Rollback means a sufficient recovery route, not an automatic full copy.
+
+<!-- agentos:solution-integrity:start -->
+
+## Solution integrity
+
+### Свод законов работы — редакция 1
+
+**Решение сохраняет исходную задачу, имеет обоснованный путь получения и выдерживает существенную проверку. Желаемый ответ сам по себе этого не доказывает.**
+
+Применяй законы к разработке, исследованиям, расчётам и диагностике. Они действуют на уровнях 1–5 и во временной диагностике 0. Уровень меняет глубину работы, но не достоверность. Для новой функции обосновывается ожидаемое поведение; выдумывать неисправность и её причину не нужно. Явная заглушка или временная мера может быть принятым промежуточным результатом.
+
+**Агентам запрещено менять, сокращать, переопределять или ослаблять этот свод, его эталон и проверку ради своей задачи. Изменение возможно только по явному решению владельца именно об изменении свода. Предложение сохраняется отдельно; прежняя редакция остаётся в истории. Общее поручение улучшить проект таким разрешением не является.**
+
+| № | Закон | Правильно | Неправильно |
+|---|---|---|---|
+| 1 | Сохраняй задачу, входы, условия и критерий успеха. Изменённые условия — отдельный опыт. | Учтены исходные расходы. | Расходы убраны ради прибыли. |
+| 2 | Обоснуй ожидаемый результат: смысл, единицы, порядок, время и округление. Ожидание тоже может быть ошибочным. | 10 000 копеек = 100 рублей. | «Число кажется большим». |
+| 3 | Проследи источник → вход → преобразование → выход на текущих версиях и настройках. | Проверен реально вызываемый код. | Исправлена неиспользуемая копия. |
+| 4 | Найди последнее верное и первое неверное состояние. Углубляйся по наблюдаемому расхождению. | Проверено преобразование неверного поля. | Переписана вся система наугад. |
+| 5 | Причина даёт проверяемое предсказание; сопоставляй существенные альтернативы. Противоречие требует пересмотра гипотезы. | Повтор события воспроизводит лишний эффект. | Причина выбрана по правдоподобию. |
+| 6 | Проверяй существенный результат независимым эталоном, инвариантом или способом расчёта. | Малый пример рассчитан отдельно. | Ожидание вычислено проверяемой функцией. |
+| 7 | Сохраняй исходную точку и различимость влияния изменений. Связанные изменения обосновывай вместе. | Сравнены одинаковые входы до и после. | Одновременно заменены данные и критерий. |
+| 8 | Исправляй породивший ошибку механизм. Снятие симптома называй временной мерой. | Устранена повторная обработка. | Перезапуск объявлен исправлением причины. |
+| 9 | Обосновывай решение только доступной тогда информацией. Поздние данные служат оценке. | Использована уже закрытая свеча. | Будущий минимум выбран задним числом. |
+| 10 | Сохраняй состояние, историю и исходную идентичность неопределённой операции. Новый ID не обнуляет эффект. | Проверен исходный неизвестный запрос. | Тот же эффект отправлен под новым ID. |
+| 11 | Ищи существенный случай, который опровергнет решение или покажет его вред. | Проверены настоящий повтор и другая операция. | Проверен только удобный пример. |
+| 12 | Различай наблюдение, гипотезу, механизм, проверенную выборку и обобщение. Называй границы. | Кандидат установлен; живой сценарий открыт. | Сборка названа готовым продуктом. |
+| 13 | Планируй целое, собирай связный модульный стенд, затем углубляй выбранную часть и подключай обратно. | Главный путь проходит через модули. | Готовые части не работают вместе. |
+| 14 | Рано проверь предпосылку, способную обесценить выбранный путь, в нужной среде и контексте. | Проверены подпись и системный запуск. | Linux-тест выдан за проверку другой ОС. |
+| 15 | Принимай пользовательскую цепочку в объявленном объёме, включая существенный следующий переход состояния. | Проверены вход, выход и повторный вход. | Сообщение бота принято за сессию приложения. |
+| 16 | Если попытка не даёт новой информации, измени проверку или подход. Уточнение владельца сверяй с фактическим контекстом. | Сопоставлены удалённая и графическая сессии. | Повторяется уже опровергнутая просьба. |
+| 17 | Сохраняй выбранный уровень. Проверяй соразмерно связи и риску; на уровне 1 нужны модульность, полезный debug и журнал ошибок. | Связный шаг проверен, работа продолжена. | Каждая вспомогательная функция тормозит платформу. |
+| 18 | Фиксируй накопленный результат, проверку, остаток и следующий шаг кратко. Явный договор доставки сохраняй отдельно. | Принятое сохранено; доставка ещё открыта. | Новый этап обнулил прогресс; отчёт остановил работу. |
+| 19 | Владей ресурсами. Перед большой записью проверь запас на реальном томе и параллельные записи; перед очисткой — потребителей, уникальные данные и восстановление. Измеряй эффект. | Известный временный ресурс освобождён и проверен. | Всё остановленное объявлено мусором. |
+| 20 | Сохраняй права, Auth/ACL, данные, откат и границы синтетики, кандидата и production. Закон не создаёт полномочий. | Выполнена разрешённая часть, точный остаток назван. | Проверка или разрешение обойдены ради PASS. |
+
+**Приёмка:** результат, нарушающий применимый закон, не принимается в заявленном объёме. Сохрани проверенные части, назови конкретное нарушение и исправь его; не обнуляй всё и не расширяй проверку без основания. Самооценка исполнителя, число тестов, ACK или хеш не заменяют проверку результата. Зависимые наблюдения не становятся независимыми от их количества.
+
+**Короткий порядок:** восстанови цель и текущую основу → выбери связный шаг → выполни → проверь существенное → запиши результат и остаток → продолжай разрешённую работу. Для исправления объясни: где расхождение; какой механизм; почему правка влияет; что могло её опровергнуть и что показала проверка; что ещё неизвестно.
+
+**Соразмерность:** используй существующие план, контракты и журнал. Новые формы, полный архив после каждого малого шага, произвольные лимиты времени и доказательство каждой функции не требуются. Явное поручение владельца о передаче или расписании сохраняется. Детали уровней, диагностики, причинной проверки и гигиены находятся в соответствующих разделах PROCESS. Чтение свода не доказывает его применение.
+
+<!-- agentos:solution-integrity:end -->
+
+<!-- agentos:workspace-hygiene:start -->
+
+## Workspace hygiene
+
+Own the space used by the authorized work through its useful lifetime. Apply
+this method to development levels **1–5** and diagnostic **0** without changing
+the saved level or scope. Before a material build, test, restore, package,
+download or cleanup, establish the relevant resource and capacity facts. Reuse
+unchanged facts and record one compact result at a substantive checkpoint,
+close or handoff. The complete class, retention and qualification contract is
+[WORKSPACE_HYGIENE.md](WORKSPACE_HYGIENE.md).
+
+### What is implemented
+
+`agentos project resource plan --input PATH|-` observes an explicit bounded
+private descriptor and returns a metadata-only plan. It does not register a
+resource, reserve capacity, release a lease, delete files or accept a stage.
+Declared ownership, reproduction or closure is not independently proved by a
+plan. Native reservation and cleanup apply/reconcile are proposed successors,
+with separate destructive-profile qualification. Existing inventory and task
+metadata budgets do not allocate filesystem capacity. A handoff retirement
+retains history and does not reclaim space.
+
+The obligations below already govern the agent's authorized work. Use an
+existing qualified cleanup routine for its own private resources when disposal
+is within the task's authority; do not ask again for each ordinary derived file.
+A new observation plan grants no deletion or host authority and does not enable
+mass cleanup of old directories.
+
+### Before and during the run
+
+Keep the existing task/run record of the resource's opaque ID, project/run and
+creating operation, owner, private admitted root, class, reproduction/recovery
+reference, consumers and release condition. One build tree or private test
+database needs one root record: its known ordinary derivatives inherit the
+class. Separate a different owner, durable evidence or recovery copy inside it.
+Keep the path mapping private on the host; ordinary output uses opaque IDs and
+safe reasons. Age, a `tmp` prefix, filename or common UID do not establish
+provenance. An unclassified existing object stays HOLD.
+
+Choose the actual filesystem and estimate its remaining peak of simultaneously
+live new writes: archive/download, expansion, PGDATA/WAL, intermediates, package,
+final copy, retained partial and any retry overlap. Do not count an existing
+input read in place as a new copy. Use a comparable measured run or a justified
+bound; distinguish estimates, configured limits, usage and measured peaks.
+Bound unknown growth by chunks with fresh checks or a qualified exclusive window
+with an enforceable limit. Do not prescribe one universal multiplier or margin.
+
+Measure available bytes and inode capacity for the current identity, applicable
+quota when known, relevant filesystem identity and other participating runs'
+unconsumed reservations. Compare the remaining peak after subtracting those
+promises and justified service headroom. Reserve room in the decision for the
+final result and emergency journal. Physical allocation reduces an unconsumed
+promise; counting both in full would count the same use twice. For a known
+required quota without an observation, use a separately verified bounded area
+or pause the dependent write. UNKNOWN is not unlimited. The read-only command
+does not make a shared reservation or fence external writers.
+
+Keep live ownership and consumer facts current. On normal exit and exception,
+finish the owned routine in `finally`. After a crash or lost reply, reconcile
+the original operation before a new attempt. Verify the exact stopped process
+using the relevant host/boot/start identity, run, locks and data root. An absent
+PID file or expired lease requires reconciliation; neither proves termination.
+
+### Decide what can be released
+
+- Release scratch, staging, build output or a private cache only within its
+  proven ownership, after required output is retained/read back and reproduction
+  inputs remain available. Shared caches belong to their manager and consumers.
+- A disposable database additionally needs actual isolation, reproducible
+  seed/migrations, stopped owner and consumers, and retained diagnostic evidence.
+  Unique changes or uncertain process state stay HOLD.
+- A temporary recovery copy needs a closed rollback window, no active
+  backup/restore dependency and a verified usable replacement or exact recovery
+  route. Check from the restoration location, including dependencies and access;
+  replacing the only critical copy requires a restoration check.
+- Retain authoritative results, receipts, journals, accepted checkpoints,
+  durable backups and necessary PREPARED/UNKNOWN evidence under their own policy.
+  A separate packaging copy can be removed after destination content is verified.
+  No automatic age expiry or bulk historical cleanup follows from this method.
+
+### Complete or hand over cleanup
+
+Use the selected run's plan to see each resource ID, class/owner, estimate,
+release or HOLD reason, and next action. Resolve the listed dependency through
+its owner; close the owned consumer, preserve the useful result and record the
+release condition. Then use only a qualified already-authorized routine with
+durable intent/outcome outside the removable tree and fresh identity checks.
+Keep a single cleaner in an exclusively controlled private scope. Do not follow
+symlinks, cross unexpected mounts, infer mount identity from device number alone,
+or treat another object at the same name as the former resource. A hardlink,
+unexpected independent object, uncontrolled writer or unsupported adapter gives
+HOLD in the initial profile. Repeated `lstat` alone cannot exclude substitution.
+
+Read back the original object and any retained/transferred result. Lost output
+requires the same operation ID and actual-state reconciliation, not another
+delete against the current name. Record released, accepted transfer, or retention
+with reason, responsible actor and next review date/event in the existing run
+journal. A due date requests review rather than authorizing removal. A transfer
+of HOLD retains responsibility and does not free bytes. Unrelated historical
+material does not block the current stage. These are procedural obligations;
+this release adds no native close gate or per-file report requirement.
+
+Keep removed names, known allocated blocks and observed available-space delta
+separate. Competing writes can make the volume delta zero or negative; an open
+deleted file may keep its blocks. Retain timestamps and filesystem/quota scope.
+Report uncertain reclaimed bytes as UNKNOWN, even after name removal is verified.
+
+### Handle insufficient space without losing the result
+
+On negative admission, ENOSPC or EDQUOT, stop new heavy writes to that filesystem.
+Observe bytes, inode, quota and the selected owned temporary resources; check
+open-deleted files when observable. Keep an unmeasured accumulation cause unknown.
+Check a candidate alternate volume's capacity, quota, rights and lifetime, plus
+memory headroom for memory-backed storage. Recheck both staging and the final
+destination; their free space is separate.
+
+Preserve the previous accepted result. Write its replacement through an exclusive
+sibling partial, bounded writes, size/hash readback, file fsync, atomic replacement
+on that filesystem and directory fsync under the publisher's qualified semantics.
+Keep a failed write visibly partial and rebuild only reproducible outputs.
+If the required durable journal cannot be written, pause new deletion until its
+storage is reliable. Retain useful progress and an owned next action; do not
+create another full archive or repeat unchanged work to finish a cleanup note.
+
+<!-- agentos:workspace-hygiene:end -->
+
+<!-- agentos:project-diagnostics:start -->
+
+## Project diagnostics
+
+**Diagnostic level 0** is a temporary, one-pass mode for understanding and
+correcting the direction of an existing project. Its result is a current dossier,
+an explicit inventory and gap assessment, and a justified next step. Ask: what
+result are we pursuing, what actually exists, do the parts fit, does the work
+serve that result, and what should happen next? Apply **Solution integrity**;
+guidance prepends that same canonical body to this method.
+
+Include resource ownership, capacity and retention gaps in the current dossier
+where relevant; use [Workspace hygiene](#workspace-hygiene) for material audit
+outputs and their disposition, without scanning unrelated historical roots.
+
+### Enter, preserve and return
+
+Keep the selected development level **1–5** and its scope; 0 does not replace it
+or add a sixth persistent choice. Enter on the owner's request, or before
+substantial work when material uncertainty about the current state, objective,
+architecture or dependencies could lead to the wrong implementation. At a
+significant architecture, integration, migration or delivery milestone, review
+whether changed evidence warrants another diagnostic pass. This is an event-based
+decision, not a calendar schedule or an audit after every patch.
+
+Record the reason, scope, current basis and captured previous level in the
+existing task/context. An active pass survives interruption and a new session:
+resume its findings and next investigation instead of starting again. Native
+registered tasks use `project diagnose start|status|finish|cancel`; take exact
+arguments from the current CLI/contract. Standalone read-only work needs no
+intake, project initialization or fabricated task. Retain equivalent state in its
+existing plan/context and journal; do not create a parallel settings register.
+
+On finish, retain the current dossier reference, findings, unresolved work and
+next action, then return to the saved development mode. An explicit newer owner
+choice of level/scope takes precedence over the captured previous choice; retain
+both as history rather than restoring an obsolete setting. Cancellation records
+the partial result and remainder and also returns the mode; it does not pretend
+the audit completed. Neither transition closes the product task, accepts its
+findings as repaired, grants READY/authority, nor clears a concrete blocker.
+
+### Establish the current project, then its gaps
+
+1. **Restore the intended outcome.** Read the original objective, current scope,
+   main user scenarios, constraints and acceptance conditions. Separate the
+   desired state from observations. Identify where current work no longer serves
+   the goal; a convenient implementation is not a substitute for the requested
+   result. Preserve the current writer, accepted results and their dated basis.
+2. **Build the current inventory.** Cover the whole project at the selected
+   architectural level: authoritative source/revisions, documents, components,
+   services, dependencies, state owners, environments, interfaces and existing
+   work. Name the inventory's boundary, exclusions and uninspected areas. Expand
+   selected modules recursively when a dependency or discrepancy requires it;
+   a top-level audit need not enumerate every internal helper. Stay within the
+   known project roots and authorized sources, not unrelated accounts or hosts.
+3. **Trace the useful chains.** Connect goal → user scenario → modules →
+   interfaces/data → implementation → evidence → delivery/recovery. Establish
+   responsibility, inputs/outputs, actual consumers, state/effect ownership and
+   dependencies at each material boundary. A directory or service name alone
+   does not establish modularity, independent builds or independent updates.
+4. **Compare documents with actual state.** Check applicable contracts,
+   architecture, dossier, roadmap and stage records against the relevant source
+   and permitted runtime observations. Identify missing, stale, conflicting or
+   incomplete content, including a documented interface with undocumented
+   consumers or incompatible errors. A heading, file, hash or generated schema
+   alone does not prove semantic correctness or complete coverage.
+5. **Classify consequential gaps.** For each material finding keep its source,
+   observation, effect on the goal, remaining uncertainty and next owner/action.
+   Distinguish a demonstrated inconsistency from a hypothesis or missing evidence.
+   Identify which gap blocks a particular next step and which belongs to a later
+   stage. Do not stop independent authorized work for unrelated findings.
+6. **Update the path forward.** Correct the affected authoritative documents
+   through their existing writer and permitted change route; retain AS_IS and
+   proposals separately. Reuse the current dossier, architecture, work matrix,
+   roadmap and journal rather than creating another report suite. If a required
+   source cannot be changed in this scope, return an exact proposed delta to its
+   owner. Preserve history and prior partial acceptance. Leave an ordered plan
+   with dependencies, a bounded next result and its meaningful check.
+
+### Select applicable contracts and evidence
+
+Use [the documentation catalog](DOCUMENTATION_CATALOG.md) and the existing module
+contracts to select the required content and suitable formats. Inspect:
+
+- **Interfaces:** provided and consumed HTTP, event, RPC and in-process methods;
+  input/output/error semantics, versions, compatibility, Auth/ACL/tenant context,
+  effects, idempotency and unknown-outcome reconciliation. Use OpenAPI for an
+  applicable HTTP surface, or the project's appropriate schema/IDL/typed contract.
+  No HTTP API means OpenAPI may be N/A with a reason, not a missing deliverable.
+- **State and data:** actual owner, lifecycle, schema and migrations, lineage,
+  privacy/access, transaction boundaries and partial/repeated operations. Do not
+  manufacture an ERD when there is no database or omit real file-backed state.
+- **Build and operations:** declared build/dependency inputs, artifacts,
+  deployment units, versions/configuration, useful logs and error journal,
+  readiness, continuity, recovery and rollback where the stage/effect needs them.
+  Do not infer independent deployment from logical module boundaries.
+- **Quality and progress:** what is accepted, partially accepted, running,
+  blocked or not begun; exact proof scope and the concrete remainder. Separate
+  source review, synthetic stand, candidate, installed state and observed
+  production behavior. Preserve untested conditions and stale evidence.
+
+Mark UNKNOWN when evidence cannot establish a fact, and N/A only with an
+applicability reason. Missing required content is a named gap, not a placeholder
+filled to pass a gate. Reuse current evidence with its original scope/date;
+repeat only for changed inputs, a material discrepancy, applicable freshness or
+a required gate. Existing Atlas `project-audit`/coverage is useful evidence about
+its declared inventory; it does not automatically inspect the whole source or
+execute the product. Read-only diagnosis grants no runtime mutation or access.
+
+For migration from an existing production system to independent service modules,
+map the current user journeys, identities/sessions, state and in-flight work to
+the proposed owners and contracts. Identify compatibility during mixed versions,
+migration ownership/order, observable continuity, cutover conditions, reconciliation
+and recovery. Confirm which units can actually be built and updated separately.
+A diagram, successful build or synthetic scenario does not establish a seamless
+user transition; place the remaining real acceptance in the migration plan.
+
+### Finish when the direction is sufficiently clear
+
+The pass is sufficient when the inspected scope and sources are explicit, the
+current/desired states and their material gaps are understandable, applicable
+documentation and contracts are accounted for, and the next justified action,
+owner, dependencies and check are clear. State remaining UNKNOWN and their impact.
+Completing diagnosis does not require repairing every finding, proving every
+internal detail or eliminating every unknown. Block only the next action whose
+material precondition remains unestablished; give other gaps owned roadmap work.
+
+Save one concise result in the existing records and return to the development
+level. After a later significant change, inspect the affected delta against this
+basis. Repeat the full inventory only when its scope or reliability materially
+changed. Loading this method, ending the mode or receiving an ACK proves neither
+that the audit was performed nor that the project works.
+
+<!-- agentos:project-diagnostics:end -->
 
 <!-- agentos:project-development:start -->
 
@@ -184,7 +496,27 @@ understandable plans and working increments. It applies to ordinary development,
 features and policy work. The canonical text is this marked section of
 `docs/PROCESS.md`; read its current body through `agentos workflow guidance`,
 or directly from the selected source or installed resource when the CLI is
-unavailable. Continue the existing project and writer, using the current plan.
+unavailable. Apply the shared [Solution integrity](#solution-integrity) laws at
+every level; guidance includes their current body before this method. When
+reading the document directly, read both sections. Continue the existing project
+and writer, using the current plan.
+
+For material allocations and completion, use [Workspace hygiene](#workspace-hygiene).
+
+At first engagement, read [WORK_ENVIRONMENT](WORK_ENVIRONMENT.md) once.
+Reuse the current introduction and restore relevant parts after context loss;
+the frozen laws remain the acceptance standard.
+
+Before substantial work with material uncertainty about the project's state,
+direction or dependencies, use **Project diagnostics** through
+`agentos workflow guidance --method project-diagnostics`: temporary level 0
+preserves the selected 1–5 level and returns to it after a current dossier,
+findings and next action are recorded. Resume an active pass across sessions.
+At significant milestones review changed evidence and diagnose the affected
+scope when needed; do not launch a full audit after every increment or repeat
+unchanged inventory. Explicit newer owner level choices prevail on return.
+Diagnostics clarifies the next step; it does not require fixing every finding
+before continuing, replace product acceptance or grant authority.
 
 ### Development level: 1–5, default 3
 
@@ -193,6 +525,21 @@ it anytime for a project, stage or module. Inherit the enclosing level unless a
 narrower choice exists; otherwise use **3**. Briefly state it at start/change and
 record its scope in the current plan. Changes govern subsequent work; do not
 rebuild completed work merely for a level change.
+
+Carry the choice across sessions and handoffs. The existing task answers and
+context goal can contain `development: {"level": 1, "scope": "project"}`;
+`1D` is an input alias of level 1, not another level. Same-task resume retains
+an omitted saved choice. For registered tasks, context callers bind the exact
+current task and revision through `development_source` in [CONTEXT_BINDING](CONTEXT_BINDING.md);
+the builder carries and checks its saved choice. Unregistered/portable callers
+carry typed `goal.development`; a choice recorded only in prose is insufficient. Scope
+names identify the existing plan's project/stage/module, not an authority grant
+or an automatically inferred scope tree. Use the enclosing plan to resolve it.
+When loading guidance, pass that same choice with `--development-level` and
+`--development-scope`, including an explicit causal-debugging lookup. Omitted
+arguments expose the stateless default; they do not replace a choice already
+known from the plan. Without the CLI, retain the choice beside the actual method
+text in that plan; no installation is required merely to read the method.
 
 Only for a new project whose development has not begun, offer a native
 single-choice control with the five options below, in the user's language;
@@ -203,7 +550,7 @@ standalone storage or imitation buttons.
 
 | Level / short button label | Description |
 |---|---|
-| **1 — Fast assembly** | Connect and run the whole fastest, with minimal detail/checks before assembly, extensive useful debug and an accessible error journal. |
+| **1 — Fast assembly** | Connect the whole with simple implementations or explicit stubs; check the new connection and material risk sufficiently, retain useful debug and an accessible error journal, then continue assembly. |
 | **2 — Main connections** | Assemble quickly with debug; check main module boundaries and connections, then deepen details. |
 | **3 — Working stage** | Run a coherent stage with related functions/exports connected and exercised; use a light synthetic end-to-end scenario, then proceed. |
 | **4 — Integration detail** | Detail selected module contracts and check main failure scenarios during integration. |
@@ -219,6 +566,65 @@ that part suffices without whole-project proof.
 Every level preserves modularity, common working stand before recursive detail,
 explicit stub status, access rights and essential checks for secrets, irreversible
 effects and other protected operations.
+
+At level 1, choose a connected increment as the unit of progress. A helper,
+file edit or internal microstep need not become a separate acceptance cycle.
+Keep module inputs/outputs and the short complete structure plan visible; defer
+nonblocking internal detail to its named recursive stage. One relevant existing
+check or a small scenario may suffice for the changed connection. Check affected
+Auth/ACL and data/effect protections when needed at every level. Investigate a
+concrete malfunction causally, then return to assembly once its scoped blocking
+condition is resolved. No level imposes a fixed number of minutes or tests.
+
+### Proportionate protection of data and runtime
+
+Assess the actual action and affected state before choosing protection.
+Distinguish a live service or operational database, unique non-production data,
+and an isolated reproducible development stand. A new runtime is not production
+merely because it runs a server or database. Names such as `lab` or `test` do not
+establish isolation either; use the known target, connections, storage and
+dependencies. Reuse unchanged facts instead of repeating discovery for every edit.
+
+- For versioned source and reproducible development state, preserve changes
+  through Git and retain the available inputs needed to rebuild or reseed the
+  affected stand. Preserve relevant uncommitted or untracked work before an
+  operation that could remove it. Do not routinely copy the whole runtime,
+  dependencies, caches, synthetic database or earlier backups. A release package
+  captures its declared source/artifacts; it does not require a running database
+  copy. A full stand capture is warranted for a concrete transfer or recovery
+  rehearsal that needs those bytes, not for ordinary development increments.
+- Unique data, configuration or evidence can exist outside production. Preserve
+  only the affected material that cannot be safely or acceptably recreated.
+  Retain an expensive experiment's necessary result without copying unrelated
+  runtime state. An isolated copy of real data remains confidential; keep private
+  data and secrets out of public Git even when that copy can be recreated.
+- For live services and operational data, assess concrete loss or corruption,
+  interruption, disclosure and external effects. Choose the smallest sufficient
+  protection: an existing applicable recovery point, transaction, targeted
+  preimage/export, configuration rollback or retained release. A code-only change
+  does not automatically require a database copy; code can still cause destructive
+  writes without a schema migration. Read-only inspection requires no new backup.
+
+A new backup needs a concrete reason: what state could be lost, by which action,
+why it cannot be safely or acceptably recreated, and why an available recovery
+route or a smaller copy is insufficient. A full backup is appropriate only when
+the affected scope and recovery need justify it, or it is the requested
+deliverable. Reuse an available, sufficiently current recovery point when it
+covers the operation. Account for the copy's disk, time and service impact;
+repeated copies are not evidence of safety.
+
+Record material decisions briefly in the existing plan or operation record,
+without a separate risk register, per-command form or repeated owner approval.
+If the target or effect is uncertain, make the smallest relevant read-only check
+and continue independent authorized work. Development level changes verification
+depth, not the value of data or a default backup requirement. Existing target
+authority, ownership, mandatory narrow transactional journals and UNKNOWN
+reconciliation remain in force. This rule does not authorize deleting retained
+backups, evidence or history.
+
+For capacity, temporary-copy release conditions and owned cleanup, apply
+[Workspace hygiene](#workspace-hygiene) and its single
+[resource contract](WORKSPACE_HYGIENE.md); retain decisions in the existing run.
 
 ### Working cycle
 
@@ -282,10 +688,55 @@ effects and other protected operations.
 9. **Record and continue.** Update the existing plan briefly with the result,
    remaining stubs or limits, and the next step. Save changes through the
    project's normal route, then perform that step. Adjust affected plans when
-   new information changes dependencies or scope. Make routine technical
-   decisions within the assignment without repeatedly returning them to the
-   owner. This method uses existing authority and does not change external
-   permissions, protections or UNKNOWN reconciliation.
+   new information changes dependencies or scope. When newer scoped guidance
+   supersedes part of a mutable plan, mark the replaced section as historical
+   and link to the current plan and its scope. Preserve accepted results and
+   dated evidence. For immutable snapshots, update the existing current index
+   instead. Repair affected links and conflicts without a separate documentation
+   sweep. Make routine technical decisions within the assignment without
+   repeatedly returning them to the owner. This method uses existing authority
+   and does not change external permissions, protections or UNKNOWN reconciliation.
+
+### Internal progress, handoff and coordination
+
+For an internal step in the same retained working stand, keep a compact record:
+changed connection, sufficient check/result, remaining stub or error, and next
+authorized action. Continue within the current assignment. This is not a call
+to `project close` or `project checkpoint`; those terminal operations retain
+their existing accepted-handoff requirements. A long report and a rebuilt full
+archive are not prerequisites for every internal step.
+
+Reuse an accepted available base and retain changed/added/deleted files and
+relevant new evidence as a delta. Pin the base and delta identities and their
+relationship; preserve the dependencies required to reconstruct the result.
+A delta without its accessible verified base is partial, not a self-contained
+handoff. Produce a complete package when requested, when transfer/recovery needs
+it, or when the destination cannot obtain the pinned base. Existing capture,
+integrity, required result-delivery and restore checks still apply.
+
+Preserve the result before a notification attempt. A failed optional owner
+notification does not hold the saved result or an already authorized independent
+next step; retain its exact delivery state for reconciliation. Required result
+receipt/review and optional notification are separate. The coordinator still
+reviews the declared result and owns the next assignment; do not infer permission
+for an unassigned step or send a duplicate to a busy/unknown executor.
+
+Delegate bounded independent parts when they can help. Record each returned
+contribution and observed execution, dependent wait and integration time where
+available; reuse existing timestamps at meaningful boundaries. Distinguish
+implementation, checks, packaging/reporting, coordinator wait and lost access.
+Unknown intervals stay UNKNOWN, overlaps are not summed twice, and gaps between
+messages do not establish their cause. A launch count or an unmatched before/after
+observation does not establish acceleration. This is lightweight task accounting,
+not per-command instrumentation or another mandatory report.
+
+A new method file, capsule hash or ACK proves neither active-session pickup nor
+application. Deliver the exact current instruction through the authorized route
+at a safe boundary, then inspect the next permitted action: retained level/scope,
+connected increment, proportionate check, useful journal, compact progress and
+continued ownership. Mark each observed behavior separately from unexercised or
+unknown behavior. Do not restart work or replay a finished scenario to manufacture
+adoption evidence.
 
 <!-- agentos:project-development:end -->
 
@@ -308,11 +759,17 @@ The canonical text is this section of `docs/PROCESS.md`, mirrored byte-for-byte
 in installed `resources/docs/PROCESS.md` (located with `agentos resources`).
 Read the actual bounded section returned by the effect-free
 `agentos workflow guidance --method causal-debugging`; if the CLI is unavailable,
-read this exact section from the selected source or installed resource.
+read this exact section and shared [Solution integrity](#solution-integrity) from
+the selected source or installed resource. Guidance includes the shared laws
+before this method; their integrity requirements apply at every development level.
 Entry/context output that already
 materializes the same current body may be reused. A link, hash or receipt for
 instruction delivery alone does not prove agent behavior. Ordinary feature work
 without a malfunction does not require an invented failure or reversal cycle.
+
+Use [Workspace hygiene](#workspace-hygiene) for diagnostic fixtures, capacity
+observations and cleanup. A full filesystem can explain a write failure while
+the accumulation cause remains unmeasured; preserve that distinction.
 
 ### Define and reproduce the failure
 
@@ -353,6 +810,10 @@ and temporary copies, rollback/WAL and other journals, indexes and service data,
 retained partials and required recovery copies. Compare their combined requirement
 and justified headroom with available space. Preserve the previous configuration
 and an applicable rollback route; do not discard a partial to make the budget fit.
+Select recovery copies under [Proportionate protection](#proportionate-protection-of-data-and-runtime):
+the action's actual risk determines their scope. A reproducible stand normally
+uses retained source and rebuild inputs; this capacity check does not require a
+full runtime or database backup. Reuse an applicable existing recovery point.
 
 Keep **configured ceilings**, **estimated requirements**, **observed usage** and
 **measured peaks** separate. A configured stage budget, end-of-run file size or

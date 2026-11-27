@@ -1,10 +1,12 @@
 # Main coordinator knowledge and execution contract
 
-Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Resolve the current source version from package metadata and the selected
+release manifest. Historical version records do not establish target adoption.
 
 
 Contract: `agentos.work-coordination/v1`, knowledge revision `1.3.3`.
-Stable source: **0.7.1 — NOT_INSTALLED, NOT_PUBLISHED, NOT_LIVE_ADOPTED**.
+The original stable contract was introduced in **0.7.1**. Its historical source
+status does not describe the current release or any live installation.
 This approved universal work-management contract governs the prepared public
 source. The installed predecessor retains its own version. Source
 rules never change model system instructions, start a scheduler, authorize a
@@ -89,6 +91,41 @@ against a former writer. The display name does not authenticate an actor.
    the supported provider read/receipt and explicitly selected stored result;
    do not infer failure from silence or resend an unknown operation blindly.
    Keep history and retry the same stable operation only after proven non-delivery.
+
+### Match coordination to the development level
+
+Use [Project development](PROCESS.md#project-development) for the scoped level,
+internal-step record and transfer boundary. Carry the selected `development`
+object in the existing task/goal when continuing or assigning work; a different
+session does not change it. Review the declared connected increment at level 1,
+not every helper as a separately delivered task. Existing required result
+acceptance and protected effects retain their checks.
+
+An optional owner-facing notice is not the required result-return channel.
+Once the result is preserved, record an optional delivery failure/UNKNOWN under
+its original identity and continue already authorized independent work. The
+coordinator can review an accessible result and choose its next assignment
+without waiting for that optional notice. Required acceptance still needs its
+evidence; silence never authorizes a duplicate request to a busy or unknown
+worker. Do not create a new polling service or replacement sender for this rule.
+
+Reuse the accepted available base for small deltas; use a complete transfer
+package when the recipient or recovery path requires one. Attribute elapsed
+time only to observed events: implementation, checks, packaging/reporting,
+coordination wait and access loss remain separate, with unknown portions explicit.
+For delegation, retain the useful returned contribution and any measured wait
+and integration cost. Do not equate a subagent count with effective parallelism.
+
+Shared workspace capacity also constrains delegation. Follow
+[workspace hygiene](WORKSPACE_HYGIENE.md): assign an owner and bounded run root,
+account for simultaneous peaks and outstanding reservations on the same volume,
+and return each run resource's disposition with the existing result record.
+Disjoint directories do not provide independent free space. The current resource
+plan observes metadata; it does not acquire a host-wide reservation or fence a
+writer. Without such coordination, reduce concurrent heavy writes or use an
+already qualified coordinator. Cleanup of owned run resources remains due after
+a failure or refusal; unknown ownership and unresolved effects stay on HOLD.
+Do not turn each file into another report or stop unrelated authorized work.
 
 ## Architecture qualifications
 
@@ -294,7 +331,7 @@ author contract semantics, create a keeper or schedule another session.
 | Result prepared and final saved | Worker may return it only through the currently authorized route; preserve a stable operation identity. |
 | Send attempted, recipient outcome unknown | Read/reconcile that exact operation. Do not send again because of silence or timeout. |
 | Recipient receipt captured | Coordinator reads the result and evidence and reviews the original criteria. Receipt alone is not review. |
-| Child semantic review recorded | Coordinator records accepted/partial/held, remaining original goal and next owned action, then prepares its own return report/final. This does not accept the original business goal. |
+| Child semantic review recorded | Coordinator records accepted/partial/held, remaining original goal and next owned action, preserves a compact review record and continues the next authorized action. Its own final is prepared at the actual return/handoff boundary. This does not accept the original business goal. |
 | Worker active/busy | Use a bounded supported wait and continue independent authorized work. Do not send redundant continuation. |
 | Exact worker idle/completed, result absent | After supported readback and no uncertain input, one authorized request may ask for its existing result. A completed turn does not prove completed work. |
 | Child blocked | Obtain its evidence and owned checkpoint; continue independent work and escalate only the material unresolved decision/effect. |
@@ -348,7 +385,13 @@ at most two wait/read attempts and one result/checkpoint request before an owned
 checkpoint. Record an attempted input as UNKNOWN before I/O; never reset the
 counters merely on a new turn or final. Only actual new progress/assignment with
 reconciled prior operations can establish a new bounded observation cycle.
-`report-review` prepares the delegator's report; it is not permission to send it.
+`report-review` preserves the compact semantic review, remaining goal and next
+owned action in the existing record. It does not require an owner-facing full
+report or terminal final after every child result. Continue already authorized
+work; prepare the final at the actual return/handoff boundary. A selected owner
+presentation contract governs the corresponding report format without replacing
+required result-return, review or acceptance records. This recommendation is not
+permission to send a message.
 Unknown worker inputs/effects block worker-directed requests, but do not prohibit
 a distinct currently authorized report that accurately discloses that unknown.
 
