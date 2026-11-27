@@ -1,10 +1,12 @@
 # Main coordinator knowledge and execution contract
 
-Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Resolve the current source version from package metadata and the selected
+release manifest. Historical version records do not establish target adoption.
 
 
 Contract: `agentos.work-coordination/v1`, knowledge revision `1.3.3`.
-Stable source: **0.7.1 — NOT_INSTALLED, NOT_PUBLISHED, NOT_LIVE_ADOPTED**.
+The original stable contract was introduced in **0.7.1**. Its historical source
+status does not describe the current release or any live installation.
 This approved universal work-management contract governs the prepared public
 source. The installed predecessor retains its own version. Source
 rules never change model system instructions, start a scheduler, authorize a

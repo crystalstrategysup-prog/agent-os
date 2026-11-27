@@ -5,7 +5,8 @@ classification described in [SOURCE_ARCHIVES.md](SOURCE_ARCHIVES.md). Recognized
 cache omission is not a scanner exemption. Canonical conflicts fail closed;
 historical refused payloads and receipts are never rewritten or replayed.
 
-Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Resolve the current source version from package metadata and the selected
+release manifest. Historical version records do not establish target adoption.
 
 
 Stable source `0.7.1`. This POSIX local adapter implements the provider-neutral

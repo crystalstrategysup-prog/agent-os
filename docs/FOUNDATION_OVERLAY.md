@@ -1,6 +1,7 @@
 # Foundation ↔ user overlay contract
 
-Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Resolve the current source version from package metadata and the selected
+release manifest. Historical version records do not establish target adoption.
 
 
 Contract version: `agentos.foundation-overlay/v1` with optional `agentos.profile/v1` adapter.

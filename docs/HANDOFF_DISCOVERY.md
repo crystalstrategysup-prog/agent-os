@@ -1,6 +1,7 @@
 # Find the current handoff
 
-Current source candidate: `0.8.0rc2` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Resolve the current source version from package metadata and the selected
+release manifest. Historical version records do not establish target adoption.
 
 
 ## Historical: Indexed handoff successor0.7.0rc1

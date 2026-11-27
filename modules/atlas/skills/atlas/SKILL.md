@@ -5,6 +5,13 @@ description: "Manage controlled development through parameterized standard proce
 
 # Atlas
 
+At first engagement, read AgentOS `docs/WORK_ENVIRONMENT.md` (or the installed
+resource) and the frozen Solution integrity laws in PROCESS. Reuse the current
+introduction thereafter; restore the goal and relevant parts after context loss.
+Only an explicit owner decision about those texts permits a new revision;
+agents may not weaken them or their pinned checks for a task. Current project
+facts remain in ordinary records. Verify application through actual work.
+
 **Project scope:** load [operating-modes.md](references/operating-modes.md)
 to select MINIMAL or FULL work and the separate development level; AGENTS only
 routes to Atlas.

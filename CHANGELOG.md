@@ -1,3 +1,23 @@
+# 0.8.0rc2068 — freeze short work laws and explain their practical application
+
+- Express the existing twelve solution-integrity laws and established workflow
+  duties as twenty short numbered rules with correct/incorrect examples. Keep
+  the original task, independent evidence, saved levels, modular stand, scoped
+  acceptance, cumulative progress, workspace hygiene and authority boundaries.
+  These principles predate this release; the change makes their application
+  explicit and protects the owner-approved revision from routine rewriting.
+- Add one initial WORK_ENVIRONMENT introduction explaining work types, useful
+  steps, target preconditions, stateful user paths, comparisons and handoff.
+  Read it once, then restore relevant context. Default guidance still supplies
+  the actual common laws and selected method, without the whole introduction.
+- Require an explicit owner decision to revise these protected texts or their
+  retained checks. Validate their exact source and resource bytes in the existing
+  public release path. A pin detects drift; it does not prove authorization,
+  semantic correctness, provider intent or live adoption by existing agents.
+- Correct remaining stale current-version labels in active documentation while
+  preserving historical version records. No recipe CLI, background reviewer,
+  automatic cleanup, native hooks or changes to the reviewed user projects.
+
 # 0.8.0rc2067 — resolve release instructions from the selected manifest
 
 - Complete the workspace-hygiene delivery introduced in rc2066 with corrected

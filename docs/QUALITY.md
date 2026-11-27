@@ -1,6 +1,19 @@
 # Verification strategy
 
-Current source candidate: `0.8.0rc2056` (not publication or host adoption). RC-labelled sections below are retained historical records, not current installation or publication claims.
+Resolve the current source version from package metadata and the selected
+release manifest. Historical version records do not establish target adoption.
+
+## Frozen work laws and initial orientation
+
+PROCESS owns the short work laws; WORK_ENVIRONMENT explains their application
+on first engagement. A retained revision pin protects both texts against an
+unreviewed byte change through the existing public release check. Do not update
+that pin as a routine release step. A new revision requires an explicit owner
+decision; retain prior revisions. This is not tamper-proof authorization.
+Verify actual guidance delivery, source/resource parity and the unchanged level
+and authority boundaries. Review fresh ordinary tasks against observed actions
+and independently justified outputs. A supplied body, ACK, checksum or test
+count does not establish semantic acceptance or adoption by existing workers.
 
 ## Causal-debugging increment
 

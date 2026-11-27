@@ -35,6 +35,12 @@ readback, or retain it with an owner and release condition in the existing log.
 The observation-only resource plan grants neither deletion nor reservation.
 The original controls below retain their scope and authority requirements.
 
+At first engagement read [WORK_ENVIRONMENT](WORK_ENVIRONMENT.md), then reuse the
+current introduction and relevant sections. The frozen Solution integrity laws
+and introduction may change only on an explicit owner decision about those
+texts; general improvement authority does not permit weakening their acceptance
+criteria or changing their retained pins. Keep factual project records current.
+
 ## Original policy, verbatim
 
 # Project contract

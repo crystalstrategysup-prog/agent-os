@@ -5,6 +5,13 @@ description: "Enter a new or existing project task before making product changes
 
 # agentos-project-entry
 
+On first engagement, read the frozen Solution integrity laws in PROCESS and the
+full `resources/docs/WORK_ENVIRONMENT.md` introduction (or verified source).
+Then reuse the current introduction and restore relevant parts after context
+loss. Agents may not change or weaken these texts or their pinned checks without
+an explicit owner decision about the revision. Keep current project facts in
+their existing records. Read/ACK is separate from observed application.
+
 Before creating substantial workspace data, load **Workspace hygiene** with
 `agentos workflow guidance --method workspace-hygiene`, or its marked section in
 current PROCESS. Use `resources/docs/WORKSPACE_HYGIENE.md` for the exact contract.

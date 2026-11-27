@@ -973,12 +973,12 @@
       "capability_contract": "No owner-home discovery, task mutation, registration, reservation, lease release, deletion, READY or authority. HOLD/RETAINED/CANDIDATE_FOR_QUALIFICATION are observational dispositions, not delete permission. Arithmetic FITS_REPORTED_VALUES is not admission. Native hooks stay disabled."
     }
   ],
-  "distribution_version": "0.8.0rc2067",
+  "distribution_version": "0.8.0rc2068",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.8.0rc2067",
+  "release": "0.8.0rc2068",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",

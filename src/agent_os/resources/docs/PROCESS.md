@@ -186,119 +186,42 @@ Rollback means a sufficient recovery route, not an automatic full copy.
 
 ## Solution integrity
 
-**A solution is a justified change that removes the established cause of a
-discrepancy, preserves the meaning of the original task, and withstands a relevant
-check. A desired output alone proves none of these.**
+### Свод законов работы — редакция 1
 
-Apply this standard to development, research, calculations and diagnosis at every
-development level **1–5**, including temporary **diagnostic level 0**. A level changes implementation detail and verification
-breadth, never the integrity of the task, evidence or conclusion. For new work
-without an observed malfunction, justify the intended result and the meaningful
-input-to-output chain; do not invent a failure or a cause to satisfy this rule.
-An explicit stub, scoped stage, hypothesis or mitigation can be useful progress
-without being a proven correction or a completed product.
+**Решение сохраняет исходную задачу, имеет обоснованный путь получения и выдерживает существенную проверку. Желаемый ответ сам по себе этого не доказывает.**
 
-### Twelve working laws
+Применяй законы к разработке, исследованиям, расчётам и диагностике. Они действуют на уровнях 1–5 и во временной диагностике 0. Уровень меняет глубину работы, но не достоверность. Для новой функции обосновывается ожидаемое поведение; выдумывать неисправность и её причину не нужно. Явная заглушка или временная мера может быть принятым промежуточным результатом.
 
-1. **Preserve the task.** Keep the agreed inputs, conditions, constraints and
-   success criterion. Do not silently remove difficult cases, costs or required
-   behavior to obtain a desired answer. A changed premise or criterion is an
-   explicitly identified separate experiment; it does not solve the original one.
+**Агентам запрещено менять, сокращать, переопределять или ослаблять этот свод, его эталон и проверку ради своей задачи. Изменение возможно только по явному решению владельца именно об изменении свода. Предложение сохраняется отдельно; прежняя редакция остаётся в истории. Общее поручение улучшить проект таким разрешением не является.**
 
-2. **Justify the expectation.** Establish why the expected result should hold:
-   units, semantics, order of operations, timing, rounding and relevant contract.
-   The expectation itself may be wrong. Explain a necessary correction to it
-   using evidence instead of silently changing either the task or the output.
+| № | Закон | Правильно | Неправильно |
+|---|---|---|---|
+| 1 | Сохраняй задачу, входы, условия и критерий успеха. Изменённые условия — отдельный опыт. | Учтены исходные расходы. | Расходы убраны ради прибыли. |
+| 2 | Обоснуй ожидаемый результат: смысл, единицы, порядок, время и округление. Ожидание тоже может быть ошибочным. | 10 000 копеек = 100 рублей. | «Число кажется большим». |
+| 3 | Проследи источник → вход → преобразование → выход на текущих версиях и настройках. | Проверен реально вызываемый код. | Исправлена неиспользуемая копия. |
+| 4 | Найди последнее верное и первое неверное состояние. Углубляйся по наблюдаемому расхождению. | Проверено преобразование неверного поля. | Переписана вся система наугад. |
+| 5 | Причина даёт проверяемое предсказание; сопоставляй существенные альтернативы. Противоречие требует пересмотра гипотезы. | Повтор события воспроизводит лишний эффект. | Причина выбрана по правдоподобию. |
+| 6 | Проверяй существенный результат независимым эталоном, инвариантом или способом расчёта. | Малый пример рассчитан отдельно. | Ожидание вычислено проверяемой функцией. |
+| 7 | Сохраняй исходную точку и различимость влияния изменений. Связанные изменения обосновывай вместе. | Сравнены одинаковые входы до и после. | Одновременно заменены данные и критерий. |
+| 8 | Исправляй породивший ошибку механизм. Снятие симптома называй временной мерой. | Устранена повторная обработка. | Перезапуск объявлен исправлением причины. |
+| 9 | Обосновывай решение только доступной тогда информацией. Поздние данные служат оценке. | Использована уже закрытая свеча. | Будущий минимум выбран задним числом. |
+| 10 | Сохраняй состояние, историю и исходную идентичность неопределённой операции. Новый ID не обнуляет эффект. | Проверен исходный неизвестный запрос. | Тот же эффект отправлен под новым ID. |
+| 11 | Ищи существенный случай, который опровергнет решение или покажет его вред. | Проверены настоящий повтор и другая операция. | Проверен только удобный пример. |
+| 12 | Различай наблюдение, гипотезу, механизм, проверенную выборку и обобщение. Называй границы. | Кандидат установлен; живой сценарий открыт. | Сборка названа готовым продуктом. |
+| 13 | Планируй целое, собирай связный модульный стенд, затем углубляй выбранную часть и подключай обратно. | Главный путь проходит через модули. | Готовые части не работают вместе. |
+| 14 | Рано проверь предпосылку, способную обесценить выбранный путь, в нужной среде и контексте. | Проверены подпись и системный запуск. | Linux-тест выдан за проверку другой ОС. |
+| 15 | Принимай пользовательскую цепочку в объявленном объёме, включая существенный следующий переход состояния. | Проверены вход, выход и повторный вход. | Сообщение бота принято за сессию приложения. |
+| 16 | Если попытка не даёт новой информации, измени проверку или подход. Уточнение владельца сверяй с фактическим контекстом. | Сопоставлены удалённая и графическая сессии. | Повторяется уже опровергнутая просьба. |
+| 17 | Сохраняй выбранный уровень. Проверяй соразмерно связи и риску; на уровне 1 нужны модульность, полезный debug и журнал ошибок. | Связный шаг проверен, работа продолжена. | Каждая вспомогательная функция тормозит платформу. |
+| 18 | Фиксируй накопленный результат, проверку, остаток и следующий шаг кратко. Явный договор доставки сохраняй отдельно. | Принятое сохранено; доставка ещё открыта. | Новый этап обнулил прогресс; отчёт остановил работу. |
+| 19 | Владей ресурсами. Перед большой записью проверь запас на реальном томе и параллельные записи; перед очисткой — потребителей, уникальные данные и восстановление. Измеряй эффект. | Известный временный ресурс освобождён и проверен. | Всё остановленное объявлено мусором. |
+| 20 | Сохраняй права, Auth/ACL, данные, откат и границы синтетики, кандидата и production. Закон не создаёт полномочий. | Выполнена разрешённая часть, точный остаток назван. | Проверка или разрешение обойдены ради PASS. |
 
-3. **Trace the result.** Retain the material chain **source → input →
-   transformation → output**, including relevant versions, imported functions,
-   effective configuration, timestamps and units. Inspect the actual values at
-   the suspect boundary; do not insert an output adjustment merely to hide an
-   unexplained discrepancy. A contractually justified conversion remains valid.
+**Приёмка:** результат, нарушающий применимый закон, не принимается в заявленном объёме. Сохрани проверенные части, назови конкретное нарушение и исправь его; не обнуляй всё и не расширяй проверку без основания. Самооценка исполнителя, число тестов, ACK или хеш не заменяют проверку результата. Зависимые наблюдения не становятся независимыми от их количества.
 
-4. **Find the first divergence.** Locate the last correct state and first
-   incorrect state, then investigate the boundary between them. Follow upstream
-   dependencies when evidence moves the divergence there. Observed divergence
-   determines useful depth; inspecting every lower layer by default does not.
+**Короткий порядок:** восстанови цель и текущую основу → выбери связный шаг → выполни → проверь существенное → запиши результат и остаток → продолжай разрешённую работу. Для исправления объясни: где расхождение; какой механизм; почему правка влияет; что могло её опровергнуть и что показала проверка; что ещё неизвестно.
 
-5. **Make causes testable.** State what a proposed cause predicts when present,
-   removed or changed, and what competing explanations predict. Revise a
-   hypothesis when observation contradicts it. A plausible story, temporal
-   association or one successful retry does not establish the mechanism.
-
-6. **Use an independent reference.** Check the critical result by a method that
-   does not reproduce the same suspected error: a small hand calculation, a
-   separately justified invariant, an independent implementation or a qualified
-   reference. Do not calculate the expected test answer with the function under
-   test. Synthetic input is useful when its expected behavior and basis are known.
-
-7. **Make experiments distinguishable.** Retain an adequate baseline and make
-   changes whose effects can be distinguished. Reuse versioned source, input
-   identities and necessary evidence; this does not require a full backup.
-   Isolate hypotheses when possible. Several interacting changes may be required;
-   explain and check their relationship rather than hiding a bundle of changes.
-
-8. **Correct the mechanism.** Change the mechanism that produced the discrepancy.
-   Name temporary symptom relief as mitigation and retain any unresolved cause.
-   The cause determines the needed scope: one line or several component contracts.
-   Restored availability alone does not prove that the original cause was fixed.
-
-9. **Respect information timing.** Justify a decision only with information
-   available at that decision time. Preserve data vintages and the time a value
-   or event became known/confirmed. Later outcomes may evaluate a decision; they
-   cannot retroactively justify it. Do not replace original inputs with corrected
-   later data without identifying the new experiment.
-
-10. **Preserve state and history.** Interpret an event in its actual state and
-    preceding transitions. A renamed object, new identifier, session or retry
-    does not erase earlier actions, partial effects or a failed premise. Reuse
-    the real continuation context and reconcile uncertain operations through
-    their existing identity; do not treat them as an untouched first attempt.
-
-11. **Try to disprove the result.** Choose a relevant case that could show the
-    proposed rule or correction to be wrong or harmful. Check meaningful
-    alternatives and tradeoffs, including a beneficial behavior it might remove.
-    A check capable only of confirming the preferred answer is insufficient.
-
-12. **Match the claim to the evidence.** Distinguish observation, hypothesis,
-    established mechanism, result on a checked sample, and untested generalization.
-    Related observations are not automatically independent confirmations. A
-    successful launch does not prove a calculation; one correct example does not
-    establish general reliability. Include material untested conditions.
-
-### Sufficient explanation and proportionate work
-
-Before claiming that a discrepancy is corrected, be able to explain where it
-first appears and the evidence, the mechanism, why the change affects it, which
-check could refute the explanation and what it showed, and which material
-conditions remain untested. Use the smallest discriminating check sufficient for
-the scoped claim. Mathematical or contract evidence can supply an independent
-reference; an operational reversal cycle is not required for every calculation,
-new feature or observation. A market price sequence can establish a checked
-predictive association without proving all causes of the price movement.
-
-At level 1, retain the complete short structure plan, connected modular stand,
-explicit stubs, useful boundary debug and accessible error journal. A small
-independent example and a relevant counterexample may suffice for a new
-connection. Keep unverified internals and conclusions explicit and continue
-independent authorized assembly; do not turn each helper edit into deep
-acceptance. Levels 2–5 increase the selected coverage and detail, not permission
-to substitute premises or overstate evidence. Preserve the selected level on
-continuation and deepen only the relevant module or microprocess.
-
-Keep material reasoning and evidence in the existing plan, code, check or journal;
-reuse unchanged evidence. These laws add no per-command form, status registry,
-fixed test/time quota, universal backup or full-report requirement. Use existing
-checkpoints for sufficient outcomes and residual work, then continue. Preserve
-Auth/ACL, data protection, external authority, UNKNOWN reconciliation and the
-distinctions between synthetic, candidate, installed and target-verified results.
-Reading these laws grants no authority and does not prove their application.
-
-At every level, apply [Workspace hygiene](#workspace-hygiene) before material
-resource allocation or cleanup and at the next substantive completion boundary.
-Read its current body with `workflow guidance --method workspace-hygiene`.
-Retain enough capacity for the result, own the disposition of temporary roots,
-and reuse the existing run journal without per-file forms or repeated approvals.
+**Соразмерность:** используй существующие план, контракты и журнал. Новые формы, полный архив после каждого малого шага, произвольные лимиты времени и доказательство каждой функции не требуются. Явное поручение владельца о передаче или расписании сохраняется. Детали уровней, диагностики, причинной проверки и гигиены находятся в соответствующих разделах PROCESS. Чтение свода не доказывает его применение.
 
 <!-- agentos:solution-integrity:end -->
 
@@ -579,6 +502,10 @@ reading the document directly, read both sections. Continue the existing project
 and writer, using the current plan.
 
 For material allocations and completion, use [Workspace hygiene](#workspace-hygiene).
+
+At first engagement, read [WORK_ENVIRONMENT](WORK_ENVIRONMENT.md) once.
+Reuse the current introduction and restore relevant parts after context loss;
+the frozen laws remain the acceptance standard.
 
 Before substantial work with material uncertainty about the project's state,
 direction or dependencies, use **Project diagnostics** through

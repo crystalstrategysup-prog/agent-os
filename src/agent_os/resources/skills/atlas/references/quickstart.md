@@ -1,5 +1,10 @@
 # Atlas every day
 
+For first engagement, read AgentOS `docs/WORK_ENVIRONMENT.md` and its frozen work
+laws in PROCESS. Reuse that introduction; ordinary continuation restores the
+goal, current state and relevant details, not a repeated full handbook. Agents
+cannot revise the laws or their pins without an explicit owner decision.
+
 ## Start or continue a project
 
 Check the selected project's instructions, registry entry and Atlas binding before

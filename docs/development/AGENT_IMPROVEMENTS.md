@@ -28,3 +28,20 @@ If an AgentOS limitation prevents the authorized task, diagnose and patch the ow
 Canonical repository: https://github.com/crystalstrategysup-prog/agent-os . Public core changes and shipped guidance are version-controlled here. Release artifacts identify source commit and checksums. Future package changes use an appropriate version before publication. Installation does not prove an already-running client loaded new instructions.
 
 If publication fails, preserve the prepared commit and exact evidence, continue independent authorized work, and report delivery as incomplete. Do not change credentials or permissions to bypass a refusal. Opening an authorized PR does not grant permission to merge, deploy or replay unknown operations.
+
+## Protected work laws
+
+The Solution integrity section of PROCESS and WORK_ENVIRONMENT are an
+owner-approved frozen revision. Agents must not edit, shorten, override or
+weaken them, their retained manifest or the validating guard for a task. A
+general request to improve a project or AgentOS is not permission to revise
+these texts. Record a proposed correction separately with its observed basis.
+Only an explicit owner decision about this revision permits a successor; retain
+the previous revision and review the exact text and pin change independently.
+
+Current facts, project plans, results and installed-version records remain
+editable through their normal owners. Keep these facts outside frozen laws.
+The release guard detects changed bytes while its anchor remains trusted; it
+does not prove authorization, semantic truth or agent behavior. The ordinary
+receipt and review path must still verify the actual result. Do not change a
+test oracle, remove a counterexample or redefine acceptance to obtain a PASS.
