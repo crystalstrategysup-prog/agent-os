@@ -180,7 +180,7 @@ def test_unexpected_remote_asset_is_refused_without_upload(package, monkeypatch)
     assert state["calls"] == []
 
 
-def test_commit_export_excludes_dirty_untracked_and_ignored_sources(tmp_path):
+def test_commit_export_excludes_dirty_untracked_and_ignored_sources(tmp_path, monkeypatch):
     import subprocess
 
     spec = importlib.util.spec_from_file_location(
@@ -214,9 +214,48 @@ def test_commit_export_excludes_dirty_untracked_and_ignored_sources(tmp_path):
     (root / "source.py").write_text("dirty_value = 2\n")
     (root / "untracked.py").write_text("untracked_value = 3\n")
     (root / "ignored.py").write_text("ignored_value = 4\n")
+    monkeypatch.setenv("TZ", "UTC-2")
     exported = builder.export_commit(
         root, commit, tmp_path / "source.zip", tmp_path / "export", "0.8.0rc2"
     )
     assert (exported / "source.py").read_text() == "committed_value = 1\n"
     assert not (exported / "untracked.py").exists()
     assert not (exported / "ignored.py").exists()
+    monkeypatch.setenv("TZ", "UTC-10")
+    builder.export_commit(root, commit, tmp_path / "other.zip", tmp_path / "other", "0.8.0rc2")
+    assert (tmp_path / "source.zip").read_bytes() == (tmp_path / "other.zip").read_bytes()
+
+
+def test_wheel_metadata_is_reproducible_across_producer_settings(tmp_path):
+    import os
+    import subprocess
+    import sys
+    import zipfile
+
+    pytest.importorskip("build")
+    pytest.importorskip("setuptools")
+    pytest.importorskip("wheel")
+    builder = Path(__file__).resolve().parents[1] / "tools/release_package.py"
+    driver = (
+        "import runpy, sys; from pathlib import Path; "
+        "runpy.run_path(sys.argv[1])['build_wheel'](Path(sys.argv[2]), Path(sys.argv[3]), 1700000000)"
+    )
+    wheels = []
+    for zone, mask in (("UTC-2", 0o022), ("UTC-10", 0o077)):
+        project = tmp_path / zone
+        project.mkdir()
+        (project / "pyproject.toml").write_text(
+            '[build-system]\nrequires=["setuptools", "wheel"]\nbuild-backend="setuptools.build_meta"\n'
+            '[project]\nname="mode-fixture"\nversion="1.0"\n[project.scripts]\nprobe="example:main"\n'
+            '[tool.setuptools]\npy-modules=["example"]\n'
+        )
+        (project / "example.py").write_text("def main():\n    return 0\n")
+        output = project / "dist"
+        subprocess.run([sys.executable, "-B", "-c", driver, str(builder), str(project), str(output)],
+                       env={**os.environ, "TZ": zone}, umask=mask, check=True, capture_output=True)
+        wheel, = output.glob("*.whl")
+        with zipfile.ZipFile(wheel) as archive:
+            for member in ("WHEEL", "entry_points.txt", "top_level.txt"):
+                assert archive.getinfo("mode_fixture-1.0.dist-info/" + member).external_attr >> 16 == 0o100644
+        wheels.append(wheel.read_bytes())
+    assert wheels[0] == wheels[1]

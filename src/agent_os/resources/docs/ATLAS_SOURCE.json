@@ -449,9 +449,9 @@
       "source_sha256": "e1eb1c798d3a858909ccf30823aaad5829db6857aae2e8da6859b8663df35e18"
     },
     {
-      "bytes": 21316,
+      "bytes": 21803,
       "path": "skills/atlas/SKILL.md",
-      "sha256": "407af4f573333d0b2fdb37ac5afe3ea26daea836b1731fe7a9f2a59972cfbf3d",
+      "sha256": "84dd3d17f4195d2657be71b06f9f093b1b79b2d1f352c56095641b4c7a784c9e",
       "source_bytes": 14379,
       "source_sha256": "c5c841e5cdfbd55edad3835840e9c5ce4e36f0cf733855896813040983ca18cf"
     },
@@ -1075,7 +1075,7 @@
   },
   "schema": "agent-os.atlas-source/v1",
   "selected_file_count": 74,
-  "selected_tree_sha256": "7fb35cafbef84416e8f4253433a41f846eddc9e4d6818dfbbd878ea59e6b83c0",
+  "selected_tree_sha256": "f1ebce3b6e82035f3619a6ba27f6ff9974c828774291e61c30860c7f1d08c1cb",
   "solution_integrity_increment": {
     "previous_selected_tree_sha256": "e1887b6bd01c54c50c98dd9adf1735f0dbbb7adc8db8faef13dc0580d6753eff",
     "scope": "Load the shared Solution integrity section with development/diagnostic guidance and standalone research. Reconcile current selected pins, including prior unchanged modularity and operating-mode sources; historical source provenance is retained. Live adoption needs separate evidence.",

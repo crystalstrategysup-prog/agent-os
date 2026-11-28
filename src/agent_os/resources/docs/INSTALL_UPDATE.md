@@ -80,7 +80,7 @@ never replaced.
 
 ## Integrating with Codex
 
-Plan `integrate codex`, then apply. Target Codex home comes from explicit
+Run `integrate codex` in plan mode. Target Codex home comes from explicit
 `--codex-home`, then `CODEX_HOME`, then `~/.codex`. An override file is chosen
 only when it contains instructions; an empty file does not hide the owner's
 AGENTS file. Integration edits only its managed block while preserving other
@@ -89,6 +89,15 @@ are installed without overwriting another owner's modifications. A local log
 supports rollback and interrupted-operation recovery; concurrent changes are
 not overwritten. Backups live under `USER/backups/integration`. Client config,
 auth, model, and trust stores are untouched.
+
+Even `--skill NAME` includes the shared file in `agents_selected`. Compare the
+proposed hash in `managed_files` with the current hash for that path, or record
+that the file will be created. Absolute resource paths in the generated block
+can change the hash between releases even when the selected skill is identical.
+Before applying a change to a shared input, qualify its declared consumers
+using their effective configuration and any existing reviewed pins. Follow
+[update verification](UPDATE_VERIFICATION.md#shared-instruction-consumers)
+for compatibility before the change and a useful request after it.
 
 Native hooks are excluded. Integration does not create, enable, change, or
 restore AgentOS hooks, including in `hooks.json` or `config.toml`. It also does
@@ -112,6 +121,8 @@ isolated regression or rollback rehearsal may reuse verified evidence for its
 complete source/test/contract/runtime scope. A new package version alone does
 not require repeating every suite. Artifact integrity, actual compatibility,
 the exact installer plan/apply boundary and installed readback remain fresh.
+If a declared consumer follows the core's `current` pointer directly, qualify
+its candidate inputs before switching that pointer.
 
 Old releases remain immutable. Install a new verified wheel offline with the
 observed expected current release. The installer does not migrate user data

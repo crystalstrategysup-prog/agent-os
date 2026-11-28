@@ -36,6 +36,7 @@ def export_commit(root, commit, source, folder, version):
             commit,
         ],
         root,
+        env={**os.environ, "TZ": "UTC"},
     )
     with zipfile.ZipFile(source) as archive:
         infos = archive.infolist()
@@ -62,6 +63,16 @@ def export_commit(root, commit, source, folder, version):
             if not item.is_dir():
                 target.chmod(0o755 if mode & 0o111 else 0o644)
     return folder / prefix
+
+
+def build_wheel(source, output, epoch):
+    env = {**os.environ, "SOURCE_DATE_EPOCH": str(epoch), "PYTHONHASHSEED": "0", "TZ": "UTC"}
+    run(
+        [sys.executable, "-m", "build", "--wheel", "--no-isolation", "--outdir", str(output)],
+        source,
+        env=env,
+        umask=0o022,
+    )
 
 
 def main():
@@ -96,23 +107,9 @@ def main():
     source = out / ("agent-os-" + commit + ".zip")
     with tempfile.TemporaryDirectory(prefix="agentos-release-source-") as name:
         clean = export_commit(root, commit, source, Path(name), version)
+        run([sys.executable, "-B", str(clean / "tools/sync_atlas.py")], clean)
         run([sys.executable, str(clean / "tools/verify_public.py")], clean)
-        env = os.environ.copy()
-        env["SOURCE_DATE_EPOCH"] = str(pin["source_date_epoch"])
-        env["PYTHONHASHSEED"] = "0"
-        run(
-            [
-                sys.executable,
-                "-m",
-                "build",
-                "--wheel",
-                "--no-isolation",
-                "--outdir",
-                str(out),
-            ],
-            clean,
-            env=env,
-        )
+        build_wheel(clean, out, pin["source_date_epoch"])
     wheel = out / ("crystal_agent_os-" + version + "-py3-none-any.whl")
     if not digest(wheel) == pin["wheel_sha256"]:
         raise RuntimeError("wheel differs from reviewed release pin")

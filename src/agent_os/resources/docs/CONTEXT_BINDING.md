@@ -119,6 +119,15 @@ materializes **Solution integrity** plus **Project diagnostics**. It does not
 write or activate anything; portable lifecycle/results remain with the existing
 writer and journal. On completion/cancellation, retain that result and remove the
 active descriptor from the next request while keeping the saved development.
+A native checkpoint with an active diagnostic embeds both current goal fields
+in `continuation` inside the verified `evidence:review` asset. Copy those fields
+into the recipient's existing `goal` for portable continuation. This preserves an
+implicitly captured default and any later explicit return choice. A checkpoint
+without an active pass omits the field. Older packets may also omit it; if an
+audit may still be active, resolve the original task or its existing journal.
+An interrupted older checkpoint reuses its original candidate and operation
+identity on retry. Its published bytes remain historical. A subsequent checkpoint
+for changed work or a new pass carries the current diagnostic fields.
 An ordinary audit without a descriptor still takes the existing read-only fast
 path. No project intake or user-home/profile dependency is added to either path.
 

@@ -76,6 +76,7 @@
     {
       "effect": "plan_or_preserving_merge",
       "name": "integrate codex",
+      "skill_selection_contract": "Repeat --skill NAME for exact shipped skills plus the managed AGENTS block. Default remains all shipped skills; --agents-only is mutually exclusive. Unknown names, paths and patterns refuse. Unselected skill paths are untouched; previous ownership hashes are retained without fresh verification. Selected symlink, ownership, locked precondition, receipt and recovery boundaries remain enforced; explicit recovery cannot expand to unselected skills.",
       "status_values": [
         "PLANNED",
         "INSTALLED_MANUAL_WORKFLOW",
@@ -373,9 +374,10 @@
         "causal-debugging",
         "solution-integrity",
         "project-diagnostics",
-        "workspace-hygiene"
+        "workspace-hygiene",
+        "crystal-microscope"
       ],
-      "guidance_contract": "Read-only common Solution integrity followed by the selected method; standalone solution-integrity needs no intake. Ordered sections identify exact UTF-8 content, and the aggregate content hash covers every returned section. Development selection, authority and behavior-compliance limits are unchanged. Project diagnostics is temporary level 0; development retains the saved 1–5 return choice. execution.lifecycle=GUIDANCE_ONLY does not start a diagnostic run. Workspace hygiene applies at every saved level and temporary diagnostic 0; it supplies no native reservation or deletion capability."
+      "guidance_contract": "Read-only common Solution integrity followed by the selected method; standalone solution-integrity needs no intake. Ordered sections identify exact UTF-8 content, and the aggregate content hash covers every returned section. Development selection, authority and behavior-compliance limits are unchanged. Project diagnostics is temporary level 0; development retains the saved 1–5 return choice. execution.lifecycle=GUIDANCE_ONLY does not start a diagnostic run. Workspace hygiene applies at every saved level and temporary diagnostic 0; it supplies no native reservation or deletion capability. Crystal Microscope supplies a scoped execution-map and measurement method within levels 1-5 and temporary diagnostic 0. It retains the selected development choice; lookup does not change diagnostic lifecycle, collect runtime data or launch profilers."
     },
     {
       "effect": "read_only",
@@ -973,12 +975,12 @@
       "capability_contract": "No owner-home discovery, task mutation, registration, reservation, lease release, deletion, READY or authority. HOLD/RETAINED/CANDIDATE_FOR_QUALIFICATION are observational dispositions, not delete permission. Arithmetic FITS_REPORTED_VALUES is not admission. Native hooks stay disabled."
     }
   ],
-  "distribution_version": "0.8.0rc2068",
+  "distribution_version": "0.8.0rc2070",
   "global_options": [
     "--home",
     "--user-home"
   ],
-  "release": "0.8.0rc2068",
+  "release": "0.8.0rc2070",
   "schema": "agentos.cli-contract/v1",
   "standard_exit_codes": {
     "0": "completed command or plan",

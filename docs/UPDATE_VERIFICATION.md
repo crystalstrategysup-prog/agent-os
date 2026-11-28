@@ -65,6 +65,33 @@ Output schema is `agentos.update-verification-plan/v1`: `checks` contains each
 receipt reference/hash. `execution_authorized` is always false. This version
 adds no persistent state or migration and does not change legacy repeat APIs.
 
+## Shared instruction consumers
+
+Use the target's declared bindings and effective configuration, including
+overrides, to identify consumers of a changed instruction file or release
+pointer. Scope the existing `compatibility` and `post-install-smoke` checks
+to each affected consumer's actual input, the proposed bytes and any existing
+guard, reviewed pin or projection. A reader without a pin can be checked through
+its effective binding and normal request. Before changing what a consumer reads,
+verify the authorized transition. If an existing guard rejects the candidate,
+retain the verified input until a compatible transition passes its normal
+review. Never repin automatically or weaken a guard. Continue independent work.
+
+Record the selected target and proposed hash. Preserve the current writer and
+any applicable lease across plan and apply. `integrate codex --apply` selects
+the target and computes its bytes again. Its concurrency checks cover that
+invocation. If the target changes (for example, a new AGENTS override) or the
+proposed bytes differ, replan and requalify the affected consumers before the
+write. After applying, read back the actual path and hash against the qualified
+candidate. A mismatch leaves consumer acceptance pending.
+
+For each affected consumer, verify its next authorized, bounded request that
+depends on those bytes. Trace the effective input and any admission check
+through to a useful result for that request. An idle service or CLI probe can
+leave that result untested. Record the stage reached and the outstanding
+consumer in the existing rollout journal. Reconcile uncertain requests under
+their original identity before any retry.
+
 ## Execution and stopping
 
 Read the current change list and affected fragments once. Batch independent
@@ -74,7 +101,7 @@ manually and then repeat it only to obtain a workflow receipt. Perform only the
 authorized activation, then obtain current readback.
 A fresh native client is needed for changed native integration or a native
 adoption claim; a CLI-only update can be checked in new CLI processes.
-Refresh managed instructions only when their source bytes changed. Preserve
+Refresh managed instructions only when their effective target bytes change. Preserve
 existing conflict guards and unknown-effect reconciliation.
 
 Record stage durations, changed inputs, decisions and actual results together.

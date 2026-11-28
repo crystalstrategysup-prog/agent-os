@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check exact public Markdown mirrors; apply updates without deleting orphans."""
+"""Check public Markdown mirrors and exact skill deliveries without deleting orphans."""
 
 from __future__ import annotations
 
@@ -12,6 +12,12 @@ from pathlib import Path
 
 MAX_FILES = 1000
 MAX_BYTES = 32 * 1024 * 1024
+SKILL_DELIVERY_MIRRORS = (
+    ("docs/CRYSTAL_MICROSCOPE.md",
+     "src/agent_os/resources/skills/crystal-microscope/references/CRYSTAL_MICROSCOPE.md"),
+    ("docs/CRYSTAL_MICROSCOPE_OBSERVABILITY.md",
+     "src/agent_os/resources/skills/crystal-microscope/references/CRYSTAL_MICROSCOPE_OBSERVABILITY.md"),
+)
 
 
 def _directory(root: Path, relative: str, *, required: bool = False) -> Path:
@@ -49,12 +55,67 @@ def _inventory(directory: Path) -> dict[str, bytes]:
     return result
 
 
+def _declared_deliveries(root: Path, source: dict[str, bytes]) -> list[tuple[str, str, bytes, bytes | None]]:
+    """Read only the two declared pairs; never discover arbitrary skill files."""
+    skill_root = root / "src/agent_os/resources/skills/crystal-microscope"
+    active = any(Path(name).name in source for name, _target in SKILL_DELIVERY_MIRRORS)
+    if not active and not skill_root.exists() and not skill_root.is_symlink():
+        return []
+    result = []
+    for source_name, target_name in SKILL_DELIVERY_MIRRORS:
+        if Path(source_name).name not in source:
+            raise ValueError("DECLARED_DELIVERY_SOURCE_REQUIRED")
+        _directory(root, str(Path(source_name).parent), required=True)
+        _directory(root, str(Path(target_name).parent))
+        path = root / target_name
+        before = _read(path, MAX_BYTES) if path.exists() or path.is_symlink() else None
+        result.append((source_name, target_name, source[Path(source_name).name], before))
+    return result
+
+
+def _check_pair(root: Path, pair: tuple[str, str, bytes, bytes | None]) -> None:
+    source_name, target_name, expected, before = pair
+    _directory(root, str(Path(source_name).parent), required=True)
+    _directory(root, str(Path(target_name).parent))
+    if _read(root / source_name, MAX_BYTES) != expected:
+        raise ValueError("DOCUMENT_SOURCE_CHANGED")
+    path = root / target_name
+    observed = _read(path, MAX_BYTES) if path.exists() or path.is_symlink() else None
+    if observed != before:
+        raise ValueError("DOCUMENT_TARGET_CHANGED")
+
+
+def _replace_pair(root: Path, pair: tuple[str, str, bytes, bytes | None]) -> None:
+    _check_pair(root, pair)
+    _source_name, target_name, expected, _before = pair
+    target_path = root / target_name
+    target_dir = target_path.parent
+    target_dir.mkdir(parents=True, exist_ok=True)
+    _check_pair(root, pair)
+    mode = stat.S_IMODE(target_path.stat().st_mode) if target_path.exists() else 0o644
+    fd, temporary = tempfile.mkstemp(prefix="." + target_path.name + ".sync-", dir=target_dir)
+    try:
+        with os.fdopen(fd, "wb") as stream:
+            stream.write(expected)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.chmod(temporary, mode)
+        _check_pair(root, pair)
+        os.replace(temporary, target_path)
+        if _read(target_path, MAX_BYTES) != expected:
+            raise ValueError("DOCUMENT_SYNC_READBACK")
+    finally:
+        Path(temporary).unlink(missing_ok=True)
+
+
 def synchronize(root: Path, *, apply: bool = False) -> dict:
     """Compare both inventories before any write, preserving unsupported extras.
 
-    Only top-level Markdown mirrors belong to this operation. JSON provenance,
-    nested resources and historical artifacts are outside its write scope.
-    Individual replacements are atomic; this is not a multi-file transaction.
+    The generic inventory remains top-level Markdown only. In addition, exactly
+    SKILL_DELIVERY_MIRRORS deliver canonical docs to named skill references.
+    JSON provenance, other skill files and historical artifacts are outside its
+    write scope. All selected preconditions are read before writing; individual
+    replacements are atomic, not a multi-file transaction or OS-level CAS.
     """
     root = Path(root).absolute()
     if root.is_symlink() or not root.is_dir():
@@ -67,40 +128,41 @@ def synchronize(root: Path, *, apply: bool = False) -> dict:
     target = _inventory(target_dir)
     changed = sorted(name for name, raw in source.items() if target.get(name) != raw)
     orphaned = sorted(set(target) - set(source))
+    deliveries = _declared_deliveries(root, source)
+    changed_deliveries = [pair for pair in deliveries if pair[2] != pair[3]]
     result = {
-        "status": "FAIL" if changed or orphaned else "PASS",
+        "status": "FAIL" if changed or orphaned or changed_deliveries else "PASS",
         "changed": changed,
         "orphaned": orphaned,
         "documents": sorted(source),
         "effects": "NONE",
+        "skill_deliveries": {
+            "scope": "EXACT_DECLARED_PAIRS_ONLY",
+            "active": bool(deliveries),
+            "pairs": [{"source": source_name, "target": target_name}
+                      for source_name, target_name in SKILL_DELIVERY_MIRRORS],
+            "changed": [pair[1] for pair in changed_deliveries],
+        },
+        "writes": [],
     }
     # Never hide an obsolete instruction by deleting it, or update some files
     # before reporting an orphan that requires an explicit source decision.
-    if not apply or orphaned or not changed:
+    if not apply or orphaned or not (changed or changed_deliveries):
         return result
-    target_dir.mkdir(parents=True, exist_ok=True)
-    for name in changed:
-        _directory(root, "src/agent_os/resources/docs", required=True)
-        source_path, target_path = source_dir / name, target_dir / name
-        if _read(source_path, MAX_BYTES) != source[name]:
-            raise ValueError("DOCUMENT_SOURCE_CHANGED")
-        observed = _read(target_path, MAX_BYTES) if target_path.exists() or target_path.is_symlink() else None
-        if observed != target.get(name):
-            raise ValueError("DOCUMENT_TARGET_CHANGED")
-        mode = stat.S_IMODE(target_path.stat().st_mode) if target_path.exists() else 0o644
-        fd, temporary = tempfile.mkstemp(prefix="." + name + ".sync-", dir=target_dir)
-        try:
-            with os.fdopen(fd, "wb") as stream:
-                stream.write(source[name])
-                stream.flush()
-                os.fsync(stream.fileno())
-            os.chmod(temporary, mode)
-            os.replace(temporary, target_path)
-            if _read(target_path, MAX_BYTES) != source[name]:
-                raise ValueError("DOCUMENT_SYNC_READBACK")
-        finally:
-            Path(temporary).unlink(missing_ok=True)
-    result.update(status="SYNCED", effects="SELECTED_MARKDOWN_MIRRORS_ONLY")
+    pairs = [("docs/" + name, "src/agent_os/resources/docs/" + name,
+              source[name], target.get(name)) for name in changed] + changed_deliveries
+    # A known conflict in either group must not allow earlier selected writes.
+    for pair in pairs:
+        _check_pair(root, pair)
+    for pair in pairs:
+        _replace_pair(root, pair)
+    if changed and changed_deliveries:
+        effects = "SELECTED_MARKDOWN_MIRRORS_AND_EXACT_SKILL_DELIVERIES"
+    elif changed_deliveries:
+        effects = "EXACT_SKILL_DELIVERIES_ONLY"
+    else:
+        effects = "SELECTED_MARKDOWN_MIRRORS_ONLY"
+    result.update(status="SYNCED", effects=effects, writes=[pair[1] for pair in pairs])
     return result
 
 

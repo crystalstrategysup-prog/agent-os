@@ -59,6 +59,17 @@ any explicit newer owner choice. At major milestones review changed evidence;
 do not repeat a full audit for every small step. Read-only diagnosis needs no
 intake; completion does not establish READY, repaired findings or authority.
 
+Use **Crystal Microscope** when the next result requires an execution map,
+mechanism explanation or performance diagnosis. Load `agentos workflow guidance
+--method crystal-microscope` with the saved development level/scope, then follow
+the packaged `crystal-microscope` skill and `resources/docs/CRYSTAL_MICROSCOPE.md`.
+Without the CLI, read the shared laws and that marked PROCESS section directly.
+Reuse the current map and deepen the selected chain through functions, dependency
+methods and relevant measurements; distinguish source relationships from observed
+calls. This method applies within levels 1–5 and temporary 0 without replacing
+either choice, launching a profiler, granting authority or requiring a new full
+audit after every increment.
+
 The development level defaults to **3** on a **1–5** scale. The owner may set or
 change it at any time for a project, stage or module; retain the latest scoped
 choice in the existing plan/context without a new register. At the start of

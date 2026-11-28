@@ -63,6 +63,13 @@ milestones using changed evidence, without repeating unchanged full audits.
 `project-audit` supports this review against its declared inventory; it is not
 whole-project behavioral acceptance. Read-only diagnosis needs no Atlas bootstrap.
 
+For a system map, a material chain or resource question, use the installed
+`crystal-microscope` skill and `agentos workflow guidance --method crystal-microscope`.
+Keep structure, observed execution and cost distinct; trace selected boundaries
+through contracts, code and actual dependencies. Use the current dossier/journal
+and retained level. Loading this method starts no collector or diagnostic run,
+grants no target authority and does not require a full-depth audit for every edit.
+
 For a specific malfunction needing causal investigation, select
 `agentos workflow guidance --method causal-debugging`, or read the **Causal debugging**
 section of AgentOS `docs/PROCESS.md`, or installed `resources/docs/PROCESS.md`

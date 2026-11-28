@@ -1,3 +1,56 @@
+# 0.8.0rc2070 — preserve scoped continuation and verify evidence identity
+
+- Carry the saved development level and scope through `atlas profile` into
+  workflow guidance, independently of MINIMAL/FULL mode. Reuse the workflow
+  argument validator and preserve read-only and target-authority boundaries.
+- Include the active diagnostic pass and current return choice in portable
+  native checkpoints, including an implicit default and a later owner choice.
+  Keep old published revisions immutable and apply the recipient's existing
+  secret filter before publication.
+- Reconcile an interrupted pre-upgrade checkpoint through its exact existing
+  journal and publication identity. Repeated recovery retains that revision;
+  a later independent diagnostic pass receives its own portable context.
+- Require runtime/experiment metrics in Crystal Microscope to cite qualifying
+  evidence from their declared run. Supplemental comparison references remain
+  supported; structural validation still does not verify the claim itself.
+- Qualify declared readers of changed shared instructions or release pointers
+  through their existing bindings and any guards. Recheck a changed target or
+  candidate between plan and apply; verify the actual input and next permitted
+  useful request afterward. Reuse existing checks and writer ownership.
+- Correct the selected Atlas inventory for the microscope routing introduced in
+  rc2069, retaining original source provenance. Run the existing read-only Atlas
+  source/mirror check on the clean release export before building the wheel.
+- Fix public archive timestamps to UTC and the child wheel builder's umask to
+  022. Reproduce identical artifacts across different producer timezones and
+  default permissions without changing the parent environment or older pins.
+
+# 0.8.0rc2069 — Crystal Microscope for traceable systems and research
+
+- Add a bounded read-only microscope method and installable extension skill.
+  Connect structure, observed execution and measured cost, with typed relations
+  beyond a call tree and scoped zoom through contracts, code, dependencies and
+  supported runtime/hardware evidence. Preserve the existing solution laws,
+  development levels, diagnostic return, modular stand and authority boundaries.
+- Provide an optional standard-library JSON validator and offline viewer with
+  an explicit measurement passport, UNKNOWN, evidence references and exact-byte
+  export. Structural validation does not verify claims or start instrumentation.
+  Existing richer project viewers require no forced migration.
+- Explain source/build identity, observation effects, data timing, causal limits,
+  human-readable event details and scoped A/B/C comparisons. These apply the
+  existing integrity requirements rather than claiming them as new laws.
+- Deliver two exact canonical method references through the existing resource
+  synchronizer, with preflight, current-byte conflict checks and individual atomic
+  replacements. Preserve unknown resources and the generic document scope.
+- Route project entry and Atlas to the method when relevant. Keep private project
+  transcripts, measurements and artifacts outside the public distribution.
+- Add exact repeated `integrate codex --skill NAME` selection for independent
+  extension delivery. Retain unselected files/receipt history without claiming
+  fresh verification; selected symlinks and ownership conflicts still fail.
+  Default full installation and agents-only behavior remain available.
+- Reconcile the English-language check with the already approved, separately
+  pinned work-law texts. Keep their bytes and protected checks unchanged, and
+  continue checking the rest of PROCESS for unintended language drift.
+
 # 0.8.0rc2068 — freeze short work laws and explain their practical application
 
 - Express the existing twelve solution-integrity laws and established workflow

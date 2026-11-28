@@ -66,6 +66,18 @@ hidden history lookup. Legacy objects are retained, with effective default 3/tas
 effective choice beside the canonical method. Selection changes planning/check
 depth only; readiness, effect gates and behavior-proof limits remain unchanged.
 
+### Crystal Microscope guidance and portable view
+
+`workflow guidance --method crystal-microscope` materializes the common laws
+and the bounded microscope method from PROCESS. It is read-only, preserves the
+supplied saved level/scope and does not start a diagnostic run or a collector.
+The [method](CRYSTAL_MICROSCOPE.md) connects structure, execution and cost;
+[observability](CRYSTAL_MICROSCOPE_OBSERVABILITY.md) qualifies runtime/hardware
+evidence and collection effects. The installed `crystal-microscope` extension
+skill contains the optional `crystal-microscope/v1` JSON validator/offline viewer
+and its format contract. Its `claims_verified: false` result distinguishes data
+structure from factual proof. Existing project viewers need no forced migration.
+
 ### Temporary diagnostic level 0
 
 Level 0 is a one-shot diagnostic overlay, not a value of `answers.development`.
@@ -134,10 +146,24 @@ The portable descriptor and its limits are in [Context binding](CONTEXT_BINDING.
 | `project observe` | root, answers, session, turn | Optional user-home receipt; does not create a project task |
 | `overlay` | status, index, import, migrate-config | Import and migration plan by default; apply explicitly |
 | `profiles` | inventory, select, context, interview | Exact profiles and selection in the named user home |
-| `integrate codex` | target home, skills home, apply | Managed AGENTS and skills with backup; hooks/config/trust untouched |
+| `integrate codex` | target home, skills home, apply, repeated `--skill NAME` | Managed AGENTS and exact selected shipped skills with backup; default all shipped skills, hooks/config/trust untouched |
 | `resources` | list | Paths to packaged schemas, templates, skills, and docs |
 | `setup` | list, show | Read-only discovery of published scenario cards |
 | `hook` | retired compatibility entrypoint | Empty JSON, exit 0, no input or state access |
+
+`integrate codex --skill NAME` selects an exact shipped skill; repeat the option
+for additional names. The managed AGENTS block is still included. Without this
+option, the existing all-skills behavior remains; `--agents-only` copies none
+and cannot be combined with `--skill`. Unknown names, paths and patterns refuse.
+Unselected skill paths are not traversed or updated. Their prior managed-file
+hashes remain historical receipt entries, not fresh verification. Selected paths
+retain symlink and ownership-conflict checks, backup, locked preconditions and
+rollback. A concurrent receipt change requires replanning. Explicit selection
+cannot recover a pending transaction that would alter an unselected skill;
+reconcile that original transaction through its existing scope first. Plan by
+default, apply explicitly, and read back the selected result. Integration does
+not change authentication, model settings or hooks and does not prove adoption
+by an already running session.
 
 `profiles inventory` reports IDs, versions, hashes, host bindings, and conflicts.
 `profiles select --mode none|one|all` stores explicit selection. One or all needs

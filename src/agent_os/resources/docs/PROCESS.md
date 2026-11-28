@@ -968,6 +968,76 @@ evidence; it does not execute or establish the source incident's next result.
 
 <!-- agentos:causal-debugging:end -->
 
+<!-- agentos:crystal-microscope:start -->
+## Crystal microscope
+
+Use **Crystal Microscope** to connect system structure, the path of an actual
+result and the cost of producing it. **Lab** is an isolated experimental stand,
+not another development level. Apply the common Solution integrity laws. Read
+[the full method](CRYSTAL_MICROSCOPE.md) on first use and restore relevant parts;
+read [observability guidance](CRYSTAL_MICROSCOPE_OBSERVABILITY.md) before a new
+collector. Reuse the existing project plan, dossier, journal and evidence.
+
+1. Fix the original question, expected useful result, actual revision/deployed
+   build, scenario, inputs, environment, current writer and authority. A source
+   checkout is not proof that its implementation is loaded. Keep UNKNOWN explicit.
+2. Keep three related views: structure, observed execution and measured cost.
+   Separate containment from calls, asynchronous messages, data flow, ownership,
+   waits, state/recovery and correlation. A call tree alone cannot describe them.
+3. Zoom from the user result through components, contracts, tasks/queues, functions,
+   actual library methods and supported runtime/OS/hardware evidence only as far
+   as a material question requires. Record applicable inputs, outputs, units,
+   invariants, errors, cancellation, concurrency, lifetime and recovery. Do not
+   invent private/closed internals, missing symbols or an irrelevant HTTP API.
+4. Distinguish declared, source-verified, runtime-observed, experiment-supported,
+   hypothesis and UNKNOWN. Every numeric result or estimate needs its definition,
+   units, run/scenario, method, primary evidence, sample/aggregation, clock and
+   interval, inclusion/overlap, overhead and limits. UNKNOWN is not zero. Wall is
+   not CPU time, cumulative allocations are not RSS, zero allocations do not mean
+   no copying, and logical bytes are not physical RAM traffic. Source listings,
+   samples and counters do not establish an exhaustive execution trace.
+5. Locate the last correct and first incorrect state. Test a mechanism against an
+   independent expectation and a case that can disprove it. Compare alternatives
+   on the same useful work and contracts, including relevant error, ownership,
+   cancellation and recovery behavior; verify the parent path and user effect.
+   A faster wrong or incomplete response is not an optimization of the same task.
+6. For research, trace source/data vintage, transformation/model and interpretation.
+   Preserve what was available at the decision time; distinguish association,
+   hypothesis, evaluated forecast and causation. Human-facing event/news markers
+   must expose readable content or summary, source and meaningful timestamps;
+   explain axes, units and uncertainty without making users decode internal IDs.
+7. Keep one versioned canonical model and lossless views/exports. Preserve source
+   references, contracts, experimental variants, unknown fields, zero and UNKNOWN.
+   Detect and explicitly confirm a changed same-ID replacement; retain recovery.
+   Check roundtrip and actual required human navigation. A reproducible viewer
+   proves packaging, not the measurements or the user's product.
+8. Keep behavior checked, cost measured, mechanism supported, alternative compared,
+   user effect verified, prepared, installed and target-verified distinct. Preserve
+   accepted partial results and concrete remaining work. Finish the investigation
+   when it sufficiently supports the next authorized decision; continue that work.
+
+Preserve the selected development level and scope. At level 1 keep the connected
+modular whole, simple implementations or explicit stubs, useful debug and error
+journal; zoom only into the selected risk. Levels 3 and 5 scale relevant immediate
+coverage without changing truth or authority. A temporary diagnostic 0 may use
+the map, then returns to the retained 1–5 choice. Loading this method changes
+neither a level, active diagnostic run, task state nor readiness.
+
+Reading existing evidence, starting instrumentation and fault experimentation
+have different effects. Use existing rights, qualified host routes and owned
+bounded resources. Preserve explicit bans on OS/kernel/CPU/memory/driver/security/
+power changes. Do not weaken access controls, clear another tracer or consume an
+unbounded recording to fill a map. An unsupported observation stays UNKNOWN.
+
+The bundled `crystal-microscope` skill offers an optional offline JSON validator,
+viewer and exact-byte export. It does not collect profiles, execute inspected
+code, contact hosts, verify supplied claims or grant permissions. Existing richer
+project viewers need no compulsory migration. Delegate independent useful parts;
+the coordinator retains responsibility for integration and acceptance. Record
+small steps in the existing journal, issue owner updates when meaningful, and
+package a full archive for transfer, recovery or release rather than every edit.
+<!-- agentos:crystal-microscope:end -->
+
 ## 6. Close only a registered task
 
 Update documents to reflect the result and register their new hashes. Run the

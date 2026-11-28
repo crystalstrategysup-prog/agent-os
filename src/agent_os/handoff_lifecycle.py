@@ -151,6 +151,39 @@ def draft(
     }
 
 
+def _unfinished_legacy_checkpoint(root, task, payload, active_digest, library, principal):
+    """Select only an exact pre-diagnostic candidate that still needs reconciliation."""
+    fingerprint = hashlib.sha256(encoded(payload)).hexdigest()
+    path = within(root, f".agentos/tasks/{task['id']}/handoff-checkpoint-{fingerprint}.json")
+    if not path.exists():
+        return False
+    journal = read_json(path)
+    key = task["id"] + ":checkpoint:" + fingerprint[:24]
+    require(isinstance(journal, dict) and journal.get("payload_sha256") == fingerprint
+            and journal.get("idempotency_key") == key and isinstance(journal.get("candidate_ref"), dict)
+            and isinstance(journal.get("library_root"), str)
+            and Path(journal["library_root"]).resolve() == library.path,
+            "HANDOFF_REVIEW_CHANGED_RETRY_REQUIRED")
+    recorded = task.get("checkpoint", {}).get("handoff", {})
+    if recorded.get("manifest_ref") == journal["candidate_ref"]:
+        # A prior recovery of this same request remains idempotent. A newly
+        # requested active pass can now publish its own portable descriptor.
+        return recorded.get("reconciled_diagnostic_sha256") == active_digest
+    if recorded.get("library_root") == journal["library_root"]:
+        # A task may have completed A then B, and subsequently request A's
+        # old summary again. B's later accepted receipt makes A historical.
+        try:
+            previous = library.reconcile(key, principal)
+        except HandoffError as exc:
+            if exc.code != "NOT_FOUND":
+                raise
+        else:
+            recorded_receipt = library.reconcile(recorded["receipt"]["idempotency_key"], principal)
+            if previous["committed_seq"] < recorded_receipt["committed_seq"]:
+                return False
+    return True
+
+
 def deliver(root, task, review, assessment, *, profile, user_home=None, protected_sources=None, capture_selection=None):
     """Called under the project write lock before a terminal status is persisted."""
     if (protected_sources is not None or capture_selection is not None) and profile != "checkpoint":
@@ -209,6 +242,23 @@ def deliver(root, task, review, assessment, *, profile, user_home=None, protecte
             **({"protected_sources_request": protected_sources} if protected_sources is not None else {}),
             **({"capture_selection_request": capture_selection} if capture_selection is not None else {}),
         }
+        reconciled_diagnostic = None
+        if profile == "checkpoint" and "diagnostics" in task:
+            from .project_diagnostics import context_selection
+
+            active = context_selection(task)
+            if active is not None:
+                from .context_gate import checked_development_fields
+                from .development_level import effective
+
+                continuation = {"development": effective(task["answers"]), "diagnostic": active}
+                active_digest = digest(continuation)
+                if _unfinished_legacy_checkpoint(root, task, payload, active_digest, library, principal):
+                    # Replay through the same journal/key below. Preserve its
+                    # historical evidence bytes and publication identity.
+                    reconciled_diagnostic = active_digest
+                else:
+                    payload["continuation"] = checked_development_fields(continuation)
         fingerprint = hashlib.sha256(encoded(payload)).hexdigest()
         journal_path = within(
             root, f".agentos/tasks/{task['id']}/handoff-{profile}-{fingerprint}.json"
@@ -446,6 +496,8 @@ def deliver(root, task, review, assessment, *, profile, user_home=None, protecte
             "manifest_ref": journal["candidate_ref"],
             "receipt": receipt,
             "profile": profile,
+            **({"reconciled_diagnostic_sha256": reconciled_diagnostic}
+               if reconciled_diagnostic is not None else {}),
             "cleanup_authorized": False,
         }
     except (HandoffError, OSError) as exc:
