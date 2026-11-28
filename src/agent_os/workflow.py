@@ -60,6 +60,31 @@ def route(kind: str, effects: list[str] | None = None, *, development: dict | No
     return result
 
 
+def add_development_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--development-level",
+        help="Saved planning/check depth 1–5; 1D aliases 1. For temporary level 0 "
+             "select --method project-diagnostics in workflow guidance.",
+    )
+    parser.add_argument("--development-scope", help="Existing project, stage, module or task scope")
+
+
+def development_from_args(args: argparse.Namespace) -> dict | None:
+    from .development_level import normalize
+
+    level, scope = args.development_level, args.development_scope
+    if (level is None) != (scope is None):
+        raise GateError("development_level_and_scope_required_together")
+    if level is None:
+        return None
+    if level == "0":
+        raise GateError("diagnostic_zero_use_project_diagnostics_with_saved_development_level")
+    return normalize({
+        "level": int(level) if level in {"1", "2", "3", "4", "5"} else level,
+        "scope": scope,
+    })
+
+
 def command(argv: list[str]) -> tuple[dict, int]:
     from .engineering_guidance import DEFAULT_METHOD, METHODS, load
 
@@ -68,22 +93,9 @@ def command(argv: list[str]) -> tuple[dict, int]:
     p.add_argument("--kind", choices=KINDS)
     p.add_argument("--effect", choices=EFFECTS, action="append", default=[])
     p.add_argument("--method", choices=METHODS)
-    p.add_argument("--development-level", help="Saved planning/check depth 1–5; 1D aliases 1. For temporary level 0 select --method project-diagnostics.")
-    p.add_argument("--development-scope", help="Existing project, stage, module or task scope")
+    add_development_arguments(p)
     a = p.parse_args(argv)
-    development = None
-    if (a.development_level is None) != (a.development_scope is None):
-        raise GateError("development_level_and_scope_required_together")
-    if a.development_level is not None:
-        from .development_level import normalize
-
-        value = a.development_level
-        if value == "0":
-            raise GateError("diagnostic_zero_use_project_diagnostics_with_saved_development_level")
-        development = normalize({
-            "level": int(value) if value in {"1", "2", "3", "4", "5"} else value,
-            "scope": a.development_scope,
-        })
+    development = development_from_args(a)
     if a.action == "guidance":
         if a.kind is not None or a.effect:
             raise GateError("engineering_guidance_does_not_accept_route_arguments")

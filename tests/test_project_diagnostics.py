@@ -175,6 +175,123 @@ def test_checkpoint_suspends_diagnosis_without_blocking_another_task(setup, monk
     assert ended["diagnostic"]["effective_level"] == 1
 
 
+@pytest.mark.parametrize("initial_level, new_development", [
+    (None, None), (2, {"level": 4, "scope": "stage:catalog-contracts"}),
+])
+def test_published_checkpoint_restores_portable_active_diagnosis(setup, tmp_path, initial_level, new_development):
+    from agent_os import context_gate
+    from agent_os.handoff import Library, local_principal
+    from test_development_levels import request
+
+    root, home, _ = setup
+    task = enter(setup, initial_level)
+    reason, next_step = "Current contract work is recorded.", "Continue the catalog review."
+    started = begin(setup, task)
+    if new_development is not None:
+        project.enter(root, {"authority": "Current scoped owner choice.", "development": new_development},
+            session_id="session-a", turn_id="turn-a", user_home=home, resume_task=task, reuse=True)
+    assert project.checkpoint(root, task, reason, next_step)["status"] == "CHECKPOINT"
+    lib, principal, handoff_id = Library(home / "results-library"), local_principal(), "handoff:" + task
+    first_ref = lib.resolve(handoff_id, principal)["row"]["manifest_ref"]["object_id"]
+    first = lib.read_evidence(handoff_id, "evidence:review", principal)
+    assert first["captured_bytes_verified"]
+    delivered = json.loads(first["bytes"])
+    portable = request(purpose="continuation")
+    portable["goal"].update(delivered["continuation"])
+    cap = context_gate.build(tmp_path / "absent-recipient-home", portable)
+    assert cap["effective_level"] == 0 and not cap["authority_granted"]
+    assert cap["diagnostic"] == started["diagnostic"]["active"]
+    assert cap["development"] == (new_development or {"level": 3, "scope": "task"})
+
+    # Only the current pass travels. A later snapshot cannot reactivate it or alter old bytes.
+    d.finish(root, task, result=result(), **mutation(setup, task))
+    assert project.checkpoint(root, task, reason, next_step)["status"] == "CHECKPOINT"
+    current = json.loads(lib.read_evidence(handoff_id, "evidence:review", principal)["bytes"])
+    assert "continuation" not in current
+    assert lib.read_evidence(handoff_id, "evidence:review", principal, revision=first_ref)["bytes"] == first["bytes"]
+
+
+def test_portable_diagnosis_applies_recipient_secret_filter_before_publication(setup):
+    from agent_os.handoff import Library, local_principal
+
+    root, home, _ = setup
+    task = enter(setup)
+    project.checkpoint(root, task, "Before inspecting the contract.", "Inspect the adapter.")
+    lib, principal, handoff_id = Library(home / "results-library"), local_principal(), "handoff:" + task
+    first = lib.read_evidence(handoff_id, "evidence:review", principal)["bytes"]
+    assert "continuation" not in json.loads(first)
+    synthetic_value = "gho_" + "A" * 24
+    d.start(root, task, scope="contract", reason=synthetic_value, **mutation(setup, task))
+    with pytest.raises(GateError, match="context_secret_like_value_refused"):
+        project.checkpoint(root, task, "Inspecting the adapter.", "Continue the contract review.")
+    assert lib.read_evidence(handoff_id, "evidence:review", principal)["bytes"] == first
+    assert d.status(root, task)["diagnostic"]["effective_level"] == 0
+
+
+@pytest.mark.parametrize("boundary", ["before_publish", "after_publish"])
+def test_pre_diagnostic_checkpoint_retry_preserves_candidate_and_journal(setup, monkeypatch, boundary):
+    from agent_os import handoff_lifecycle
+    from agent_os.handoff import Library, local_principal
+
+    root, home, _ = setup
+    task = enter(setup, 2)
+    started = begin(setup, task)
+    def checkpoint():
+        return project.checkpoint(root, task, "Contract under review.", "Continue the catalog review.")
+
+    original = handoff_lifecycle.deliver
+    def legacy(root, value, *args, **kwargs):
+        return original(root, {k: v for k, v in value.items() if k != "diagnostics"}, *args, **kwargs)
+    def interrupt(*args, **kwargs):
+        raise OSError("synthetic interrupted checkpoint")
+
+    with monkeypatch.context() as old:
+        old.setattr(handoff_lifecycle, "deliver", legacy)
+        if boundary == "before_publish":
+            old.setattr(Library, "publish_handoff", interrupt)
+        else:
+            old.setattr(tm, "write_task", interrupt)
+        with pytest.raises((GateError, OSError), match="synthetic interrupted checkpoint"):
+            checkpoint()
+
+    folder = root / ".agentos/tasks" / task
+    paths = list(folder.glob("handoff-checkpoint-*.json"))
+    assert len(paths) == 1
+    journal_bytes = paths[0].read_bytes()
+    retained = json.loads(journal_bytes)
+    lib, principal, hid = Library(home / "results-library"), local_principal(), "handoff:" + task
+    for _ in range(2):
+        assert checkpoint()["status"] == "CHECKPOINT"
+        assert list(folder.glob("handoff-checkpoint-*.json")) == paths
+        assert paths[0].read_bytes() == journal_bytes
+        assert lib.resolve(hid, principal)["row"]["manifest_ref"] == retained["candidate_ref"]
+        assert "continuation" not in json.loads(lib.read_evidence(hid, "evidence:review", principal)["bytes"])
+    assert d.status(root, task)["diagnostic"]["active"] == started["diagnostic"]["active"]
+
+    # The same text for a newly active run must not be swallowed by the old journal.
+    d.finish(root, task, result=result(), **mutation(setup, task))
+    next_run = begin(setup, task, run="audit-later")
+    assert checkpoint()["status"] == "CHECKPOINT"
+    assert len(list(folder.glob("handoff-checkpoint-*.json"))) == 2
+    current = json.loads(lib.read_evidence(hid, "evidence:review", principal)["bytes"])
+    assert current["continuation"]["diagnostic"] == next_run["diagnostic"]["active"]
+
+
+def test_superseded_legacy_checkpoint_does_not_capture_new_diagnosis(setup):
+    from agent_os.handoff import Library, local_principal
+
+    root, home, _ = setup
+    task = enter(setup, 4)
+    first, next_step = "Original summary.", "Continue the contract review."
+    project.checkpoint(root, task, first, next_step)
+    project.checkpoint(root, task, "Superseding summary.", next_step)
+    started = begin(setup, task)
+    assert project.checkpoint(root, task, first, next_step)["status"] == "CHECKPOINT"
+    lib = Library(home / "results-library")
+    payload = json.loads(lib.read_evidence("handoff:" + task, "evidence:review", local_principal())["bytes"])
+    assert payload["continuation"]["diagnostic"] == started["diagnostic"]["active"]
+
+
 def test_run_identity_prevents_nested_duplicate_and_reopened_diagnostics(setup):
     root, home, _ = setup
     task = enter(setup)

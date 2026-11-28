@@ -1,7 +1,9 @@
 """Exact skill selection preserves unrelated installations and transaction guards."""
 
 from contextlib import contextmanager
+from hashlib import sha256
 from pathlib import Path
+from shutil import copytree
 
 import pytest
 
@@ -75,6 +77,37 @@ def test_exact_selection_skips_foreign_symlink_preserves_manifest_and_default_re
     assert all(later["managed_files"][key] == value for key, value in installed["managed_files"].items())
     assert {name: Path(name).read_bytes() for name in expected} == prior_files
     assert linked.is_symlink()
+
+
+def test_selected_skill_from_new_release_changes_shared_instruction_pin(homes, tmp_path, monkeypatch):
+    codex, skills, owner = homes
+    name = "agentos-safe-update"
+    source_package = Path(integration.__file__).parent
+    first = integration.install(codex, skills, owner, skills=[name], apply=True)
+    shared = Path(first["agents_selected"])
+    original = shared.read_bytes()
+    reviewed_pin = sha256(original).hexdigest()
+    skill = skills / name / "SKILL.md"
+    skill_pin = sha256(skill.read_bytes()).hexdigest()
+
+    # Run the same integration code against the same shipped skill in a new release root.
+    next_package = tmp_path / "next-release" / "agent_os"
+    skill_path = Path("resources", "skills", name)
+    copytree(source_package / skill_path, next_package / skill_path)
+    monkeypatch.setattr(integration, "__file__", str(next_package / "integration.py"))
+    plan = integration.install(codex, skills, owner, skills=[name])
+
+    proposed_pin = plan["managed_files"][str(shared)]
+    assert str(shared) in plan["files"] and proposed_pin != reviewed_pin
+    assert plan["managed_files"][str(skill)] == skill_pin
+    assert shared.read_bytes() == original
+
+    integration.install(codex, skills, owner, skills=[name], apply=True)
+    updated = shared.read_bytes()
+    assert str(next_package / "resources").encode() in updated
+    assert updated == original.replace(str(source_package).encode(), str(next_package).encode())
+    assert sha256(updated).hexdigest() == proposed_pin
+    assert sha256(skill.read_bytes()).hexdigest() == skill_pin
 
 
 @pytest.mark.parametrize("apply", [False, True])

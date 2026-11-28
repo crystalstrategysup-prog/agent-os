@@ -96,6 +96,7 @@ def main():
     source = out / ("agent-os-" + commit + ".zip")
     with tempfile.TemporaryDirectory(prefix="agentos-release-source-") as name:
         clean = export_commit(root, commit, source, Path(name), version)
+        run([sys.executable, "-B", str(clean / "tools/sync_atlas.py")], clean)
         run([sys.executable, str(clean / "tools/verify_public.py")], clean)
         env = os.environ.copy()
         env["SOURCE_DATE_EPOCH"] = str(pin["source_date_epoch"])

@@ -1,3 +1,26 @@
+# 0.8.0rc2070 — preserve scoped continuation and verify evidence identity
+
+- Carry the saved development level and scope through `atlas profile` into
+  workflow guidance, independently of MINIMAL/FULL mode. Reuse the workflow
+  argument validator and preserve read-only and target-authority boundaries.
+- Include the active diagnostic pass and current return choice in portable
+  native checkpoints, including an implicit default and a later owner choice.
+  Keep old published revisions immutable and apply the recipient's existing
+  secret filter before publication.
+- Reconcile an interrupted pre-upgrade checkpoint through its exact existing
+  journal and publication identity. Repeated recovery retains that revision;
+  a later independent diagnostic pass receives its own portable context.
+- Require runtime/experiment metrics in Crystal Microscope to cite qualifying
+  evidence from their declared run. Supplemental comparison references remain
+  supported; structural validation still does not verify the claim itself.
+- Qualify declared readers of changed shared instructions or release pointers
+  through their existing bindings and any guards. Recheck a changed target or
+  candidate between plan and apply; verify the actual input and next permitted
+  useful request afterward. Reuse existing checks and writer ownership.
+- Correct the selected Atlas inventory for the microscope routing introduced in
+  rc2069, retaining original source provenance. Run the existing read-only Atlas
+  source/mirror check on the clean release export before building the wheel.
+
 # 0.8.0rc2069 — Crystal Microscope for traceable systems and research
 
 - Add a bounded read-only microscope method and installable extension skill.

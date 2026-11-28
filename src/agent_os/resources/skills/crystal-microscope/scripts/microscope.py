@@ -157,7 +157,7 @@ def validate(document: dict[str, Any]) -> list[str]:
         if not isinstance(value, str) or value not in tables[table]:
             error(path, f"unknown {table} ID")
 
-    def evidence_refs(item: dict[str, Any], path: str) -> None:
+    def evidence_refs(item: dict[str, Any], path: str, *, metric_run: str | None = None) -> None:
         values = item.get("evidence")
         if not isinstance(values, list):
             error(path + ".evidence", "expected array of evidence IDs")
@@ -167,13 +167,15 @@ def validate(document: dict[str, Any]) -> list[str]:
         status = item.get("status")
         if isinstance(status, str) and status in {"runtime", "experiment"} and not values:
             error(path + ".evidence", "runtime/experiment claims need a declared evidence reference")
-        kinds = {tables["evidence"][value].get("kind") for value in values
-                 if isinstance(value, str) and value in tables["evidence"]
-                 and isinstance(tables["evidence"][value].get("kind"), str)}
-        if item.get("status") == "runtime" and not kinds.intersection({"runtime", "experiment"}):
-            error(path + ".evidence", "runtime claims need runtime or experiment evidence; source alone is insufficient")
-        if item.get("status") == "experiment" and "experiment" not in kinds:
-            error(path + ".evidence", "experiment claims need experiment evidence")
+        records = (tables["evidence"][value] for value in values
+                   if isinstance(value, str) and value in tables["evidence"])
+        kinds = {record["kind"] for record in records if isinstance(record.get("kind"), str)
+                 and (metric_run is None or record.get("run") == metric_run)}
+        scope = " from the metric's run" if metric_run is not None else ""
+        if status == "runtime" and not kinds.intersection({"runtime", "experiment"}):
+            error(path + ".evidence", f"runtime claims need runtime or experiment evidence{scope}; source alone is insufficient")
+        if status == "experiment" and "experiment" not in kinds:
+            error(path + ".evidence", f"experiment claims need experiment evidence{scope}")
 
     for key, item in tables["runs"].items():
         for field in ("scenario", "environment", "revision"):
@@ -247,7 +249,7 @@ def validate(document: dict[str, Any]) -> list[str]:
         if "run" in item:
             ref(item["run"], "runs", path + ".run")
         if "evidence" in item:
-            evidence_refs(item, path)
+            evidence_refs(item, path, metric_run=item.get("run"))
         if "value" not in item:
             error(path + ".value", "required; use null with unknown_reason if unknown")
             continue

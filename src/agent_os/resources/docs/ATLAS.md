@@ -290,6 +290,10 @@ Explicit v3 restores only predecessor-bound objective/scope_note under original 
 
 The optional `agentos atlas profile` method composes the existing workflow route;
 see operating-modes.md for explicit declarations, UNKNOWN and authority limits.
+For a project change, pass the saved `--development-level` and
+`--development-scope` together. The embedded workflow guidance then carries
+that pair regardless of the selected MINIMAL/FULL profile. An omitted pair
+uses the stateless workflow default of 3 with scope `task`.
 No project registry or intake is read for the READ_ONLY path.
 
 ## DN-01.4 finite native document growth

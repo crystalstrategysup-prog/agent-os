@@ -57,6 +57,12 @@ def _goal(value, required):
     for key, answer in answers.items():
         _text(key, "answer_key", 200)
         _text(answer, "answer")
+    return {**value, **checked_development_fields(value)}
+
+
+def checked_development_fields(value: dict) -> dict:
+    """Return portable selections suitable for the recipient's context goal."""
+    fields = {}
     if "diagnostic" in value:
         from .project_diagnostics import normalize_selection
 
@@ -64,14 +70,14 @@ def _goal(value, required):
         for key in ("id", "scope", "reason"):
             _text(diagnostic[key], "diagnostic_" + key)
         _text(diagnostic["captured_development"]["scope"], "diagnostic_captured_scope", 200)
-        value = {**value, "diagnostic": diagnostic}
+        fields["diagnostic"] = diagnostic
     if "development" in value:
         from .development_level import normalize
 
         choice = normalize(value["development"])
         _text(choice["scope"], "development_scope", 200)
-        return {**value, "development": choice}
-    return value
+        fields["development"] = choice
+    return fields
 
 
 def _bytes(home, relative):
@@ -115,21 +121,15 @@ def _task_development(source: dict) -> dict:
         raise GateError("context_development_task_choice_missing")
     # A native diagnostic explicitly captures even the previously implicit
     # default. Other legacy tasks retain the existing choice-required contract.
+    fields = {"development": effective(answers)}
     diagnostic = context_selection(task)
     if diagnostic is not None:
-        for key in ("id", "scope", "reason"):
-            _text(diagnostic[key], "diagnostic_" + key)
-        _text(diagnostic["captured_development"]["scope"], "diagnostic_captured_scope", 200)
-    selected = effective(answers)
-    _text(selected["scope"], "development_scope", 200)
-    result = {
+        fields["diagnostic"] = diagnostic
+    return {
         "root": str(root), "task_id": task_id, "revision": task["revision"],
         "project_id": project_id, "task_digest": digest(task),
-        "project_digest": digest(current_project), "development": selected,
+        "project_digest": digest(current_project), **checked_development_fields(fields),
     }
-    if diagnostic is not None:
-        result["diagnostic"] = diagnostic
-    return result
 
 
 def build(home: Path, request: dict) -> dict:

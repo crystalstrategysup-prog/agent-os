@@ -95,7 +95,55 @@ def test_fresh_cli_has_no_user_state_writes(tmp_path):
         assert p.returncode == 0, p.stdout + p.stderr
         r = json.loads(p.stdout)
         assert r['native_hooks'] == 'DISABLED' and r['writes'] == []
+        if kind == 'project-change':
+            assert r['foundation_route']['foundation_guidance']['development'] == {'level': 3, 'scope': 'task'}
     assert list(tmp_path.iterdir()) == []
+
+
+def test_scoped_profile_preserves_real_target_gate(tmp_path):
+    env = dict(os.environ, HOME=str(tmp_path), PYTHONPATH=str(ROOT / 'src'), PYTHONDONTWRITEBYTECODE='1')
+    args = [sys.executable, '-B', '-m', 'agent_os', 'atlas', 'profile',
+            '--kind', 'project-change', '--effect', 'deploy',
+            '--development-level', '4', '--development-scope', 'stage:catalog']
+    process = subprocess.run(args, env=env, cwd=tmp_path, capture_output=True, text=True, timeout=10)
+    assert process.returncode == 2
+    profile = json.loads(process.stdout)
+    assert profile['status'] == 'BLOCKED' and profile['mode'] == 'FULL'
+    route = profile['foundation_route']
+    assert route['foundation_guidance']['development'] == {'level': 4, 'scope': 'stage:catalog'}
+    assert route['target_gates_required'] == ['deploy'] and not profile['external_authority_granted']
+    assert list(tmp_path.iterdir()) == []
+
+
+@pytest.mark.parametrize(('level', 'change', 'expected_level', 'mode'), [
+    ('1D', 'source', 1, 'MINIMAL'), ('2', 'contract', 2, 'FULL'),
+    ('3', 'source', 3, 'MINIMAL'), ('4', 'source', 4, 'MINIMAL'),
+    ('5', 'contract', 5, 'FULL'),
+])
+def test_profile_facade_carries_caller_level_and_scope(level, change, expected_level, mode, capsys):
+    args = ['profile', '--kind', 'project-change', '--change', change, '--bounded',
+            '--context', 'CURRENT', '--writer', 'CURRENT', '--development-level', level,
+            '--development-scope', 'module:catalog']
+    assert atlas_module.main(args) == 0
+    profile = json.loads(capsys.readouterr().out)
+    assert profile['mode'] == mode
+    assert profile['foundation_route']['foundation_guidance']['development'] == {
+        'level': expected_level, 'scope': 'module:catalog',
+    }
+    assert not profile['product_writes_authorized'] and profile['writes'] == []
+
+
+@pytest.mark.parametrize(('kind', 'fields', 'reason'), [
+    ('project-change', ['--development-level', '1'], 'development_level_and_scope_required_together'),
+    ('project-change', ['--development-scope', 'module'], 'development_level_and_scope_required_together'),
+    ('project-change', ['--development-level', '0', '--development-scope', 'project'],
+     'diagnostic_zero_use_project_diagnostics_with_saved_development_level'),
+    ('audit', ['--development-level', '4', '--development-scope', 'stage'],
+     'development_selection_requires_project_change'),
+])
+def test_profile_facade_refuses_invalid_development_selection(kind, fields, reason, capsys):
+    assert atlas_module.main(['profile', '--kind', kind, *fields]) == 1
+    assert json.loads(capsys.readouterr().out) == {'status': 'REFUSED', 'code': reason}
 
 
 def test_full_reuses_existing_document_applicability():

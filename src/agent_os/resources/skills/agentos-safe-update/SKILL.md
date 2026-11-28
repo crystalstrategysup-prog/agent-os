@@ -28,6 +28,12 @@ Measure the limiting stage before attributing delay to the network or tools.
 
 Overlay import is create-only: reconcile a conflict instead of overwriting.
 Migrate config only with backup and readback; block unknown future schemas.
+Before changing a shared instruction file or release pointer, qualify the
+declared consumers against their effective bindings and any existing pins.
+Follow `docs/UPDATE_VERIFICATION.md` across plan and apply. Match the
+installed path and hash to the qualified candidate, then verify a bounded
+dependent request through its useful result for each affected consumer.
+Keep untested consumers visible in the existing journal.
 After a core switch, refresh only changed managed AGENTS/skills; preserve a
 conflicting target rather than forcing an unchanged rewrite. Test new CLI
 processes; a fresh native client is needed only for changed client integration

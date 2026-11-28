@@ -704,7 +704,14 @@ def execute(args: argparse.Namespace) -> dict:
             "activation_proven": True,
             "local_probe": evidence,
             "previous": old,
-            "next": "Import separate overlay, then integrate AGENTS/skills and read back in a new session. Keep native hooks disabled. No live service was replaced.",
+            "next": (
+                "Import the separate overlay if needed. Before integrating changed AGENTS/skills, "
+                "qualify declared consumers per docs/UPDATE_VERIFICATION.md. Use a fresh CLI "
+                "process for a CLI-only change, or a fresh native client for changed client "
+                "integration or a native adoption claim. Verify each affected consumer's next "
+                "permitted dependent request. "
+                "Keep native hooks disabled. No live service was replaced."
+            ),
         }
     finally:
         (lock / "owner.json").unlink(missing_ok=True)

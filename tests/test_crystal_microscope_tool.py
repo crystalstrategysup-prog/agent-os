@@ -114,6 +114,32 @@ def test_runtime_zero_and_unknown_remain_valid_with_existing_provenance(example)
     assert TOOL.validate(example) == []
 
 
+@pytest.mark.parametrize(("status", "insufficient_kind", "qualifying_kind"), [
+    ("runtime", "source", "runtime"),
+    ("runtime", "declared", "experiment"),
+    ("experiment", "runtime", "experiment"),
+])
+def test_numeric_claim_needs_qualifying_evidence_from_its_run(
+        example, status, insufficient_kind, qualifying_kind):
+    metric = example["metrics"][0]
+    metric.update(status=status, run="candidate")
+    example["runs"].append(dict(example["runs"][0], id="candidate", revision="candidate-2"))
+    baseline_evidence = example["evidence"][1]
+    baseline_evidence["kind"] = qualifying_kind
+
+    # The baseline was measured. The candidate has a different revision.
+    assert any("metric's run" in error for error in TOOL.validate(example))
+    candidate_evidence = dict(baseline_evidence, id="candidate-record",
+                              run="candidate", kind=insufficient_kind)
+    example["evidence"].append(candidate_evidence)
+    metric["evidence"].append(candidate_evidence["id"])
+    assert any("metric's run" in error for error in TOOL.validate(example))
+
+    # One matching record suffices; the baseline can remain for comparison.
+    candidate_evidence["kind"] = qualifying_kind
+    assert TOOL.validate(example) == []
+
+
 @pytest.mark.parametrize("field", ["run", "scenario", "method", "clock", "time_basis", "overlap", "overhead", "limits", "sample", "evidence"])
 def test_numeric_measurement_needs_passport(example, field):
     del example["metrics"][0][field]

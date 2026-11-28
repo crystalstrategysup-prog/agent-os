@@ -229,7 +229,7 @@ def main(argv: list[str] | None = None) -> int:
     if selected and selected[0] == 'profile':
         # Optional local classification; no project registry or user-home read.
         import argparse
-        from .workflow import route, KINDS, EFFECTS
+        from .workflow import EFFECTS, KINDS, add_development_arguments, development_from_args, route
         parser = argparse.ArgumentParser(prog='agentos atlas profile', allow_abbrev=False)
         parser.add_argument('--kind', choices=KINDS, required=True)
         parser.add_argument('--effect', choices=EFFECTS, action='append', default=[])
@@ -238,11 +238,13 @@ def main(argv: list[str] | None = None) -> int:
         parser.add_argument('--full', action='store_true')
         parser.add_argument('--context', default='UNKNOWN')
         parser.add_argument('--writer', default='UNKNOWN')
+        add_development_arguments(parser)
         args = parser.parse_args(selected[1:])
         try:
+            foundation_route = route(args.kind, args.effect, development=development_from_args(args))
             with _workspace():
                 function = importlib.import_module('work_profile')
-                result = function.select_profile(route(args.kind, args.effect),
+                result = function.select_profile(foundation_route,
                     changes=args.change, bounded=args.bounded, context=args.context,
                     writer=args.writer, full=args.full)
             print(json.dumps(result, ensure_ascii=False, sort_keys=True))

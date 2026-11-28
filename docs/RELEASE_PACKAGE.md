@@ -37,7 +37,9 @@ readback; the release publisher's historical default notes do not describe a
 new version.
 
 `tools/release_package.py --output NEW_DIRECTORY` produces the exact wheel,
-commit-bound source ZIP, public MANIFEST.json and SHA256SUMS. The publisher
+commit-bound source ZIP, public MANIFEST.json and SHA256SUMS. Before building the
+wheel, it verifies the selected Atlas source inventory and packaged mirrors in
+the clean export; a stale pin or mirror stops packaging. The release publisher
 reconciles an existing or unknown Release/asset result, refuses different bytes
 or duplicate names, and uploads only missing assets without clobbering. This
 route changes no host credentials, client security or production application.

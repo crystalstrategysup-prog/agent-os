@@ -107,6 +107,13 @@ Each metric requires `id`, `node`, `name`, `unit`, `status`, and `value`.
 - `overhead`: measured collection influence, or an explicit unmeasured reason;
 - `limits`: applicable constraints, missing coverage and uncertainty.
 
+For a numeric `runtime` metric, at least one referenced runtime or experiment
+record must name the metric's run. An `experiment` metric needs an experiment
+record from that run. A candidate measurement may cite its baseline as an
+additional reference. For a result calculated across runs, identify the run
+that produced the comparison and retain evidence of its calculation alongside
+the input references. Validation checks the declared links only.
+
 Units are explicit strings. Preserve distinctions between wall/CPU/wait time;
 heap/virtual/resident/physical memory; logical/payload/wire bytes; direct counts,
 samples and derived estimates. For a percentile identify its population and

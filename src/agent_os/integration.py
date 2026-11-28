@@ -273,7 +273,12 @@ def install(
             "unselected_files_verified": False,
         },
         "required_config": {},
-        "note": "Read back AGENTS/skills in a new session. Existing hooks/config are untouched; never restore retired AgentOS hooks.",
+        "note": (
+            "Before applying changed shared inputs, qualify declared consumers per "
+            "docs/UPDATE_VERIFICATION.md. Read back changed client integration in a fresh "
+            "session and verify each affected consumer's next permitted dependent request. "
+            "Preserve existing client configuration and keep retired AgentOS hooks disabled."
+        ),
     }
     if not apply or conflicts:
         return report
