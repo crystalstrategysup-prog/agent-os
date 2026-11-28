@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 
 from .safeio import (
@@ -32,7 +33,10 @@ def _current_bytes(path: Path) -> bytes | None:
     return path.read_bytes()
 
 
-def _recover_transaction(journal: Path, codex_home: Path, skills_home: Path, user_home: Path) -> None:
+def _recover_transaction(
+    journal: Path, codex_home: Path, skills_home: Path, user_home: Path, *,
+    selected_skills: list[str] | None = None,
+) -> None:
     record = read_json(journal)
     if (
         record.get("schema") != "agentos.integration-transaction/v1"
@@ -49,6 +53,14 @@ def _recover_transaction(journal: Path, codex_home: Path, skills_home: Path, use
         if not isinstance(row["path"], str):
             raise GateError("integration_recovery_path_invalid")
         path = Path(row["path"])
+        if (
+            selected_skills is not None
+            and path not in {codex_home / "AGENTS.md", codex_home / "AGENTS.override.md",
+                             codex_home / "agentos-integration.json"}
+            and skills_home in path.parents
+            and path.relative_to(skills_home).parts[0] not in selected_skills
+        ):
+            raise GateError("integration_recovery_skill_scope_mismatch")
         if not path.is_absolute() or not (
             path == codex_home / "AGENTS.md"
             or path == codex_home / "AGENTS.override.md"
@@ -89,12 +101,34 @@ def _recover_transaction(journal: Path, codex_home: Path, skills_home: Path, use
     journal.unlink()
 
 
+def _skill_selection(resources: Path, skills: list[str] | None, agents_only: bool) -> list[str] | None:
+    if skills is None:
+        return None
+    if agents_only:
+        raise GateError("integration_skill_selection_conflict")
+    if (
+        not isinstance(skills, list) or not skills
+        or any(not isinstance(name, str) or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", name)
+               for name in skills)
+    ):
+        raise GateError("integration_skill_name_invalid")
+    selected = sorted(set(skills))
+    for name in selected:
+        root = within(resources / "skills", name)
+        if not root.is_dir() or not within(root, "SKILL.md").is_file():
+            raise GateError("integration_skill_unknown:" + name)
+    return selected
+
+
 def install(
     codex_home: Path, skills_home: Path, user_home: Path, *, apply: bool = False,
-    agents_only: bool = False,
+    agents_only: bool = False, skills: list[str] | None = None,
 ) -> dict:
     from .overlay import validate_roots
 
+    resources = Path(__file__).parent / "resources"
+    selected = _skill_selection(resources, skills, agents_only)
+    recovery_options = {"selected_skills": selected} if selected is not None else {}
     codex_home = codex_home.expanduser()
     if not codex_home.is_absolute():
         raise GateError("codex_home_absolute_required")
@@ -115,13 +149,12 @@ def install(
                 "native_hooks": "DISABLED",
             }
         with lock(within(user_home, "state/integration.lock")):
-            _recover_transaction(journal, codex_home, skills_home, user_home)
+            _recover_transaction(journal, codex_home, skills_home, user_home, **recovery_options)
         return {
             "status": "RECOVERED_RETRY",
             "codex_home_selected": str(codex_home),
             "native_hooks": "DISABLED",
         }
-    resources = Path(__file__).parent / "resources"
     # Do not manufacture an override that shadows existing owner instructions.
     override = codex_home / "AGENTS.override.md"
     override_bytes = _current_bytes(override)
@@ -182,20 +215,27 @@ def install(
         updated = old + separator + block.encode() + b"\n"
     paths = {str(agents): updated}
     # Copy maintained skills into namespaced folders; never delete user skills.
-    for src in sorted((resources / "skills").rglob("*")):
-        if agents_only:
-            break
-        if not src.is_file():
-            continue
-        rel = src.relative_to(resources / "skills").as_posix()
-        target = within(skills_home, rel)
-        paths[str(target)] = src.read_bytes()
+    source_roots = [] if agents_only else (
+        [resources / "skills" / name for name in selected]
+        if selected is not None else [resources / "skills"]
+    )
+    for source_root in source_roots:
+        for src in sorted(source_root.rglob("*")):
+            if not src.is_file():
+                continue
+            rel = src.relative_to(resources / "skills").as_posix()
+            target = within(skills_home, rel)
+            paths[str(target)] = src.read_bytes()
     conflicts = []
+    receipt_path = codex_home / "agentos-integration.json"
+    receipt_before = _current_bytes(receipt_path)
     previous = (
-        read_json(codex_home / "agentos-integration.json")
-        if (codex_home / "agentos-integration.json").exists()
+        read_json(receipt_path)
+        if receipt_before is not None
         else {}
     )
+    if _current_bytes(receipt_path) != receipt_before:
+        raise GateError("integration_target_changed_replan:" + str(receipt_path))
     managed = previous.get("managed_files", {})
     if not isinstance(managed, dict):
         raise GateError("integration_managed_files_invalid")
@@ -224,16 +264,19 @@ def install(
         "activation_status": "MANUAL_WORKFLOW_NO_HOOKS",
         "native_hooks": "DISABLED",
         "hook_files_changed": False,
-        "managed_files": {**(managed if agents_only else {}),
+        "managed_files": {**(managed if agents_only or selected is not None else {}),
                           **{p: sha(d) for p, d in paths.items()}},
         "agents_only": agents_only,
+        "skill_selection": {
+            "mode": "AGENTS_ONLY" if agents_only else "EXPLICIT" if selected is not None else "ALL_SHIPPED",
+            "names": selected,
+            "unselected_files_verified": False,
+        },
         "required_config": {},
         "note": "Read back AGENTS/skills in a new session. Existing hooks/config are untouched; never restore retired AgentOS hooks.",
     }
     if not apply or conflicts:
         return report
-    receipt_path = codex_home / "agentos-integration.json"
-    receipt_before = _current_bytes(receipt_path)
     report["status"] = "INSTALLED_MANUAL_WORKFLOW"
     report["at"] = now()
     receipt_bytes = (
@@ -292,7 +335,7 @@ def install(
                 if _current_bytes(path) != data:
                     raise GateError("integration_readback_failed:" + str(path))
         except BaseException:
-            _recover_transaction(journal, codex_home, skills_home, user_home)
+            _recover_transaction(journal, codex_home, skills_home, user_home, **recovery_options)
             raise
         journal.unlink()
     return report
@@ -306,11 +349,13 @@ def command(argv: list[str], home: Path) -> tuple[dict, int]:
     p.add_argument("--apply", action="store_true")
     p.add_argument("--agents-only", action="store_true",
                    help="Update the managed instruction block without copying skills.")
+    p.add_argument("--skill", action="append", dest="skills", metavar="NAME",
+                   help="Copy only this exact shipped skill; repeat for more. Incompatible with --agents-only.")
     a = p.parse_args(argv)
     codex_home = a.codex_home
     if codex_home is None:
         env_home = os.environ.get("CODEX_HOME", "").strip()
         codex_home = Path(env_home) if env_home else Path.home() / ".codex"
     result = install(codex_home, a.skills_home, home, apply=a.apply,
-                     agents_only=a.agents_only)
+                     agents_only=a.agents_only, skills=a.skills)
     return result, 0 if result["status"] in {"PLANNED", "INSTALLED_MANUAL_WORKFLOW"} else 2

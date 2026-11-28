@@ -28,6 +28,15 @@ that mode, honoring a newer explicit owner choice. Do not turn every increment
 into a full audit or require all findings to be fixed before independent work.
 This diagnosis grants no readiness or additional effects.
 
+For a selected execution chain or resource bottleneck, use **Crystal Microscope**
+through `agentos workflow guidance --method crystal-microscope`, retaining the
+saved level/scope. Its packaged skill and `resources/docs/CRYSTAL_MICROSCOPE.md`
+define map refinement, evidence and measurement boundaries; use the marked
+PROCESS section with the shared laws if the CLI is unavailable. Update the
+affected map delta rather than restarting a whole audit. A source call relation,
+observed runtime call and measured resource cost are separate claims. Loading the
+method does not run a profiler, alter diagnostic lifecycle or authorize effects.
+
 For a concrete malfunction needing causal investigation, read **Causal debugging**
 from `agentos workflow guidance --method causal-debugging`, or
 read **Solution integrity** and the selected method in `resources/docs/PROCESS.md` if the CLI is unavailable

@@ -1,3 +1,30 @@
+# 0.8.0rc2069 — Crystal Microscope for traceable systems and research
+
+- Add a bounded read-only microscope method and installable extension skill.
+  Connect structure, observed execution and measured cost, with typed relations
+  beyond a call tree and scoped zoom through contracts, code, dependencies and
+  supported runtime/hardware evidence. Preserve the existing solution laws,
+  development levels, diagnostic return, modular stand and authority boundaries.
+- Provide an optional standard-library JSON validator and offline viewer with
+  an explicit measurement passport, UNKNOWN, evidence references and exact-byte
+  export. Structural validation does not verify claims or start instrumentation.
+  Existing richer project viewers require no forced migration.
+- Explain source/build identity, observation effects, data timing, causal limits,
+  human-readable event details and scoped A/B/C comparisons. These apply the
+  existing integrity requirements rather than claiming them as new laws.
+- Deliver two exact canonical method references through the existing resource
+  synchronizer, with preflight, current-byte conflict checks and individual atomic
+  replacements. Preserve unknown resources and the generic document scope.
+- Route project entry and Atlas to the method when relevant. Keep private project
+  transcripts, measurements and artifacts outside the public distribution.
+- Add exact repeated `integrate codex --skill NAME` selection for independent
+  extension delivery. Retain unselected files/receipt history without claiming
+  fresh verification; selected symlinks and ownership conflicts still fail.
+  Default full installation and agents-only behavior remain available.
+- Reconcile the English-language check with the already approved, separately
+  pinned work-law texts. Keep their bytes and protected checks unchanged, and
+  continue checking the rest of PROCESS for unintended language drift.
+
 # 0.8.0rc2068 — freeze short work laws and explain their practical application
 
 - Express the existing twelve solution-integrity laws and established workflow

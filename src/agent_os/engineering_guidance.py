@@ -17,8 +17,9 @@ DEFAULT_METHOD = "project-development"
 COMMON_METHOD = "solution-integrity"
 DIAGNOSTIC_METHOD = "project-diagnostics"
 HYGIENE_METHOD = "workspace-hygiene"
+MICROSCOPE_METHOD = "crystal-microscope"
 METHODS = (DEFAULT_METHOD, "causal-debugging", COMMON_METHOD, DIAGNOSTIC_METHOD,
-           HYGIENE_METHOD)
+           HYGIENE_METHOD, MICROSCOPE_METHOD)
 START = "<!-- agentos:project-development:start -->"
 END = "<!-- agentos:project-development:end -->"
 MAX_DOCUMENT_BYTES = 128 * 1024

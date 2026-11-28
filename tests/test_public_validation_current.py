@@ -38,6 +38,15 @@ def test_unknown_or_malformed_skill_is_rejected():
     assert validator.skill_name(Path("src/agent_os/resources/skills/agentos-project-entry/nested/SKILL.md"), text) is None
 
 
+def test_microscope_extension_has_one_exact_public_name_and_location():
+    text = "---\nname: crystal-microscope\ndescription: Inspect declared execution chains\n---\n"
+    location = Path("src/agent_os/resources/skills/crystal-microscope/SKILL.md")
+    assert validator.skill_name(location, text) == "crystal-microscope"
+    assert validator.skill_name(location, text.replace("name: crystal-microscope", "name: other")) is None
+    assert validator.skill_name(Path("modules/crystal-microscope/SKILL.md"), text) is None
+    assert validator.skill_name(location.parent / "nested/SKILL.md", text) is None
+
+
 def release_contracts(root, version):
     for directory in ("schemas", "src/agent_os/resources/contracts"):
         target = root / directory

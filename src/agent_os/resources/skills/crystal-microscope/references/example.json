@@ -1,0 +1,51 @@
+{
+  "schema": "crystal-microscope/v1",
+  "metadata": {
+    "revision": "synthetic-example-1",
+    "environment": "Illustrative data only; no system or profiler was run",
+    "question": "Where would an operation wait, and which observations are missing?",
+    "scope": "One synthetic operation and a dependency boundary",
+    "unknowns": ["Actual execution, latency and resource cost are not measured."],
+    "x_example": {"preserved_extension": true, "zero": 0}
+  },
+  "nodes": [
+    {
+      "id": "operation", "parent": null, "kind": "scenario", "title": "Synthetic operation",
+      "contract": {"input": "One synthetic request", "output": "Result or explicit failure"},
+      "source": null, "evidence": ["design"], "status": "declared"
+    },
+    {
+      "id": "worker", "parent": "operation", "kind": "function", "title": "Worker function",
+      "contract": {"input": "Synthetic request", "output": "Dependency result", "cancellation": "Unknown; not implemented in this example"},
+      "source": {"revision": "synthetic-example-1", "symbol": "ExampleWorker.handle", "note": "Illustrative symbol, not a claim about an existing library"},
+      "evidence": ["design"], "status": "hypothesis"
+    },
+    {
+      "id": "dependency", "parent": "operation", "kind": "library", "title": "Unmeasured dependency",
+      "contract": {"input": "Synthetic request", "output": "UNKNOWN", "unknown_reason": "No implementation or execution supplied"},
+      "source": null, "evidence": [], "status": "unknown", "unknown_reason": "No actual package or runtime selected"
+    }
+  ],
+  "edges": [
+    {"id": "call-dependency", "from": "worker", "to": "dependency", "kind": "call", "status": "hypothesis", "evidence": ["design"]},
+    {"id": "wait-for-result", "from": "worker", "to": "dependency", "kind": "wait", "status": "hypothesis", "evidence": ["design"]}
+  ],
+  "runs": [
+    {"id": "illustration", "scenario": "Documentation example, not an executed test", "environment": "Synthetic fixture", "revision": "synthetic-example-1"}
+  ],
+  "evidence": [
+    {"id": "design", "kind": "declared", "locator": "example.json", "summary": "The example declares a possible chain; it records no real behavior", "run": null, "limits": ["No source verification or execution"]},
+    {"id": "illustrated-zero", "kind": "hypothesis", "locator": "example.json#metrics", "summary": "The value 0 demonstrates lossless numeric export only", "run": "illustration", "limits": ["Not a measured retry count"]}
+  ],
+  "metrics": [
+    {
+      "id": "retry-illustration", "node": "worker", "name": "Illustrative retries", "value": 0, "unit": "count", "status": "hypothesis",
+      "run": "illustration", "scenario": "Documentation example, not an executed test", "method": "Manually specified illustrative value",
+      "evidence": ["illustrated-zero"], "sample": {"na_reason": "No sampling or execution; demonstrates zero preservation"},
+      "clock": "N/A: no execution or elapsed-time measurement", "time_basis": "not_applicable", "overlap": "N/A: no intervals",
+      "overhead": "N/A: no collector was run", "limits": ["This value must not be reported as observed behavior"]
+    },
+    {"id": "dependency-latency", "node": "dependency", "name": "Dependency latency", "value": null, "unit": "ms", "status": "unknown", "unknown_reason": "No actual run or timing evidence"}
+  ],
+  "x_preserved_example": {"custom": [0, false, null, {"notes": "Unknown extension fields remain in the export"}]}
+}

@@ -7,12 +7,27 @@ import re
 from pathlib import Path
 
 from agent_os.doc_catalog import DOCS
+from agent_os.engineering_guidance import _section
+from test_frozen_work_laws import validator
 
 ROOT = Path(__file__).resolve().parents[1]
 CYRILLIC = re.compile(r"[\u0400-\u04ff]")
+FROZEN_LAW_DOCUMENTS = {"docs/PROCESS.md", "src/agent_os/resources/docs/PROCESS.md"}
+
+
+def language_remainder(relative: str, text: str) -> str:
+    # Only the reviewed frozen law section has a different language contract;
+    # later prose elsewhere in PROCESS must still pass the English check.
+    if relative in FROZEN_LAW_DOCUMENTS:
+        _body, (first, last) = _section(text, "solution-integrity")
+        return text[:first] + text[last:]
+    return text
 
 
 def test_public_source_has_no_cyrillic_copy() -> None:
+    # rc2068 approved and pinned Russian laws/orientation. Their existing exact
+    # guard must pass before this language-specific exception can apply.
+    assert validator.frozen_work_laws_errors(ROOT) == []
     excluded = {".git", ".venv", ".agentos", "__pycache__", ".pytest_cache", "dist", "build"}
     suffixes = {".md", ".py", ".json", ".toml", ".txt", ".yml", ".yaml", ".sh"}
     paths = [
@@ -23,7 +38,8 @@ def test_public_source_has_no_cyrillic_copy() -> None:
         and not any(part.endswith(".egg-info") for part in path.relative_to(ROOT).parts)
         and path.suffix in suffixes
     ]
-    offenders = [str(path.relative_to(ROOT)) for path in paths if CYRILLIC.search(path.read_text())]
+    offenders = [str(path.relative_to(ROOT)) for path in paths
+                 if CYRILLIC.search(language_remainder(str(path.relative_to(ROOT)), path.read_text()))]
     # Extensions have their own language contract. This explicit allowlist
     # ensures that source belonging to the English-language foundation stays
     # English; no foreign-language extension content is silently stripped.
@@ -40,9 +56,23 @@ def test_public_source_has_no_cyrillic_copy() -> None:
         "modules/atlas/skills/atlas/references/quickstart.md",
         "modules/atlas/skills/atlas/references/workspace.md",
         "modules/atlas/skills/atlas/scripts/navigator.py",
+        # The complete frozen introduction is protected by the guard above.
+        "docs/WORK_ENVIRONMENT.md",
+        "src/agent_os/resources/docs/WORK_ENVIRONMENT.md",
+        # The unicode-offset fixture is intentional non-ASCII source input for
+        # byte/character-position regression; it is not localized public prose.
+        "tests/test_source_runtime_http.py",
     }
     assert set(offenders) <= imported_multilingual, offenders
     assert {name for name in imported_multilingual if (ROOT / name).exists()} <= set(offenders), 'changed public language surface requires review'
+
+
+def test_frozen_language_exception_does_not_hide_other_process_text():
+    for relative in FROZEN_LAW_DOCUMENTS:
+        text = (ROOT / relative).read_text()
+        assert CYRILLIC.search(language_remainder(relative, text)) is None
+        assert CYRILLIC.search(language_remainder(relative, text + chr(0x0416)))
+    assert language_remainder("tests/unrelated.py", chr(0x0416)) == chr(0x0416)
 
 
 def test_document_source_package_and_catalog_agree() -> None:

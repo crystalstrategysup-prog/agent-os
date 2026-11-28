@@ -20,6 +20,7 @@ from agent_os.handoff_store import HandoffError, scan_secrets
 
 EXTENSION_SKILLS = {
     "src/agent_os/resources/skills/atlas/SKILL.md": "atlas",
+    "src/agent_os/resources/skills/crystal-microscope/SKILL.md": "crystal-microscope",
     "src/agent_os/resources/skills/function-extractor/SKILL.md": "function-extractor",
     "modules/atlas/skills/atlas/SKILL.md": "atlas",
 }
