@@ -20,6 +20,9 @@
 - Correct the selected Atlas inventory for the microscope routing introduced in
   rc2069, retaining original source provenance. Run the existing read-only Atlas
   source/mirror check on the clean release export before building the wheel.
+- Fix public archive timestamps to UTC and the child wheel builder's umask to
+  022. Reproduce identical artifacts across different producer timezones and
+  default permissions without changing the parent environment or older pins.
 
 # 0.8.0rc2069 — Crystal Microscope for traceable systems and research
 
